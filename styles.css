@@ -80,12 +80,30 @@ h1 em { color: var(--sage-dark); font-style: italic; font-weight: 500; }
 .reassurance p + p { border-left: 1px solid rgba(255,255,255,.24); }
 
 .app-showcase { background: var(--paper); }
-.screenshot-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; margin-top: 58px; }
+.app-showcase .section-heading { max-width: 850px; }
+.app-showcase .section-heading h2 { font-size: clamp(2.8rem, 4.7vw, 4.8rem); }
+.screenshot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 64px 54px;
+  width: min(100%, 960px);
+  margin: 64px auto 72px;
+}
 .screenshot-card { min-width: 0; margin: 0; }
-.screenshot-card img { width: 100%; aspect-ratio: 828 / 1800; object-fit: cover; border: 1px solid var(--line); border-radius: 30px; box-shadow: 0 18px 42px rgba(31, 57, 43, .13); }
+.screenshot-card:nth-child(even) { margin-top: 72px; }
+.screenshot-card img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center top;
+  border: 1px solid var(--line);
+  border-radius: 34px;
+  box-shadow: 0 22px 52px rgba(31, 57, 43, .14);
+}
 .screenshot-card figcaption { display: grid; gap: 4px; padding-top: 18px; }
-.screenshot-card strong { font-family: var(--serif); font-size: 1.3rem; }
-.screenshot-card span { color: var(--muted); font-size: .9rem; line-height: 1.5; }
+.screenshot-card strong { font-family: var(--serif); font-size: 1.45rem; }
+.screenshot-card span { max-width: 390px; color: var(--muted); font-size: .95rem; line-height: 1.5; }
 
 .section-heading { max-width: 760px; }
 h2 { margin: 18px 0 22px; font-size: clamp(2.8rem, 5vw, 5rem); }
@@ -201,7 +219,8 @@ details p { margin: -8px 0 25px; padding-right: 40px; color: var(--muted); }
   .step-card, .step-card.featured { min-height: 0; transform: none; }
   .step-card h3 { margin-top: 28px; }
   .benefit-grid, .faq-grid { gap: 55px; }
-  .screenshot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .screenshot-grid { gap: 48px 28px; }
+  .screenshot-card:nth-child(even) { margin-top: 40px; }
   .safety-grid { grid-template-columns: 1fr; }
   .lifestyle-card { max-width: 600px; }
   .footer-grid { grid-template-columns: 1fr; justify-items: center; }
@@ -230,9 +249,12 @@ details p { margin: -8px 0 25px; padding-right: 40px; color: var(--muted); }
   .reassurance-grid { grid-template-columns: 1fr; }
   .reassurance p { padding: 9px; }
   .reassurance p + p { border-left: 0; border-top: 1px solid rgba(255,255,255,.18); }
-  .cta-panel { display: grid; padding: 38px 25px; }
+  .cta-panel { display: grid; grid-template-columns: minmax(0, 1fr); padding: 38px 25px; }
+  .cta-panel > * { min-width: 0; }
+  .cta-panel h2 { overflow-wrap: anywhere; }
   .button-light { width: 100%; }
-  .screenshot-grid { grid-template-columns: 1fr; max-width: 330px; margin-inline: auto; }
+  .screenshot-grid { grid-template-columns: 1fr; width: min(100%, 360px); gap: 44px; margin: 44px auto 0; }
+  .screenshot-card:nth-child(even) { margin-top: 0; }
   .legal-header .nav-wrap { flex-wrap: wrap; padding-block: 16px; }
   .legal-header .brand { white-space: nowrap; }
   .legal-header .legal-nav { width: 100%; padding-top: 12px; border-top: 1px solid var(--line); }
