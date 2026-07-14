@@ -197,6 +197,56 @@ details p { margin: -8px 0 25px; padding-right: 40px; color: var(--muted); }
 .support-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
 .support-actions .button { color: white; text-decoration: none; }
 
+.consent-banner {
+  position: fixed;
+  z-index: 100;
+  right: 22px;
+  bottom: 22px;
+  left: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  width: min(940px, calc(100% - 44px));
+  margin-inline: auto;
+  padding: 24px;
+  color: white;
+  background: var(--ink-dark);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 8px;
+  box-shadow: 0 24px 64px rgba(11, 46, 34, .28);
+}
+.consent-banner[hidden] { display: none; }
+.consent-copy { max-width: 610px; }
+.consent-copy strong { font-family: var(--serif); font-size: 1.35rem; }
+.consent-copy p { margin: 5px 0 0; color: #d7e1d9; font-size: .9rem; line-height: 1.5; }
+.consent-copy a { color: white; text-underline-offset: 3px; }
+.consent-actions { display: flex; flex: 0 0 auto; gap: 10px; }
+.consent-button, .consent-settings {
+  min-height: 44px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 750;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.consent-button { border: 1px solid white; }
+.consent-decline { color: white; background: transparent; }
+.consent-accept { color: var(--ink-dark); background: white; }
+.consent-settings {
+  position: fixed;
+  z-index: 19;
+  bottom: 12px;
+  left: 12px;
+  min-height: 38px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(31, 57, 43, .12);
+}
+.consent-settings[hidden] { display: none; }
+
 @media (prefers-reduced-motion: no-preference) {
   .reveal { animation: fade-up .65s both; }
   .reveal:nth-child(2) { animation-delay: .08s; }
@@ -259,6 +309,10 @@ details p { margin: -8px 0 25px; padding-right: 40px; color: var(--muted); }
   .legal-header .brand { white-space: nowrap; }
   .legal-header .legal-nav { width: 100%; padding-top: 12px; border-top: 1px solid var(--line); }
   .legal-header .language-switch { margin-left: 0; }
+  .consent-banner { align-items: stretch; flex-direction: column; gap: 18px; padding: 20px; }
+  .consent-actions { display: grid; grid-template-columns: 1fr; }
+  .consent-button { width: 100%; }
+  .consent-settings { max-width: calc(100% - 24px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
