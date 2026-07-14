@@ -5,88 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Datenschutzerklärung für die iOS-App und Website Demenz Coach.">
   <meta name="theme-color" content="#f7f3ea">
-  <title>Datenschutz – Demenz Coach</title>
+  <title>Datenschutzerklärung – Demenz Coach</title>
+  <link rel="alternate" hreflang="de" href="datenschutz.html">
+  <link rel="alternate" hreflang="en" href="privacy-en.html">
+  <link rel="alternate" hreflang="x-default" href="datenschutz.html">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="legal-page">
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
-  <header class="site-header legal-header">
-    <div class="container nav-wrap">
-      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span><span>Demenz Coach</span></a>
-      <nav class="legal-nav" aria-label="Rechtliches"><a href="support.html">Support</a><a href="nutzungsbedingungen.html">Nutzungsbedingungen</a><a href="impressum.html">Impressum</a></nav>
-    </div>
-  </header>
-  <main id="main" class="legal-main">
-    <div class="container">
-      <div class="legal-hero">
-        <span class="eyebrow">Verständlich und transparent</span>
-        <h1>Datenschutzerklärung</h1>
-        <p>Diese Erklärung beschreibt, wie Demenz Coach Daten in der iOS-App und auf dieser Website verarbeitet. Die App ist bewusst datensparsam aufgebaut und benötigt kein Benutzerkonto.</p>
-        <span class="legal-updated">Stand: 14. Juli 2026</span>
-      </div>
-      <article class="legal-content">
-        <section>
-          <h2>1. Verantwortlicher</h2>
-          <address>VIRAL GROWTH Ventures GmbH<br>Simplon Straße 14<br>D-10245 Berlin<br>Deutschland<br>Vertreten durch den Geschäftsführer Daniel Minini<br>E-Mail: <a href="mailto:dementica@minini.de">dementica@minini.de</a></address>
-        </section>
-        <section>
-          <h2>2. Welche Daten lokal bleiben</h2>
-          <p>Onboarding-Antworten, Darstellungsoptionen, Lernfortschritt, Check-ins, zuletzt verwendete Situationen und gespeicherte Sätze werden ausschließlich auf dem Gerät gespeichert. Dafür verwendet die App Apple-Technologien wie UserDefaults und SwiftData. Diese lokalen Daten werden nicht automatisch an uns übertragen.</p>
-          <p>Unter „Einstellungen → Datenschutz &amp; Daten“ können alle lokalen Daten gelöscht werden. Das Entfernen der App löscht ebenfalls die zugehörigen lokalen App-Daten.</p>
-        </section>
-        <section>
-          <h2>3. Persönliche Soforthilfe und Spracheingabe</h2>
-          <p>Nur wenn eine Soforthilfe ausdrücklich angefordert wird, übermittelt die App die eingegebene Situationsbeschreibung verschlüsselt an unseren Backend-Dienst. Bei Spracheingabe wird die Aufnahme nach dem Stoppen verschlüsselt zur Transkription übertragen. Die App speichert die Audiodatei nach der Verarbeitung nicht dauerhaft.</p>
-          <p>Die Verarbeitung erfolgt über Cloud Functions for Firebase in der Region <code>europe-west1</code> und die OpenAI API. An OpenAI werden die Situationsbeschreibung beziehungsweise die Audioaufnahme sowie technisch erforderliche Anfragedaten übermittelt. Für Textantworten setzen wir <code>store: false</code>. OpenAI verwendet API-Inhalte standardmäßig nicht zum Training seiner Modelle; Sicherheitsprotokolle können nach den aktuellen OpenAI-Regeln grundsätzlich bis zu 30 Tage aufbewahrt werden.</p>
-          <p class="legal-note"><strong>Bitte keine identifizierenden Angaben eingeben.</strong> Verwende keine Namen, Adressen, Telefonnummern, Geburtsdaten, Versicherungsnummern oder andere Angaben, durch die eine betreute Person erkennbar wird.</p>
-          <p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, soweit die Verarbeitung zur angeforderten App-Funktion erforderlich ist. Soweit eine Beschreibung trotz unserer Vorgaben besondere Kategorien personenbezogener Daten enthält, darf sie nur übermittelt werden, wenn dafür eine ausreichende Berechtigung besteht; andernfalls ist die Situation vor dem Absenden zu anonymisieren.</p>
-        </section>
-        <section>
-          <h2>4. Sicherheit, Konfiguration und Missbrauchsschutz</h2>
-          <p>Firebase Remote Config stellt technische Konfigurationswerte und Sicherheitsregeln bereit. Firebase App Check beziehungsweise Apple App Attest helfen zu prüfen, ob Anfragen von einer echten App-Installation stammen. Unser Server verarbeitet außerdem Netzwerkdaten kurzfristig für Rate-Limits und bildet daraus eine pseudonyme Sicherheitskennung. Diese Verarbeitung dient der sicheren und stabilen Bereitstellung nach Art. 6 Abs. 1 lit. f DSGVO.</p>
-          <p>Backend-Antworten werden mit <code>Cache-Control: no-store</code> ausgeliefert. Wir führen keine Inhaltsdatenbank mit Situationsbeschreibungen oder Audioaufnahmen.</p>
-        </section>
-        <section>
-          <h2>5. Freiwillige Nutzungsanalyse</h2>
-          <p>Google Analytics for Firebase ist standardmäßig deaktiviert. Erst nach einer freiwilligen Aktivierung in den Einstellungen werden technische Nutzungsereignisse verarbeitet, etwa ob Onboarding, Hilfsanfrage oder Kaufablauf funktioniert haben. Situationsbeschreibungen, Audioaufnahmen, gespeicherte Sätze und Check-in-Inhalte werden nicht als Analyseparameter versendet.</p>
-          <p>Die Einwilligung ist freiwillig und kann jederzeit mit Wirkung für die Zukunft in den Einstellungen widerrufen werden. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO sowie, soweit erforderlich, § 25 Abs. 1 TDDDG.</p>
-        </section>
-        <section>
-          <h2>6. Abonnements und Adapty</h2>
-          <p>Käufe und Abonnements werden durch Apple abgewickelt. Wir erhalten keine vollständigen Zahlungsdaten. Wenn die Premium-Verwaltung aktiviert ist, nutzt die App Adapty zur Darstellung von Angeboten und zur Prüfung des anonymen Abonnementstatus. Dabei können eine zufällige App-Profilkennung, Geräte- und App-Informationen, IP-Adresse, Angebotsinteraktionen sowie Kauf- und Abonnementstatus verarbeitet werden. Die Erfassung der Apple-Werbe-ID ist in unserer Konfiguration deaktiviert.</p>
-          <p>Rechtsgrundlagen sind Art. 6 Abs. 1 lit. b DSGVO für Vertragsdurchführung und Art. 6 Abs. 1 lit. f DSGVO für die zuverlässige Bereitstellung und Missbrauchsprävention.</p>
-        </section>
-        <section>
-          <h2>7. Empfänger und Drittlandübermittlungen</h2>
-          <ul>
-            <li><strong>Google/Firebase:</strong> Hosting, Remote Config, App Check und – nur nach Einwilligung – Nutzungsanalyse.</li>
-            <li><strong>OpenAI Ireland Ltd.:</strong> Erstellung strukturierter Hilfetexte und Transkription.</li>
-            <li><strong>Apple:</strong> App-Vertrieb, Käufe, Abonnements und technische Plattformdienste.</li>
-            <li><strong>Adapty Tech Inc.:</strong> optionale Abonnement- und Paywallverwaltung.</li>
-          </ul>
-          <p>Bei Verarbeitungen außerhalb des Europäischen Wirtschaftsraums stützen sich die Anbieter je nach Fall auf Angemessenheitsbeschlüsse, das EU-US Data Privacy Framework und/oder EU-Standardvertragsklauseln. Trotz dieser Garantien können bei Drittlandverarbeitungen zusätzliche Risiken bestehen.</p>
-        </section>
-        <section>
-          <h2>8. Speicherdauer</h2>
-          <p>Lokale Daten bleiben bis zur Löschung in der App oder bis zum Entfernen der App gespeichert. Der Backend-Dienst speichert eingegebene Inhalte und Audio nicht in einer eigenen dauerhaften Datenbank. Kurzfristige Sicherheits-, Infrastruktur- und Fehlerprotokolle werden nur so lange aufbewahrt, wie sie für Betrieb, Sicherheit und gesetzliche Pflichten erforderlich sind. Für Daten bei Apple, Google, OpenAI und Adapty gelten zusätzlich deren vertragliche Lösch- und Aufbewahrungsregeln.</p>
-        </section>
-        <section>
-          <h2>9. Website und GitHub Pages</h2>
-          <p>Diese Website wird über GitHub Pages bereitgestellt. Beim Abruf verarbeitet GitHub technisch erforderliche Daten wie IP-Adresse, Zeitpunkt, angeforderte Datei, Referrer sowie Browser- und Geräteinformationen, um die Seite sicher auszuliefern. Wir setzen auf dieser Website keine eigenen Cookies, Analyse- oder Werbedienste ein. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.</p>
-        </section>
-        <section>
-          <h2>10. Rechte und Beschwerden</h2>
-          <p>Betroffene Personen haben im gesetzlichen Umfang Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch sowie das Recht, eine Einwilligung jederzeit zu widerrufen. Anfragen können an <a href="mailto:dementica@minini.de">dementica@minini.de</a> gesendet werden.</p>
-          <p>Außerdem besteht ein Beschwerderecht bei einer zuständigen Datenschutzaufsichtsbehörde. Zuständig ist insbesondere die Aufsichtsbehörde am Wohn- oder Arbeitsort oder am Ort des vermuteten Verstoßes.</p>
-        </section>
-        <section>
-          <h2>11. Änderungen</h2>
-          <p>Wir aktualisieren diese Erklärung, wenn sich Funktionen, Anbieter oder Rechtslage ändern. Es gilt die hier veröffentlichte Fassung mit dem oben angegebenen Stand.</p>
-          <p><a href="datenschutzoptionen.html">Datenschutzoptionen und Löschung ansehen</a></p>
-        </section>
-      </article>
-    </div>
-  </main>
-  <footer class="site-footer"><div class="container footer-grid"><a class="brand" href="index.html">Demenz Coach</a><p>Kein Ersatz für medizinische Beratung oder Notfallhilfe.</p><nav aria-label="Rechtliches"><a href="support.html">Support</a><a href="impressum.html">Impressum</a></nav></div></footer>
+  <header class="site-header legal-header"><div class="container nav-wrap">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span><span>Demenz Coach</span></a>
+    <nav class="legal-nav" aria-label="Rechtliches"><a href="support.html">Support</a><a href="nutzungsbedingungen.html">Bedingungen</a><a href="impressum.html">Impressum</a></nav>
+    <nav class="language-switch" aria-label="Sprache"><a href="datenschutz.html" lang="de" aria-current="page">DE</a><span aria-hidden="true">|</span><a href="privacy-en.html" lang="en">EN</a></nav>
+  </div></header>
+  <main id="main" class="legal-main"><div class="container">
+    <div class="legal-hero"><span class="eyebrow">Verständlich und transparent</span><h1>Datenschutzerklärung</h1><p>Diese Erklärung informiert nach Art. 13 und 14 DSGVO über die Verarbeitung personenbezogener Daten in der iOS-App Demenz Coach und auf dieser Website. Die App benötigt kein Benutzerkonto.</p><span class="legal-updated">Stand: 14. Juli 2026</span></div>
+    <article class="legal-content">
+      <section><h2>1. Verantwortlicher</h2><address>VIRAL GROWTH Ventures GmbH<br>Simplon Straße 14<br>D-10245 Berlin<br>Deutschland<br>Vertreten durch den Geschäftsführer Daniel Minini<br>E-Mail: <a href="mailto:dementica@minini.de">dementica@minini.de</a></address></section>
+
+      <section><h2>2. Datenverarbeitung auf dem Gerät</h2><p>Onboarding-Antworten, Darstellungsoptionen, Lernfortschritt, Check-ins, zuletzt verwendete Situationen und gespeicherte Sätze werden mit Apple-Technologien wie UserDefaults und SwiftData lokal auf dem Gerät gespeichert. Diese Inhalte werden nicht automatisch an uns übertragen.</p><p>Die lokale Speicherung ist erforderlich, um die ausdrücklich gewünschten App-Funktionen bereitzustellen. Soweit § 25 TDDDG anwendbar ist, stützen wir dies auf § 25 Abs. 2 Nr. 2 TDDDG; bei personenbezogenen Daten auf Art. 6 Abs. 1 lit. b DSGVO. Lokale Daten bleiben bis zur Löschung in der App oder bis zur Deinstallation gespeichert.</p></section>
+
+      <section><h2>3. Persönliche KI-Hilfe und Spracheingabe</h2><p>Eine persönliche Anfrage wird erst nach ausdrücklicher Einwilligung übertragen. Bei Textanfragen verarbeitet unser Backend die Situationsbeschreibung und technisch erforderliche Anfragedaten. Bei einer Spracheingabe wird zusätzlich die aktiv aufgenommene Audiodatei zur Transkription übermittelt. Die daraus erzeugte Antwort kann anschließend für eine mehrsprachige Darstellung verarbeitet werden.</p><p>Die Verarbeitung erfolgt über Google Cloud Functions for Firebase in der Region <code>europe-west1</code> und über die OpenAI API. Für Textantworten verwenden wir <code>store: false</code>. OpenAI nutzt API-Ein- und Ausgaben standardmäßig nicht zum Training. Je nach API-Endpunkt können Sicherheitsprotokolle nach den jeweils geltenden OpenAI-Regeln bis zu 30 Tage aufbewahrt werden. Unser Backend führt keine dauerhafte Inhaltsdatenbank mit Situationsbeschreibungen oder Audiodateien.</p><p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO. Die Einwilligung kann unter „Einstellungen → Datenschutz &amp; Daten“ jederzeit mit Wirkung für die Zukunft widerrufen werden. Ohne Einwilligung bleiben die lokal bereitgestellten Standardinhalte nutzbar.</p><p class="legal-note"><strong>Nur anonymisierte Situationen eingeben.</strong> Namen, Adressen, Kontaktdaten, Geburtsdaten, Versicherungsnummern, detaillierte Patientenunterlagen und andere identifizierende Angaben über betreute Personen dürfen nicht eingegeben oder eingesprochen werden.</p><p>Die App ist nicht für die Verarbeitung identifizierbarer Gesundheitsdaten Dritter bestimmt. Wer entgegen dieser Vorgabe Daten einer anderen Person übermittelt, muss selbst sicherstellen, dass dafür eine wirksame Befugnis und eine Rechtsgrundlage nach Art. 6 und, bei Gesundheitsdaten, Art. 9 DSGVO bestehen. Im Zweifel darf die Übermittlung nicht erfolgen.</p></section>
+
+      <section><h2>4. Sicherheit, Konfiguration und Missbrauchsschutz</h2><p>Firebase Remote Config stellt technische Konfigurationen bereit. Firebase App Check und Apple App Attest helfen zu prüfen, ob Anfragen aus einer echten App-Installation stammen. Netzwerkdaten, insbesondere die IP-Adresse, werden kurzfristig für Betrieb, Fehlerdiagnose, Sicherheitsprüfungen und Rate-Limits verarbeitet; daraus wird eine pseudonyme Sicherheitskennung gebildet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt im sicheren, stabilen und missbrauchsfreien Betrieb.</p><p>Backend-Antworten werden mit <code>Cache-Control: no-store</code> ausgeliefert. Sicherheits- und Infrastrukturprotokolle werden nur so lange gespeichert, wie dies für den jeweiligen Zweck oder gesetzliche Pflichten erforderlich ist.</p></section>
+
+      <section><h2>5. Freiwillige Nutzungsanalyse</h2><p>Google Analytics for Firebase ist standardmäßig ausgeschaltet. Erst nach freiwilliger Aktivierung in den Einstellungen werden technische Nutzungsereignisse verarbeitet, etwa ob Onboarding, Hilfsanfrage oder Kaufablauf funktioniert haben. Dabei können eine App-Instanzkennung sowie Geräte-, App- und Interaktionsdaten anfallen. Situationsbeschreibungen, Audiodateien, gespeicherte Sätze und Check-in-Inhalte werden nicht als Analyseparameter gesendet.</p><p>Rechtsgrundlagen sind Art. 6 Abs. 1 lit. a DSGVO und, soweit erforderlich, § 25 Abs. 1 TDDDG. Die Einwilligung kann jederzeit in den Einstellungen mit Wirkung für die Zukunft widerrufen werden.</p></section>
+
+      <section><h2>6. Käufe, Abonnements und Adapty</h2><p>Käufe und Abonnements werden über Apple abgewickelt. Wir erhalten keine vollständigen Zahlungsdaten. Soweit die Premium-Verwaltung aktiviert ist, verwendet die App Adapty zur Darstellung von Angeboten und zur Prüfung des Abonnementstatus. Dabei können eine zufällige App-Profilkennung, IP-Adresse, Geräte- und App-Informationen, Angebotsinteraktionen sowie Kauf- und Abonnementstatus verarbeitet werden. Die Apple-Werbe-ID ist in unserer Konfiguration deaktiviert.</p><p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO für die Vertragsdurchführung und Art. 6 Abs. 1 lit. f DSGVO für zuverlässige Bereitstellung und Missbrauchsprävention. Kaufdaten werden nach den gesetzlichen Aufbewahrungspflichten beziehungsweise den Regeln von Apple und Adapty gespeichert.</p></section>
+
+      <section><h2>7. Website, Support und GitHub Pages</h2><p>Diese Website wird über GitHub Pages bereitgestellt. Beim Abruf verarbeitet GitHub technisch erforderliche Daten wie IP-Adresse, Zeitpunkt, angeforderte Datei, Referrer sowie Browser- und Geräteinformationen. Wir verwenden auf dieser Website keine eigenen Cookies, Analyse- oder Werbedienste. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; unser berechtigtes Interesse liegt in der sicheren Bereitstellung der Informationsseiten.</p><p>Bei einer Supportanfrage per E-Mail verarbeiten wir Absenderadresse, Inhalt und Metadaten zur Bearbeitung der Anfrage. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei vertragsbezogenen Anliegen, sonst Art. 6 Abs. 1 lit. f DSGVO. Supportnachrichten werden gelöscht, sobald sie nicht mehr benötigt werden und keine gesetzlichen Aufbewahrungspflichten entgegenstehen. Bitte keine Gesundheitsdaten mitsenden.</p></section>
+
+      <section><h2>8. Empfänger und Drittlandübermittlungen</h2><ul><li><strong>Google Ireland Limited / Google LLC:</strong> Firebase- und Cloud-Infrastruktur, App Check, Remote Config und freiwillige Analyse.</li><li><strong>OpenAI Ireland Limited und verbundene Auftragsverarbeiter:</strong> KI-Antworten, Übersetzungen und Transkription.</li><li><strong>Apple Distribution International Ltd. und verbundene Unternehmen:</strong> App-Vertrieb, Plattformdienste, Käufe und Abonnements.</li><li><strong>Adapty Tech Inc.:</strong> optionale Angebots- und Abonnementverwaltung.</li><li><strong>GitHub B.V. / GitHub, Inc.:</strong> Hosting dieser Website.</li></ul><p>Soweit Daten außerhalb des Europäischen Wirtschaftsraums verarbeitet werden, erfolgen Übermittlungen abhängig vom Anbieter auf Grundlage eines Angemessenheitsbeschlusses, insbesondere des EU-US Data Privacy Framework, und/oder der EU-Standardvertragsklauseln sowie ergänzender Schutzmaßnahmen. Weitere Informationen finden sich in den Datenschutzhinweisen der jeweiligen Anbieter.</p></section>
+
+      <section><h2>9. Bereitstellungspflicht und automatisierte Entscheidungen</h2><p>Es besteht keine gesetzliche Pflicht, persönliche Text- oder Spracheingaben oder Analysedaten bereitzustellen. Ohne diese Daten können die persönliche KI-Hilfe, Spracheingabe beziehungsweise freiwillige Analyse nicht genutzt werden. Es findet keine ausschließlich automatisierte Entscheidung mit rechtlicher oder ähnlich erheblicher Wirkung und kein Werbeprofiling statt. Antworten werden jedoch automatisiert durch ein KI-System erzeugt und in der App als KI-Vorschlag gekennzeichnet.</p></section>
+
+      <section><h2>10. Rechte betroffener Personen</h2><p>Im gesetzlichen Umfang bestehen Rechte auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21). Eine Einwilligung kann nach Art. 7 Abs. 3 DSGVO jederzeit für die Zukunft widerrufen werden. Die Rechtmäßigkeit der Verarbeitung bis zum Widerruf bleibt unberührt.</p><p>Lokale Daten können nur auf dem jeweiligen Gerät unter „Einstellungen → Datenschutz &amp; Daten“ gelöscht werden, weil wir darauf keinen Zugriff haben. Andere Anfragen bitte an <a href="mailto:dementica@minini.de?subject=Datenschutzanfrage%20Demenz%20Coach">dementica@minini.de</a> senden. Zur Identitätsprüfung können erforderliche zusätzliche Angaben angefragt werden.</p></section>
+
+      <section><h2>11. Beschwerderecht</h2><p>Betroffene Personen können sich bei einer Datenschutzaufsichtsbehörde beschweren. Für unser Unternehmen ist insbesondere zuständig:</p><address>Berliner Beauftragte für Datenschutz und Informationsfreiheit<br>Alt-Moabit 59–61<br>10555 Berlin<br>E-Mail: <a href="mailto:mailbox@datenschutz-berlin.de">mailbox@datenschutz-berlin.de</a><br><a href="https://www.datenschutz-berlin.de/">www.datenschutz-berlin.de</a></address></section>
+
+      <section><h2>12. Anbieterhinweise</h2><ul class="legal-source-links"><li><a href="https://firebase.google.com/support/privacy">Datenschutz bei Firebase</a></li><li><a href="https://openai.com/policies/privacy-policy/">Datenschutz bei OpenAI</a></li><li><a href="https://www.apple.com/legal/privacy/">Datenschutz bei Apple</a></li><li><a href="https://adapty.io/privacy/">Datenschutz bei Adapty</a></li><li><a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">Datenschutz bei GitHub</a></li></ul></section>
+
+      <section><h2>13. Änderungen und Sprachfassungen</h2><p>Wir aktualisieren diese Erklärung, wenn sich Funktionen, Anbieter oder die Rechtslage ändern. Es gilt die veröffentlichte Fassung mit dem oben angegebenen Stand. Die deutsche und englische Fassung sollen denselben Inhalt wiedergeben. Bei Abweichungen ist, soweit rechtlich zulässig, die deutsche Fassung maßgeblich; zwingende Rechte aufgrund einer anderen Vertragssprache bleiben unberührt.</p><p><a href="datenschutzoptionen.html">Datenschutzoptionen und Löschung ansehen</a></p></section>
+    </article>
+  </div></main>
+  <footer class="site-footer"><div class="container footer-grid"><a class="brand" href="index.html">Demenz Coach</a><p>Kein Ersatz für medizinische Beratung oder Notfallhilfe.</p><nav aria-label="Rechtliches"><a href="support.html">Support</a><a href="nutzungsbedingungen.html">Bedingungen</a><a href="impressum.html">Impressum</a></nav></div></footer>
 </body>
 </html>
