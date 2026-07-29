@@ -28,6 +28,8 @@ jobs:
             echo "A required legal address is still missing."
             exit 1
           fi
+      - name: Validate SEO, links and structured data
+        run: node scripts/validate-seo.mjs .
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

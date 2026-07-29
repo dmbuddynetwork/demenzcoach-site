@@ -2,6 +2,11 @@ const menuButton = document.querySelector('.menu-button');
 const navigation = document.querySelector('.site-nav');
 const usesEnglish = document.documentElement.lang.startsWith('en');
 const localizedSiteCopy = window.demenzCoachSiteLocale ?? {};
+const pageContext = {
+  page_type: document.body.dataset.pageType ?? 'product',
+  page_language: document.body.dataset.pageLanguage ?? document.documentElement.lang,
+  page_slug: document.body.dataset.pageSlug ?? 'home'
+};
 const menuOpenCopy = localizedSiteCopy.menuOpen ?? (usesEnglish ? 'Open menu' : 'Menü öffnen');
 const menuCloseCopy = localizedSiteCopy.menuClose ?? (usesEnglish ? 'Close menu' : 'Menü schließen');
 
@@ -17,6 +22,15 @@ navigation?.addEventListener('click', (event) => {
   menuButton?.setAttribute('aria-expanded', 'false');
   const label = menuButton?.querySelector('.sr-only');
   if (label) label.textContent = menuOpenCopy;
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !navigation?.classList.contains('open')) return;
+  navigation.classList.remove('open');
+  menuButton?.setAttribute('aria-expanded', 'false');
+  const label = menuButton?.querySelector('.sr-only');
+  if (label) label.textContent = menuOpenCopy;
+  menuButton?.focus();
 });
 
 const websiteAnalytics = (() => {
@@ -65,7 +79,8 @@ const websiteAnalytics = (() => {
     gtag('js', new Date());
     gtag('config', measurementID, {
       allow_google_signals: false,
-      allow_ad_personalization_signals: false
+      allow_ad_personalization_signals: false,
+      content_group: pageContext.page_type
     });
 
     const script = document.createElement('script');
@@ -104,7 +119,7 @@ const websiteAnalytics = (() => {
   const track = (name, parameters = {}) => {
     if (readConsent() !== 'granted') return;
     loadTag();
-    gtag('event', name, parameters);
+    gtag('event', name, { ...pageContext, ...parameters });
   };
 
   return { deny, grant, loadTag, readConsent, track };
@@ -113,7 +128,7 @@ const websiteAnalytics = (() => {
 const fallbackAnalyticsCopy = usesEnglish
   ? {
       title: 'Your privacy choice',
-      text: 'With your permission, Google Analytics helps us understand which pages and app information are useful. No advertising, health information or form content is collected.',
+      text: 'With your permission, Google Analytics records visited pages and technical usage. It does not receive situations you enter, form content or other personal care details.',
       decline: 'Necessary only',
       accept: 'Allow analytics',
       privacy: 'Privacy policy',
@@ -121,7 +136,7 @@ const fallbackAnalyticsCopy = usesEnglish
     }
   : {
       title: 'Deine Datenschutzwahl',
-      text: 'Mit deiner Einwilligung hilft uns Google Analytics zu verstehen, welche Seiten und App-Informationen hilfreich sind. Wir erfassen keine Werbung, Gesundheitsdaten oder Formulareingaben.',
+      text: 'Mit deiner Einwilligung erfasst Google Analytics aufgerufene Seiten und technische Nutzung. Eingegebene Situationen, Formularinhalte oder persönliche Pflegedetails werden nicht übertragen.',
       decline: 'Nur notwendige',
       accept: 'Analyse erlauben',
       privacy: 'Datenschutzerklärung',
@@ -137,8 +152,7 @@ const privacyURL = localizedSiteCopy.privacyURL
 const consentBanner = document.createElement('section');
 consentBanner.className = 'consent-banner';
 consentBanner.hidden = true;
-consentBanner.setAttribute('role', 'dialog');
-consentBanner.setAttribute('aria-modal', 'true');
+consentBanner.setAttribute('role', 'region');
 consentBanner.setAttribute('aria-labelledby', 'consent-title');
 consentBanner.innerHTML = `
   <div class="consent-copy">
@@ -193,6 +207,11 @@ document.addEventListener('click', (event) => {
 
   if (link.dataset.storeLink) {
     websiteAnalytics.track('app_store_click', { link_source: link.dataset.storeLink });
+  } else if (link.dataset.contentLink) {
+    websiteAnalytics.track('select_content', {
+      content_type: 'caregiver_guide',
+      item_id: link.dataset.contentLink
+    });
   } else if (link.getAttribute('href') === '#app-einblicke') {
     websiteAnalytics.track('select_content', { content_type: 'app_preview', item_id: 'website_app_gallery' });
   } else if (link.getAttribute('href') === '#download') {
