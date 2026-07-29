@@ -230,6 +230,10 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
 .article-lead { max-width: 780px; color: var(--muted); font-size: clamp(1.08rem, 2vw, 1.35rem); line-height: 1.65; }
 .content-narrow { width: min(100% - 40px, 880px); }
 .content-library { padding-top: 52px; }
+.topic-cluster + .topic-cluster { margin-top: 72px; }
+.topic-cluster-header { max-width: 760px; }
+.topic-cluster-header h2 { margin: 12px 0; font-size: clamp(2rem, 4vw, 3.35rem); line-height: 1.08; }
+.topic-cluster-header p { margin: 0; color: var(--muted); font-size: 1.04rem; }
 .content-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 46px; }
 .content-card {
   display: flex;
@@ -290,6 +294,25 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
 .article-sources { padding: 38px 0 0; border-top: 1px solid var(--line); }
 .article-sources li + li { margin-top: 10px; }
 .article-sources small { color: var(--muted); }
+.related-guides { margin: 38px 0; padding: 34px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.related-guides h2 { margin: 10px 0 22px; font-size: clamp(1.8rem, 4vw, 2.65rem); line-height: 1.15; }
+.related-guide-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.related-guide-link {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 18px;
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.related-guide-link:hover { border-color: var(--sage); transform: translateY(-2px); }
+.related-guide-link span { color: var(--muted); font-size: .76rem; }
+.related-guide-link strong { font-family: var(--serif); font-size: 1.12rem; line-height: 1.25; }
+.related-guides > p { margin: 22px 0 0; }
 
 .legal-page { background: var(--paper); }
 .legal-header { position: static; border-bottom: 1px solid var(--line); background: rgba(247,243,234,.96); }
@@ -397,6 +420,7 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   .footer-grid { grid-template-columns: 1fr; justify-items: center; }
   .footer-grid nav { justify-content: center; }
   .content-card-grid { grid-template-columns: 1fr; }
+  .related-guide-grid { grid-template-columns: 1fr; }
   .legal-main { padding-top: 48px; }
 }
 

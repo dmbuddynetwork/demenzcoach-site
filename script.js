@@ -80,7 +80,8 @@ const websiteAnalytics = (() => {
     gtag('config', measurementID, {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
-      content_group: pageContext.page_type
+      content_group: pageContext.page_type,
+      ...pageContext
     });
 
     const script = document.createElement('script');
@@ -206,7 +207,23 @@ document.addEventListener('click', (event) => {
   if (!link) return;
 
   if (link.dataset.storeLink) {
-    websiteAnalytics.track('app_store_click', { link_source: link.dataset.storeLink });
+    let campaignToken = '';
+    try {
+      const token = new URL(link.href, window.location.href).searchParams.get('ct') ?? '';
+      if (/^[a-zA-Z0-9_-]{1,30}$/.test(token)) campaignToken = token;
+    } catch {
+      // The stable link source still makes the click measurable if URL parsing is unavailable.
+    }
+    websiteAnalytics.track('app_store_click', {
+      link_source: link.dataset.storeLink,
+      campaign_token: campaignToken,
+      destination: 'app_store'
+    });
+  } else if (link.dataset.relatedLink) {
+    websiteAnalytics.track('related_guide_click', {
+      source_guide: pageContext.page_slug,
+      target_guide: link.dataset.relatedLink
+    });
   } else if (link.dataset.contentLink) {
     websiteAnalytics.track('select_content', {
       content_type: 'caregiver_guide',
@@ -220,6 +237,22 @@ document.addEventListener('click', (event) => {
     websiteAnalytics.track('support_contact_click');
   }
 });
+
+if (pageContext.page_type === 'seo-guide') {
+  const reportedDepths = new Set();
+  const reportReadDepth = () => {
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollable <= 0) return;
+    const depth = Math.round((window.scrollY / scrollable) * 100);
+    [50, 90].forEach((milestone) => {
+      if (depth < milestone || reportedDepths.has(milestone)) return;
+      reportedDepths.add(milestone);
+      websiteAnalytics.track('guide_read_depth', { percent_scrolled: milestone });
+    });
+    if (reportedDepths.size === 2) window.removeEventListener('scroll', reportReadDepth);
+  };
+  window.addEventListener('scroll', reportReadDepth, { passive: true });
+}
 
 const observedSections = [
   'app-einblicke',

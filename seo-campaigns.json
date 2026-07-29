@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-07-29",
+  "privacyBoundary": "No care text, search query, profile, device identifier or user-level web-to-app join.",
+  "stages": [
+    {
+      "stage": "website",
+      "source": "Google Analytics 4 after consent",
+      "events": [
+        "page_view",
+        "app_store_click",
+        "related_guide_click"
+      ]
+    },
+    {
+      "stage": "app_store",
+      "source": "App Store Connect App Analytics",
+      "dimensions": [
+        "campaign_token"
+      ],
+      "metrics": [
+        "impressions",
+        "product_page_views",
+        "first_time_downloads",
+        "usage",
+        "sales"
+      ]
+    },
+    {
+      "stage": "activation",
+      "source": "Consent-aware in-app analytics, aggregate reporting only",
+      "events": [
+        "app_install_recorded",
+        "first_help_received",
+        "first_qualifying_help_received",
+        "user_activated",
+        "activated_user_returned"
+      ]
+    }
+  ],
+  "campaigns": [
+    {
+      "language": "de",
+      "page_slug": "demenz-kommunikation",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/demenz-kommunikation.html",
+      "campaign_token": "seo_de_kommunikation"
+    },
+    {
+      "language": "de",
+      "page_slug": "demenz-nach-hause-was-sagen",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/demenz-nach-hause-was-sagen.html",
+      "campaign_token": "seo_de_nach_hause"
+    },
+    {
+      "language": "de",
+      "page_slug": "pflegende-angehoerige-ueberfordert",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "campaign_token": "seo_de_ueberfordert"
+    },
+    {
+      "language": "de",
+      "page_slug": "demenz-wiederholt-fragen",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/demenz-wiederholt-fragen.html",
+      "campaign_token": "seo_de_wiederholte_fragen"
+    },
+    {
+      "language": "de",
+      "page_slug": "demenz-unruhe-am-abend",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/demenz-unruhe-am-abend.html",
+      "campaign_token": "seo_de_unruhe_abend"
+    },
+    {
+      "language": "de",
+      "page_slug": "ploetzliche-verwirrtheit-demenz",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/ploetzliche-verwirrtheit-demenz.html",
+      "campaign_token": "seo_de_akute_verwirrtheit"
+    },
+    {
+      "language": "en",
+      "page_slug": "dementia-communication",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-communication.html",
+      "campaign_token": "seo_en_communication"
+    },
+    {
+      "language": "en",
+      "page_slug": "dementia-wants-to-go-home",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-wants-to-go-home.html",
+      "campaign_token": "seo_en_go_home"
+    },
+    {
+      "language": "en",
+      "page_slug": "dementia-caregiver-overwhelmed",
+      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-caregiver-overwhelmed.html",
+      "campaign_token": "seo_en_overwhelmed"
+    }
+  ]
+}

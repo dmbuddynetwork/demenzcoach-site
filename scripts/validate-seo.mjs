@@ -90,6 +90,60 @@ for (const file of htmlFiles) {
   }
 }
 
+const campaignManifestPath = path.join(root, "seo-campaigns.json");
+if (!fs.existsSync(campaignManifestPath)) {
+  fail("seo-campaigns.json: missing SEO campaign mapping");
+} else {
+  const campaignManifest = JSON.parse(fs.readFileSync(campaignManifestPath, "utf8"));
+  const campaignTokens = new Set();
+  for (const campaign of campaignManifest.campaigns ?? []) {
+    if (!/^[a-zA-Z0-9_-]{1,30}$/.test(campaign.campaign_token ?? "")) {
+      fail(`seo-campaigns.json: invalid token for ${campaign.page_slug}`);
+      continue;
+    }
+    if (campaignTokens.has(campaign.campaign_token)) {
+      fail(`seo-campaigns.json: duplicate campaign token ${campaign.campaign_token}`);
+    }
+    campaignTokens.add(campaign.campaign_token);
+    const relativePath = new URL(campaign.page_url).pathname
+      .replace("/demenzcoach-site/", "");
+    const html = read(relativePath);
+    if (!html.includes(`ct=${campaign.campaign_token}&amp;mt=8`)) {
+      fail(`${relativePath}: missing mapped campaign token ${campaign.campaign_token}`);
+    }
+    if ((html.match(/data-related-link=/g) ?? []).length < 2) {
+      fail(`${relativePath}: expected at least two internal related-guide links`);
+    }
+  }
+  const expectedStageEvents = [
+    "app_store_click",
+    "app_install_recorded",
+    "first_help_received",
+    "first_qualifying_help_received",
+    "user_activated"
+  ];
+  const serializedStages = JSON.stringify(campaignManifest.stages ?? []);
+  expectedStageEvents.forEach((event) => {
+    if (!serializedStages.includes(event)) {
+      fail(`seo-campaigns.json: missing funnel event ${event}`);
+    }
+  });
+}
+
+const trackingScript = read("script.js");
+for (const measurementField of ["campaign_token", "related_guide_click", "guide_read_depth"]) {
+  if (!trackingScript.includes(measurementField)) {
+    fail(`script.js: missing SEO measurement field ${measurementField}`);
+  }
+}
+
+const acuteGuide = read("ratgeber/ploetzliche-verwirrtheit-demenz.html");
+const acuteSafetyPosition = acuteGuide.indexOf("Plötzliche oder stark schwankende Verwirrtheit");
+const acuteStoreCTA = acuteGuide.indexOf("https://apps.apple.com/");
+if (acuteSafetyPosition === -1 || acuteStoreCTA === -1 || acuteStoreCTA < acuteSafetyPosition) {
+  fail("ratgeber/ploetzliche-verwirrtheit-demenz.html: App Store CTA must follow the acute safety guidance");
+}
+
 for (const file of ["index.html", "index-en.html"]) {
   const html = read(file);
   const scripts = [...html.matchAll(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)]
