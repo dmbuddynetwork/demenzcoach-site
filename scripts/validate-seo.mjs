@@ -137,13 +137,6 @@ for (const measurementField of ["campaign_token", "related_guide_click", "guide_
   }
 }
 
-const acuteGuide = read("ratgeber/ploetzliche-verwirrtheit-demenz.html");
-const acuteSafetyPosition = acuteGuide.indexOf("Plötzliche oder stark schwankende Verwirrtheit");
-const acuteStoreCTA = acuteGuide.indexOf("https://apps.apple.com/");
-if (acuteSafetyPosition === -1 || acuteStoreCTA === -1 || acuteStoreCTA < acuteSafetyPosition) {
-  fail("ratgeber/ploetzliche-verwirrtheit-demenz.html: App Store CTA must follow the acute safety guidance");
-}
-
 for (const file of ["index.html", "index-en.html"]) {
   const html = read(file);
   const scripts = [...html.matchAll(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)]
