@@ -1,16 +1,21 @@
 const menuButton = document.querySelector('.menu-button');
 const navigation = document.querySelector('.site-nav');
+const usesEnglish = document.documentElement.lang.startsWith('en');
 
 menuButton?.addEventListener('click', () => {
   const isOpen = navigation.classList.toggle('open');
   menuButton.setAttribute('aria-expanded', String(isOpen));
-  menuButton.querySelector('.sr-only').textContent = isOpen ? 'Menü schließen' : 'Menü öffnen';
+  menuButton.querySelector('.sr-only').textContent = usesEnglish
+    ? (isOpen ? 'Close menu' : 'Open menu')
+    : (isOpen ? 'Menü schließen' : 'Menü öffnen');
 });
 
 navigation?.addEventListener('click', (event) => {
   if (!event.target.closest('a')) return;
   navigation.classList.remove('open');
   menuButton?.setAttribute('aria-expanded', 'false');
+  const label = menuButton?.querySelector('.sr-only');
+  if (label) label.textContent = usesEnglish ? 'Open menu' : 'Menü öffnen';
 });
 
 const websiteAnalytics = (() => {
@@ -104,7 +109,7 @@ const websiteAnalytics = (() => {
   return { deny, grant, loadTag, readConsent, track };
 })();
 
-const analyticsCopy = document.documentElement.lang === 'en'
+const analyticsCopy = usesEnglish
   ? {
       title: 'Your privacy choice',
       text: 'With your permission, Google Analytics helps us understand which pages and app information are useful. No advertising, health information or form content is collected.',
@@ -131,7 +136,7 @@ consentBanner.setAttribute('aria-labelledby', 'consent-title');
 consentBanner.innerHTML = `
   <div class="consent-copy">
     <strong id="consent-title">${analyticsCopy.title}</strong>
-    <p>${analyticsCopy.text} <a href="${document.documentElement.lang === 'en' ? 'privacy-en.html' : 'datenschutz.html'}">${analyticsCopy.privacy}</a></p>
+    <p>${analyticsCopy.text} <a href="${usesEnglish ? 'privacy-en.html' : 'datenschutz.html'}">${analyticsCopy.privacy}</a></p>
   </div>
   <div class="consent-actions">
     <button class="consent-button consent-decline" type="button">${analyticsCopy.decline}</button>
@@ -179,7 +184,9 @@ document.addEventListener('click', (event) => {
   const link = event.target.closest('a');
   if (!link) return;
 
-  if (link.getAttribute('href') === '#app-einblicke') {
+  if (link.dataset.storeLink) {
+    websiteAnalytics.track('app_store_click', { link_source: link.dataset.storeLink });
+  } else if (link.getAttribute('href') === '#app-einblicke') {
     websiteAnalytics.track('select_content', { content_type: 'app_preview', item_id: 'website_app_gallery' });
   } else if (link.getAttribute('href') === '#download') {
     websiteAnalytics.track('select_content', { content_type: 'download', item_id: 'website_download_section' });
@@ -188,7 +195,16 @@ document.addEventListener('click', (event) => {
   }
 });
 
-const observedSections = ['app-einblicke', 'so-funktionierts', 'sicherheit', 'fragen'];
+const observedSections = [
+  'app-einblicke',
+  'so-funktionierts',
+  'vorteile',
+  'sicherheit',
+  'fragen',
+  'how-it-works',
+  'safety',
+  'questions'
+];
 const sectionObserver = 'IntersectionObserver' in window
   ? new IntersectionObserver((entries, observer) => {
       entries.filter((entry) => entry.isIntersecting).forEach((entry) => {
