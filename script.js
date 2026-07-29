@@ -1,13 +1,14 @@
 const menuButton = document.querySelector('.menu-button');
 const navigation = document.querySelector('.site-nav');
 const usesEnglish = document.documentElement.lang.startsWith('en');
+const localizedSiteCopy = window.demenzCoachSiteLocale ?? {};
+const menuOpenCopy = localizedSiteCopy.menuOpen ?? (usesEnglish ? 'Open menu' : 'Menü öffnen');
+const menuCloseCopy = localizedSiteCopy.menuClose ?? (usesEnglish ? 'Close menu' : 'Menü schließen');
 
 menuButton?.addEventListener('click', () => {
   const isOpen = navigation.classList.toggle('open');
   menuButton.setAttribute('aria-expanded', String(isOpen));
-  menuButton.querySelector('.sr-only').textContent = usesEnglish
-    ? (isOpen ? 'Close menu' : 'Open menu')
-    : (isOpen ? 'Menü schließen' : 'Menü öffnen');
+  menuButton.querySelector('.sr-only').textContent = isOpen ? menuCloseCopy : menuOpenCopy;
 });
 
 navigation?.addEventListener('click', (event) => {
@@ -15,7 +16,7 @@ navigation?.addEventListener('click', (event) => {
   navigation.classList.remove('open');
   menuButton?.setAttribute('aria-expanded', 'false');
   const label = menuButton?.querySelector('.sr-only');
-  if (label) label.textContent = usesEnglish ? 'Open menu' : 'Menü öffnen';
+  if (label) label.textContent = menuOpenCopy;
 });
 
 const websiteAnalytics = (() => {
@@ -109,7 +110,7 @@ const websiteAnalytics = (() => {
   return { deny, grant, loadTag, readConsent, track };
 })();
 
-const analyticsCopy = usesEnglish
+const fallbackAnalyticsCopy = usesEnglish
   ? {
       title: 'Your privacy choice',
       text: 'With your permission, Google Analytics helps us understand which pages and app information are useful. No advertising, health information or form content is collected.',
@@ -126,6 +127,12 @@ const analyticsCopy = usesEnglish
       privacy: 'Datenschutzerklärung',
       settings: 'Datenschutz-Einstellungen'
     };
+const analyticsCopy = {
+  ...fallbackAnalyticsCopy,
+  ...(localizedSiteCopy.analytics ?? {})
+};
+const privacyURL = localizedSiteCopy.privacyURL
+  ?? (usesEnglish ? 'privacy-en.html' : 'datenschutz.html');
 
 const consentBanner = document.createElement('section');
 consentBanner.className = 'consent-banner';
@@ -136,7 +143,7 @@ consentBanner.setAttribute('aria-labelledby', 'consent-title');
 consentBanner.innerHTML = `
   <div class="consent-copy">
     <strong id="consent-title">${analyticsCopy.title}</strong>
-    <p>${analyticsCopy.text} <a href="${usesEnglish ? 'privacy-en.html' : 'datenschutz.html'}">${analyticsCopy.privacy}</a></p>
+    <p>${analyticsCopy.text} <a href="${privacyURL}">${analyticsCopy.privacy}</a></p>
   </div>
   <div class="consent-actions">
     <button class="consent-button consent-decline" type="button">${analyticsCopy.decline}</button>
