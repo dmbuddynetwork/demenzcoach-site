@@ -148,7 +148,7 @@ const analyticsCopy = {
   ...(localizedSiteCopy.analytics ?? {})
 };
 const privacyURL = localizedSiteCopy.privacyURL
-  ?? (usesEnglish ? 'privacy-en.html' : 'datenschutz.html');
+  ?? (usesEnglish ? '../privacy-en.html' : '../datenschutz.html');
 
 const consentBanner = document.createElement('section');
 consentBanner.className = 'consent-banner';
