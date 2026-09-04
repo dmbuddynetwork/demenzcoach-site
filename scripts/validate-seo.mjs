@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(process.argv[2] ?? "landingpage");
-const baseURL = "https://dmbuddynetwork.github.io/demenzcoach-site";
+const baseURL = "https://dementiacoachapp.com";
 const errors = [];
 const warnings = [];
 

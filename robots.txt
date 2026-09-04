@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dmbuddynetwork.github.io/demenzcoach-site/sitemap.xml
+Sitemap: https://dementiacoachapp.com/sitemap.xml
