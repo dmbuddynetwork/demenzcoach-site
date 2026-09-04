@@ -685,14 +685,33 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   .human-hero h1 { font-size: clamp(3rem, 14vw, 4.3rem); }
   .human-hero .hero-actions { justify-content: stretch; }
   .human-hero .hero-actions > * { width: 100%; }
-  .hero-photo { display: block; min-height: 520px; border-radius: 30px; }
-  .hero-photo > img { width: 100%; height: 520px; min-height: 520px; object-fit: cover; border-radius: 30px; }
-  .hero-response { right: 12px; bottom: 12px; left: 12px; grid-template-columns: 1fr; gap: 4px; padding: 17px; border-radius: 20px; }
-  .hero-response strong, .hero-response p { margin-bottom: 7px; font-size: .9rem; }
-  .hero-response strong { font-size: 1rem; }
+  .hero-photo { display: block; min-height: 0; border-radius: 30px; }
+  .hero-photo > img {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 30px 30px 0 0;
+  }
+  .hero-response {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    grid-template-columns: minmax(82px, .42fr) 1fr;
+    gap: 6px 10px;
+    margin: -16px 12px 12px;
+    padding: 15px;
+    border-radius: 18px;
+  }
+  .hero-response strong, .hero-response p { margin: 0; font-size: .84rem; line-height: 1.35; }
+  .hero-response strong { font-size: .94rem; }
   .audience-layout { gap: 36px; }
   .question-grid p, .question-grid p:nth-child(2), .question-grid p:nth-child(3) { margin-left: 0; border-radius: 22px; }
   .story-grid, .pillar-grid, .moment-library-grid, .expertise-grid, .testimonial-grid { grid-template-columns: 1fr; }
+  .story-panel img { max-height: 200px; aspect-ratio: 16 / 9; }
   .story-panel > div { padding: 22px; }
   .lovable-steps .step-card { padding: 26px; }
   .profile-compare { grid-template-columns: 1fr; }
@@ -704,8 +723,46 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   .testimonial-grid blockquote { min-height: 0; }
   .disclaimer-card { padding: 32px 22px; }
   .emotional-cta .cta-panel { border-radius: 30px; }
-  .emotional-cta .cta-panel > img { min-height: 300px; }
+  .emotional-cta .cta-panel > img {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
   .emotional-cta .cta-panel > div { padding: 0 24px 34px; }
+
+  /* Keep the tall in-app screens available without making the page four screens longer. */
+  .screenshot-grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(210px, 72vw);
+    gap: 14px;
+    width: auto;
+    max-width: none;
+    margin: 32px -14px 0;
+    padding: 4px 14px 18px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-padding-inline: 14px;
+    scroll-snap-type: inline mandatory;
+    scrollbar-width: thin;
+  }
+  .screenshot-card {
+    scroll-snap-align: start;
+    padding: 12px;
+    border-radius: 24px;
+  }
+  .screenshot-card img {
+    width: auto;
+    max-width: 100%;
+    max-height: 52svh;
+    margin-inline: auto;
+    border-radius: 20px;
+  }
+  .screenshot-card figcaption { padding: 14px 2px 2px; }
+  .screenshot-card strong { font-size: 1.2rem; }
+  .screenshot-card span { font-size: .88rem; line-height: 1.4; }
+  .feature-screenshot img { width: auto; max-width: 100%; max-height: 52svh; }
 }
 
 [dir="rtl"] .site-nav,
