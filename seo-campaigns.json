@@ -41,37 +41,37 @@
     {
       "language": "de",
       "page_slug": "demenz-kommunikation",
-      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/demenz-kommunikation.html",
+      "page_url": "https://dementiacoachapp.com/ratgeber/demenz-kommunikation.html",
       "campaign_token": "seo_de_kommunikation"
     },
     {
       "language": "de",
       "page_slug": "demenz-nach-hause-was-sagen",
-      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/demenz-nach-hause-was-sagen.html",
+      "page_url": "https://dementiacoachapp.com/ratgeber/demenz-nach-hause-was-sagen.html",
       "campaign_token": "seo_de_nach_hause"
     },
     {
       "language": "de",
       "page_slug": "pflegende-angehoerige-ueberfordert",
-      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "page_url": "https://dementiacoachapp.com/ratgeber/pflegende-angehoerige-ueberfordert.html",
       "campaign_token": "seo_de_ueberfordert"
     },
     {
       "language": "en",
       "page_slug": "dementia-communication",
-      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-communication.html",
+      "page_url": "https://dementiacoachapp.com/guides/dementia-communication.html",
       "campaign_token": "seo_en_communication"
     },
     {
       "language": "en",
       "page_slug": "dementia-wants-to-go-home",
-      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-wants-to-go-home.html",
+      "page_url": "https://dementiacoachapp.com/guides/dementia-wants-to-go-home.html",
       "campaign_token": "seo_en_go_home"
     },
     {
       "language": "en",
       "page_slug": "dementia-caregiver-overwhelmed",
-      "page_url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-caregiver-overwhelmed.html",
+      "page_url": "https://dementiacoachapp.com/guides/dementia-caregiver-overwhelmed.html",
       "campaign_token": "seo_en_overwhelmed"
     }
   ]
