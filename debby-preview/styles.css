@@ -345,9 +345,8 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
 .expertise-grid h3 { margin-top: 0; }
 
 .founder-section { background: #ece9e4; }
-.founder-grid { display: grid; grid-template-columns: .82fr 1.18fr; gap: 80px; align-items: center; }
-.founder-photo { margin: 0; }
-.founder-photo img { width: 100%; border-radius: 45% 45% 16px 16px; box-shadow: var(--shadow); }
+.founder-grid { display: grid; grid-template-columns: 1fr; }
+.founder-copy { width: min(100%, 940px); margin-inline: auto; }
 .founder-copy blockquote { margin: 30px 0; font-family: var(--serif); font-size: clamp(1.35rem, 2.2vw, 1.85rem); line-height: 1.45; }
 .founder-copy ul { display: flex; flex-wrap: wrap; gap: 10px; padding: 0; list-style: none; }
 .founder-copy li { padding: 10px 14px; color: var(--ink); background: white; border-radius: 999px; font-size: .85rem; font-weight: 750; }
@@ -593,20 +592,18 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   .related-guide-grid { grid-template-columns: 1fr; }
   .legal-main { padding-top: 48px; }
   .human-hero .hero-grid,
-  .audience-layout,
-  .founder-grid { grid-template-columns: 1fr; }
+  .audience-layout { grid-template-columns: 1fr; }
   .human-hero .hero-copy { text-align: left; }
   .human-hero .hero-lead { margin-inline: 0; }
   .human-hero .hero-actions { justify-content: flex-start; }
   .hero-photo { min-height: 560px; }
   .hero-photo > img { height: 560px; min-height: 560px; }
-  .audience-layout, .founder-grid { gap: 48px; }
+  .audience-layout { gap: 48px; }
   .question-grid { max-width: 700px; }
   .lovable-steps .step-card { min-height: 0; }
   .pillar-grid, .moment-library-grid, .testimonial-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .profile-compare, .personal-premium, .emotional-cta .cta-panel { grid-template-columns: 1fr; }
   .personal-premium { gap: 38px; }
-  .founder-photo { width: min(520px, 100%); }
   .community-card { grid-template-columns: 1fr; }
   .community-links { display: flex; flex-wrap: wrap; }
   .community-card > small { grid-column: auto; }
