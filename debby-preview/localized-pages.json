@@ -1,0 +1,237 @@
+{
+  "sourceCatalog": "DemenzCoach/Localizable.xcstrings",
+  "sourceASO": "fastlane/aso-localizations.json",
+  "pages": [
+    {
+      "code": "de",
+      "nativeName": "Deutsch",
+      "file": "index.html",
+      "direction": "ltr",
+      "generated": false
+    },
+    {
+      "code": "en",
+      "nativeName": "English",
+      "file": "index-en.html",
+      "direction": "ltr",
+      "generated": false
+    },
+    {
+      "code": "pl",
+      "nativeName": "Polski",
+      "file": "index-pl.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "ro",
+      "nativeName": "Română",
+      "file": "index-ro.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "bg",
+      "nativeName": "Български",
+      "file": "index-bg.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "hr",
+      "nativeName": "Hrvatski",
+      "file": "index-hr.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "sk",
+      "nativeName": "Slovenčina",
+      "file": "index-sk.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "hu",
+      "nativeName": "Magyar",
+      "file": "index-hu.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "cs",
+      "nativeName": "Čeština",
+      "file": "index-cs.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "uk",
+      "nativeName": "Українська",
+      "file": "index-uk.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "bs",
+      "nativeName": "Bosanski",
+      "file": "index-bs.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "sr",
+      "nativeName": "Srpski",
+      "file": "index-sr.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "lt",
+      "nativeName": "Lietuvių",
+      "file": "index-lt.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "sl",
+      "nativeName": "Slovenščina",
+      "file": "index-sl.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "lv",
+      "nativeName": "Latviešu",
+      "file": "index-lv.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "et",
+      "nativeName": "Eesti",
+      "file": "index-et.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "ru",
+      "nativeName": "Русский",
+      "file": "index-ru.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "tr",
+      "nativeName": "Türkçe",
+      "file": "index-tr.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "ar",
+      "nativeName": "العربية",
+      "file": "index-ar.html",
+      "direction": "rtl",
+      "generated": true
+    },
+    {
+      "code": "fr",
+      "nativeName": "Français",
+      "file": "index-fr.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "it",
+      "nativeName": "Italiano",
+      "file": "index-it.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "es",
+      "nativeName": "Español",
+      "file": "index-es.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "pt",
+      "nativeName": "Português",
+      "file": "index-pt.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "nl",
+      "nativeName": "Nederlands",
+      "file": "index-nl.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "el",
+      "nativeName": "Ελληνικά",
+      "file": "index-el.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "sq",
+      "nativeName": "Shqip",
+      "file": "index-sq.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "fa",
+      "nativeName": "فارسی",
+      "file": "index-fa.html",
+      "direction": "rtl",
+      "generated": true
+    },
+    {
+      "code": "th",
+      "nativeName": "ไทย",
+      "file": "index-th.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "da",
+      "nativeName": "Dansk",
+      "file": "index-da.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "fi",
+      "nativeName": "Suomi",
+      "file": "index-fi.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "ga",
+      "nativeName": "Gaeilge",
+      "file": "index-ga.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "mt",
+      "nativeName": "Malti",
+      "file": "index-mt.html",
+      "direction": "ltr",
+      "generated": true
+    },
+    {
+      "code": "sv",
+      "nativeName": "Svenska",
+      "file": "index-sv.html",
+      "direction": "ltr",
+      "generated": true
+    }
+  ]
+}

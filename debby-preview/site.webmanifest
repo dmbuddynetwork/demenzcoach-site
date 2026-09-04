@@ -1,0 +1,22 @@
+{
+  "name": "Demenz Coach",
+  "short_name": "Demenz Coach",
+  "description": "Kommunikations- und Alltagshilfe für Angehörige von Menschen mit Demenz.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "browser",
+  "background_color": "#f7f3ea",
+  "theme_color": "#123f2e",
+  "icons": [
+    {
+      "src": "assets/favicon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/favicon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

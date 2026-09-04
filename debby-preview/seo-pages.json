@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-07-29",
+  "pages": [
+    {
+      "lang": "de",
+      "type": "hub",
+      "path": "ratgeber/",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/"
+    },
+    {
+      "lang": "de",
+      "type": "editorial",
+      "path": "ratgeber/redaktion.html",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/redaktion.html"
+    },
+    {
+      "lang": "de",
+      "type": "article",
+      "slug": "demenz-kommunikation",
+      "alternateSlug": "dementia-communication",
+      "campaign": "seo_de_kommunikation",
+      "cluster": "communication",
+      "path": "ratgeber/demenz-kommunikation.html",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/demenz-kommunikation.html"
+    },
+    {
+      "lang": "de",
+      "type": "article",
+      "slug": "demenz-nach-hause-was-sagen",
+      "alternateSlug": "dementia-wants-to-go-home",
+      "campaign": "seo_de_nach_hause",
+      "cluster": "situations",
+      "path": "ratgeber/demenz-nach-hause-was-sagen.html",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/demenz-nach-hause-was-sagen.html"
+    },
+    {
+      "lang": "de",
+      "type": "article",
+      "slug": "pflegende-angehoerige-ueberfordert",
+      "alternateSlug": "dementia-caregiver-overwhelmed",
+      "campaign": "seo_de_ueberfordert",
+      "cluster": "safety",
+      "path": "ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/ratgeber/pflegende-angehoerige-ueberfordert.html"
+    },
+    {
+      "lang": "en",
+      "type": "hub",
+      "path": "guides/",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/"
+    },
+    {
+      "lang": "en",
+      "type": "editorial",
+      "path": "guides/redaktion.html",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/redaktion.html"
+    },
+    {
+      "lang": "en",
+      "type": "article",
+      "slug": "dementia-communication",
+      "alternateSlug": "demenz-kommunikation",
+      "campaign": "seo_en_communication",
+      "cluster": "communication",
+      "path": "guides/dementia-communication.html",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-communication.html"
+    },
+    {
+      "lang": "en",
+      "type": "article",
+      "slug": "dementia-wants-to-go-home",
+      "alternateSlug": "demenz-nach-hause-was-sagen",
+      "campaign": "seo_en_go_home",
+      "cluster": "situations",
+      "path": "guides/dementia-wants-to-go-home.html",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-wants-to-go-home.html"
+    },
+    {
+      "lang": "en",
+      "type": "article",
+      "slug": "dementia-caregiver-overwhelmed",
+      "alternateSlug": "pflegende-angehoerige-ueberfordert",
+      "campaign": "seo_en_overwhelmed",
+      "cluster": "safety",
+      "path": "guides/dementia-caregiver-overwhelmed.html",
+      "url": "https://dmbuddynetwork.github.io/demenzcoach-site/guides/dementia-caregiver-overwhelmed.html"
+    }
+  ]
+}
