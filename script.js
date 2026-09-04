@@ -238,6 +238,24 @@ document.addEventListener('click', (event) => {
   }
 });
 
+document.querySelectorAll('[data-contact-form]').forEach((form) => {
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+
+    const data = new FormData(form);
+    const recipient = form.dataset.recipient ?? 'demenzcoachapp@gmail.com';
+    const name = String(data.get('name') ?? '').trim();
+    const subject = String(data.get('subject') ?? '').trim();
+    const message = String(data.get('message') ?? '').trim();
+    const nameLine = name ? `Name: ${name}\n\n` : '';
+    const body = `${nameLine}${message}`;
+
+    websiteAnalytics.track('support_contact_click', { contact_method: 'prepared_email' });
+    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+});
+
 if (pageContext.page_type === 'seo-guide') {
   const reportedDepths = new Set();
   const reportReadDepth = () => {
