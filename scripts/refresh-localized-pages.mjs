@@ -120,7 +120,8 @@ for (const { code } of languages) {
   if (code !== "de" && !/<body\b[^>]*class="[^"]*localized-home/.test(html)) {
     html = html.replace(/<body\b/, '<body class="localized-home"');
   }
-  html = html.replace('href="styles.css"', 'href="lovable-home.css"');
+  html = html.replace('href="styles.css"', 'href="lovable-home.css?v=20260908a"');
+  html = html.replace(/href="lovable-home\.css(?:\?v=[^"]+)?"/, 'href="lovable-home.css?v=20260908a"');
   html = html.replace('src="script.js"', 'src="lovable-home.js"');
   html = html.replace(/<span class="brand-mark" aria-hidden="true"><i><\/i><i><\/i><\/span>/g, '<img class="brand-logo" src="assets/lovable-logo.jpg" width="44" height="44" alt="">');
   html = html.replace(/<!-- localized-alternates:start -->[\s\S]*?<!-- localized-alternates:end -->/, `<!-- localized-alternates:start -->\n${alternateLinks}\n  <!-- localized-alternates:end -->`);
