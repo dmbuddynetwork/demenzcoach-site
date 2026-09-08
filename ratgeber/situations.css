@@ -1,0 +1,15 @@
+/* Readable guide navigation, using the existing Lovable palette and type. */
+.guide-contents { display: grid; gap: 8px; margin: 28px 0; }
+.guide-contents a { display: flex; align-items: center; min-height: 48px; text-underline-offset: 4px; }
+.seo-article section[id] { scroll-margin-top: 100px; }
+.seo-article .article-header h1 { font-size: clamp(2rem, 4.5vw, 3.5rem); line-height: 1.15; hyphens: none; }
+.article-body, .article-lead, .quick-answer { overflow-wrap: anywhere; }
+.content-card .text-link { min-height: 48px; }
+@media (max-width: 720px) {
+  .seo-article .article-header h1 { font-size: clamp(1.8rem, 7.5vw, 2.35rem); }
+  .seo-article { padding-top: 28px; }
+  .breadcrumbs { margin-bottom: 24px; font-size: .94rem; }
+  .article-meta { font-size: .94rem; }
+  .content-hero h1 { font-size: 2.1rem; line-height: 1.15; }
+  .topic-cluster-header h2 { font-size: 1.7rem; }
+}
