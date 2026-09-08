@@ -158,11 +158,45 @@ for (const url of sitemapURLs) {
   if (!indexableURLs.has(url)) fail(`sitemap.xml: contains non-indexable or unknown URL ${url}`);
 }
 
-for (const file of htmlFiles.filter((name) => /^index-[a-z]{2}\.html$/.test(name) && name !== "index-en.html")) {
-  const robots = meta(read(file), "robots") ?? "";
-  if (!robots.toLowerCase().includes("noindex")) {
-    fail(`${file}: unreviewed translation must remain noindex`);
+const homeLanguages = [
+  "de", "en", "pl", "ro", "bg", "hr", "sk", "hu", "cs", "uk", "bs",
+  "sr", "lt", "sl", "lv", "et", "ru", "tr", "ar", "fr", "it", "es",
+  "pt", "nl", "el", "sq", "fa", "th", "da", "fi", "ga", "mt", "sv"
+];
+const storeLocaleByLanguage = {
+  ar: "ar-SA", cs: "cs", da: "da", de: "de-DE", el: "el", en: "en-US",
+  es: "es-ES", fi: "fi", fr: "fr-FR", hr: "hr", hu: "hu", it: "it",
+  nl: "nl-NL", pl: "pl", pt: "pt-PT", ro: "ro", ru: "ru", sk: "sk",
+  sl: "sl-SI", sv: "sv", th: "th", tr: "tr", uk: "uk"
+};
+
+for (const language of homeLanguages) {
+  const file = language === "de" ? "index.html" : `index-${language}.html`;
+  const html = read(file);
+  const robots = meta(html, "robots") ?? "";
+  if (robots.toLowerCase().includes("noindex")) fail(`${file}: localized home must be indexable`);
+  if (html.includes('data-page-type="localized-product-draft"')) fail(`${file}: draft page type remains`);
+  if (!html.includes('href="lovable-home.css"')) fail(`${file}: missing shared Lovable design system`);
+  if (!html.includes('src="lovable-home.js"')) fail(`${file}: missing shared accessible navigation script`);
+
+  const alternates = new Map([...html.matchAll(/<link\s+rel=["']alternate["']\s+hreflang=["']([^"']+)["']\s+href=["']([^"']+)["'][^>]*>/gi)]
+    .map((match) => [match[1], match[2]]));
+  for (const alternateLanguage of [...homeLanguages, "x-default"]) {
+    if (!alternates.has(alternateLanguage)) fail(`${file}: missing reciprocal hreflang ${alternateLanguage}`);
   }
+
+  const expectedStoreLocale = storeLocaleByLanguage[language] ?? "en-US";
+  const storeImages = [...html.matchAll(/<img\s+[^>]*src=["']assets\/store\/([^/]+)\/([^"']+\.webp)["'][^>]*>/gi)];
+  if (storeImages.length < 6) fail(`${file}: expected at least six final Store screenshot references`);
+  for (const [, storeLocale, asset] of storeImages) {
+    if (storeLocale !== expectedStoreLocale) fail(`${file}: unexpected Store locale ${storeLocale}`);
+    if (!fs.existsSync(path.join(root, "assets", "store", storeLocale, asset))) {
+      fail(`${file}: missing final Store screenshot assets/store/${storeLocale}/${asset}`);
+    }
+  }
+  const fallbackExpected = !storeLocaleByLanguage[language];
+  const hasFallbackLabel = html.includes('class="screenshot-language-note"');
+  if (fallbackExpected !== hasFallbackLabel) fail(`${file}: Store screenshot fallback disclosure mismatch`);
 }
 
 for (const asset of [

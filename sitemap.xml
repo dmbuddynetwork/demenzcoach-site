@@ -3,15 +3,102 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://dementiacoachapp.com/</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://dementiacoachapp.com/index-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/"/>
   </url>
   <url>
     <loc>https://dementiacoachapp.com/index-en.html</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/"/>
-    <xhtml:link rel="alternate" hreflang="en" href="https://dementiacoachapp.com/index-en.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-pl.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-ro.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-bg.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-hr.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-sk.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-hu.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-cs.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-uk.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-bs.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-sr.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-lt.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-sl.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-lv.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-et.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-ru.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-tr.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-ar.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-fr.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-it.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-es.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-pt.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-nl.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-el.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-sq.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-fa.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-th.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-da.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-fi.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-ga.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-mt.html</loc>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/index-sv.html</loc>
   </url>
   <url>
     <loc>https://dementiacoachapp.com/support.html</loc>
