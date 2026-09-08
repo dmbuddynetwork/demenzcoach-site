@@ -912,33 +912,30 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   .hero-response strong, .hero-response p { font-family: var(--sans); font-size: .96rem; line-height: 1.5; }
   .hero-response strong { font-weight: 650; }
   .section { padding-block: 32px; }
-  .section.mobile-fold { padding: 0; margin: 0; background: white; color: var(--ink-dark); overflow: visible; }
-  .mobile-fold::before, .mobile-fold::after { display: none; }
-  .mobile-fold > details { border-bottom: 1px solid var(--line); }
-  .mobile-fold > details > summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 64px; padding: 18px 20px; font: 650 1rem/1.4 var(--sans); cursor: pointer; list-style: none; }
-  .mobile-fold > details > summary::-webkit-details-marker { display: none; }
-  .mobile-fold > details > summary::after { content: '+'; flex-shrink: 0; font-size: 1.5rem; color: var(--ink); }
-  .mobile-fold > details[open] > summary::after { content: '−'; }
-  .mobile-fold-content { padding: 12px 0 24px; }
-  .mobile-fold-content .eyebrow { color: var(--sage-dark); }
-  .mobile-fold-content .personal-premium .eyebrow,
-  .mobile-fold-content .community-card .eyebrow { color: #dfe2fa; }
-  .reassurance p { font-size: .8rem; }
-  .mobile-fold-content .story-grid,
-  .mobile-fold-content .steps,
-  .mobile-fold-content .pillar-grid,
-  .mobile-fold-content .moment-library-grid,
-  .mobile-fold-content .profile-compare,
-  .mobile-fold-content .expertise-grid,
-  .mobile-fold-content .testimonial-grid,
-  .mobile-fold-content .content-card-grid,
-  .mobile-fold-content .question-grid { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); grid-auto-columns: auto; width: 100%; margin: 20px 0 0; padding: 0; overflow: visible; }
-  .mobile-fold-content .step-demo { margin-top: 18px; }
-  .mobile-fold-content .story-panel { height: auto; border: 1px solid var(--line); }
-  .mobile-fold-content .evidence-strip { width: calc(100% - 28px); margin-inline: auto; }
-  .mobile-fold-content .quote-wrap p { color: var(--muted); }
   .app-showcase .section-heading h2, .faq h2, .disclaimer-card h2 { font-size: 1.9rem; }
-  .screenshot-grid { grid-auto-columns: 68vw; margin-block: 22px 0; }
+  /* All mobile content follows the normal vertical reading direction. */
+  .question-grid, .profile-compare, .evidence-strip, .story-grid,
+  .steps, .pillar-grid, .moment-library-grid, .expertise-grid,
+  .testimonial-grid, .content-card-grid, .screenshot-grid {
+    grid-auto-flow: row;
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-columns: auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 24px 0 0;
+    padding: 0;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+  .container.evidence-strip { width: calc(100% - 28px); margin-inline: auto; }
+  .story-panel { height: auto; }
+  .step-demo { margin-top: 18px; }
+  .screenshot-grid { gap: 20px; }
+  .screenshot-card { width: min(100%, 320px); margin-inline: auto; }
+  .screenshot-card:nth-child(even) { margin-top: 0; }
+  .reassurance-grid { grid-template-columns: 1fr; }
+  .reassurance p { font-size: .85rem; }
+  .reassurance p + p { border-left: 0; border-top: 1px solid rgba(255,255,255,.18); }
   .screenshot-card { align-self: start; }
   .screenshot-card img { width: 100%; height: auto; aspect-ratio: 640 / 1391; max-height: 42svh; }
   .screenshot-card strong { font: 600 .95rem/1.4 var(--sans); }
