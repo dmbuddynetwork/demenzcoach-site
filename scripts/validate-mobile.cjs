@@ -17,6 +17,9 @@ const root = path.resolve(__dirname, '..');
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     const pages = fs.readdirSync(root).filter(file => /^index(?:-[a-z]+)?\.html$/.test(file));
+    const guidePages = fs.readdirSync(path.join(root, 'ratgeber'))
+      .filter(file => file.endsWith('.html') && file !== 'redaktion.html')
+      .map(file => `ratgeber/${file}`);
     const fits = async label => {
       const result = await page.evaluate(() => ({
         width: document.documentElement.scrollWidth,
@@ -31,7 +34,7 @@ const root = path.resolve(__dirname, '..');
     };
     for (const width of [320, 390, 430]) {
       await page.setViewportSize({ width, height: 844 });
-      for (const file of width === 320 ? pages : ['index.html', 'index-en.html', 'index-ar.html']) {
+      for (const file of [...(width === 320 ? pages : ['index.html', 'index-en.html', 'index-ar.html']), ...guidePages]) {
         await page.goto(pathToFileURL(path.join(root, file)).href);
         if (await page.locator('.consent-decline').isVisible()) await page.locator('.consent-decline').click();
         await fits(`${file} ${width}`);
@@ -47,7 +50,7 @@ const root = path.resolve(__dirname, '..');
       }
     }
     assert.deepEqual(errors, [], 'Browser script errors');
-    console.log(`Mobile checks passed: ${pages.length} languages at 320px; DE/EN/AR also at 390/430px; menu and doubled text.`);
+    console.log(`Mobile checks passed: ${pages.length} languages at 320px; DE/EN/AR and ${guidePages.length} German guide/hub pages at 320/390/430px; menu and doubled text.`);
   } finally {
     await browser.close();
   }

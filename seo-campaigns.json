@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-29",
+  "generatedAt": "2026-09-08",
   "privacyBoundary": "No care text, search query, profile, device identifier or user-level web-to-app join.",
   "stages": [
     {
@@ -73,6 +73,36 @@
       "page_slug": "dementia-caregiver-overwhelmed",
       "page_url": "https://dementiacoachapp.com/guides/dementia-caregiver-overwhelmed.html",
       "campaign_token": "seo_en_overwhelmed"
+    },
+    {
+      "language": "de",
+      "page_slug": "demenz-immer-dieselbe-frage",
+      "page_url": "https://dementiacoachapp.com/ratgeber/demenz-immer-dieselbe-frage.html",
+      "campaign_token": "seo_de_fragen"
+    },
+    {
+      "language": "de",
+      "page_slug": "demenz-will-sich-nicht-waschen",
+      "page_url": "https://dementiacoachapp.com/ratgeber/demenz-will-sich-nicht-waschen.html",
+      "campaign_token": "seo_de_waschen"
+    },
+    {
+      "language": "de",
+      "page_slug": "demenz-diebstahlvorwuerfe",
+      "page_url": "https://dementiacoachapp.com/ratgeber/demenz-diebstahlvorwuerfe.html",
+      "campaign_token": "seo_de_vorwuerfe"
+    },
+    {
+      "language": "de",
+      "page_slug": "demenz-fragt-nach-verstorbener-mutter",
+      "page_url": "https://dementiacoachapp.com/ratgeber/demenz-fragt-nach-verstorbener-mutter.html",
+      "campaign_token": "seo_de_mutter"
+    },
+    {
+      "language": "de",
+      "page_slug": "demenz-nachts-zur-arbeit",
+      "page_url": "https://dementiacoachapp.com/ratgeber/demenz-nachts-zur-arbeit.html",
+      "campaign_token": "seo_de_nachts"
     }
   ]
 }
