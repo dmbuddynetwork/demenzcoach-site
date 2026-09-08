@@ -52,6 +52,9 @@ for (const file of htmlFiles) {
     ?? /<link\s+[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["'][^>]*>/i.exec(html)?.[1];
 
   if (!title) fail(`${file}: missing title`);
+  if (!/href=["'][^"']*lovable-home\.css\?v=/.test(html)) fail(`${file}: missing current shared layout`);
+  if (/href=["'][^"']*\/(?:styles)\.css|href=["']styles\.css/.test(html)) fail(`${file}: legacy stylesheet remains`);
+  if (/src=["'][^"']*\bscript\.js["']/.test(html)) fail(`${file}: legacy navigation script remains`);
   if (!description && file !== "404.html") fail(`${file}: missing meta description`);
   if (h1Count !== 1) fail(`${file}: expected one h1, found ${h1Count}`);
   if (file === "404.html") {
@@ -84,7 +87,7 @@ for (const file of htmlFiles) {
   for (const href of hrefs(html)) {
     if (/^(?:https?:|mailto:|tel:|data:)/i.test(href)) continue;
     const clean = decodeURIComponent(href.split("?")[0]);
-    let target = path.resolve(root, relativeBase, clean);
+    let target = clean.startsWith('/') ? path.join(root, clean) : path.resolve(root, relativeBase, clean);
     if (clean.endsWith("/")) target = path.join(target, "index.html");
     if (!fs.existsSync(target)) fail(`${file}: missing internal target ${href}`);
   }
@@ -130,7 +133,7 @@ if (!fs.existsSync(campaignManifestPath)) {
   });
 }
 
-const trackingScript = read("script.js");
+const trackingScript = read("lovable-home.js");
 for (const measurementField of ["campaign_token", "related_guide_click", "guide_read_depth"]) {
   if (!trackingScript.includes(measurementField)) {
     fail(`script.js: missing SEO measurement field ${measurementField}`);
