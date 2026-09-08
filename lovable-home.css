@@ -897,6 +897,57 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   .emotional-cta .cta-panel > div { padding: 0 22px 28px; }
 }
 
+@media (max-width: 720px) {
+  .nav-wrap { min-height: 64px; }
+  .site-nav { top: 64px; max-height: calc(100svh - 80px); overflow-y: auto; }
+  main > section { scroll-margin-top: 76px; }
+  .hero-orb { display: none; }
+  .human-hero { padding: 28px 0 32px; background: #f7f7fc; }
+  .human-hero h1 { margin-block: 12px 16px; font-size: clamp(2rem, 8.7vw, 2.4rem); line-height: 1.08; }
+  .hero-photo { padding: 0; background: white; border: 1px solid var(--line); border-radius: 20px; box-shadow: none; }
+  .hero-photo > picture, .hero-photo > picture > img { height: 132px; min-height: 0; aspect-ratio: auto; border-radius: 19px 19px 0 0; }
+  .hero-response { display: grid; grid-template-columns: 1fr; gap: 6px; margin: 0; padding: 18px; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; }
+  .hero-response span { font-size: .69rem; letter-spacing: .06em; }
+  .hero-response span:not(:first-child) { margin-top: 10px; }
+  .hero-response strong, .hero-response p { font-family: var(--sans); font-size: .96rem; line-height: 1.5; }
+  .hero-response strong { font-weight: 650; }
+  .section { padding-block: 32px; }
+  .section.mobile-fold { padding: 0; margin: 0; background: white; color: var(--ink-dark); overflow: visible; }
+  .mobile-fold::before, .mobile-fold::after { display: none; }
+  .mobile-fold > details { border-bottom: 1px solid var(--line); }
+  .mobile-fold > details > summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 64px; padding: 18px 20px; font: 650 1rem/1.4 var(--sans); cursor: pointer; list-style: none; }
+  .mobile-fold > details > summary::-webkit-details-marker { display: none; }
+  .mobile-fold > details > summary::after { content: '+'; flex-shrink: 0; font-size: 1.5rem; color: var(--ink); }
+  .mobile-fold > details[open] > summary::after { content: '−'; }
+  .mobile-fold-content { padding: 12px 0 24px; }
+  .mobile-fold-content .eyebrow { color: var(--sage-dark); }
+  .mobile-fold-content .personal-premium .eyebrow,
+  .mobile-fold-content .community-card .eyebrow { color: #dfe2fa; }
+  .reassurance p { font-size: .8rem; }
+  .mobile-fold-content .story-grid,
+  .mobile-fold-content .steps,
+  .mobile-fold-content .pillar-grid,
+  .mobile-fold-content .moment-library-grid,
+  .mobile-fold-content .profile-compare,
+  .mobile-fold-content .expertise-grid,
+  .mobile-fold-content .testimonial-grid,
+  .mobile-fold-content .content-card-grid,
+  .mobile-fold-content .question-grid { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); grid-auto-columns: auto; width: 100%; margin: 20px 0 0; padding: 0; overflow: visible; }
+  .mobile-fold-content .step-demo { margin-top: 18px; }
+  .mobile-fold-content .story-panel { height: auto; border: 1px solid var(--line); }
+  .mobile-fold-content .evidence-strip { width: calc(100% - 28px); margin-inline: auto; }
+  .mobile-fold-content .quote-wrap p { color: var(--muted); }
+  .app-showcase .section-heading h2, .faq h2, .disclaimer-card h2 { font-size: 1.9rem; }
+  .screenshot-grid { grid-auto-columns: 68vw; margin-block: 22px 0; }
+  .screenshot-card { align-self: start; }
+  .screenshot-card img { width: 100%; height: auto; aspect-ratio: 640 / 1391; max-height: 42svh; }
+  .screenshot-card strong { font: 600 .95rem/1.4 var(--sans); }
+  .final-cta .cta-panel > img { display: none; }
+  .emotional-cta .cta-panel > div { padding: 26px 22px; }
+  .emotional-cta .cta-panel h2 { font-size: 1.9rem; }
+  .consent-settings { position: static; display: block; margin: 16px auto; box-shadow: none; min-height: 44px; }
+}
+
 [dir="rtl"] .site-nav,
 [dir="rtl"] .hero-copy,
 [dir="rtl"] .benefit-copy,

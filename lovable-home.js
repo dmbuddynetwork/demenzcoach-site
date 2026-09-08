@@ -33,6 +33,54 @@ document.addEventListener('keydown', (event) => {
   menuButton?.focus();
 });
 
+// Keep supporting content available without forcing a long mobile reading path.
+const mobileLayout = window.matchMedia('(max-width: 720px)');
+const mobileSections = [];
+const setupMobileSections = () => {
+  if (!mobileLayout.matches) {
+    mobileSections.splice(0).forEach(({ section, details, nodes }) => {
+      details.remove();
+      section.append(...nodes);
+      section.classList.remove('mobile-fold');
+    });
+    return;
+  }
+  if (mobileSections.length) return;
+  document.querySelectorAll('main > section').forEach(section => {
+    if (section.matches('.hero, .reassurance, .app-showcase, .disclaimer-section, .final-cta, .faq')) return;
+    const heading = section.querySelector('h2');
+    if (!heading) return;
+    const nodes = [...section.childNodes];
+    const details = document.createElement('details');
+    const summary = document.createElement('summary');
+    const label = section.querySelector('.eyebrow');
+    summary.textContent = label?.textContent.trim() || heading.textContent.trim();
+    const content = document.createElement('div');
+    content.className = 'mobile-fold-content';
+    content.append(...nodes);
+    details.append(summary, content);
+    section.append(details);
+    section.classList.add('mobile-fold');
+    mobileSections.push({ section, details, nodes });
+  });
+};
+const revealMobileAnchor = () => {
+  const target = document.getElementById(location.hash.slice(1));
+  const entry = mobileSections.find(({ section }) => section === target || section.contains(target));
+  if (entry) entry.details.open = true;
+};
+setupMobileSections();
+revealMobileAnchor();
+mobileLayout.addEventListener('change', () => { setupMobileSections(); revealMobileAnchor(); });
+window.addEventListener('hashchange', revealMobileAnchor);
+document.addEventListener('click', event => {
+  const link = event.target.closest('a[href^="#"]');
+  if (!link) return;
+  const target = document.getElementById(link.getAttribute('href').slice(1));
+  const entry = mobileSections.find(({ section }) => section === target || section.contains(target));
+  if (entry) entry.details.open = true;
+});
+
 const websiteAnalytics = (() => {
   const measurementID = 'G-5NRN1EMJDC';
   const consentKey = 'demenzcoach.analyticsConsent.v1';
@@ -181,7 +229,8 @@ const showConsentBanner = () => {
 const hideConsentBanner = () => {
   consentBanner.hidden = true;
   consentSettingsButton.hidden = false;
-  consentSettingsButton.focus();
+  if (mobileLayout.matches && menuButton) menuButton.focus({ preventScroll: true });
+  else consentSettingsButton.focus({ preventScroll: true });
 };
 
 consentBanner.querySelector('.consent-decline').addEventListener('click', () => {

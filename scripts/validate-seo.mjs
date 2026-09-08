@@ -177,7 +177,7 @@ for (const language of homeLanguages) {
   if (robots.toLowerCase().includes("noindex")) fail(`${file}: localized home must be indexable`);
   if (html.includes('data-page-type="localized-product-draft"')) fail(`${file}: draft page type remains`);
   if (!/href="lovable-home\.css(?:\?v=[^"]+)?"/.test(html)) fail(`${file}: missing shared Lovable design system`);
-  if (!html.includes('src="lovable-home.js"')) fail(`${file}: missing shared accessible navigation script`);
+  if (!/src="lovable-home\.js(?:\?v=[^"]+)?"/.test(html)) fail(`${file}: missing shared accessible navigation script`);
 
   const alternates = new Map([...html.matchAll(/<link\s+rel=["']alternate["']\s+hreflang=["']([^"']+)["']\s+href=["']([^"']+)["'][^>]*>/gi)]
     .map((match) => [match[1], match[2]]));
