@@ -696,7 +696,7 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   .brand-logo { width: 38px; height: 38px; border-radius: 11px; }
   .human-hero { padding-top: 52px; }
   .human-hero .hero-copy { text-align: left; }
-  .human-hero h1 { font-size: clamp(3rem, 14vw, 4.3rem); }
+  .human-hero h1 { font-size: clamp(2.35rem, 10vw, 2.75rem); overflow-wrap: anywhere; }
   .human-hero .hero-actions { justify-content: stretch; }
   .human-hero .hero-actions > * { width: 100%; }
   .hero-photo { display: block; min-height: 0; border-radius: 30px; }
