@@ -33,6 +33,8 @@ document.addEventListener('keydown', (event) => {
   menuButton?.focus();
 });
 
+const mobileLayout = window.matchMedia('(max-width: 720px)');
+
 const websiteAnalytics = (() => {
   const measurementID = 'G-5NRN1EMJDC';
   const consentKey = 'demenzcoach.analyticsConsent.v1';
@@ -181,7 +183,8 @@ const showConsentBanner = () => {
 const hideConsentBanner = () => {
   consentBanner.hidden = true;
   consentSettingsButton.hidden = false;
-  consentSettingsButton.focus();
+  if (mobileLayout.matches && menuButton) menuButton.focus({ preventScroll: true });
+  else consentSettingsButton.focus({ preventScroll: true });
 };
 
 consentBanner.querySelector('.consent-decline').addEventListener('click', () => {
