@@ -1,0 +1,17 @@
+name: Website checks
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node scripts/validate-seo.mjs .
+      - run: node scripts/validate-contact-form.cjs
+      - run: node scripts/validate-situation-guides.mjs .
