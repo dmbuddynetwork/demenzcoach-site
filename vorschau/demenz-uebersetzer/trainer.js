@@ -1,0 +1,145 @@
+// Gesprächstrainer: Quiz mit festen Antworten. Nichts wird gespeichert oder
+// gesendet; Analytics (nach Einwilligung) erhält nur Frage-Schlüssel und Punktzahl.
+(() => {
+  const root = document.getElementById('trainer');
+  const dataElement = document.getElementById('trainer-data');
+  if (!root || !dataElement) return;
+  const { questions, url } = JSON.parse(dataElement.textContent);
+  const appURL = 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=seo_de_trainer&mt=8';
+  let index = 0;
+  let score = 0;
+  const missed = [];
+
+  const track = (name, parameters) => {
+    if (typeof websiteAnalytics !== 'undefined') websiteAnalytics.track(name, parameters);
+  };
+
+  const element = (tag, options = {}, children = []) => {
+    const node = document.createElement(tag);
+    if (options.className) node.className = options.className;
+    if (options.text) node.textContent = options.text;
+    Object.entries(options.attributes ?? {}).forEach(([name, value]) => node.setAttribute(name, value));
+    children.filter(Boolean).forEach((child) => node.append(child));
+    return node;
+  };
+
+  const focusHeading = () => root.querySelector('h2')?.focus({ preventScroll: false });
+
+  const renderQuestion = () => {
+    const question = questions[index];
+    const progress = element('div', { className: 'trainer-progress', attributes: { role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(questions.length), 'aria-valuenow': String(index) } }, [
+      element('span', { attributes: { style: `width:${(index / questions.length) * 100}%` } })
+    ]);
+    const options = element('div', { className: 'trainer-options', attributes: { role: 'group', 'aria-label': 'Antwortmöglichkeiten' } });
+    const feedback = element('div', { className: 'trainer-feedback', attributes: { 'aria-live': 'polite' } });
+
+    question.options.forEach((option) => {
+      const button = element('button', { className: 'trainer-option', text: option.text, attributes: { type: 'button' } });
+      button.addEventListener('click', () => {
+        options.querySelectorAll('button').forEach((candidate, candidateIndex) => {
+          candidate.disabled = true;
+          if (question.options[candidateIndex].good) candidate.classList.add('is-good');
+        });
+        if (!option.good) button.classList.add('is-bad');
+        if (option.good) score += 1;
+        else missed.push(question);
+        track('trainer_answer', { question_key: question.key, correct: option.good ? 'yes' : 'no' });
+
+        const goodOption = question.options.find((candidate) => candidate.good);
+        feedback.replaceChildren(
+          element('p', { className: option.good ? 'trainer-verdict is-good' : 'trainer-verdict is-bad', text: option.good ? 'Gut gewählt.' : 'Eher ungünstig.' }),
+          element('p', { text: option.why }),
+          option.good ? null : element('p', { text: `Besser geeignet: ${goodOption.text} – ${goodOption.why}` })
+        );
+        const next = element('button', {
+          className: 'button',
+          text: index + 1 < questions.length ? 'Nächste Situation' : 'Ergebnis ansehen',
+          attributes: { type: 'button' }
+        });
+        next.addEventListener('click', () => {
+          index += 1;
+          if (index < questions.length) renderQuestion();
+          else renderResult();
+        });
+        feedback.append(next);
+        next.focus();
+      });
+      options.append(button);
+    });
+
+    root.replaceChildren(
+      progress,
+      element('p', { className: 'eyebrow', text: `Situation ${index + 1} von ${questions.length}` }),
+      element('h2', { className: 'trainer-situation', text: question.situation, attributes: { tabindex: '-1' } }),
+      element('p', { className: 'trainer-ask', text: 'Was würdest du sagen?' }),
+      options,
+      feedback
+    );
+    if (index > 0) focusHeading();
+  };
+
+  const verdict = () => {
+    const ratio = score / questions.length;
+    if (ratio >= 0.85) return 'Du hast ein sehr gutes Gespür für ruhige, wertschätzende Antworten.';
+    if (ratio >= 0.5) return 'Du liegst oft richtig. Ein paar Situationen lohnen sich, noch einmal anzuschauen.';
+    return 'Viele dieser Reaktionen sind ganz normal – sie fallen uns zuerst ein. Gut, dass du es hier geübt hast.';
+  };
+
+  const renderResult = () => {
+    track('trainer_complete', { score, total: questions.length });
+    const shareText = `Ich habe beim Demenz-Gesprächstrainer ${score} von ${questions.length} Situationen ruhig gelöst. Wie würdest du antworten?`;
+    const share = element('div', { className: 'translator-share' }, [element('span', { text: 'Teilen:' })]);
+    if (navigator.share) {
+      const native = element('button', { className: 'translator-copy', text: 'Teilen', attributes: { type: 'button' } });
+      native.addEventListener('click', async () => {
+        try {
+          await navigator.share({ title: 'Gesprächstrainer Demenz', text: shareText, url });
+          track('trainer_share', { method: 'native', score });
+        } catch {
+          // Abgebrochen.
+        }
+      });
+      share.append(native);
+    }
+    const whatsapp = element('a', {
+      className: 'translator-copy',
+      text: 'WhatsApp',
+      attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${url}`)}`, rel: 'noopener', target: '_blank' }
+    });
+    whatsapp.addEventListener('click', () => track('trainer_share', { method: 'whatsapp', score }));
+    share.append(whatsapp);
+
+    const restart = element('button', { className: 'translator-copy', text: 'Noch einmal üben', attributes: { type: 'button' } });
+    restart.addEventListener('click', () => {
+      index = 0;
+      score = 0;
+      missed.length = 0;
+      renderQuestion();
+      focusHeading();
+    });
+
+    const review = missed.filter((question) => question.href);
+    root.replaceChildren(
+      element('p', { className: 'eyebrow', text: 'Dein Ergebnis' }),
+      element('h2', { className: 'trainer-score', text: `${score} von ${questions.length} Situationen ruhig gelöst`, attributes: { tabindex: '-1' } }),
+      element('p', { text: verdict() }),
+      review.length ? element('p', { className: 'trainer-review-title', text: 'Zum Nachlesen:' }) : null,
+      review.length ? element('ul', {}, review.map((question) => element('li', {}, [
+        element('a', { text: question.options.find((option) => option.good).text.replace(/^„|“$/g, ''), attributes: { href: question.href, 'data-related-link': question.key } })
+      ]))) : null,
+      share,
+      element('div', { className: 'translator-result-links' }, [restart]),
+      element('aside', { className: 'article-cta translator-app-cta' }, [
+        element('div', {}, [
+          element('span', { className: 'eyebrow', text: 'Weiter üben mit Demenz Coach' }),
+          element('h2', { text: 'Drei Minuten am Tag, ein persönlicher Plan' }),
+          element('p', { text: 'In der App gibt es ein Drei-Minuten-Training und einen persönlichen 7-Tage-Plan – und Hilfe für eure ganz konkrete Situation. Kostenloser Download, optionales Abo.' })
+        ]),
+        element('a', { className: 'button', text: 'Kostenlos im App Store', attributes: { href: appURL, 'data-store-link': 'trainer-result' } })
+      ])
+    );
+    focusHeading();
+  };
+
+  renderQuestion();
+})();
