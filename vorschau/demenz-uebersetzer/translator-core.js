@@ -13,6 +13,9 @@
     [/\bvati\b/g, 'papa']
   ];
 
+  const speaker = /^(?:(?:mein|meine|unser|unsere|die|der) )?(?:vater|mutter|mama|papa|mann|frau|ehemann|ehefrau|partner|partnerin|oma|opa|schwiegermutter|schwiegervater|tante|onkel|bruder|schwester|patient|patientin|bewohner|bewohnerin|er|sie) (?=(?:sagt|meint|behauptet|denkt|glaubt|fragt|erzaehlt|ruft|will|erkennt|haelt|sucht|weiss|schreit|steht|isst|redet|spricht|langweilt|traut|wirft)\b)/;
+  const sayingVerb = /^(?:sagt|meint|behauptet|denkt|glaubt|erzaehlt)(?: (?:immer|staendig|dauernd|oft|wieder|jeden tag|abends|nachts))*(?: dass)? /;
+
   const normalize = (text) => {
     let value = String(text)
       .toLowerCase()
@@ -25,6 +28,10 @@
     replacements.forEach(([pattern, replacement]) => {
       value = value.replace(pattern, replacement);
     });
+    // Beschreibungen aus Sicht der Angehörigen („Mein Vater sagt immer, dass …“):
+    // Wer spricht, ist nicht das Thema – sonst würde „Vater“ als Sehnsucht nach
+    // den Eltern erkannt. Erst die Person, dann das Redeverb entfernen.
+    value = value.replace(speaker, '').replace(sayingVerb, '');
     return ` ${value} `;
   };
 
