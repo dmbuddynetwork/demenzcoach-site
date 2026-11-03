@@ -33,6 +33,8 @@ document.addEventListener('keydown', (event) => {
   menuButton?.focus();
 });
 
+const mobileLayout = window.matchMedia('(max-width: 720px)');
+
 const websiteAnalytics = (() => {
   const measurementID = 'G-5NRN1EMJDC';
   const consentKey = 'demenzcoach.analyticsConsent.v1';
@@ -181,7 +183,8 @@ const showConsentBanner = () => {
 const hideConsentBanner = () => {
   consentBanner.hidden = true;
   consentSettingsButton.hidden = false;
-  consentSettingsButton.focus();
+  if (mobileLayout.matches && menuButton) menuButton.focus({ preventScroll: true });
+  else consentSettingsButton.focus({ preventScroll: true });
 };
 
 consentBanner.querySelector('.consent-decline').addEventListener('click', () => {
@@ -238,7 +241,7 @@ document.addEventListener('click', (event) => {
   }
 });
 
-if (pageContext.page_type === 'seo-guide' || pageContext.page_type === 'translator-phrase') {
+if (pageContext.page_type === 'seo-guide') {
   const reportedDepths = new Set();
   const reportReadDepth = () => {
     const scrollable = document.documentElement.scrollHeight - window.innerHeight;
@@ -253,6 +256,23 @@ if (pageContext.page_type === 'seo-guide' || pageContext.page_type === 'translat
   };
   window.addEventListener('scroll', reportReadDepth, { passive: true });
 }
+
+// Preserve the existing support form behavior: prepare an email, never send it.
+document.querySelectorAll('[data-contact-form]').forEach((form) => {
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const data = new FormData(form);
+    const recipient = form.dataset.recipient ?? 'demenzcoachapp@gmail.com';
+    const name = String(data.get('name') ?? '').trim();
+    const subject = String(data.get('subject') ?? '').trim();
+    const message = String(data.get('message') ?? '').trim();
+    const nameLine = name ? `Name: ${name}\n\n` : '';
+    const body = `${nameLine}${message}`;
+    websiteAnalytics.track('support_contact_click', { contact_method: 'prepared_email' });
+    window.location.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+});
 
 const observedSections = [
   'app-einblicke',
