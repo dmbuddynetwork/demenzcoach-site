@@ -158,7 +158,10 @@
     return wrapper;
   };
 
-  const appCTA = () => element('aside', { className: 'article-cta translator-app-cta' }, [
+  // App-Link je Situation mit eigenem Kampagnen-Token (fester Schlüssel, nie Text),
+  // damit messbar wird, welche Situationen zur App führen.
+  const appLinkFor = (result) => (result?.campaign ? appURL.replace('ct=seo_de_translator', `ct=${result.campaign}`) : appURL);
+  const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
       element('span', { className: 'eyebrow', text: 'Demenz Coach für iPhone' }),
       element('h2', { text: 'Persönliche Hilfe für eure Situation' }),
@@ -183,7 +186,7 @@
       element('a', {
         className: 'button',
         text: 'Kostenlos im App Store',
-        attributes: { href: appURL, 'data-store-link': 'translator-result' }
+        attributes: { href: appLinkFor(result), 'data-store-link': result?.key ? `translator-result-${result.key}` : 'translator-result' }
       })
     ])
   ]);
@@ -451,7 +454,7 @@
       nodes.push(feelingPicker(result.feeling ? 'Anderes Gefühl?' : 'Passt nicht ganz? Was spürst du bei der Person?'));
       nodes.push(feedbackBlock(result, retry));
       nodes.push(shareBlock(result));
-      nodes.push(appCTA());
+      nodes.push(appCTA(result));
     }
 
     output.replaceChildren(...nodes);
