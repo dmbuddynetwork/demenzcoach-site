@@ -363,8 +363,6 @@
       });
       nodes.push(alsoWrapper);
     }
-    nodes.push(element('div', { className: 'quick-answer' }, [element('p', { text: result.short })]));
-
     if (alternatives.length) {
       const altWrapper = element('p', { className: 'translator-alternatives' }, [element('span', { text: 'Passt eher? ' })]);
       alternatives.forEach((alternative) => {
@@ -389,8 +387,10 @@
         }));
       };
       paint();
-      nodes.push(personalPanel(() => { paint(); retry?.refresh(); }), phraseList);
+      // Auf dem Handy muss der erste Satz ohne Scrollen sichtbar sein: Sätze zuerst, Anpassen und Erklärung danach.
+      nodes.push(phraseList, personalPanel(() => { paint(); retry?.refresh(); }));
     }
+    nodes.push(element('div', { className: 'quick-answer' }, [element('p', { text: result.short })]));
     if (retry) nodes.push(retry.toggle, retry.block);
 
     // Antwort zuerst, Hintergrund zum Aufklappen: hält das Ergebnis auf dem Handy kurz.
