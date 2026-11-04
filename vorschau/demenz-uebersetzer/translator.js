@@ -318,7 +318,18 @@
     nodes.push(element('span', { className: 'eyebrow', text: 'Noch nicht in der Liste' }));
     const heading = element('h2', { text: 'Was spürst du gerade bei der Person?', attributes: { tabindex: '-1' } });
     nodes.push(heading);
-    nodes.push(element('p', { text: 'Diesen Satz kennt der Übersetzer noch nicht. Fast immer steckt aber ein Gefühl dahinter – wähle das, was am ehesten passt, und du bekommst passende Sätze zum Ausprobieren.' }));
+    // Auch ohne Treffer sofort ein Satz, den man sagen kann – danach die Gefühls-Auswahl für passendere Sätze.
+    const firstAid = core.personalize(fallback.phrases[0], personal, data.formal);
+    nodes.push(element('p', { className: 'translator-first-aid-title', text: 'Für den Moment passt fast immer:' }));
+    nodes.push(element('div', { className: 'translator-phrases' }, [
+      element('div', { className: 'translator-phrase' }, [
+        element('q', { text: firstAid }),
+        button('Kopieren', 'translator-copy', async (event) => {
+          if (await copyText(firstAid, event.currentTarget)) track('translator_copy', { result_key: 'unbekannt' });
+        })
+      ])
+    ]));
+    nodes.push(element('p', { text: 'Diesen Satz kennt der Übersetzer noch nicht. Wähle das Gefühl, das am ehesten passt – dann bekommst du genauere Sätze.' }));
     nodes.push(feelingPicker('Gefühl wählen'));
     const popular = element('p', { className: 'translator-alternatives' }, [element('span', { text: 'Oder ähnlich wie: ' })]);
     ['mutter', 'nachhause', 'geld', 'ruhe'].map((key) => entryByKey.get(key)).filter(Boolean).forEach((candidate) => {
