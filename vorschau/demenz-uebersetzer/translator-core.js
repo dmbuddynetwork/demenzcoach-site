@@ -8,6 +8,16 @@
     [/\bned\b/g, 'nicht'],
     [/\bhab\b/g, 'habe'],
     [/\bkenn\b/g, 'kenne'],
+    // Umgangssprache und leichter Dialekt, wie man im Moment schnell tippt.
+    [/\bnich\b/g, 'nicht'],
+    [/\bis\b/g, 'ist'],
+    [/\bisch\b/g, 'ich'],
+    [/^i\b/, 'ich'],
+    [/\bgehts\b/g, 'geht es'],
+    [/\bgibts\b/g, 'gibt es'],
+    [/\bmei\b/g, 'mein'],
+    [/\bhoam\b/g, 'heim'],
+    [/\bwill\s+ham\b/g, 'will heim'],
     [/\bwill\s+heim\b/g, 'will nach hause'],
     [/\bmutti\b/g, 'mama'],
     [/\bvati\b/g, 'papa']
