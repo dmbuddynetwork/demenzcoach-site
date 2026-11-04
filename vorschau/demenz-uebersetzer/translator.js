@@ -346,7 +346,9 @@
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
-  const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '' } = {}) => {
+  const moodLead = { wut: 'Zuerst beruhigen', trauer: 'Zuerst trösten', angst: 'Zuerst Sicherheit geben' };
+
+  const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null } = {}) => {
     if (!entry) {
       renderUnknown({ safetyHit, typed });
       return;
@@ -394,9 +396,12 @@
       nodes.push(element('h3', { text: 'Sätze zum Ausprobieren' }));
       const phraseList = element('div', { className: 'translator-phrases' });
       const paint = () => {
-        phraseList.replaceChildren(...result.phrases.map((original) => {
+        // Bei Wut, Tränen oder Angst kommt zuerst ein kurzer beruhigender Satz.
+        const first = mood && mood.phrases?.length ? [{ original: mood.phrases[0], lead: moodLead[mood.id] }] : [];
+        phraseList.replaceChildren(...[...first, ...result.phrases.map((original) => ({ original }))].map(({ original, lead }) => {
           const text = core.personalize(original, personal, data.formal);
-          return element('div', { className: 'translator-phrase' }, [
+          return element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : 'translator-phrase' }, [
+            lead ? element('span', { className: 'translator-mood-lead', text: lead }) : null,
             element('q', { text }),
             button('Kopieren', 'translator-copy', async (event) => {
               if (await copyText(text, event.currentTarget)) track('translator_copy', { result_key: result.key });
@@ -518,7 +523,7 @@
       input.focus();
       return;
     }
-    const { entry, alternatives, safetyHit, feeling, also } = core.match(text, data);
+    const { entry, alternatives, safetyHit, feeling, also, mood } = core.match(text, data);
     const feelingEntry = !entry && feeling ? feelingEntries.get(feeling.id) : null;
     if (feelingEntry) {
       render(feelingEntry, { safetyHit, typed: text });
@@ -527,9 +532,9 @@
       return;
     }
     const knownPhrase = entry && entry.says === text;
-    render(entry, { safetyHit, alternatives, also, typed: knownPhrase ? '' : text });
+    render(entry, { safetyHit, alternatives, also, mood, typed: knownPhrase ? '' : text });
     setHash(entry?.key);
-    track('translator_result', { result_key: entry?.key ?? 'none', input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no', multiple: also.length ? 'yes' : 'no' });
+    track('translator_result', { result_key: entry?.key ?? 'none', input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no', multiple: also.length ? 'yes' : 'no', mood: mood?.id ?? 'none' });
   });
 
   document.querySelectorAll('[data-translator-key]').forEach((chip) => {

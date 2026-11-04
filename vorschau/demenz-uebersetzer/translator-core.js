@@ -111,8 +111,25 @@
     return keywords.some((keyword) => normalized.includes(` ${keyword}`));
   };
 
+  const moodIds = ['wut', 'trauer', 'angst'];
+
   const match = (text, data) => {
-    const ranked = rank(text, data.entries);
+    let ranked = rank(text, data.entries);
+    // Starkes Gefühl in einer beschriebenen Situation („Er ist wütend und will zur Arbeit“):
+    // Das Gefühl soll nicht das Thema überdecken. Ohne Gefühlswörter neu suchen und das
+    // Gefühl als kurze erste Antwort mitgeben („Erst trösten …“).
+    const moodFeelings = (data.feelings ?? []).filter((item) => moodIds.includes(item.id));
+    let mood = ranked.length ? rank(text, moodFeelings)[0]?.entry ?? null : null;
+    const withoutMood = (value) => (mood ? mood.keywords.reduce((result, keyword) => result.replace(new RegExp(` ${keyword}\\S*`, 'g'), ' '), normalize(value)) : value);
+    if (mood) {
+      const topic = rank(withoutMood(text), data.entries);
+      if (topic.length && topic[0].entry.key !== ranked[0].entry.key) {
+        // Alternativen ebenfalls ohne Gefühlswörter, sonst steht „Lass mich in Ruhe“ nur wegen „wütend“ daneben.
+        ranked = topic;
+      }
+      // „Lass mich in Ruhe“ beantwortet Wut schon selbst.
+      if (mood.id === 'wut' && ranked[0].entry.key === 'ruhe') mood = null;
+    }
     const best = ranked[0] ?? null;
     const alternatives = best
       ? ranked.slice(1).filter((candidate) => candidate.score >= best.score * 0.5 && !candidate.entry.safetyOnly).slice(0, 2)
@@ -128,7 +145,7 @@
     const also = [];
     if (parts.length > 1) {
       parts.forEach((part) => {
-        const top = rank(part, data.entries)[0]?.entry;
+        const top = rank(withoutMood(part), data.entries)[0]?.entry;
         if (top && !top.safetyOnly && !shown.has(top.key)) {
           shown.add(top.key);
           also.push(top);
@@ -137,6 +154,7 @@
     }
     return {
       feeling,
+      mood,
       also: also.slice(0, 2),
       entry: best?.entry ?? null,
       alternatives: alternatives.map((candidate) => candidate.entry).filter((entry) => !also.includes(entry)),
