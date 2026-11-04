@@ -173,6 +173,8 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 .translator-more summary::after { content: ""; }
 }
 .translator-also { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 4px 0 16px; padding: 12px 14px; background: var(--ivory); border: 1px dashed var(--sage); border-radius: 14px; }
+.translator-also-quick { margin: -4px 0 14px; color: var(--muted); font-size: .92rem; }
+.translator-also-quick .translator-also-link { margin: 0 6px 0 0; padding: 0; color: var(--ink); background: none; border: 0; font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .translator-also-title { flex-basis: 100%; margin: 0; font-weight: 700; color: var(--ink); }
 @media print {
 .translator-also { display: none; }

@@ -339,7 +339,7 @@
     nodes.push(...listSection('Was fast immer hilft', fallback.next));
     nodes.push(suggestLink(typed));
     nodes.push(appCTA());
-    output.replaceChildren(...nodes);
+    output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
     heading.focus({ preventScroll: true });
@@ -365,14 +365,21 @@
     nodes.push(element('span', { className: 'eyebrow', text: result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
     const heading = element('h2', { text: result.feeling ? `Wenn ${result.feeling} im Raum steht` : `„${result.says}“`, attributes: { tabindex: '-1' } });
     nodes.push(heading);
+    // Weitere Anliegen kommen direkt nach den Sätzen: Der erste Satz zum Ausprobieren bleibt auf dem Handy oben.
+    let alsoWrapper = null;
     if (also.length) {
-      const alsoWrapper = element('div', { className: 'translator-also', attributes: { role: 'group', 'aria-label': 'Weitere Anliegen in deiner Eingabe' } }, [
-        element('p', { className: 'translator-also-title', text: also.length > 1 ? 'Du hast noch mehr beschrieben – dazu gibt es eigene Antworten:' : 'Du hast noch etwas beschrieben – dazu gibt es eine eigene Antwort:' })
+      alsoWrapper = element('div', { className: 'translator-also', attributes: { role: 'group', 'aria-label': 'Weitere Anliegen in deiner Eingabe' } }, [
+        element('p', { className: 'translator-also-title', text: also.length > 1 ? 'Du hast noch mehr beschrieben. Antworten dazu:' : 'Du hast noch etwas beschrieben. Antwort dazu:' })
       ]);
       also.forEach((candidate) => {
         alsoWrapper.append(button(`„${candidate.says}“ →`, 'translator-chip', () => show(candidate, 'also')));
       });
-      nodes.push(alsoWrapper);
+    }
+    // Kurzer Hinweis direkt unter der Überschrift, damit das zweite Anliegen nicht übersehen wird.
+    if (also.length) {
+      const quick = element('p', { className: 'translator-also-quick' }, [element('span', { text: 'Auch beschrieben: ' })]);
+      also.forEach((candidate) => quick.append(button(`„${candidate.says}“`, 'translator-also-link', () => show(candidate, 'also'))));
+      nodes.push(quick);
     }
     if (alternatives.length) {
       const altWrapper = element('p', { className: 'translator-alternatives' }, [element('span', { text: 'Passt eher? ' })]);
@@ -399,7 +406,9 @@
       };
       paint();
       // Auf dem Handy muss der erste Satz ohne Scrollen sichtbar sein: Sätze zuerst, Anpassen und Erklärung danach.
-      nodes.push(phraseList, personalPanel(() => { paint(); retry?.refresh(); }));
+      nodes.push(phraseList, alsoWrapper, personalPanel(() => { paint(); retry?.refresh(); }));
+    } else if (alsoWrapper) {
+      nodes.push(alsoWrapper);
     }
     nodes.push(element('div', { className: 'quick-answer' }, [element('p', { text: result.short })]));
     if (retry) nodes.push(retry.toggle, retry.block);
@@ -475,7 +484,7 @@
       nodes.push(appCTA(result));
     }
 
-    output.replaceChildren(...nodes);
+    output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
     heading.focus({ preventScroll: true });
