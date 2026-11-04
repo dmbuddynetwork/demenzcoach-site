@@ -28,6 +28,8 @@
 .translator-phrase q { font-family: var(--serif); font-size: 1.15rem; quotes: "„" "“"; }
 .translator-phrase-mood { flex-wrap: wrap; row-gap: 4px; background: var(--sage-soft); border-left-color: var(--sage-dark); }
 .translator-mood-lead { flex-basis: 100%; font-size: .8rem; font-weight: 700; color: var(--sage-dark); }
+.translator-mood-hint { margin: 4px 0 14px; padding: 10px 14px; background: var(--sage-soft); border-radius: 10px; font-size: .95rem; }
+.translator-mood-hint strong { display: block; color: var(--sage-dark); }
 .translator-copy { flex: 0 0 auto; min-height: 40px; padding: 4px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; font: inherit; font-size: .85rem; font-weight: 700; }
 .translator-result-links { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 22px; }
 .translator-teaser { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 34px 0; padding: 26px 28px; background: var(--sage-soft); border-radius: 16px; }
