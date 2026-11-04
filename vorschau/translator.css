@@ -58,6 +58,9 @@
 .translator-trust { gap: 4px 12px; margin-top: 10px; font-size: .8rem; }
 .translator-trust li::before { width: 18px; height: 18px; margin-right: 5px; font-size: .65rem; }
 .translator-trust li:nth-child(2) { display: none; }
+.translator-hero-more { display: none; }
+.translator-input-row input { padding: 0 14px; }
+.translator-input-row input::placeholder { font-size: .95rem; }
 .translator-section .translator-form-title { margin-bottom: 10px; font-size: 1.4rem; }
 }
 .translator-cluster-title { margin: 0 0 8px; font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.2rem); }

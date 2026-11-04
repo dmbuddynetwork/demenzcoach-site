@@ -544,12 +544,13 @@
 
   // Wechselnde Beispiele im Eingabefeld.
   if (!reduceMotion) {
-    const examples = data.entries.filter((entry) => !entry.safetyOnly).map((entry) => entry.says);
+    // Nur kurze Sätze, damit das Beispiel auch auf schmalen Handys nicht abgeschnitten wird.
+    const examples = data.entries.filter((entry) => !entry.safetyOnly && entry.says.length <= 20).map((entry) => entry.says);
     let index = 0;
     setInterval(() => {
       if (document.activeElement === input || input.value) return;
       index = (index + 1) % examples.length;
-      input.placeholder = `z. B. „${examples[index]}“`;
+      input.placeholder = examples[index];
     }, 3500);
   }
 
