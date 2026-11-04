@@ -315,7 +315,7 @@
       ]));
     }
     if (typed) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
-    nodes.push(element('span', { className: 'eyebrow', text: 'Noch nicht in der Liste' }));
+    nodes.push(element('span', { className: 'eyebrow translator-eyebrow-keep', text: 'Noch nicht in der Liste' }));
     const heading = element('h2', { text: 'Was spürst du gerade bei der Person?', attributes: { tabindex: '-1' } });
     nodes.push(heading);
     // Auch ohne Treffer sofort ein Satz, den man sagen kann – danach die Gefühls-Auswahl für passendere Sätze.

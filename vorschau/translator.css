@@ -199,6 +199,11 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 [data-page-type="translator-phrase"] .article-header .eyebrow { display: none; }
 [data-page-type="translator-phrase"] .article-header h1 { margin: 0; font-size: 1.6rem; line-height: 1.18; }
 [data-page-type="translator-phrase"] .translator-answer-first h2 { margin-top: 10px; font-size: 1.35rem; }
+.translator-result > .eyebrow:not(.translator-eyebrow-keep) { display: none; }
+.translator-result .translator-echo { margin: 0 0 6px; font-size: .85rem; }
+.translator-result > h2 { margin: 0 0 6px; font-size: 1.4rem; line-height: 1.2; }
+.translator-result > h3 { margin: 10px 0 6px; font-size: 1.05rem; }
+.translator-result .translator-also-quick { margin: 4px 0 6px; font-size: .9rem; }
 [data-page-type="translator-phrase"] .phrase-list { margin: 12px 0; gap: 8px; }
 [data-page-type="translator-phrase"] .phrase-list p { padding: 12px 14px; font-size: 1.1rem; line-height: 1.35; }
 [data-page-type="translator-phrase"] .translator-copy.phrase-copy { margin-top: 6px; }
