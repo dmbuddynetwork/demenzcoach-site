@@ -186,6 +186,8 @@
     missed.length = 0;
     renderQuestion();
     focusHeading();
+    // Auf dem Handy die erste Situation samt Antworten in den Blick holen.
+    root.scrollIntoView({ block: 'start', behavior: 'auto' });
   };
 
   // Ohne Sprung von einer Satz-Seite: erst die Länge wählen lassen.
