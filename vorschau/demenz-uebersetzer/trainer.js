@@ -139,10 +139,28 @@
     });
 
     const review = missed.filter((question) => question.href);
+    // Ein Satz zum Mitnehmen: aus der ersten verpassten Situation, sonst aus der ersten geübten.
+    const takeawayQuestion = missed[0] ?? questions[0];
+    const takeawayText = takeawayQuestion.options.find((option) => option.good).text.replace(/^„|“$/g, '');
+    const copyTakeaway = element('button', { className: 'translator-copy', text: 'Kopieren', attributes: { type: 'button' } });
+    copyTakeaway.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(takeawayText);
+        copyTakeaway.textContent = 'Kopiert';
+        track('trainer_takeaway_copy', { question_key: takeawayQuestion.key });
+      } catch {
+        copyTakeaway.textContent = 'Bitte markieren und kopieren';
+      }
+    });
+    const takeaway = element('div', { className: 'trainer-takeaway' }, [
+      element('p', { className: 'trainer-takeaway-title', text: 'Ein Satz zum Mitnehmen' }),
+      element('div', { className: 'translator-phrase' }, [element('q', { text: takeawayText }), copyTakeaway])
+    ]);
     root.replaceChildren(...[
       element('p', { className: 'eyebrow', text: 'Dein Ergebnis' }),
       element('h2', { className: 'trainer-score', text: `${score} von ${questions.length} Situationen ruhig gelöst`, attributes: { tabindex: '-1' } }),
       element('p', { text: verdict() }),
+      takeaway,
       review.length ? element('p', { className: 'trainer-review-title', text: 'Zum Nachlesen:' }) : null,
       review.length ? element('ul', {}, review.map((question) => element('li', {}, [
         element('a', { text: question.options.find((option) => option.good).text.replace(/^„|“$/g, ''), attributes: { href: question.href, 'data-related-link': question.key } })

@@ -30,6 +30,8 @@
 .translator-mood-lead { flex-basis: 100%; font-size: .8rem; font-weight: 700; color: var(--sage-dark); }
 .translator-phrase-example { flex-wrap: wrap; row-gap: 4px; }
 .translator-example-name { flex-basis: 100%; font-size: .8rem; font-weight: 600; color: var(--muted); }
+.trainer-takeaway { margin: 14px 0 18px; }
+.trainer-takeaway-title { margin: 0 0 6px; font-weight: 700; color: var(--sage-dark); }
 .translator-mood-hint { margin: 4px 0 14px; padding: 10px 14px; background: var(--sage-soft); border-radius: 10px; font-size: .95rem; }
 .translator-mood-hint strong { display: block; color: var(--sage-dark); }
 .translator-copy { flex: 0 0 auto; min-height: 40px; padding: 4px 12px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; font: inherit; font-size: .85rem; font-weight: 700; }
