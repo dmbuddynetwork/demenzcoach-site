@@ -9,6 +9,8 @@
   const startKey = decodeURIComponent(location.hash.replace(/^#frage-/, ''));
   const startIndex = location.hash.startsWith('#frage-') ? questions.findIndex((question) => question.key === startKey) : -1;
   if (startIndex > 0) questions.unshift(...questions.splice(startIndex, 1));
+  // Nach dem Sprung von einer Satz-Seite: nach der ersten Frage frei wählen lassen, ob weiter geübt wird.
+  const jumpedIn = startIndex >= 0;
   const appURL = 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=seo_de_trainer&mt=8';
   let index = 0;
   let score = 0;
@@ -50,17 +52,18 @@
         track('trainer_answer', { question_key: question.key, correct: option.good ? 'yes' : 'no' });
 
         const goodOption = question.options.find((candidate) => candidate.good);
-        feedback.replaceChildren(
+        const offerReturn = jumpedIn && index === 0 && question.href;
+        feedback.replaceChildren(...[
           element('p', { className: option.good ? 'trainer-verdict is-good' : 'trainer-verdict is-bad', text: option.good ? 'Gut gewählt.' : 'Eher ungünstig.' }),
           element('p', { text: option.why }),
           option.good ? null : element('p', { text: `Besser geeignet: ${goodOption.text} – ${goodOption.why}` }),
           question.href ? element('p', { className: 'trainer-more' }, [
-            element('a', { className: 'text-link', text: 'Mehr Sätze für diese Situation →', attributes: { href: question.href, 'data-related-link': question.key } })
+            element('a', { className: 'text-link', text: offerReturn ? 'Zurück zu den Sätzen →' : 'Mehr Sätze für diese Situation →', attributes: { href: question.href, 'data-related-link': question.key } })
           ]) : null
-        );
+        ].filter(Boolean));
         const next = element('button', {
           className: 'button',
-          text: index + 1 < questions.length ? 'Nächste Situation' : 'Ergebnis ansehen',
+          text: index + 1 < questions.length ? (offerReturn ? `Weiter üben: ${questions.length - 1} weitere Situationen` : 'Nächste Situation') : 'Ergebnis ansehen',
           attributes: { type: 'button' }
         });
         next.addEventListener('click', () => {
@@ -126,7 +129,7 @@
     });
 
     const review = missed.filter((question) => question.href);
-    root.replaceChildren(
+    root.replaceChildren(...[
       element('p', { className: 'eyebrow', text: 'Dein Ergebnis' }),
       element('h2', { className: 'trainer-score', text: `${score} von ${questions.length} Situationen ruhig gelöst`, attributes: { tabindex: '-1' } }),
       element('p', { text: verdict() }),
@@ -144,7 +147,7 @@
         ]),
         element('a', { className: 'button', text: 'Kostenlos im App Store', attributes: { href: appURL, 'data-store-link': 'trainer-result' } })
       ])
-    );
+    ].filter(Boolean));
     focusHeading();
   };
 
