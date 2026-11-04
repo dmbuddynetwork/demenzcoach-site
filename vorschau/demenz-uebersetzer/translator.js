@@ -202,12 +202,12 @@
   };
   let panelCounter = 0;
 
-  const personalPanel = (repaint) => {
+  const personalPanel = (repaint, { open = false } = {}) => {
     panelCounter += 1;
     const id = (suffix) => `translator-personal-${suffix}-${panelCounter}`;
     const isSet = personal.formal || personal.callName || personal.me || personal.role;
     const details = element('details', { className: 'translator-personal' });
-    if (isSet) details.open = true;
+    if (isSet || open) details.open = true;
     details.append(element('summary', { text: isSet ? 'Persönlich angepasst – ändern' : 'Sätze persönlich machen: Name, du oder Sie' }));
 
     const formality = element('div', { className: 'translator-personal-toggle', attributes: { role: 'group', 'aria-label': 'Anrede' } }, [
@@ -398,10 +398,15 @@
       const paint = () => {
         // Bei Wut, Tränen oder Angst kommt zuerst ein kurzer beruhigender Satz.
         const first = mood && mood.phrases?.length ? [{ original: mood.phrases[0], lead: moodLead[mood.id] }] : [];
+        // „Anna“ ist ein Beispielname: Solange kein eigener Name eingetragen ist, einmal darauf hinweisen.
+        let exampleHintShown = false;
         phraseList.replaceChildren(...[...first, ...result.phrases.map((original) => ({ original }))].map(({ original, lead }) => {
           const text = core.personalize(original, personal, data.formal);
-          return element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : 'translator-phrase' }, [
+          const exampleHint = !exampleHintShown && !String(personal.me ?? '').trim() && /\bAnna\b/.test(text);
+          if (exampleHint) exampleHintShown = true;
+          return element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : exampleHint ? 'translator-phrase translator-phrase-example' : 'translator-phrase' }, [
             lead ? element('span', { className: 'translator-mood-lead', text: lead }) : null,
+            exampleHint ? element('span', { className: 'translator-example-name', text: '„Anna“ ist ein Beispiel – trag unten deinen Namen ein.' }) : null,
             element('q', { text }),
             button('Kopieren', 'translator-copy', async (event) => {
               if (await copyText(text, event.currentTarget)) track('translator_copy', { result_key: result.key });
@@ -411,7 +416,8 @@
       };
       paint();
       // Auf dem Handy muss der erste Satz ohne Scrollen sichtbar sein: Sätze zuerst, Anpassen und Erklärung danach.
-      nodes.push(phraseList, alsoWrapper, personalPanel(() => { paint(); retry?.refresh(); }));
+      const usesExampleName = result.phrases.some((original) => /\bAnna\b/.test(original));
+      nodes.push(phraseList, alsoWrapper, personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
     }
