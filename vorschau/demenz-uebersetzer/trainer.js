@@ -5,6 +5,10 @@
   const dataElement = document.getElementById('trainer-data');
   if (!root || !dataElement) return;
   const { questions, url } = JSON.parse(dataElement.textContent);
+  // Kommt man von einer Satz-Seite (#frage-<key>), startet der Trainer mit genau dieser Situation.
+  const startKey = decodeURIComponent(location.hash.replace(/^#frage-/, ''));
+  const startIndex = location.hash.startsWith('#frage-') ? questions.findIndex((question) => question.key === startKey) : -1;
+  if (startIndex > 0) questions.unshift(...questions.splice(startIndex, 1));
   const appURL = 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=seo_de_trainer&mt=8';
   let index = 0;
   let score = 0;

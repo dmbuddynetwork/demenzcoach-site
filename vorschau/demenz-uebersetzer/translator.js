@@ -449,6 +449,13 @@
         attributes: { href: result.guide.href, 'data-related-link': result.guide.slug }
       }));
     }
+    if (result.trainer) {
+      actions.append(element('a', {
+        className: 'text-link',
+        text: 'Diese Situation üben →',
+        attributes: { href: result.trainer, 'data-related-link': 'gespraechstrainer' }
+      }));
+    }
     actions.append(button('Als Merkzettel drucken', 'translator-copy', () => {
       track('translator_print', { result_key: result.key });
       window.print();
