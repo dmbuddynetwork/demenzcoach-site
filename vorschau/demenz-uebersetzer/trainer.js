@@ -49,7 +49,10 @@
         feedback.replaceChildren(
           element('p', { className: option.good ? 'trainer-verdict is-good' : 'trainer-verdict is-bad', text: option.good ? 'Gut gewählt.' : 'Eher ungünstig.' }),
           element('p', { text: option.why }),
-          option.good ? null : element('p', { text: `Besser geeignet: ${goodOption.text} – ${goodOption.why}` })
+          option.good ? null : element('p', { text: `Besser geeignet: ${goodOption.text} – ${goodOption.why}` }),
+          question.href ? element('p', { className: 'trainer-more' }, [
+            element('a', { className: 'text-link', text: 'Mehr Sätze für diese Situation →', attributes: { href: question.href, 'data-related-link': question.key } })
+          ]) : null
         );
         const next = element('button', {
           className: 'button',
