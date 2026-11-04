@@ -121,7 +121,7 @@
     const feeling = best ? null : rank(text, (data.feelings ?? []).map((item) => ({ ...item, keywords: item.keywords ?? [] })))[0]?.entry ?? null;
     // Mehrere Anliegen in einer Eingabe („Wo ist Mama? Ich will heim.“): jeden Satzteil
     // einzeln prüfen und weitere Treffer als „Auch in deiner Eingabe“ anbieten.
-    const parts = String(text).split(/[.!?;\n]+|,\s*(?:und|aber)\s+|\s+und\s+(?=(?:ich|du|er|sie|wo|wann|wer|das|da|mir|mich|lass|will|muss|kann|sagt|hat|ist|habe)\b)/i)
+    const parts = String(text).split(/[.!?;\n]+|,\s*(?:und|aber)\s+|\s+und\s+(?=(?:ich|du|er|sie|wo|wann|wer|das|da|mir|mich|lass|will|muss|kann|sagt|hat|ist|habe|sucht|fragt|meint|glaubt|weint|schreit|ruft|isst|trinkt|versteckt|zur|nach|nachts|abends)\b)/i)
       .map((part) => part.trim())
       .filter((part) => part.split(/\s+/).length >= 2);
     const shown = new Set([best?.entry.key]);
