@@ -331,8 +331,10 @@
     ]));
     nodes.push(element('p', { text: 'Diesen Satz kennt der Übersetzer noch nicht. Wähle das Gefühl, das am ehesten passt – dann bekommst du genauere Sätze.' }));
     nodes.push(feelingPicker('Gefühl wählen'));
-    const popular = element('p', { className: 'translator-alternatives' }, [element('span', { text: 'Oder ähnlich wie: ' })]);
-    ['mutter', 'nachhause', 'geld', 'ruhe'].map((key) => entryByKey.get(key)).filter(Boolean).forEach((candidate) => {
+    // Ähnliche Situationen nach gemeinsamen Wörtern; ohne Überschneidung die häufigsten.
+    const similar = typed ? core.near(typed, data) : [];
+    const popular = element('p', { className: 'translator-alternatives' }, [element('span', { text: similar.length ? 'Vielleicht passt: ' : 'Oder ähnlich wie: ' })]);
+    (similar.length ? similar : ['mutter', 'nachhause', 'geld', 'ruhe'].map((key) => entryByKey.get(key)).filter(Boolean)).forEach((candidate) => {
       popular.append(button(`„${candidate.says}“`, 'translator-chip', () => show(candidate, 'alternative')));
     });
     nodes.push(popular);

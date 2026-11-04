@@ -191,7 +191,27 @@
     return result;
   };
 
-  const api = { normalize, rank, match, personalize, roles: Object.keys(roles) };
+  // Kein Treffer? Dann die Situationen mit den meisten gemeinsamen Wortanfängen anbieten
+  // („Er versteckt seine Sachen“ → Geld, „Sie zieht sich dauernd aus“ → Umziehen).
+  const stopwords = new Set(['ich', 'du', 'er', 'sie', 'es', 'wir', 'ihr', 'mein', 'meine', 'meinen', 'meinem', 'meiner', 'dein', 'deine', 'sein', 'seine', 'ihre', 'ihren', 'das', 'der', 'die', 'und', 'ist', 'bin', 'hat', 'habe', 'nicht', 'will', 'muss', 'kann', 'immer', 'wieder', 'sagt', 'mir', 'mich', 'dir', 'dich', 'sich', 'was', 'wie', 'wo', 'wann', 'warum', 'ein', 'eine', 'einen', 'noch', 'schon', 'so', 'da', 'hier', 'jetzt', 'mal', 'auch', 'doch', 'den', 'dem', 'zu', 'im', 'in', 'mit', 'von', 'auf', 'fuer', 'aber', 'dann', 'denn', 'oder', 'staendig', 'dauernd', 'ganz', 'gar', 'sehr', 'alles', 'nichts', 'heute', 'gerade', 'einfach', 'wird', 'sind', 'haben', 'werden', 'kein', 'keine', 'keinen']);
+  const contentWords = (text) => normalize(text).trim().split(' ').filter((word) => word.length >= 4 && !stopwords.has(word));
+  const stem = (word) => word.slice(0, 5);
+  const near = (text, data, limit = 2) => {
+    const words = contentWords(text);
+    if (!words.length) return [];
+    return data.entries
+      .filter((entry) => !entry.safetyOnly)
+      .map((entry) => {
+        const vocab = new Set([entry.says, ...(entry.variants ?? []), ...entry.keywords.map((keyword) => keyword.replace(/^=/, ''))].flatMap(contentWords).map(stem));
+        return { entry, score: words.filter((word) => vocab.has(stem(word))).length };
+      })
+      .filter((candidate) => candidate.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map((candidate) => candidate.entry);
+  };
+
+  const api = { normalize, rank, match, near, personalize, roles: Object.keys(roles) };
   root.DemenzTranslatorCore = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
