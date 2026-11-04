@@ -4,11 +4,13 @@
   const root = document.getElementById('trainer');
   const dataElement = document.getElementById('trainer-data');
   if (!root || !dataElement) return;
-  const { questions, url } = JSON.parse(dataElement.textContent);
+  const { questions: allQuestions, url } = JSON.parse(dataElement.textContent);
+  const shortLength = 5;
   // Kommt man von einer Satz-Seite (#frage-<key>), startet der Trainer mit genau dieser Situation.
   const startKey = decodeURIComponent(location.hash.replace(/^#frage-/, ''));
-  const startIndex = location.hash.startsWith('#frage-') ? questions.findIndex((question) => question.key === startKey) : -1;
-  if (startIndex > 0) questions.unshift(...questions.splice(startIndex, 1));
+  const startIndex = location.hash.startsWith('#frage-') ? allQuestions.findIndex((question) => question.key === startKey) : -1;
+  if (startIndex > 0) allQuestions.unshift(...allQuestions.splice(startIndex, 1));
+  let questions = allQuestions;
   // Nach dem Sprung von einer Satz-Seite: nach der ersten Frage frei wählen lassen, ob weiter geübt wird.
   const jumpedIn = startIndex >= 0;
   const appURL = 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=seo_de_trainer&mt=8';
@@ -119,6 +121,14 @@
     whatsapp.addEventListener('click', () => track('trainer_share', { method: 'whatsapp', score }));
     share.append(whatsapp);
 
+    const remaining = allQuestions.slice(questions.length);
+    const continueButton = questions.length < allQuestions.length && questions[0] === allQuestions[0]
+      ? element('button', { className: 'button', text: `Weitere ${remaining.length} Situationen üben`, attributes: { type: 'button' } })
+      : null;
+    continueButton?.addEventListener('click', () => {
+      track('trainer_start', { length: 'rest' });
+      begin(remaining);
+    });
     const restart = element('button', { className: 'translator-copy', text: 'Noch einmal üben', attributes: { type: 'button' } });
     restart.addEventListener('click', () => {
       index = 0;
@@ -138,7 +148,7 @@
         element('a', { text: question.options.find((option) => option.good).text.replace(/^„|“$/g, ''), attributes: { href: question.href, 'data-related-link': question.key } })
       ]))) : null,
       share,
-      element('div', { className: 'translator-result-links' }, [restart]),
+      element('div', { className: 'translator-result-links' }, [continueButton, restart]),
       element('aside', { className: 'article-cta translator-app-cta' }, [
         element('div', {}, [
           element('span', { className: 'eyebrow', text: 'Weiter üben mit Demenz Coach' }),
@@ -151,5 +161,35 @@
     focusHeading();
   };
 
-  renderQuestion();
+  const begin = (selection) => {
+    questions = selection;
+    index = 0;
+    score = 0;
+    missed.length = 0;
+    renderQuestion();
+    focusHeading();
+  };
+
+  // Ohne Sprung von einer Satz-Seite: erst die Länge wählen lassen.
+  const renderStart = () => {
+    const short = element('button', { className: 'button', text: `Kurzrunde: ${shortLength} Situationen`, attributes: { type: 'button' } });
+    const all = element('button', { className: 'button button-light-outline trainer-all', text: `Alle ${allQuestions.length} Situationen`, attributes: { type: 'button' } });
+    short.addEventListener('click', () => {
+      track('trainer_start', { length: 'kurz' });
+      begin(allQuestions.slice(0, shortLength));
+    });
+    all.addEventListener('click', () => {
+      track('trainer_start', { length: 'alle' });
+      begin(allQuestions);
+    });
+    root.replaceChildren(
+      element('p', { className: 'eyebrow', text: 'Los geht’s' }),
+      element('h2', { className: 'trainer-situation', text: 'Wie viel möchtest du heute üben?', attributes: { tabindex: '-1' } }),
+      element('p', { className: 'trainer-ask', text: 'Du kannst nach der Kurzrunde jederzeit weitermachen.' }),
+      element('div', { className: 'translator-result-links trainer-start-choice' }, [short, all])
+    );
+  };
+
+  if (jumpedIn || allQuestions.length <= shortLength) renderQuestion();
+  else renderStart();
 })();
