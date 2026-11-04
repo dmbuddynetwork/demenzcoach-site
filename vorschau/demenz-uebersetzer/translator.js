@@ -464,13 +464,6 @@
         attributes: { href: result.href, 'data-related-link': result.key }
       }));
     }
-    if (result.guide) {
-      actions.append(element('a', {
-        className: 'text-link',
-        text: `Ratgeber: ${result.guide.label} →`,
-        attributes: { href: result.guide.href, 'data-related-link': result.guide.slug }
-      }));
-    }
     if (result.trainer) {
       actions.append(element('a', {
         className: 'text-link',
@@ -478,10 +471,6 @@
         attributes: { href: result.trainer, 'data-related-link': 'gespraechstrainer' }
       }));
     }
-    actions.append(button('Als Merkzettel drucken', 'translator-copy', () => {
-      track('translator_print', { result_key: result.key });
-      window.print();
-    }));
     actions.append(button('Neuen Satz übersetzen', 'translator-copy', () => {
       input.value = '';
       history.replaceState(null, '', location.pathname);

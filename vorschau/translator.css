@@ -120,7 +120,10 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 .trainer-ask { margin: 0 0 16px; color: var(--muted); font-weight: 700; }
 .trainer-options { display: grid; gap: 10px; }
 .trainer-option { padding: 16px 18px; color: var(--ink-dark); text-align: left; background: var(--paper); border: 2px solid var(--line); border-radius: 14px; cursor: pointer; font: inherit; font-family: var(--serif); font-size: 1.12rem; line-height: 1.4; }
-.trainer-option:hover:not(:disabled), .trainer-option:focus-visible { border-color: var(--sage); background: var(--sage-soft); }
+@media (hover: hover) {
+.trainer-option:hover:not(:disabled) { border-color: var(--sage); background: var(--sage-soft); }
+}
+.trainer-option:focus-visible { border-color: var(--sage); background: var(--sage-soft); }
 .trainer-option:disabled { cursor: default; opacity: .7; }
 .trainer-option.is-good { opacity: 1; border-color: var(--green); background: #e4f1ea; }
 .trainer-option.is-bad { opacity: 1; border-color: #b4492f; background: #fbe9e4; }
@@ -223,6 +226,40 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 @media (max-width: 380px) {
 [data-page-type="translator-phrase"] .article-header h1 { font-size: 1.45rem; }
 }
+[data-page-type^="translator"] { --muted: var(--ink-dark); }
+[data-page-type^="translator"] main { font-size: 1.06rem; line-height: 1.55; }
+[data-page-type^="translator"] main h1,
+[data-page-type^="translator"] main h2,
+[data-page-type^="translator"] main h3,
+[data-page-type^="translator"] main h4,
+[data-page-type^="translator"] main q,
+[data-page-type^="translator"] main .phrase-list p,
+[data-page-type^="translator"] main .trainer-option,
+[data-page-type^="translator"] main .translator-form-title { font-family: var(--sans); letter-spacing: 0; }
+[data-page-type^="translator"] main h1 { font-weight: 800; }
+[data-page-type^="translator"] main h2, [data-page-type^="translator"] main h3, [data-page-type^="translator"] main h4 { font-weight: 750; }
+[data-page-type^="translator"] main q, [data-page-type^="translator"] main .phrase-list p { font-weight: 600; color: var(--ink-dark); }
+[data-page-type^="translator"] main .eyebrow:not(.translator-eyebrow-keep) { display: none; }
+[data-page-type^="translator"] .translator-trust { display: none; }
+[data-page-type="translator-tool"] .translator-hero .translator-hero-more { display: none; }
+[data-page-type="translator-tool"] .translator-card .translator-chips + .translator-chips { display: none; }
+[data-page-type^="translator"] .translator-chips { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding: 0; }
+[data-page-type^="translator"] .translator-chips > span { width: 100%; font-size: 1rem; color: var(--ink-dark); }
+[data-page-type^="translator"] .translator-chip { min-height: 48px; font-size: 1rem; }
+[data-page-type^="translator"] .translator-privacy { font-size: .95rem; }
+[data-page-type^="translator"] .translator-input-row input { font-size: 1.15rem; min-height: 56px; }
+[data-page-type="translator-tool"] .content-library .topic-cluster-header p,
+[data-page-type="translator-tool"] .content-library .content-card p,
+[data-page-type="translator-tool"] .content-library .content-card .text-link { display: none; }
+[data-page-type="translator-tool"] .content-library .content-card-grid { gap: 8px; }
+[data-page-type="translator-tool"] .content-library .content-card { padding: 14px 16px; min-height: 0; }
+[data-page-type="translator-tool"] .content-library .content-card h4 { margin: 0; font-size: 1.15rem; line-height: 1.35; }
+[data-page-type^="translator"] main * { font-family: var(--sans); }
+[data-page-type="translator-tool"] .translator-card .translator-chip:nth-of-type(n+6) { display: none; }
+[data-page-type="translator-phrase"] .translator-answer-note,
+[data-page-type="translator-phrase"] .translator-variants,
+[data-page-type="translator-phrase"] .translator-retry-jump { display: none; }
+[data-page-type="translator-trainer"] #trainer, .translator-result { scroll-margin-top: 88px; }
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 .translator-teaser .button-light-outline { color: var(--ink); background: var(--paper); border: 1px solid var(--line); }
