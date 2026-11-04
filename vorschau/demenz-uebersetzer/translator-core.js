@@ -67,7 +67,11 @@
   // Treffer zählen am Wortanfang (fängt Beugungen wie „Tabletten“ ab), aber nicht
   // mitten im Wort („erwachsen“ ist kein „wach“). Lange Einzelwörter dürfen einen
   // Tippfehler enthalten.
-  const keywordWeight = (normalized, tokens, keyword) => {
+  // Ein „=“ vorne heißt: nur als ganzes Wort („=klo“ trifft „Klo“, aber nicht „kloppen“).
+  const keywordWeight = (normalized, tokens, rawKeyword) => {
+    const wholeWordOnly = rawKeyword.startsWith('=');
+    const keyword = wholeWordOnly ? rawKeyword.slice(1) : rawKeyword;
+    if (wholeWordOnly) return normalized.includes(` ${keyword} `) ? (1 + keyword.length / 20) * 2 : 0;
     const wordCount = keyword.split(' ').length;
     const base = wordCount + keyword.length / 20;
     if (normalized.includes(` ${keyword} `)) return base * 2;
