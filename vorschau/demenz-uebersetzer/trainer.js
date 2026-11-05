@@ -31,7 +31,11 @@
     return node;
   };
 
-  const focusHeading = () => root.querySelector('h2')?.focus({ preventScroll: false });
+  // Jede neue Situation beginnt oben: Frage und alle Antworten sollen auf einen Handy-Bildschirm passen.
+  const focusHeading = () => {
+    root.scrollIntoView({ block: 'start', behavior: 'auto' });
+    root.querySelector('h2')?.focus({ preventScroll: true });
+  };
 
   const renderQuestion = () => {
     const question = questions[index];
