@@ -178,9 +178,11 @@
     const feeling = best ? null : rank(text, (data.feelings ?? []).map((item) => ({ ...item, keywords: item.keywords ?? [] })))[0]?.entry ?? null;
     // Mehrere Anliegen in einer Eingabe („Wo ist Mama? Ich will heim.“): jeden Satzteil
     // einzeln prüfen und weitere Treffer als „Auch in deiner Eingabe“ anbieten.
-    const parts = String(text).split(/[.!?;\n]+|,\s*(?:und|aber)\s+|\s+und\s+(?=(?:ich|du|er|sie|wo|wann|wer|das|da|mir|mich|lass|will|muss|kann|sagt|hat|ist|habe|sucht|fragt|meint|glaubt|weint|schreit|ruft|isst|trinkt|versteckt|zur|nach|nachts|abends)\b)/i)
+    const parts = String(text).split(/[.!?;\n]+|,\s*(?:(?:und|aber|oder)\s+)?|\s+(?:und|aber|oder)\s+/i)
       .map((part) => part.trim())
-      .filter((part) => part.split(/\s+/).length >= 2);
+      .filter((part) => part.split(/\s+/).length >= 2)
+      // Fragen der Angehörigen selbst („Was soll ich tun“, „Darf ich lügen“) sind kein weiteres Anliegen.
+      .filter((part) => !/^ (?:was|wie|darf|soll|kann|muss)(?: (?:soll|kann|darf|muss))? (?:ich|man)\b/.test(normalize(part)));
     const shown = new Set([best?.entry.key]);
     const also = [];
     if (parts.length > 1) {
@@ -195,7 +197,7 @@
     return {
       feeling,
       mood,
-      also: also.slice(0, 2),
+      also: also.slice(0, 3),
       entry: best?.entry ?? null,
       alternatives: alternatives.map((candidate) => candidate.entry).filter((entry) => !also.includes(entry)),
       safetyHit: hasSafetySignal(text, data.safetySignals.keywords)
