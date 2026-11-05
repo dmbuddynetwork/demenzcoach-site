@@ -113,10 +113,11 @@
     const text = () => core.personalize(result.retry.phrase, personal, data.formal);
     const quote = element('q', { text: text() });
     block.append(
+      // Erst der neue Satz, dann der Hinweis dazu, zuletzt deutlich: Aufhören ist erlaubt.
       element('h3', { text: 'Zweiter Versuch' }),
-      element('p', { text: result.retry.tip }),
       element('div', { className: 'translator-phrase' }, [quote]),
-      element('p', { className: 'translator-retry-stop', text: data.retryStop })
+      element('p', { text: result.retry.tip }),
+      element('p', { className: 'translator-retry-stop' }, [element('strong', { text: 'Du darfst aufhören. ' }), data.retryStop])
     );
     const toggle = button('Hat nicht geholfen? Zweiter Versuch', 'translator-copy translator-retry-toggle', () => open('button'), {
       'aria-expanded': 'false',
