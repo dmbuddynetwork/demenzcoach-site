@@ -242,14 +242,15 @@
     });
 
     details.append(element('div', { className: 'translator-personal-body' }, [
-      formality,
-      field('callName', 'So sprichst du die Person an', 'z. B. Mama, Opa, Frau Weber', 'call_name'),
+      // Der eigene Name zuerst: Er ersetzt den Beispielnamen „Anna“ in den Sätzen.
       field('me', 'Dein Vorname', 'z. B. Anna', 'own_name'),
       element('div', { className: 'translator-personal-field' }, [
         element('label', { text: 'Du bist für die Person', attributes: { for: id('role') } }),
         roleSelect
       ]),
-      element('p', { className: 'translator-privacy', text: '🔒 Bleibt nur auf dieser Seite, bis du sie schließt – nicht gespeichert, nicht gesendet.' })
+      field('callName', 'So nennst du die Person', 'z. B. Mama, Opa, Frau Weber', 'call_name'),
+      formality,
+      element('p', { className: 'translator-privacy', text: '🔒 Wird nicht gespeichert und nicht gesendet.' })
     ]));
     return details;
   };
