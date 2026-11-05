@@ -108,12 +108,7 @@
     block.append(
       element('h3', { text: 'Zweiter Versuch' }),
       element('p', { text: result.retry.tip }),
-      element('div', { className: 'translator-phrase' }, [
-        quote,
-        button('Kopieren', 'translator-copy', async (event) => {
-          if (await copyText(text(), event.currentTarget)) track('translator_copy', { result_key: result.key });
-        })
-      ]),
+      element('div', { className: 'translator-phrase' }, [quote]),
       element('p', { className: 'translator-retry-stop', text: data.retryStop })
     );
     const toggle = button('Hat nicht geholfen? Zweiter Versuch', 'translator-copy translator-retry-toggle', () => open('button'), {
@@ -127,7 +122,7 @@
       toggle.setAttribute('aria-expanded', 'true');
       toggle.hidden = true;
       block.focus({ preventScroll: true });
-      block.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      block.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
       track('translator_retry', { result_key: result.key, input_source: source });
     };
     const refresh = () => { quote.textContent = text(); };
