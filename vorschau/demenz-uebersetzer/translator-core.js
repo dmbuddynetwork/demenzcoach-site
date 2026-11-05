@@ -143,6 +143,9 @@
       // „Lass mich in Ruhe“ beantwortet Wut schon selbst.
       if (mood.id === 'wut' && ranked[0].entry.key === 'ruhe') mood = null;
     }
+    // Lebensmüde Sätze („Lass mich sterben“) gehen immer vor, auch wenn „lass mich“ mehr Punkte hat.
+    const safetyFirst = ranked.find((candidate) => candidate.entry.safetyOnly);
+    if (safetyFirst && ranked[0] !== safetyFirst) ranked = [safetyFirst, ...ranked.filter((candidate) => candidate !== safetyFirst)];
     const best = ranked[0] ?? null;
     const alternatives = best
       ? ranked.slice(1).filter((candidate) => candidate.score >= best.score * 0.5 && !candidate.entry.safetyOnly).slice(0, 2)
