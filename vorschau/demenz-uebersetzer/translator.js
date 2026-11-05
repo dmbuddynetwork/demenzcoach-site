@@ -301,7 +301,7 @@
     });
     link.addEventListener('click', () => track('translator_suggest', { result_key: 'none' }));
     return element('p', { className: 'translator-suggest' }, [
-      element('span', { text: 'Fehlt dieser Satz? Schlag ihn vor, damit der Übersetzer besser wird. Das öffnet dein E-Mail-Programm; du entscheidest, was du schickst.' }),
+      element('span', { text: 'Fehlt dieser Satz? Schick ihn uns, dann nehmen wir ihn auf.' }),
       link
     ]);
   };
@@ -315,8 +315,8 @@
       ]));
     }
     if (typed) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
-    nodes.push(element('span', { className: 'eyebrow translator-eyebrow-keep', text: 'Noch nicht in der Liste' }));
-    const heading = element('h2', { text: 'Was spürst du gerade bei der Person?', attributes: { tabindex: '-1' } });
+    // Schlicht für Menschen ab 60: eine klare Aussage, ein Satz zum Sagen, dann die Gefühls-Auswahl.
+    const heading = element('h2', { text: 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
     nodes.push(heading);
     // Auch ohne Treffer sofort ein Satz, den man sagen kann – danach die Gefühls-Auswahl für passendere Sätze.
     const firstAid = core.personalize(fallback.phrases[0], personal, data.formal);
@@ -329,16 +329,16 @@
         })
       ])
     ]));
-    nodes.push(element('p', { text: 'Diesen Satz kennt der Übersetzer noch nicht. Wähle das Gefühl, das am ehesten passt – dann bekommst du genauere Sätze.' }));
-    nodes.push(feelingPicker('Gefühl wählen'));
+    nodes.push(feelingPicker('Was spürst du bei der Person? Dann bekommst du genauere Sätze.'));
     // Ähnliche Situationen nach gemeinsamen Wörtern; ohne Überschneidung die häufigsten.
     const similar = typed ? core.near(typed, data) : [];
-    const popular = element('p', { className: 'translator-alternatives' }, [element('span', { text: similar.length ? 'Vielleicht passt: ' : 'Oder ähnlich wie: ' })]);
-    (similar.length ? similar : ['mutter', 'nachhause', 'geld', 'ruhe'].map((key) => entryByKey.get(key)).filter(Boolean)).forEach((candidate) => {
-      popular.append(button(`„${candidate.says}“`, 'translator-chip', () => show(candidate, 'alternative')));
-    });
-    nodes.push(popular);
-    nodes.push(...listSection('Was fast immer hilft', fallback.next));
+    if (similar.length) {
+      const popular = element('p', { className: 'translator-alternatives' }, [element('span', { text: 'Vielleicht passt: ' })]);
+      similar.forEach((candidate) => {
+        popular.append(button(`„${candidate.says}“`, 'translator-chip', () => show(candidate, 'alternative')));
+      });
+      nodes.push(popular);
+    }
     nodes.push(suggestLink(typed));
     nodes.push(appCTA());
     output.replaceChildren(...nodes.filter(Boolean));
