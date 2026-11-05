@@ -351,17 +351,11 @@
     let alsoWrapper = null;
     if (also.length) {
       alsoWrapper = element('div', { className: 'translator-also', attributes: { role: 'group', 'aria-label': 'Weitere Anliegen in deiner Eingabe' } }, [
-        element('p', { className: 'translator-also-title', text: also.length > 1 ? 'Du hast noch mehr beschrieben. Antworten dazu:' : 'Du hast noch etwas beschrieben. Antwort dazu:' })
+        element('p', { className: 'translator-also-title', text: also.length > 1 ? 'Du hast noch mehr beschrieben:' : 'Du hast noch etwas beschrieben:' })
       ]);
       also.forEach((candidate) => {
         alsoWrapper.append(button(`„${candidate.says}“ →`, 'translator-chip', () => show(candidate, 'also')));
       });
-    }
-    // Kurzer Hinweis direkt unter der Überschrift, damit das zweite Anliegen nicht übersehen wird.
-    if (also.length) {
-      const quick = element('p', { className: 'translator-also-quick' }, [element('span', { text: 'Auch beschrieben: ' })]);
-      also.forEach((candidate) => quick.append(button(`„${candidate.says}“`, 'translator-also-link', () => show(candidate, 'also'))));
-      nodes.push(quick);
     }
     if (alternatives.length) {
       const altWrapper = element('p', { className: 'translator-alternatives' }, [element('span', { text: 'Passt eher? ' })]);
