@@ -88,7 +88,8 @@
     if (normalized.includes(` ${keyword}`)) return base * 1.5;
     if (wordCount === 1 && keyword.length >= 6) {
       const fuzzy = tokens.some((token) => token.length >= 5
-        && (distanceAtMostOne(token, keyword) || distanceAtMostOne(token.slice(0, keyword.length), keyword)));
+        // Wortanfang mit Tippfehler nur bei längeren Suchwörtern: sonst wird „schlägt“ zu „schlaf“.
+        && (distanceAtMostOne(token, keyword) || (keyword.length >= 7 && distanceAtMostOne(token.slice(0, keyword.length), keyword))));
       if (fuzzy) return base;
     }
     return 0;
@@ -123,7 +124,13 @@
     const withoutMood = (value) => (mood ? mood.keywords.reduce((result, keyword) => result.replace(new RegExp(` ${keyword}\\S*`, 'g'), ' '), normalize(value)) : value);
     if (mood) {
       const topic = rank(withoutMood(text), data.entries);
-      if (topic.length && topic[0].entry.key !== ranked[0].entry.key) {
+      // Kennt die Situation selbst eine Wendung mit dem Gefühlswort („schreit nachts“), bleibt sie vorn.
+      const normalizedText = normalize(text);
+      const tokens = normalizedText.trim().split(' ').filter(Boolean);
+      const moodPhrase = ranked[0].entry.keywords.some((keyword) => keyword.includes(' ')
+        && mood.keywords.some((word) => keyword.replace(/^=/, '').split(' ').includes(word))
+        && keywordWeight(normalizedText, tokens, keyword) > 0);
+      if (!moodPhrase && topic.length && topic[0].entry.key !== ranked[0].entry.key) {
         // Alternativen ebenfalls ohne Gefühlswörter, sonst steht „Lass mich in Ruhe“ nur wegen „wütend“ daneben.
         ranked = topic;
       }
