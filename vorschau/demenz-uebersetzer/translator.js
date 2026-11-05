@@ -301,7 +301,7 @@
     });
     link.addEventListener('click', () => track('translator_suggest', { result_key: 'none' }));
     return element('p', { className: 'translator-suggest' }, [
-      element('span', { text: 'Fehlt dieser Satz? Schick ihn uns, dann nehmen wir ihn auf.' }),
+      element('span', { text: 'Fehlt dieser Satz? Schick ihn uns, damit wir ihn ergänzen können.' }),
       link
     ]);
   };
@@ -440,14 +440,6 @@
       more('Was danach helfen kann', result.next)
     ].filter(Boolean);
     if (moreBlocks.length) nodes.push(element('div', { className: 'translator-more-group' }, moreBlocks));
-    if (result.related?.length) {
-      const related = element('p', { className: 'translator-alternatives' }, [element('span', { text: 'Typische Sätze dazu: ' })]);
-      result.related.forEach(({ key, says }) => {
-        const candidate = entryByKey.get(key);
-        if (candidate) related.append(button(`„${says}“`, 'translator-chip', () => show(candidate, 'alternative')));
-      });
-      nodes.push(related);
-    }
 
     if (result.safety && !result.safetyOnly && !safetyHit) {
       nodes.push(element('aside', { className: 'safety-note' }, [
