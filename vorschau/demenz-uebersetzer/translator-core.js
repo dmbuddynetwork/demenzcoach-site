@@ -78,6 +78,12 @@
   // mitten im Wort („erwachsen“ ist kein „wach“). Lange Einzelwörter dürfen einen
   // Tippfehler enthalten.
   // Ein „=“ vorne heißt: nur als ganzes Wort („=klo“ trifft „Klo“, aber nicht „kloppen“).
+  // Richtig geschriebene häufige Wörter sind keine Tippfehler: „Schuhe“ ist nicht „Schule“,
+  // „sauer“ nicht „sauber“, „schreiben“ nicht „schreien“, „schlucken“ nicht „Schmuck“.
+  const noFuzzy = new Set(['schreiben', 'schreibt', 'schreibe', 'schreib', 'stimmung', 'schlucken', 'schluckt', 'schluck', 'schmeckt',
+    'kauen', 'kaut', 'schuld', 'schuhe', 'schuhen', 'melden', 'merken', 'sauer', 'allen', 'kennen', 'legen', 'stellen', 'stiller',
+    'muster', 'stammen', 'einladen', 'abbauen', 'baden', 'malen', 'spielen', 'singen', 'lesen']);
+
   const keywordWeight = (normalized, tokens, rawKeyword) => {
     const wholeWordOnly = rawKeyword.startsWith('=');
     const keyword = wholeWordOnly ? rawKeyword.slice(1) : rawKeyword;
@@ -87,7 +93,7 @@
     if (normalized.includes(` ${keyword} `)) return base * 2;
     if (normalized.includes(` ${keyword}`)) return base * 1.5;
     if (wordCount === 1 && keyword.length >= 6) {
-      const fuzzy = tokens.some((token) => token.length >= 5
+      const fuzzy = tokens.some((token) => token.length >= 5 && !noFuzzy.has(token)
         // Wortanfang mit Tippfehler nur bei längeren Suchwörtern: sonst wird „schlägt“ zu „schlaf“.
         && (distanceAtMostOne(token, keyword) || (keyword.length >= 7 && distanceAtMostOne(token.slice(0, keyword.length), keyword))));
       if (fuzzy) return base;
