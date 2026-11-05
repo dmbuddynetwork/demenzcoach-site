@@ -19,6 +19,19 @@
     [/\bhoam\b/g, 'heim'],
     [/\bwill\s+ham\b/g, 'will heim'],
     [/\bwill\s+heim\b/g, 'will nach hause'],
+    // So tippen viele Ältere auf dem Handy: nach Gehör, Endungen auf „-a“, einfache Buchstaben.
+    [/\bsint\b/g, 'sind'],
+    [/\bmus\b/g, 'muss'],
+    [/\bire\b/g, 'ihre'],
+    [/\bmene\b/g, 'meine'],
+    [/\bhir\b/g, 'hier'],
+    [/\bbet\b/g, 'bett'],
+    [/\bluge\b/g, 'luege'],
+    [/\b(kind|mutt|vat|hung|imm|wied|schwest|brud)a\b/g, '$1er'],
+    // Notfälle mit Tippfehlern müssen trotzdem den Sicherheitshinweis auslösen.
+    [/\bgestuer?tzt\b/g, 'gestuerzt'],
+    [/\bhingefal+en\b/g, 'hingefallen'],
+    [/\bbewus+tlos\b/g, 'bewusstlos'],
     [/\bmutti\b/g, 'mama'],
     [/\bvati\b/g, 'papa']
   ];
