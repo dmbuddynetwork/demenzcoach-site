@@ -82,7 +82,7 @@
   // „sauer“ nicht „sauber“, „schreiben“ nicht „schreien“, „schlucken“ nicht „Schmuck“.
   const noFuzzy = new Set(['schreiben', 'schreibt', 'schreibe', 'schreib', 'stimmung', 'schlucken', 'schluckt', 'schluck', 'schmeckt',
     'kauen', 'kaut', 'schuld', 'schuhe', 'schuhen', 'melden', 'merken', 'sauer', 'allen', 'kennen', 'legen', 'stellen', 'stiller',
-    'muster', 'stammen', 'einladen', 'abbauen', 'baden', 'malen', 'spielen', 'singen', 'lesen']);
+    'muster', 'stammen', 'einladen', 'abbauen', 'baden', 'malen', 'spielen', 'singen', 'lesen', 'anrufer']);
 
   const keywordWeight = (normalized, tokens, rawKeyword) => {
     const wholeWordOnly = rawKeyword.startsWith('=');
