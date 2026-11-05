@@ -349,7 +349,7 @@
 
     if (typed) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
     nodes.push(element('span', { className: 'eyebrow', text: result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
-    const heading = element('h2', { text: result.feeling ? `Wenn ${result.feeling} im Raum steht` : `„${result.says}“`, attributes: { tabindex: '-1' } });
+    const heading = element('h2', { text: result.feeling ? `Bei ${result.feeling}` : `„${result.says}“`, attributes: { tabindex: '-1' } });
     nodes.push(heading);
     // Weitere Anliegen kommen direkt nach den Sätzen: Der erste Satz zum Ausprobieren bleibt auf dem Handy oben.
     let alsoWrapper = null;
