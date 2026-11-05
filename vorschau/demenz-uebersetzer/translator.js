@@ -273,9 +273,9 @@
   }]));
 
   const feelingPicker = (title) => {
-    const wrapper = element('div', { className: 'translator-feelings', attributes: { role: 'group', 'aria-label': title } }, [
-      element('p', { className: 'translator-feelings-title', text: title })
-    ]);
+    const wrapper = element('div', { className: 'translator-feelings', attributes: { role: 'group', 'aria-label': title || 'Gefühl wählen' } }, [
+      title ? element('p', { className: 'translator-feelings-title', text: title }) : null
+    ].filter(Boolean));
     feelingEntries.forEach((feelingEntry, id) => {
       wrapper.append(button(feelingEntry.feeling, 'translator-chip', () => showFeeling(id, 'feeling_picker')));
     });
@@ -304,31 +304,23 @@
         element('span', { text: data.safetySignals.text })
       ]));
     }
-    if (typed) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
-    // Schlicht für Menschen ab 60: eine klare Aussage, ein Satz zum Sagen, dann die Gefühls-Auswahl.
-    const heading = element('h2', { text: 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
+    // Gleicher Aufbau wie ein Treffer: oben der Satz, dann klar, was jetzt hilft.
+    const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
+    const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
     nodes.push(heading);
-    // Auch ohne Treffer sofort ein Satz, den man sagen kann – danach die Gefühls-Auswahl für passendere Sätze.
-    const firstAid = core.personalize(fallback.phrases[0], personal, data.formal);
-    nodes.push(element('p', { className: 'translator-first-aid-title', text: 'Für den Moment passt fast immer:' }));
-    nodes.push(element('div', { className: 'translator-phrases' }, [
-      element('div', { className: 'translator-phrase' }, [
-        element('q', { text: firstAid }),
-        button('Kopieren', 'translator-copy', async (event) => {
-          if (await copyText(firstAid, event.currentTarget)) track('translator_copy', { result_key: 'unbekannt' });
-        })
-      ])
-    ]));
-    nodes.push(feelingPicker('Was spürst du bei der Person? Dann bekommst du genauere Sätze.'));
-    // Ähnliche Situationen nach gemeinsamen Wörtern; ohne Überschneidung die häufigsten.
+    if (shown) nodes.push(element('p', { className: 'translator-meaning', text: 'Diesen Satz kenne ich noch nicht.' }));
+    // Ähnliche Situationen zuerst: Sie führen am schnellsten zu genauen Sätzen.
     const similar = typed ? core.near(typed, data) : [];
     if (similar.length) {
-      const popular = element('p', { className: 'translator-alternatives' }, [element('span', { text: 'Vielleicht passt: ' })]);
-      similar.forEach((candidate) => {
-        popular.append(button(`„${candidate.says}“`, 'translator-chip', () => show(candidate, 'alternative')));
-      });
-      nodes.push(popular);
+      nodes.push(element('h3', { className: 'translator-step', text: 'Meinst du vielleicht:' }));
+      nodes.push(element('div', { className: 'translator-chips translator-near' }, similar.map((candidate) => button(`„${candidate.says}“`, 'translator-chip', () => show(candidate, 'alternative')))));
     }
+    nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
+    nodes.push(element('div', { className: 'translator-phrases' }, [
+      element('div', { className: 'translator-phrase' }, [element('q', { text: core.personalize(fallback.phrases[0], personal, data.formal) })])
+    ]));
+    nodes.push(element('h3', { className: 'translator-step', text: 'Was spürst du bei der Person?' }));
+    nodes.push(feelingPicker(''));
     nodes.push(suggestLink(typed));
     nodes.push(appCTA());
     output.replaceChildren(...nodes.filter(Boolean));
