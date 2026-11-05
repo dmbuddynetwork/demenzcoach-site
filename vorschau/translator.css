@@ -268,6 +268,10 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 [data-page-type="translator-tool"] .translator-result, [data-page-type="translator-tool"] .translator-card { padding: 18px 14px; }
 [data-page-type^="translator"] .translator-phrase { padding-left: 14px; padding-right: 12px; }
 }
+[data-page-type^="translator"] .translator-copy { min-height: 44px; padding: 6px 16px; font-size: 1rem; }
+@media (max-width: 380px) {
+[data-page-type^="translator"] .translator-result .quick-answer, [data-page-type^="translator"] .translator-quick { padding: 14px 16px; }
+}
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 .translator-teaser .button-light-outline { color: var(--ink); background: var(--paper); border: 1px solid var(--line); }
