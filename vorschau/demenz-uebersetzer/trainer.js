@@ -58,8 +58,10 @@
         feedback.replaceChildren(...[
           element('p', { className: option.good ? 'trainer-verdict is-good' : 'trainer-verdict is-bad', text: option.good ? 'Gut gewählt.' : 'Eher ungünstig.' }),
           element('p', { text: option.why }),
-          option.good ? null : element('p', { text: `Besser geeignet: ${goodOption.text} – ${goodOption.why}` }),
-          question.href ? element('p', { className: 'trainer-more' }, [
+          option.good ? null : element('p', { className: 'trainer-better-title', text: 'Besser:' }),
+          option.good ? null : element('div', { className: 'translator-phrase' }, [element('q', { text: goodOption.text.replace(/^„|“$/g, '') })]),
+          // Nur wer von einer Satz-Seite kam, bekommt den Weg zurück; sonst bleibt der Blick beim Üben.
+          offerReturn ? element('p', { className: 'trainer-more' }, [
             element('a', { className: 'text-link', text: offerReturn ? 'Zurück zu den Sätzen →' : 'Mehr Sätze für diese Situation →', attributes: { href: question.href, 'data-related-link': question.key } })
           ]) : null
         ].filter(Boolean));
@@ -74,7 +76,9 @@
           else renderResult();
         });
         feedback.append(next);
-        next.focus();
+        // Die Rückmeldung von oben zeigen (Urteil zuerst), nicht nur den Knopf am Ende.
+        next.focus({ preventScroll: true });
+        feedback.scrollIntoView({ block: 'start', behavior: 'auto' });
       });
       options.append(button);
     });
