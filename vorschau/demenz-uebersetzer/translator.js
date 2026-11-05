@@ -78,29 +78,24 @@
   const shareBlock = (result) => {
     const url = result.url || toolURL;
     const text = shareText(result);
-    const wrapper = element('div', { className: 'translator-share' }, [
-      element('span', { text: 'Mit Familie teilen:' })
-    ]);
+    // Ein einziger Knopf: Teilen-Menü des Handys, sonst WhatsApp.
     if (navigator.share) {
-      wrapper.append(button('Teilen', 'translator-copy', async () => {
+      return element('div', { className: 'translator-share' }, [button('Mit Familie teilen', 'translator-copy', async () => {
         try {
           await navigator.share({ title: 'Demenz-Übersetzer', text, url });
           track('translator_share', { result_key: result.key, method: 'native' });
         } catch {
           // Abgebrochen – nichts zu tun.
         }
-      }));
+      })]);
     }
     const whatsapp = element('a', {
       className: 'translator-copy',
-      text: 'WhatsApp',
+      text: 'Per WhatsApp an die Familie',
       attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, rel: 'noopener', target: '_blank' }
     });
     whatsapp.addEventListener('click', () => track('translator_share', { result_key: result.key, method: 'whatsapp' }));
-    wrapper.append(whatsapp);
-    wrapper.append(button('Link kopieren', 'translator-copy', async (event) => {
-      if (await copyText(url, event.currentTarget)) track('translator_share', { result_key: result.key, method: 'copy_link' });
-    }));
+    const wrapper = element('div', { className: 'translator-share' }, [whatsapp]);
     return wrapper;
   };
 
@@ -163,13 +158,8 @@
   const appLinkFor = (result) => (result?.campaign ? appURL.replace('ct=seo_de_translator', `ct=${result.campaign}`) : appURL);
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
-      element('span', { className: 'eyebrow', text: 'Demenz Coach für iPhone' }),
-      element('h2', { text: 'Persönliche Hilfe für eure Situation' }),
-      element('ul', { className: 'translator-app-benefits' }, [
-        element('li', { text: 'Eure Situation in wenigen Worten beschreiben' }),
-        element('li', { text: 'Mögliche Formulierungen und einen kleinen nächsten Schritt erhalten' }),
-        element('li', { text: 'Persönlicher 7-Tage-Plan und kurze Check-ins für dich' })
-      ]),
+      element('h2', { text: 'Hilfe für eure ganz eigene Situation' }),
+      element('p', { text: 'Mit der App Demenz Coach beschreibst du eure Lage in wenigen Worten und bekommst passende Sätze und einen nächsten Schritt.' }),
       element('p', { text: 'Kostenloser Download, optionales Abo.' })
     ]),
     element('div', { className: 'translator-app-visual' }, [
@@ -394,8 +384,13 @@
     }
 
     const retry = result.retry ? retryBlock(result) : null;
+    // Erst verstehen, dann antworten: genau die zwei Fragen, mit denen jemand kommt.
+    if (result.short) {
+      nodes.push(element('h3', { className: 'translator-step', text: result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt' }));
+      nodes.push(element('p', { className: 'translator-meaning', text: result.short }));
+    }
     if (result.phrases.length) {
-      nodes.push(element('h3', { text: 'Sätze zum Ausprobieren' }));
+      nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
       const phraseList = element('div', { className: 'translator-phrases' });
       const paint = () => {
         // Bei Wut, Tränen oder Angst kommt zuerst ein kurzer beruhigender Satz.
@@ -409,10 +404,7 @@
           return element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : exampleHint ? 'translator-phrase translator-phrase-example' : 'translator-phrase' }, [
             lead ? element('span', { className: 'translator-mood-lead', text: lead }) : null,
             exampleHint ? element('span', { className: 'translator-example-name', text: '„Anna“ ist ein Beispiel – trag unten deinen Namen ein.' }) : null,
-            element('q', { text }),
-            button('Kopieren', 'translator-copy', async (event) => {
-              if (await copyText(text, event.currentTarget)) track('translator_copy', { result_key: result.key });
-            })
+            element('q', { text })
           ]);
         }));
       };
@@ -423,7 +415,6 @@
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
     }
-    nodes.push(element('div', { className: 'quick-answer' }, [element('p', { text: result.short })]));
     if (retry) nodes.push(retry.toggle, retry.block);
 
     // Antwort zuerst, Hintergrund zum Aufklappen: hält das Ergebnis auf dem Handy kurz.
@@ -435,7 +426,7 @@
       ])
       : null;
     const moreBlocks = [
-      more('Was dahinterstecken kann', result.meanings),
+      more('Weitere mögliche Gründe', result.meanings),
       more('Was du eher vermeiden solltest', result.avoid, 'Eher ungünstig ist es,'),
       more('Was danach helfen kann', result.next)
     ].filter(Boolean);
@@ -472,7 +463,7 @@
     nodes.push(actions);
 
     if (!result.safetyOnly) {
-      nodes.push(feelingPicker(result.feeling ? 'Anderes Gefühl?' : 'Passt nicht ganz? Was spürst du bei der Person?'));
+      if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
       nodes.push(feedbackBlock(result, retry));
       nodes.push(shareBlock(result));
       nodes.push(appCTA(result));
