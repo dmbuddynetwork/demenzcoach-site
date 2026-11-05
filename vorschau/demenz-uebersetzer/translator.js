@@ -299,8 +299,10 @@
     { pattern: /116 117/, label: 'Bereitschaftsdienst 116 117', tel: '116117' },
     { pattern: /0800 111 0 111/, label: 'TelefonSeelsorge 0800 111 0 111', tel: '08001110111' }
   ];
-  const safetyCalls = (text) => {
-    const found = callNumbers.filter(({ pattern }) => pattern.test(text));
+  // Bei Entlastung für Angehörige steht das Gespräch (TelefonSeelsorge) vor dem Notruf.
+  const safetyCalls = (text, listenFirst = false) => {
+    const matches = callNumbers.filter(({ pattern }) => pattern.test(text));
+    const found = listenFirst ? [...matches].reverse() : matches;
     return found.length
       ? element('div', { className: 'translator-calls' }, found.map(({ label, tel }) => element('a', { className: 'translator-call', text: `📞 ${label}`, attributes: { href: `tel:${tel}` } })))
       : null;
@@ -350,10 +352,17 @@
     const result = entry;
     const nodes = [];
 
-    if (safetyHit || result.safetyOnly) nodes.push(urgentNote(result.safetyOnly ? result.safety : data.safetySignals.text));
+    if (result.selfCare) {
+      // Angehörige schreiben über sich selbst: Hilfe für sie zuerst, ruhig statt alarmierend.
+      nodes.push(element('aside', { className: safetyHit ? 'safety-note safety-urgent' : 'safety-note translator-selfcare', attributes: { role: 'note' } }, [
+        element('strong', { text: result.safetyTitle || 'Hilfe für dich' }),
+        element('span', { text: result.safety }),
+        safetyCalls(result.safety, !safetyHit)
+      ]));
+    } else if (safetyHit || result.safetyOnly) nodes.push(urgentNote(result.safetyOnly ? result.safety : data.safetySignals.text));
 
     if (typed) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
-    nodes.push(element('span', { className: 'eyebrow', text: result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
+    nodes.push(element('span', { className: 'eyebrow', text: result.selfCare ? 'Für dich' : result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
     const heading = element('h2', { text: result.feeling ? `Bei ${result.feeling}` : `„${result.says}“`, attributes: { tabindex: '-1' } });
     nodes.push(heading);
     // Weitere Anliegen kommen direkt nach den Sätzen: Der erste Satz zum Ausprobieren bleibt auf dem Handy oben.
@@ -377,11 +386,11 @@
     const retry = result.retry ? retryBlock(result) : null;
     // Erst verstehen, dann antworten: genau die zwei Fragen, mit denen jemand kommt.
     if (result.short) {
-      nodes.push(element('h3', { className: 'translator-step', text: result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt' }));
+      nodes.push(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
       nodes.push(element('p', { className: 'translator-meaning', text: result.short }));
     }
     if (result.phrases.length) {
-      nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
+      nodes.push(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
       const phraseList = element('div', { className: 'translator-phrases' });
       const paint = () => {
         // Bei Wut, Tränen oder Angst kommt zuerst ein kurzer beruhigender Satz.
@@ -389,7 +398,8 @@
         // „Anna“ ist ein Beispielname: Solange kein eigener Name eingetragen ist, einmal darauf hinweisen.
         let exampleHintShown = false;
         phraseList.replaceChildren(...[...first, ...result.phrases.map((original) => ({ original }))].map(({ original, lead }) => {
-          const text = core.personalize(original, personal, data.formal);
+          // Bitten an Familie oder Freunde bleiben, wie sie sind: keine Anrede der erkrankten Person davor.
+          const text = result.selfCare ? original : core.personalize(original, personal, data.formal);
           const exampleHint = !exampleHintShown && !String(personal.me ?? '').trim() && /\bAnna\b/.test(text);
           if (exampleHint) exampleHintShown = true;
           return element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : exampleHint ? 'translator-phrase translator-phrase-example' : 'translator-phrase' }, [
@@ -402,7 +412,7 @@
       paint();
       // Auf dem Handy muss der erste Satz ohne Scrollen sichtbar sein: Sätze zuerst, Anpassen und Erklärung danach.
       const usesExampleName = result.phrases.some((original) => /\bAnna\b/.test(original));
-      nodes.push(phraseList, alsoWrapper, personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
+      nodes.push(phraseList, alsoWrapper, result.selfCare ? null : personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
     }

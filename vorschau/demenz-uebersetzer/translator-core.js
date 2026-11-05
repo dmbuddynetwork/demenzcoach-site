@@ -88,6 +88,11 @@
     const wholeWordOnly = rawKeyword.startsWith('=');
     const keyword = wholeWordOnly ? rawKeyword.slice(1) : rawKeyword;
     if (wholeWordOnly) return normalized.includes(` ${keyword} `) ? (1 + keyword.length / 20) * 2 : 0;
+    // Ein „$“ hinten heißt: nur am Ende der Eingabe („Ich kann nicht mehr“, aber nicht „… mehr laufen“).
+    if (keyword.endsWith('$')) {
+      const phrase = keyword.slice(0, -1);
+      return normalized.endsWith(` ${phrase} `) ? (phrase.split(' ').length + phrase.length / 20) * 2 : 0;
+    }
     const wordCount = keyword.split(' ').length;
     const base = wordCount + keyword.length / 20;
     if (normalized.includes(` ${keyword} `)) return base * 2;
@@ -122,6 +127,9 @@
 
   const match = (text, data) => {
     let ranked = rank(text, data.entries);
+    // Sicherheits- und Entlastungssätze merken, bevor Gefühlswörter entfernt werden:
+    // „Ich bin so wütend auf sie“ ist ein Satz über die Angehörigen selbst.
+    const initialSafety = ranked.find((candidate) => candidate.entry.safetyOnly);
     // Starkes Gefühl in einer beschriebenen Situation („Er ist wütend und will zur Arbeit“):
     // Das Gefühl soll nicht das Thema überdecken. Ohne Gefühlswörter neu suchen und das
     // Gefühl als kurze erste Antwort mitgeben („Erst trösten …“).
@@ -144,7 +152,10 @@
       if (mood.id === 'wut' && ranked[0].entry.key === 'ruhe') mood = null;
     }
     // Lebensmüde Sätze („Lass mich sterben“) gehen immer vor, auch wenn „lass mich“ mehr Punkte hat.
+    if (initialSafety && !ranked.some((candidate) => candidate.entry.key === initialSafety.entry.key)) ranked = [initialSafety, ...ranked];
     const safetyFirst = ranked.find((candidate) => candidate.entry.safetyOnly);
+    // Schreiben Angehörige über sich selbst, gibt es keinen Beruhigungssatz für die erkrankte Person davor.
+    if (safetyFirst?.entry.selfCare) mood = null;
     if (safetyFirst && ranked[0] !== safetyFirst) ranked = [safetyFirst, ...ranked.filter((candidate) => candidate !== safetyFirst)];
     const best = ranked[0] ?? null;
     const alternatives = best
