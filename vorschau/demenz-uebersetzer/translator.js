@@ -5,6 +5,13 @@
   const dataElement = document.getElementById('translator-data');
   const form = document.getElementById('translator-form');
   const input = document.getElementById('translator-input');
+  // Das Feld wächst mit dem Text: Ältere sehen den ganzen Satz, den sie getippt haben.
+  // Enter schickt ab wie bei einem einzeiligen Feld.
+  const grow = () => {
+    if (input?.tagName !== 'TEXTAREA') return;
+    input.style.height = 'auto';
+    input.style.height = `${input.scrollHeight + 4}px`;
+  };
   const output = document.getElementById('translator-result');
   const core = window.DemenzTranslatorCore;
   if (!dataElement || !form || !input || !output || !core) return;
@@ -473,6 +480,7 @@
     }
     actions.append(button('Neuen Satz übersetzen', 'translator-copy', () => {
       input.value = '';
+      grow();
       history.replaceState(null, '', location.pathname);
       input.focus();
       input.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
@@ -508,10 +516,19 @@
 
   function show(entry, source) {
     input.value = entry.says;
+    grow();
     render(entry);
     setHash(entry.key);
     track('translator_result', { result_key: entry.key, input_source: source, safety_hint: 'no' });
   }
+
+  input.addEventListener('input', grow);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && input.tagName === 'TEXTAREA') {
+      event.preventDefault();
+      form.requestSubmit();
+    }
+  });
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -575,6 +592,7 @@
     const entry = entryByKey.get(key);
     if (!entry) return;
     input.value = entry.says;
+    grow();
     render(entry);
     track('translator_result', { result_key: entry.key, input_source: 'link', safety_hint: 'no' });
   };
