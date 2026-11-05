@@ -207,7 +207,8 @@
     root.replaceChildren(
       element('p', { className: 'eyebrow', text: 'Los geht’s' }),
       element('h2', { className: 'trainer-situation', text: 'Wie viel möchtest du heute üben?', attributes: { tabindex: '-1' } }),
-      element('p', { className: 'trainer-ask', text: 'Du kannst nach der Kurzrunde jederzeit weitermachen.' }),
+      // Einmal sagen, was passiert: Situation lesen, eine von drei Antworten wählen.
+      element('p', { className: 'trainer-how', text: 'Du liest eine Situation und wählst eine von drei Antworten. Danach siehst du, warum sie passt oder nicht.' }),
       element('div', { className: 'translator-result-links trainer-start-choice' }, [short, all])
     );
   };

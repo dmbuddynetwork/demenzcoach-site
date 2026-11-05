@@ -308,6 +308,7 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 [data-page-type^="translator"] .translator-sticky span { display: none; }
 [data-page-type^="translator"] .translator-sticky .button { flex: 1 1 auto; }
 }
+[data-page-type^="translator"] .trainer-how { font-size: 1.1rem; line-height: 1.55; margin: 8px 0 18px; }
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 .translator-teaser .button-light-outline { color: var(--ink); background: var(--paper); border: 1px solid var(--line); }
