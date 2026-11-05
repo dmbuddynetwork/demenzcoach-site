@@ -407,7 +407,7 @@
     // Erst verstehen, dann antworten: genau die zwei Fragen, mit denen jemand kommt.
     // Auf dem Handy mit großer Schrift soll der erste Antwortsatz schnell kommen: Unter
     // „Was dahintersteckt“ steht nur der Kern (ein, zwei Sätze), der Rest unter „Mehr zum Hintergrund“.
-    const [lead, rest] = result.feeling || result.safetyOnly ? [result.short, ''] : splitLead(result.short);
+    const [lead, rest] = result.safetyOnly ? [result.short, ''] : splitLead(result.short);
     if (lead) {
       nodes.push(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
       nodes.push(element('p', { className: 'translator-meaning', text: lead }));
