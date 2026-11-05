@@ -292,14 +292,28 @@
     ]);
   };
 
+  // Nummern im Sicherheitshinweis als große Anruf-Knöpfe: im Notfall antippen statt abtippen.
+  const callNumbers = [
+    { pattern: /\b112\b/, label: 'Notruf 112', tel: '112' },
+    { pattern: /\b110\b/, label: 'Polizei 110', tel: '110' },
+    { pattern: /116 117/, label: 'Bereitschaftsdienst 116 117', tel: '116117' },
+    { pattern: /0800 111 0 111/, label: 'TelefonSeelsorge 0800 111 0 111', tel: '08001110111' }
+  ];
+  const safetyCalls = (text) => {
+    const found = callNumbers.filter(({ pattern }) => pattern.test(text));
+    return found.length
+      ? element('div', { className: 'translator-calls' }, found.map(({ label, tel }) => element('a', { className: 'translator-call', text: `📞 ${label}`, attributes: { href: `tel:${tel}` } })))
+      : null;
+  };
+  const urgentNote = (text) => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
+    element('strong', { text: 'Erst die Sicherheit' }),
+    element('span', { text }),
+    safetyCalls(text)
+  ]);
+
   const renderUnknown = ({ safetyHit, typed }) => {
     const nodes = [];
-    if (safetyHit) {
-      nodes.push(element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
-        element('strong', { text: 'Erst die Sicherheit' }),
-        element('span', { text: data.safetySignals.text })
-      ]));
-    }
+    if (safetyHit) nodes.push(urgentNote(data.safetySignals.text));
     // Gleicher Aufbau wie ein Treffer: oben der Satz, dann klar, was jetzt hilft.
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
@@ -336,12 +350,7 @@
     const result = entry;
     const nodes = [];
 
-    if (safetyHit || result.safetyOnly) {
-      nodes.push(element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
-        element('strong', { text: 'Erst die Sicherheit' }),
-        element('span', { text: result.safetyOnly ? result.safety : data.safetySignals.text })
-      ]));
-    }
+    if (safetyHit || result.safetyOnly) nodes.push(urgentNote(result.safetyOnly ? result.safety : data.safetySignals.text));
 
     if (typed) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
     nodes.push(element('span', { className: 'eyebrow', text: result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
@@ -417,7 +426,8 @@
     if (result.safety && !result.safetyOnly && !safetyHit) {
       nodes.push(element('aside', { className: 'safety-note' }, [
         element('strong', { text: 'Wann ein Gespräch nicht ausreicht' }),
-        element('span', { text: result.safety })
+        element('span', { text: result.safety }),
+        safetyCalls(result.safety)
       ]));
     }
 
