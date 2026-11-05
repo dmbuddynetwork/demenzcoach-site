@@ -100,10 +100,11 @@
   const renderResult = () => {
     track('trainer_complete', { score, total: questions.length });
     const shareText = `Ich habe beim Demenz-Gesprächstrainer ${score} von ${questions.length} Situationen ruhig gelöst. Wie würdest du antworten?`;
-    const share = element('div', { className: 'translator-share' }, [element('span', { text: 'Teilen:' })]);
+    // Ein einziger, klar beschrifteter Teilen-Knopf.
+    let share;
     if (navigator.share) {
-      const native = element('button', { className: 'translator-copy', text: 'Teilen', attributes: { type: 'button' } });
-      native.addEventListener('click', async () => {
+      share = element('button', { className: 'translator-copy', text: 'Ergebnis teilen', attributes: { type: 'button' } });
+      share.addEventListener('click', async () => {
         try {
           await navigator.share({ title: 'Gesprächstrainer Demenz', text: shareText, url });
           track('trainer_share', { method: 'native', score });
@@ -111,15 +112,14 @@
           // Abgebrochen.
         }
       });
-      share.append(native);
+    } else {
+      share = element('a', {
+        className: 'translator-copy',
+        text: 'Per WhatsApp teilen',
+        attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${url}`)}`, rel: 'noopener', target: '_blank' }
+      });
+      share.addEventListener('click', () => track('trainer_share', { method: 'whatsapp', score }));
     }
-    const whatsapp = element('a', {
-      className: 'translator-copy',
-      text: 'WhatsApp',
-      attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${url}`)}`, rel: 'noopener', target: '_blank' }
-    });
-    whatsapp.addEventListener('click', () => track('trainer_share', { method: 'whatsapp', score }));
-    share.append(whatsapp);
 
     const remaining = allQuestions.slice(questions.length);
     const continueButton = questions.length < allQuestions.length && questions[0] === allQuestions[0]
@@ -139,6 +139,7 @@
     });
 
     const review = missed.filter((question) => question.href);
+    const reviewRest = review.filter((question) => question !== (missed[0] ?? questions[0])).slice(0, 3);
     // Ein Satz zum Mitnehmen: aus der ersten verpassten Situation, sonst aus der ersten geübten.
     const takeawayQuestion = missed[0] ?? questions[0];
     const takeawayText = takeawayQuestion.options.find((option) => option.good).text.replace(/^„|“$/g, '');
@@ -157,21 +158,18 @@
       element('div', { className: 'translator-phrase' }, [element('q', { text: takeawayText }), copyTakeaway])
     ]);
     root.replaceChildren(...[
-      element('p', { className: 'eyebrow', text: 'Dein Ergebnis' }),
       element('h2', { className: 'trainer-score', text: `${score} von ${questions.length} Situationen ruhig gelöst`, attributes: { tabindex: '-1' } }),
       element('p', { text: verdict() }),
       takeaway,
-      review.length ? element('p', { className: 'trainer-review-title', text: 'Zum Nachlesen:' }) : null,
-      review.length ? element('ul', {}, review.map((question) => element('li', {}, [
+      element('div', { className: 'translator-result-links' }, [continueButton, restart, share].filter(Boolean)),
+      reviewRest.length ? element('p', { className: 'trainer-review-title', text: 'Weitere gute Sätze:' }) : null,
+      reviewRest.length ? element('ul', {}, reviewRest.map((question) => element('li', {}, [
         element('a', { text: question.options.find((option) => option.good).text.replace(/^„|“$/g, ''), attributes: { href: question.href, 'data-related-link': question.key } })
       ]))) : null,
-      share,
-      element('div', { className: 'translator-result-links' }, [continueButton, restart]),
       element('aside', { className: 'article-cta translator-app-cta' }, [
         element('div', {}, [
-          element('span', { className: 'eyebrow', text: 'Weiter üben mit Demenz Coach' }),
-          element('h2', { text: 'Drei Minuten am Tag, ein persönlicher Plan' }),
-          element('p', { text: 'In der App gibt es ein Drei-Minuten-Training und einen persönlichen 7-Tage-Plan – und Hilfe für eure ganz konkrete Situation. Kostenloser Download, optionales Abo.' })
+          element('h2', { text: 'Jeden Tag kurz üben – mit der App' }),
+          element('p', { text: 'Kostenlos laden. Abo nur, wenn du willst.' })
         ]),
         element('a', { className: 'button', text: 'Kostenlos im App Store', attributes: { href: appURL, 'data-store-link': 'trainer-result' } })
       ])
