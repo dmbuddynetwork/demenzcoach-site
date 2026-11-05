@@ -342,6 +342,17 @@
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
+  const splitLead = (text) => {
+    const sentences = String(text ?? '').split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„])/);
+    let lead = '';
+    let index = 0;
+    while (index < sentences.length && lead.length < 70) {
+      lead = lead ? `${lead} ${sentences[index]}` : sentences[index];
+      index += 1;
+    }
+    return [lead, sentences.slice(index).join(' ')];
+  };
+
   const moodLead = { wut: 'Zuerst beruhigen', trauer: 'Zuerst trösten', angst: 'Zuerst Sicherheit geben' };
 
   const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null } = {}) => {
@@ -361,7 +372,8 @@
       ]));
     } else if (safetyHit || result.safetyOnly) nodes.push(urgentNote(result.safetyOnly ? result.safety : data.safetySignals.text));
 
-    if (typed) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
+    // Steht der getippte Satz schon als Überschrift da, braucht es keine Wiederholung.
+    if (typed && core.normalize(typed) !== core.normalize(result.says ?? '')) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
     nodes.push(element('span', { className: 'eyebrow', text: result.selfCare ? 'Für dich' : result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
     const heading = element('h2', { text: result.feeling ? `Bei ${result.feeling}` : `„${result.says}“`, attributes: { tabindex: '-1' } });
     nodes.push(heading);
@@ -385,9 +397,12 @@
 
     const retry = result.retry ? retryBlock(result) : null;
     // Erst verstehen, dann antworten: genau die zwei Fragen, mit denen jemand kommt.
-    if (result.short) {
+    // Auf dem Handy mit großer Schrift soll der erste Antwortsatz schnell kommen: Unter
+    // „Was dahintersteckt“ steht nur der Kern (ein, zwei Sätze), der Rest unter „Mehr zum Hintergrund“.
+    const [lead, rest] = result.feeling || result.safetyOnly ? [result.short, ''] : splitLead(result.short);
+    if (lead) {
       nodes.push(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
-      nodes.push(element('p', { className: 'translator-meaning', text: result.short }));
+      nodes.push(element('p', { className: 'translator-meaning', text: lead }));
     }
     if (result.phrases.length) {
       nodes.push(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
@@ -419,15 +434,15 @@
     if (retry) nodes.push(retry.toggle, retry.block);
 
     // Antwort zuerst, Hintergrund zum Aufklappen: hält das Ergebnis auf dem Handy kurz.
-    const more = (title, items, intro) => items.length
+    const more = (title, items, intro, always = false) => items.length || always
       ? element('details', { className: 'translator-more' }, [
         element('summary', { text: title }),
         intro ? element('p', { text: intro }) : null,
-        element('ul', {}, items.map((item) => element('li', { text: item })))
+        items.length ? element('ul', {}, items.map((item) => element('li', { text: item }))) : null
       ])
       : null;
     const moreBlocks = [
-      more('Weitere mögliche Gründe', result.meanings),
+      more(rest ? 'Mehr zum Hintergrund' : 'Weitere mögliche Gründe', result.meanings, rest, Boolean(rest)),
       more('Was du eher vermeiden solltest', result.avoid, 'Eher ungünstig ist es,'),
       more('Was danach helfen kann', result.next)
     ].filter(Boolean);
