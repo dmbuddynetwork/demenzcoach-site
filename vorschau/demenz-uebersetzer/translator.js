@@ -91,7 +91,7 @@
     }
     const whatsapp = element('a', {
       className: 'translator-copy',
-      text: 'Per WhatsApp an die Familie',
+      text: 'Per WhatsApp teilen',
       attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, rel: 'noopener', target: '_blank' }
     });
     whatsapp.addEventListener('click', () => track('translator_share', { result_key: result.key, method: 'whatsapp' }));
