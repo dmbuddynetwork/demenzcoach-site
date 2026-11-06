@@ -251,20 +251,25 @@
   // („Er versteckt seine Sachen“ → Geld, „Sie zieht sich dauernd aus“ → Umziehen).
   const stopwords = new Set(['ich', 'du', 'er', 'sie', 'es', 'wir', 'ihr', 'mein', 'meine', 'meinen', 'meinem', 'meiner', 'dein', 'deine', 'sein', 'seine', 'ihre', 'ihren', 'das', 'der', 'die', 'und', 'ist', 'bin', 'hat', 'habe', 'nicht', 'will', 'muss', 'kann', 'immer', 'wieder', 'sagt', 'mir', 'mich', 'dir', 'dich', 'sich', 'was', 'wie', 'wo', 'wann', 'warum', 'ein', 'eine', 'einen', 'noch', 'schon', 'so', 'da', 'hier', 'jetzt', 'mal', 'auch', 'doch', 'den', 'dem', 'zu', 'im', 'in', 'mit', 'von', 'auf', 'fuer', 'aber', 'dann', 'denn', 'oder', 'staendig', 'dauernd', 'ganz', 'gar', 'sehr', 'alles', 'nichts', 'heute', 'gerade', 'einfach', 'wird', 'sind', 'haben', 'werden', 'kein', 'keine', 'keinen']);
   const contentWords = (text) => normalize(text).trim().split(' ').filter((word) => word.length >= 4 && !stopwords.has(word));
-  const stem = (word) => word.slice(0, 5);
+  const stem = (word) => word.slice(0, word.length >= 8 ? 6 : 5);
+  // Für „Meinst du vielleicht“ zählen nur Wörter mit Inhalt: Fürwörter und
+  // Allerweltswörter („seinem“, „fragt“, „morgen“) führten zu schiefen Vorschlägen.
+  const weakWords = new Set(['ihrem', 'ihrer', 'ihren', 'ihre', 'seinem', 'seiner', 'seinen', 'seine', 'meinem', 'meiner', 'meinen', 'meine',
+    'deinem', 'deiner', 'deinen', 'deine', 'nach', 'fragt', 'fragen', 'ganze', 'ganzen', 'zeit', 'weiss', 'zieht', 'immer', 'wieder',
+    'dauernd', 'staendig', 'redet', 'reden', 'sagt', 'sagen', 'morgen', 'heute', 'behauptet', 'will', 'wollen', 'macht', 'machen']);
   const near = (text, data, limit = 2) => {
-    const words = contentWords(text);
+    const words = contentWords(text).filter((word) => !weakWords.has(word));
     if (!words.length) return [];
-    return data.entries
+    const ranked = data.entries
       .filter((entry) => !entry.safetyOnly)
       .map((entry) => {
         const vocab = new Set([entry.says, ...(entry.variants ?? []), ...entry.keywords.map((keyword) => keyword.replace(/^=/, ''))].flatMap(contentWords).map(stem));
         return { entry, score: words.filter((word) => vocab.has(stem(word))).length };
       })
       .filter((candidate) => candidate.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit)
-      .map((candidate) => candidate.entry);
+      .sort((a, b) => b.score - a.score);
+    // Nur die besten Treffer: Ein Vorschlag mit weniger gemeinsamen Wörtern ist meist Zufall.
+    return ranked.filter((candidate) => candidate.score === ranked[0]?.score).slice(0, limit).map((candidate) => candidate.entry);
   };
 
   const api = { normalize, rank, match, near, personalize, roles: Object.keys(roles) };
