@@ -374,7 +374,7 @@
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
     return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
   };
-  const aiBox = (text, source) => {
+  const aiBox = (text, source, onFail = () => {}) => {
     if (!ai || !text || text.length < 2) return null;
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
@@ -411,6 +411,7 @@
         ? 'Gerade kommen viele Fragen an. Bitte versuch es in ein paar Minuten noch einmal.'
         : 'Die KI ist gerade nicht erreichbar. Bitte versuch es später noch einmal.';
       ask.disabled = false;
+      onFail();
     });
     box.append(ask, element('p', { className: 'translator-ai-note', text: 'Dein Satz geht dafür an OpenAI. Wir speichern ihn nicht. Bitte ohne Namen.' }), status);
     return box;
@@ -424,7 +425,15 @@
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
     nodes.push(heading);
     if (shown) nodes.push(element('p', { className: 'translator-meaning translator-unknown-note', text: 'Diesen Satz kenne ich noch nicht.' }));
-    nodes.push(aiBox(typed, 'unknown'));
+    // Mit KI-Knopf ist die Gefühle-Auswahl ein Weg zu viel. Sie erscheint erst,
+    // wenn die KI nicht antworten kann (oder es keinen KI-Knopf gibt).
+    const feelings = element('div', { className: 'translator-feelings-step' }, [
+      element('h3', { className: 'translator-step', text: 'Was spürst du bei der Person?' }),
+      feelingPicker('')
+    ]);
+    const box = aiBox(typed, 'unknown', () => { feelings.hidden = false; });
+    if (box) feelings.hidden = true;
+    nodes.push(box);
     // Ähnliche Situationen zuerst: Sie führen am schnellsten zu genauen Sätzen.
     const similar = typed ? core.near(typed, data) : [];
     if (similar.length) {
@@ -436,8 +445,7 @@
       element('div', { className: 'translator-phrases' }, [
         element('div', { className: 'translator-phrase' }, [element('q', { text: core.personalize(fallback.phrases[0], personal, data.formal) })])
       ]),
-      element('h3', { className: 'translator-step', text: 'Was spürst du bei der Person?' }),
-      feelingPicker('')
+      feelings
     ]));
     nodes.push(suggestLink(typed));
     nodes.push(appCTA());
