@@ -382,7 +382,7 @@
       ask.disabled = true;
       status.textContent = 'Einen Moment, die KI schreibt eine Antwort …';
       track('translator_ai', { step: 'ask', source });
-      const result = await ai.ask(text);
+      const result = await ai.ask(text, { formal: personal.formal });
       track('translator_ai', { step: result.kind, source });
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
         const { node, focus, top } = aiAnswer(result);

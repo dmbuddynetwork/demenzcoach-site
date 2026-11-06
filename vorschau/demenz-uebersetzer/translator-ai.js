@@ -1,12 +1,12 @@
 // KI-Antwort für Sätze, die der Übersetzer nicht kennt.
 // Wird nur aufgerufen, wenn jemand ausdrücklich „KI fragen“ tippt. Gesendet wird
-// nur der eingegebene Satz (höchstens 200 Zeichen) – ohne Cookies, ohne Kennung.
+// nur der eingegebene Satz (höchstens 200 Zeichen) und ob du oder Sie – ohne Cookies, ohne Kennung.
 // Der Server (Demenz Coach, Firebase) prüft Notfälle, fragt OpenAI ohne
 // Speicherung (store: false) und gibt nur geprüfte, kurze Antworten zurück.
 (function (root) {
   const endpoint = 'https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web';
 
-  const ask = async (text) => {
+  const ask = async (text, { formal = false } = {}) => {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
@@ -16,7 +16,7 @@
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: String(text).trim().slice(0, 200) }),
+        body: JSON.stringify({ text: String(text).trim().slice(0, 200), formal: formal === true }),
         signal: controller.signal
       });
       if (response.status === 429) return { kind: 'error', reason: 'busy' };
