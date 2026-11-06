@@ -143,12 +143,16 @@
     ]);
     const answer = (helpful) => () => {
       track('translator_feedback', { result_key: result.key, helpful: helpful ? 'yes' : 'no' });
+      // Teilen erst nach „Ja“: eine Zeile weniger unter dem Ergebnis, und
+      // gefragt wird genau dann, wenn es geholfen hat.
+      if (helpful) {
+        wrapper.replaceChildren(element('span', { text: 'Danke! Teile es gern mit deiner Familie:' }), shareBlock(result));
+        return;
+      }
       wrapper.replaceChildren(element('span', {
-        text: helpful
-          ? 'Danke! Teile den Übersetzer gern mit anderen Angehörigen.'
-          : retry
-            ? 'Danke. Hier ist ein zweiter Versuch – und in der App kannst du eure Situation genauer beschreiben.'
-            : 'Danke für die Rückmeldung. In der App kannst du eure Situation genauer beschreiben.'
+        text: retry
+          ? 'Danke. Hier ist ein zweiter Versuch – und in der App kannst du eure Situation genauer beschreiben.'
+          : 'Danke für die Rückmeldung. In der App kannst du eure Situation genauer beschreiben.'
       }));
       if (!helpful && retry) retry.open('feedback');
     };
@@ -490,7 +494,6 @@
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
       nodes.push(feedbackBlock(result, retry));
-      nodes.push(shareBlock(result));
       nodes.push(appCTA(result));
     }
 
