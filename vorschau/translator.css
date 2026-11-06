@@ -323,6 +323,8 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 }
 [data-page-type^="translator"] .translator-input-row textarea { display: block; box-sizing: border-box; flex: 1 1 auto; padding: 13px 14px; line-height: 1.35; resize: none; overflow: hidden; }
 [data-page-type^="translator"] .translator-retry-stop { margin: 14px 0 0; padding: 12px 14px; background: var(--sage-soft); border-radius: 12px; color: inherit; }
+[data-page-type="translator-phrase"] .translator-h1-sub { display: block; margin-top: 8px; font-size: max(1rem, .55em); font-weight: 600; line-height: 1.3; opacity: .8; }
+[data-page-type="translator-phrase"] .translator-h1-dash { display: none; }
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 .translator-teaser .button-light-outline { color: var(--ink); background: var(--paper); border: 1px solid var(--line); }
