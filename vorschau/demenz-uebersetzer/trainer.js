@@ -146,8 +146,6 @@
       focusHeading();
     });
 
-    const review = missed.filter((question) => question.href);
-    const reviewRest = review.filter((question) => question !== (missed[0] ?? questions[0])).slice(0, 3);
     // Ein Satz zum Mitnehmen: aus der ersten verpassten Situation, sonst aus der ersten geübten.
     const takeawayQuestion = missed[0] ?? questions[0];
     const takeawayText = takeawayQuestion.options.find((option) => option.good).text.replace(/^„|“$/g, '');
@@ -170,10 +168,6 @@
       element('p', { text: verdict() }),
       takeaway,
       element('div', { className: 'translator-result-links' }, [continueButton, restart, share].filter(Boolean)),
-      reviewRest.length ? element('p', { className: 'trainer-review-title', text: 'Weitere gute Sätze:' }) : null,
-      reviewRest.length ? element('ul', {}, reviewRest.map((question) => element('li', {}, [
-        element('a', { text: question.options.find((option) => option.good).text.replace(/^„|“$/g, ''), attributes: { href: question.href, 'data-related-link': question.key } })
-      ]))) : null,
       element('aside', { className: 'article-cta translator-app-cta' }, [
         element('div', {}, [
           element('h2', { text: 'Jeden Tag kurz üben – mit der App' }),
@@ -212,7 +206,7 @@
       element('p', { className: 'eyebrow', text: 'Los geht’s' }),
       element('h2', { className: 'trainer-situation', text: 'Wie viel möchtest du heute üben?', attributes: { tabindex: '-1' } }),
       // Einmal sagen, was passiert: Situation lesen, eine von drei Antworten wählen.
-      element('p', { className: 'trainer-how', text: 'Du liest eine Situation und wählst eine von drei Antworten. Danach siehst du, warum sie passt oder nicht.' }),
+      element('p', { className: 'trainer-how', text: 'Du liest eine Situation und wählst eine Antwort. Danach siehst du, was hilft.' }),
       element('div', { className: 'translator-result-links trainer-start-choice' }, [short, all])
     );
   };
