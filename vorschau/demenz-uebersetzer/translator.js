@@ -565,25 +565,7 @@
     chip.addEventListener('click', () => showFeeling(chip.dataset.translatorFeeling, 'feeling_chip'));
   });
 
-  // Vorschläge beim Tippen (nur feste Beispielsätze, nichts wird gespeichert).
-  const suggestions = document.getElementById('translator-suggestions');
-  if (suggestions) {
-    data.entries.filter((entry) => !entry.safetyOnly).forEach((entry) => {
-      [entry.says, ...(entry.variants ?? [])].forEach((value) => suggestions.append(element('option', { attributes: { value } })));
-    });
-  }
-
-  // Wechselnde Beispiele im Eingabefeld.
-  if (!reduceMotion) {
-    // Nur kurze Sätze, damit das Beispiel auch auf schmalen Handys nicht abgeschnitten wird.
-    const examples = data.entries.filter((entry) => !entry.safetyOnly && entry.says.length <= 20).map((entry) => entry.says);
-    let index = 0;
-    setInterval(() => {
-      if (document.activeElement === input || input.value) return;
-      index = (index + 1) % examples.length;
-      input.placeholder = examples[index];
-    }, 3500);
-  }
+  // Kein wechselndes Beispiel im Feld: bewegter Text lenkt ab, Beispiele stehen als Knöpfe darunter.
 
   // Geteilte Links wie …/demenz-uebersetzer/#satz-mutter öffnen das Ergebnis direkt.
   const openFromHash = () => {

@@ -323,8 +323,8 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 }
 [data-page-type^="translator"] .translator-input-row textarea { display: block; box-sizing: border-box; flex: 1 1 auto; padding: 13px 14px; line-height: 1.35; resize: none; overflow: hidden; }
 [data-page-type^="translator"] .translator-retry-stop { margin: 14px 0 0; padding: 12px 14px; background: var(--sage-soft); border-radius: 12px; color: inherit; }
-[data-page-type="translator-phrase"] .translator-h1-sub { display: block; margin-top: 8px; font-size: max(1rem, .55em); font-weight: 600; line-height: 1.3; opacity: .8; }
-[data-page-type="translator-phrase"] .translator-h1-dash { display: none; }
+[data-page-type^="translator"] .translator-h1-sub { display: block; margin-top: 8px; font-size: max(1rem, .55em); font-weight: 600; line-height: 1.3; opacity: .8; }
+[data-page-type^="translator"] .translator-h1-dash { display: none; }
 [data-page-type="translator-phrase"] .translator-more { display: block; }
 [data-page-type="translator-phrase"] .translator-more h2 { margin: 0 0 6px; }
 [data-page-type="translator-phrase"] .translator-more > p { margin: 0 0 14px; }
