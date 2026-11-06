@@ -425,9 +425,10 @@
           <h2 id="translator-form-title" class="translator-form-title">Was hat die Person gesagt?</h2>
           <label class="sr-only" for="translator-input">Satz, den die Person mit Demenz gesagt hat</label>
           <div class="translator-input-row">
-            <textarea id="translator-input" rows="1" maxlength="200" placeholder="Satz hier eintippen" enterkeyhint="go" aria-describedby="translator-privacy-note"></textarea>
+            <textarea id="translator-input" rows="1" maxlength="200" placeholder="Satz hier eintippen" enterkeyhint="go" aria-describedby="translator-empty-hint translator-privacy-note"></textarea>
             <button class="button" type="submit">Antwort finden</button>
           </div>
+          <p class="translator-empty-hint" id="translator-empty-hint" role="status"></p>
           <p class="translator-privacy" id="translator-privacy-note"><span aria-hidden="true">🔒</span> Wird nicht gespeichert und nicht gesendet.</p>
           <div class="translator-chips" role="group" aria-label="Häufige Sätze">
             <span>Oder einen Satz antippen:</span>
@@ -450,7 +451,7 @@
             <button type="button" class="translator-chip translator-chip-feeling" data-translator-feeling="sehnsucht">Sehnsucht</button>
           </div>
         </form>
-        <div id="translator-result" class="translator-result" aria-live="polite" hidden></div>
+        <div id="translator-result" class="translator-result" hidden></div>
         <noscript><p class="translator-privacy">Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der Übersicht unten.</p></noscript>
       </div>
     </section>
@@ -474,57 +475,57 @@
             <article class="content-card">
               <h4><a href="wo-ist-meine-mutter.html" data-related-link="wo-ist-meine-mutter">„Wo ist meine Mutter?“</a></h4>
               <p>Wenn ein Mensch mit Demenz nach verstorbenen Eltern fragt: was dahinterstecken kann, ruhige Antworten zum Ausprobieren und was du eher vermeiden solltest.</p>
-              <a class="text-link" href="wo-ist-meine-mutter.html" data-related-link="wo-ist-meine-mutter">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="wo-ist-meine-mutter.html" data-related-link="wo-ist-meine-mutter" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="wo-sind-meine-kinder.html" data-related-link="wo-sind-meine-kinder">„Wo sind meine Kinder?“</a></h4>
               <p>Ein Mensch mit Demenz sucht seine kleinen Kinder, die längst erwachsen sind? Was dahinterstecken kann und wie du die Fürsorge würdigst, ohne zu streiten.</p>
-              <a class="text-link" href="wo-sind-meine-kinder.html" data-related-link="wo-sind-meine-kinder">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="wo-sind-meine-kinder.html" data-related-link="wo-sind-meine-kinder" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-muss-zur-arbeit.html" data-related-link="ich-muss-zur-arbeit">„Ich muss zur Arbeit.“</a></h4>
               <p>Ein Mensch mit Demenz will zur Arbeit oder die Kinder abholen? Was hinter dem Satz stecken kann und welche Antworten Unruhe eher lindern.</p>
-              <a class="text-link" href="ich-muss-zur-arbeit.html" data-related-link="ich-muss-zur-arbeit">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-muss-zur-arbeit.html" data-related-link="ich-muss-zur-arbeit" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="wann-gehen-wir.html" data-related-link="wann-gehen-wir">„Wann gehen wir?“</a></h4>
               <p>Ein Mensch mit Demenz fragt alle paar Minuten dasselbe? Warum das passiert, wie du gelassen antwortest und was gegen die eigene Ungeduld hilft.</p>
-              <a class="text-link" href="wann-gehen-wir.html" data-related-link="wann-gehen-wir">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="wann-gehen-wir.html" data-related-link="wann-gehen-wir" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-muss-aufstehen-nachts.html" data-related-link="ich-muss-aufstehen-nachts">„Ich muss jetzt aufstehen!“</a></h4>
               <p>Ein Mensch mit Demenz steht nachts auf und will in den Tag starten? Mögliche Gründe, ruhige Sätze für die Nacht und was tagsüber den Schlaf unterstützen kann.</p>
-              <a class="text-link" href="ich-muss-aufstehen-nachts.html" data-related-link="ich-muss-aufstehen-nachts">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-muss-aufstehen-nachts.html" data-related-link="ich-muss-aufstehen-nachts" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="wo-bin-ich.html" data-related-link="wo-bin-ich">„Wo bin ich?“</a></h4>
               <p>Ein Mensch mit Demenz fragt „Wo bin ich?“ oder „Was mache ich hier?“ Was hinter der Frage stecken kann und welche kurzen Antworten Halt geben.</p>
-              <a class="text-link" href="wo-bin-ich.html" data-related-link="wo-bin-ich">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="wo-bin-ich.html" data-related-link="wo-bin-ich" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-will-nicht-ins-bett.html" data-related-link="ich-will-nicht-ins-bett">„Ich will nicht ins Bett.“</a></h4>
               <p>Ein Mensch mit Demenz will abends nicht schlafen gehen? Was hinter dem Satz stecken kann, ruhige Sätze und kleine Abendrituale, die helfen können.</p>
-              <a class="text-link" href="ich-will-nicht-ins-bett.html" data-related-link="ich-will-nicht-ins-bett">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-will-nicht-ins-bett.html" data-related-link="ich-will-nicht-ins-bett" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-muss-noch-einkaufen.html" data-related-link="ich-muss-noch-einkaufen">„Ich muss noch einkaufen.“</a></h4>
               <p>Ein Mensch mit Demenz will dringend einkaufen oder zur Bank? Was hinter dem Satz stecken kann und wie du die Aufgabe würdigst, ohne zu streiten.</p>
-              <a class="text-link" href="ich-muss-noch-einkaufen.html" data-related-link="ich-muss-noch-einkaufen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-muss-noch-einkaufen.html" data-related-link="ich-muss-noch-einkaufen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="wo-ist-mein-mann.html" data-related-link="wo-ist-mein-mann">„Wo ist mein Mann?“</a></h4>
               <p>Ein Mensch mit Demenz fragt nach dem verstorbenen Mann oder der Frau? Was hinter der Frage stecken kann und welche Antworten trösten, ohne jedes Mal neu zu verletzen.</p>
-              <a class="text-link" href="wo-ist-mein-mann.html" data-related-link="wo-ist-mein-mann">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="wo-ist-mein-mann.html" data-related-link="wo-ist-mein-mann" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="es-wird-dunkel-ich-muss-los.html" data-related-link="es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss jetzt los!“</a></h4>
               <p>Am späten Nachmittag oder Abend wird ein Mensch mit Demenz unruhig, will weg oder erkennt die Wohnung nicht? Was dahinterstecken kann und welche Sätze und Abläufe beruhigen.</p>
-              <a class="text-link" href="es-wird-dunkel-ich-muss-los.html" data-related-link="es-wird-dunkel-ich-muss-los">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="es-wird-dunkel-ich-muss-los.html" data-related-link="es-wird-dunkel-ich-muss-los" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="/ratgeber/demenz-nach-hause-was-sagen.html" data-related-link="demenz-nach-hause-was-sagen">„Ich will nach Hause.“</a></h4>
               <p>Ruhige Antworten, wenn ein Mensch mit Demenz nach Hause möchte – auch wenn die Person bereits zu Hause ist.</p>
-              <a class="text-link" href="/ratgeber/demenz-nach-hause-was-sagen.html" data-related-link="demenz-nach-hause-was-sagen">Ratgeber lesen <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="/ratgeber/demenz-nach-hause-was-sagen.html" data-related-link="demenz-nach-hause-was-sagen" tabindex="-1" aria-hidden="true">Ratgeber lesen <span aria-hidden="true">→</span></a>
             </article>
           </div>
           </details>
@@ -542,42 +543,42 @@
             <article class="content-card">
               <h4><a href="du-hast-mein-geld-gestohlen.html" data-related-link="du-hast-mein-geld-gestohlen">„Du hast mein Geld gestohlen!“</a></h4>
               <p>Diebstahlvorwürfe bei Demenz tun weh. Was dahinterstecken kann, welche Sätze die Lage entschärfen und wie du dich selbst dabei schützt.</p>
-              <a class="text-link" href="du-hast-mein-geld-gestohlen.html" data-related-link="du-hast-mein-geld-gestohlen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="du-hast-mein-geld-gestohlen.html" data-related-link="du-hast-mein-geld-gestohlen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="du-luegst-mich-an.html" data-related-link="du-luegst-mich-an">„Du lügst mich an!“</a></h4>
               <p>Ein Mensch mit Demenz wirft dir Lügen vor? Warum Misstrauen entstehen kann, wie du nicht in den Streit gehst und was dir selbst hilft.</p>
-              <a class="text-link" href="du-luegst-mich-an.html" data-related-link="du-luegst-mich-an">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="du-luegst-mich-an.html" data-related-link="du-luegst-mich-an" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="da-ist-jemand-im-zimmer.html" data-related-link="da-ist-jemand-im-zimmer">„Da ist jemand im Zimmer.“</a></h4>
               <p>Ein Mensch mit Demenz sieht Personen oder Tiere, die nicht da sind? Wie du beruhigend reagierst, was die Umgebung beitragen kann und wann ärztliche Abklärung nötig ist.</p>
-              <a class="text-link" href="da-ist-jemand-im-zimmer.html" data-related-link="da-ist-jemand-im-zimmer">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="da-ist-jemand-im-zimmer.html" data-related-link="da-ist-jemand-im-zimmer" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-bin-hier-eingesperrt.html" data-related-link="ich-bin-hier-eingesperrt">„Ich bin hier eingesperrt!“</a></h4>
               <p>Ein Mensch mit Demenz fühlt sich eingesperrt und will raus? Was dahinterstecken kann, beruhigende Sätze und wie du Sicherheit und Freiheit verbindest.</p>
-              <a class="text-link" href="ich-bin-hier-eingesperrt.html" data-related-link="ich-bin-hier-eingesperrt">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-bin-hier-eingesperrt.html" data-related-link="ich-bin-hier-eingesperrt" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="hilfe-hilfe-rufen.html" data-related-link="hilfe-hilfe-rufen">„Hilfe! Hilfe!“</a></h4>
               <p>Ständiges Rufen bei Demenz zerrt an den Nerven. Welche Bedürfnisse dahinterstecken können, wie du reagierst und wann du ärztlich nachfragen solltest.</p>
-              <a class="text-link" href="hilfe-hilfe-rufen.html" data-related-link="hilfe-hilfe-rufen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="hilfe-hilfe-rufen.html" data-related-link="hilfe-hilfe-rufen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="das-essen-ist-vergiftet.html" data-related-link="das-essen-ist-vergiftet">„Das Essen ist vergiftet.“</a></h4>
               <p>Ein Mensch mit Demenz lehnt Essen ab oder glaubt, es sei vergiftet? Was dahinterstecken kann, ruhige Sätze und wann du ärztlichen Rat holen solltest.</p>
-              <a class="text-link" href="das-essen-ist-vergiftet.html" data-related-link="das-essen-ist-vergiftet">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="das-essen-ist-vergiftet.html" data-related-link="das-essen-ist-vergiftet" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="die-nachbarn-reden-ueber-mich.html" data-related-link="die-nachbarn-reden-ueber-mich">„Die Nachbarn reden über mich.“</a></h4>
               <p>Ein Mensch mit Demenz fühlt sich von Nachbarn beobachtet oder bestohlen? Was dahinterstecken kann, beruhigende Sätze und wann ärztlicher Rat wichtig ist.</p>
-              <a class="text-link" href="die-nachbarn-reden-ueber-mich.html" data-related-link="die-nachbarn-reden-ueber-mich">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="die-nachbarn-reden-ueber-mich.html" data-related-link="die-nachbarn-reden-ueber-mich" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="du-hast-einen-anderen.html" data-related-link="du-hast-einen-anderen">„Du hast einen anderen!“</a></h4>
               <p>Ein Mensch mit Demenz wirft dem Partner Untreue vor? Was hinter der Eifersucht stecken kann, Sätze, die beruhigen statt verteidigen, und wann du ärztlichen Rat holen solltest.</p>
-              <a class="text-link" href="du-hast-einen-anderen.html" data-related-link="du-hast-einen-anderen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="du-hast-einen-anderen.html" data-related-link="du-hast-einen-anderen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
           </div>
           </details>
@@ -595,47 +596,47 @@
             <article class="content-card">
               <h4><a href="lass-mich-in-ruhe.html" data-related-link="lass-mich-in-ruhe">„Lass mich in Ruhe!“</a></h4>
               <p>Wenn ein Mensch mit Demenz dich wegschickt oder wütend wird: was dahinterstecken kann, welche Sätze deeskalieren und wann du Hilfe holen solltest.</p>
-              <a class="text-link" href="lass-mich-in-ruhe.html" data-related-link="lass-mich-in-ruhe">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="lass-mich-in-ruhe.html" data-related-link="lass-mich-in-ruhe" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-will-nicht-duschen.html" data-related-link="ich-will-nicht-duschen">„Ich will nicht duschen.“</a></h4>
               <p>Ein Mensch mit Demenz lehnt Duschen oder Waschen ab? Mögliche Gründe, Sätze mit Wahlfreiheit und kleine Schritte für mehr Ruhe im Bad.</p>
-              <a class="text-link" href="ich-will-nicht-duschen.html" data-related-link="ich-will-nicht-duschen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-will-nicht-duschen.html" data-related-link="ich-will-nicht-duschen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-nehme-keine-tabletten.html" data-related-link="ich-nehme-keine-tabletten">„Ich nehme keine Tabletten.“</a></h4>
               <p>Ein Mensch mit Demenz verweigert Medikamente? Mögliche Gründe, ruhige Sätze und warum du Fragen zu Medikamenten immer mit Arztpraxis oder Apotheke klären solltest.</p>
-              <a class="text-link" href="ich-nehme-keine-tabletten.html" data-related-link="ich-nehme-keine-tabletten">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-nehme-keine-tabletten.html" data-related-link="ich-nehme-keine-tabletten" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-bin-doch-nicht-dement.html" data-related-link="ich-bin-doch-nicht-dement">„Ich bin doch nicht dement!“</a></h4>
               <p>Ein Mensch mit Demenz will keine Hilfe und sieht keine Erkrankung? Warum Überzeugen selten klappt und welche Sätze Würde und Unterstützung verbinden.</p>
-              <a class="text-link" href="ich-bin-doch-nicht-dement.html" data-related-link="ich-bin-doch-nicht-dement">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-bin-doch-nicht-dement.html" data-related-link="ich-bin-doch-nicht-dement" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-will-auto-fahren.html" data-related-link="ich-will-auto-fahren">„Ich kann noch selbst Auto fahren.“</a></h4>
               <p>Ein Mensch mit Demenz will weiter Auto fahren? Wie du über ein schwieriges Thema sprichst, ohne die Würde zu verletzen, und wer dich dabei unterstützen kann.</p>
-              <a class="text-link" href="ich-will-auto-fahren.html" data-related-link="ich-will-auto-fahren">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-will-auto-fahren.html" data-related-link="ich-will-auto-fahren" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-will-nicht-ins-heim.html" data-related-link="ich-will-nicht-ins-heim">„Ich will nicht ins Heim.“</a></h4>
               <p>Ein Mensch mit Demenz wehrt sich gegen Pflegeheim oder Tagespflege? Welche Ängste dahinterstehen können und wie du ehrlich und behutsam darüber sprichst.</p>
-              <a class="text-link" href="ich-will-nicht-ins-heim.html" data-related-link="ich-will-nicht-ins-heim">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-will-nicht-ins-heim.html" data-related-link="ich-will-nicht-ins-heim" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-bin-doch-kein-kind.html" data-related-link="ich-bin-doch-kein-kind">„Ich bin doch kein Kind!“</a></h4>
               <p>Ein Mensch mit Demenz fühlt sich bevormundet und wehrt sich? Was hinter dem Satz stecken kann und wie du hilfst, ohne die Würde zu verletzen.</p>
-              <a class="text-link" href="ich-bin-doch-kein-kind.html" data-related-link="ich-bin-doch-kein-kind">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-bin-doch-kein-kind.html" data-related-link="ich-bin-doch-kein-kind" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-gehe-nicht-in-die-tagespflege.html" data-related-link="ich-gehe-nicht-in-die-tagespflege">„Ich gehe nicht in die Tagespflege!“</a></h4>
               <p>Ein Mensch mit Demenz will nicht in die Tagespflege oder lässt den Pflegedienst nicht herein? Was dahinterstecken kann und wie neue Hilfe leichter angenommen wird.</p>
-              <a class="text-link" href="ich-gehe-nicht-in-die-tagespflege.html" data-related-link="ich-gehe-nicht-in-die-tagespflege">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-gehe-nicht-in-die-tagespflege.html" data-related-link="ich-gehe-nicht-in-die-tagespflege" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-bleibe-heute-im-bett.html" data-related-link="ich-bleibe-heute-im-bett">„Ich bleibe heute im Bett.“</a></h4>
               <p>Ein Mensch mit Demenz will morgens nicht aus dem Bett? Was dahinterstecken kann und welche ruhigen Sätze helfen, ohne Druck in den Tag zu kommen.</p>
-              <a class="text-link" href="ich-bleibe-heute-im-bett.html" data-related-link="ich-bleibe-heute-im-bett">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-bleibe-heute-im-bett.html" data-related-link="ich-bleibe-heute-im-bett" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
           </div>
           </details>
@@ -653,67 +654,67 @@
             <article class="content-card">
               <h4><a href="ich-kann-gar-nichts-mehr.html" data-related-link="ich-kann-gar-nichts-mehr">„Ich kann gar nichts mehr.“</a></h4>
               <p>Wenn ein Mensch mit Demenz sagt, er sei dumm oder nur noch eine Last: wie du Gefühle anerkennst, statt sie wegzureden, und wann ärztlicher Rat wichtig ist.</p>
-              <a class="text-link" href="ich-kann-gar-nichts-mehr.html" data-related-link="ich-kann-gar-nichts-mehr">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-kann-gar-nichts-mehr.html" data-related-link="ich-kann-gar-nichts-mehr" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-habe-noch-nichts-gegessen.html" data-related-link="ich-habe-noch-nichts-gegessen">„Ich habe heute noch nichts gegessen.“</a></h4>
               <p>Kurz nach dem Essen sagt ein Mensch mit Demenz, er habe nichts bekommen? Was dahinterstecken kann und wie du ohne Streit reagierst.</p>
-              <a class="text-link" href="ich-habe-noch-nichts-gegessen.html" data-related-link="ich-habe-noch-nichts-gegessen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-habe-noch-nichts-gegessen.html" data-related-link="ich-habe-noch-nichts-gegessen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="mir-ist-langweilig.html" data-related-link="mir-ist-langweilig">„Mir ist so langweilig.“</a></h4>
               <p>Ein Mensch mit Demenz langweilt sich und wird unruhig? Was dahinterstecken kann, passende Sätze und einfache Beschäftigungsideen für den Alltag.</p>
-              <a class="text-link" href="mir-ist-langweilig.html" data-related-link="mir-ist-langweilig">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="mir-ist-langweilig.html" data-related-link="mir-ist-langweilig" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="wer-sind-sie.html" data-related-link="wer-sind-sie">„Wer sind Sie?“</a></h4>
               <p>Nicht erkannt zu werden, schmerzt. Warum das bei Demenz passieren kann, wie du dich ruhig vorstellst und was dir selbst in diesem Moment hilft.</p>
-              <a class="text-link" href="wer-sind-sie.html" data-related-link="wer-sind-sie">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="wer-sind-sie.html" data-related-link="wer-sind-sie" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="wo-ist-mein-hund.html" data-related-link="wo-ist-mein-hund">„Wo ist mein Hund?“</a></h4>
               <p>Ein Mensch mit Demenz sucht ein Haustier, das längst nicht mehr lebt? Was hinter der Frage stecken kann und welche Antworten trösten, statt zu verletzen.</p>
-              <a class="text-link" href="wo-ist-mein-hund.html" data-related-link="wo-ist-mein-hund">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="wo-ist-mein-hund.html" data-related-link="wo-ist-mein-hund" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="lass-mich-nicht-allein.html" data-related-link="lass-mich-nicht-allein">„Lass mich nicht allein!“</a></h4>
               <p>Ein Mensch mit Demenz folgt dir überallhin und hat Angst, allein zu sein? Was dahinterstecken kann, Sätze, die Sicherheit geben, und wie du trotzdem kurz Luft bekommst.</p>
-              <a class="text-link" href="lass-mich-nicht-allein.html" data-related-link="lass-mich-nicht-allein">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="lass-mich-nicht-allein.html" data-related-link="lass-mich-nicht-allein" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-habe-schon-gegessen.html" data-related-link="ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a></h4>
               <p>Ein Mensch mit Demenz sagt, er habe schon gegessen oder keinen Hunger? Was hinter dem Satz stecken kann, Sätze ohne Druck und wann du ärztlichen Rat holen solltest.</p>
-              <a class="text-link" href="ich-habe-schon-gegessen.html" data-related-link="ich-habe-schon-gegessen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-habe-schon-gegessen.html" data-related-link="ich-habe-schon-gegessen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-muss-nicht-aufs-klo.html" data-related-link="ich-muss-nicht-aufs-klo">„Ich muss nicht aufs Klo.“</a></h4>
               <p>Ein Mensch mit Demenz will nicht zur Toilette oder ein Missgeschick ist passiert? Was dahinterstecken kann, Sätze, die die Würde schützen, und wann du ärztlich abklären solltest.</p>
-              <a class="text-link" href="ich-muss-nicht-aufs-klo.html" data-related-link="ich-muss-nicht-aufs-klo">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-muss-nicht-aufs-klo.html" data-related-link="ich-muss-nicht-aufs-klo" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-ziehe-mich-nicht-um.html" data-related-link="ich-ziehe-mich-nicht-um">„Ich ziehe mich nicht um.“</a></h4>
               <p>Ein Mensch mit Demenz trägt seit Tagen dieselben Sachen und will sich nicht umziehen? Was dahinterstecken kann und wie du ohne Machtkampf weiterkommst.</p>
-              <a class="text-link" href="ich-ziehe-mich-nicht-um.html" data-related-link="ich-ziehe-mich-nicht-um">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-ziehe-mich-nicht-um.html" data-related-link="ich-ziehe-mich-nicht-um" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-will-das-ausziehen.html" data-related-link="ich-will-das-ausziehen">„Ich will das ausziehen!“</a></h4>
               <p>Ein Mensch mit Demenz zieht sich immer wieder aus, auch vor anderen? Was dahinterstecken kann und welche ruhigen Sätze helfen.</p>
-              <a class="text-link" href="ich-will-das-ausziehen.html" data-related-link="ich-will-das-ausziehen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-will-das-ausziehen.html" data-related-link="ich-will-das-ausziehen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="mir-ist-so-kalt.html" data-related-link="mir-ist-so-kalt">„Mir ist so kalt.“</a></h4>
               <p>Ein Mensch mit Demenz friert, obwohl es warm ist? Was hinter dem Satz stecken kann und welche Antworten und kleinen Handgriffe wirklich wärmen.</p>
-              <a class="text-link" href="mir-ist-so-kalt.html" data-related-link="mir-ist-so-kalt">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="mir-ist-so-kalt.html" data-related-link="mir-ist-so-kalt" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="ich-muss-jemanden-anrufen.html" data-related-link="ich-muss-jemanden-anrufen">„Ich muss sofort jemanden anrufen!“</a></h4>
               <p>Ein Mensch mit Demenz will ständig telefonieren oder jemanden anrufen, der nicht erreichbar ist? Was dahinterstecken kann und welche Sätze Ruhe geben.</p>
-              <a class="text-link" href="ich-muss-jemanden-anrufen.html" data-related-link="ich-muss-jemanden-anrufen">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="ich-muss-jemanden-anrufen.html" data-related-link="ich-muss-jemanden-anrufen" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
             <article class="content-card">
               <h4><a href="wann-kommt-mein-sohn.html" data-related-link="wann-kommt-mein-sohn">„Wann kommt mein Sohn?“</a></h4>
               <p>Ein Mensch mit Demenz fragt ständig nach Besuch oder sagt, seit Wochen sei niemand da gewesen, obwohl ihr gestern da wart? Was dahinterstecken kann und welche Sätze helfen.</p>
-              <a class="text-link" href="wann-kommt-mein-sohn.html" data-related-link="wann-kommt-mein-sohn">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
+              <a class="text-link" href="wann-kommt-mein-sohn.html" data-related-link="wann-kommt-mein-sohn" tabindex="-1" aria-hidden="true">Bedeutung &amp; Antworten <span aria-hidden="true">→</span></a>
             </article>
           </div>
           </details>

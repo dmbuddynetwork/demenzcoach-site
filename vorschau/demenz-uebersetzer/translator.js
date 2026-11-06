@@ -42,6 +42,13 @@
     return node;
   };
 
+  // Symbole (Daumen, Hörer) nur fürs Auge: Vorlesen soll nur „Ja“ oder
+  // „Notruf 112“ sagen, nicht „Daumen hoch Ja“.
+  const withIcon = (node, icon, label) => {
+    node.replaceChildren(element('span', { text: icon, attributes: { 'aria-hidden': 'true' } }), ` ${label}`);
+    return node;
+  };
+
   const flash = (node, text) => {
     const original = node.textContent;
     node.textContent = text;
@@ -145,18 +152,23 @@
       track('translator_feedback', { result_key: result.key, helpful: helpful ? 'yes' : 'no' });
       // Teilen erst nach „Ja“: eine Zeile weniger unter dem Ergebnis, und
       // gefragt wird genau dann, wenn es geholfen hat.
+      // Der gedrückte Knopf verschwindet; damit Tastatur und Vorlesen nicht
+      // ins Leere springen, bekommt der Dank-Satz den Fokus.
+      const thanks = (text) => element('span', { text, attributes: { tabindex: '-1' } });
       if (helpful) {
-        wrapper.replaceChildren(element('span', { text: 'Danke! Teile es gern mit deiner Familie:' }), shareBlock(result));
+        const note = thanks('Danke! Teile es gern mit deiner Familie:');
+        wrapper.replaceChildren(note, shareBlock(result));
+        note.focus({ preventScroll: true });
         return;
       }
-      wrapper.replaceChildren(element('span', {
-        text: retry
-          ? 'Danke. Hier ist ein zweiter Versuch – und in der App kannst du eure Situation genauer beschreiben.'
-          : 'Danke für die Rückmeldung. In der App kannst du eure Situation genauer beschreiben.'
-      }));
-      if (!helpful && retry) retry.open('feedback');
+      const note = thanks(retry
+        ? 'Danke. Hier ist ein zweiter Versuch – und in der App kannst du eure Situation genauer beschreiben.'
+        : 'Danke für die Rückmeldung. In der App kannst du eure Situation genauer beschreiben.');
+      wrapper.replaceChildren(note);
+      note.focus({ preventScroll: true });
+      if (retry) retry.open('feedback');
     };
-    wrapper.append(button('👍 Ja', 'translator-copy', answer(true)), button('👎 Nein', 'translator-copy', answer(false)));
+    wrapper.append(withIcon(button('', 'translator-copy', answer(true)), '👍', 'Ja'), withIcon(button('', 'translator-copy', answer(false)), '👎', 'Nein'));
     return wrapper;
   };
 
@@ -315,7 +327,7 @@
     const matches = callNumbers.filter(({ pattern }) => pattern.test(text));
     const found = listenFirst ? [...matches].reverse() : matches;
     return found.length
-      ? element('div', { className: 'translator-calls' }, found.map(({ label, tel }) => element('a', { className: 'translator-call', text: `📞 ${label}`, attributes: { href: `tel:${tel}` } })))
+      ? element('div', { className: 'translator-calls' }, found.map(({ label, tel }) => withIcon(element('a', { className: 'translator-call', attributes: { href: `tel:${tel}` } }), '📞', label)))
       : null;
   };
   const urgentNote = (text) => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
@@ -526,7 +538,8 @@
     track('translator_result', { result_key: entry.key, input_source: source, safety_hint: 'no' });
   }
 
-  input.addEventListener('input', grow);
+  const emptyHint = document.getElementById('translator-empty-hint') ?? element('p');
+  input.addEventListener('input', () => { grow(); if (input.value.trim()) emptyHint.textContent = ''; });
   input.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && input.tagName === 'TEXTAREA') {
       event.preventDefault();
@@ -538,9 +551,12 @@
     event.preventDefault();
     const text = input.value.trim();
     if (!text) {
+      // Leeres Feld: sagen, was fehlt – sichtbar und für Vorlesen.
+      emptyHint.textContent = 'Bitte zuerst einen Satz eintippen – oder unten einen antippen.';
       input.focus();
       return;
     }
+    emptyHint.textContent = '';
     const { entry, alternatives, safetyHit, feeling, also, mood } = core.match(text, data);
     const feelingEntry = !entry && feeling ? feelingEntries.get(feeling.id) : null;
     if (feelingEntry) {
