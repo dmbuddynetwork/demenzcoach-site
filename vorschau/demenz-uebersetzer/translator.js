@@ -319,9 +319,10 @@
       : null;
   };
   const urgentNote = (text) => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
+    // Im Notfall zuerst die Knöpfe zum Anrufen, dann die Erklärung.
     element('strong', { text: 'Erst die Sicherheit' }),
-    element('span', { text }),
-    safetyCalls(text)
+    safetyCalls(text),
+    element('span', { text })
   ]);
 
   const renderUnknown = ({ safetyHit, typed }) => {

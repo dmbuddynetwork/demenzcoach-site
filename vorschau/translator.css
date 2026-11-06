@@ -347,6 +347,7 @@ body.translator-cta-visible .translator-sticky { display: none !important; }
 [data-page-type="translator-tool"] .translator-cluster-count { grid-column: 1; color: var(--muted); font-size: .95rem; font-weight: 600; }
 [data-page-type="translator-tool"] .translator-cluster .content-card-grid { margin: 0; padding: 0 12px 14px; }
 [data-page-type="translator-tool"] .translator-cluster > summary:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; border-radius: 16px; }
+[data-page-type^="translator"] .safety-urgent .translator-calls { margin: 10px 0 12px; }
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 .translator-teaser .button-light-outline { color: var(--ink); background: var(--paper); border: 1px solid var(--line); }
