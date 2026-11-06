@@ -141,7 +141,12 @@
       track('translator_retry', { result_key: result.key, input_source: source });
     };
     const refresh = () => { quote.textContent = text(); };
-    return { toggle, block, open, refresh };
+    // Nach „Nein“: der Knopf „KI fragen“ steht direkt im zweiten Versuch, nicht weit unten.
+    const addAI = (box) => {
+      if (!box || block.querySelector('.translator-ai, .translator-ai-answer')) return;
+      block.append(element('p', { className: 'translator-retry-ai', text: 'Passt das nicht zu eurer Lage? Dann frag die KI:' }), box);
+    };
+    return { toggle, block, open, refresh, addAI };
   };
 
   const feedbackBlock = (result, retry) => {
@@ -164,11 +169,14 @@
       const asked = input.value.trim() || result.says || '';
       const box = aiBox(asked, 'feedback');
       const note = thanks(retry
-        ? (box ? 'Danke. Hier ist ein zweiter Versuch. Oder frag die KI nach einer Antwort für eure Lage:' : 'Danke. Hier ist ein zweiter Versuch.')
+        ? 'Danke. Oben steht ein zweiter Versuch.'
         : (box ? 'Danke. Frag gern die KI nach einer Antwort für eure Lage:' : 'Danke für die Rückmeldung.'));
-      wrapper.replaceChildren(note, box || '');
+      wrapper.replaceChildren(note, retry ? '' : (box || ''));
       note.focus({ preventScroll: true });
-      if (retry) retry.open('feedback');
+      if (retry) {
+        retry.addAI(box);
+        retry.open('feedback');
+      }
     };
     wrapper.append(withIcon(button('', 'translator-copy', answer(true)), '👍', 'Ja'), withIcon(button('', 'translator-copy', answer(false)), '👎', 'Nein'));
     return wrapper;
