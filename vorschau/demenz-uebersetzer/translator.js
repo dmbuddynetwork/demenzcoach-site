@@ -402,7 +402,7 @@
         : 'Die KI ist gerade nicht erreichbar. Bitte versuch es später noch einmal.';
       ask.disabled = false;
     });
-    box.append(ask, element('p', { className: 'translator-ai-note', text: 'Dafür geht dein Satz an die KI von OpenAI. Wir speichern ihn nicht. Bitte keine Namen eingeben.' }), status);
+    box.append(ask, element('p', { className: 'translator-ai-note', text: 'Dein Satz geht dafür an OpenAI. Wir speichern ihn nicht. Bitte ohne Namen.' }), status);
     return box;
   };
 
