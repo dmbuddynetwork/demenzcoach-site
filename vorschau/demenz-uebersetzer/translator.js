@@ -371,6 +371,8 @@
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
+    document.body.classList.remove('translator-answers-seen');
+    requestAnimationFrame(() => syncSticky());
     focusResult(heading);
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
@@ -522,6 +524,8 @@
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
+    document.body.classList.remove('translator-answers-seen');
+    requestAnimationFrame(() => syncSticky());
     focusResult(heading);
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
@@ -623,6 +627,10 @@
   });
   // Ist der große App-Kasten im Bild, braucht es die Leiste nicht doppelt.
   const syncSticky = () => {
+    // Die App-Leiste erst zeigen, wenn die Antwortsätze ganz zu sehen waren –
+    // sonst verdeckt sie auf kleinen Handys genau die erste Antwort.
+    const answers = output.querySelector('.translator-phrases')?.getBoundingClientRect();
+    if (answers && answers.height && answers.bottom < innerHeight) document.body.classList.add('translator-answers-seen');
     const box = document.querySelector('.translator-app-cta')?.getBoundingClientRect();
     document.body.classList.toggle('translator-cta-visible', Boolean(box && box.height && box.top < innerHeight && box.bottom > 0));
   };
