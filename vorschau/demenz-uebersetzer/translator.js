@@ -330,6 +330,15 @@
       ? element('div', { className: 'translator-calls' }, found.map(({ label, tel }) => withIcon(element('a', { className: 'translator-call', attributes: { href: `tel:${tel}` } }), '📞', label)))
       : null;
   };
+  // Fokus nach dem Übersetzen: normalerweise die Überschrift. Steht ein
+  // Notfall-Hinweis darüber, beginnt Vorlesen dort – sonst würden die
+  // Anruf-Knöpfe übersprungen.
+  const focusResult = (heading) => {
+    const urgent = output.querySelector('.safety-urgent');
+    const target = urgent && (urgent.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING) ? urgent : heading;
+    if (target === urgent) urgent.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
+  };
   const urgentNote = (text) => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
     // Im Notfall zuerst die Knöpfe zum Anrufen, dann die Erklärung.
     element('strong', { text: 'Erst die Sicherheit' }),
@@ -362,7 +371,7 @@
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
-    heading.focus({ preventScroll: true });
+    focusResult(heading);
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
@@ -513,7 +522,7 @@
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
-    heading.focus({ preventScroll: true });
+    focusResult(heading);
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
