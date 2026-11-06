@@ -28,6 +28,18 @@
     [/\bbet\b/g, 'bett'],
     [/\bluge\b/g, 'luege'],
     [/\b(kind|mutt|vat|hung|imm|wied|schwest|brud)a\b/g, '$1er'],
+    // Runde 126: weitere Kurzformen und Dialekt, wie sie im Stress getippt werden.
+    [/\bmudder\b/g, 'mutter'],
+    [/\bvadder\b/g, 'vater'],
+    [/\bbisn\b/g, 'bist du'],
+    [/\bbinn\b/g, 'bin'],
+    [/\bgehn\b/g, 'gehen'],
+    [/\bgegesen\b/g, 'gegessen'],
+    [/\blue(?:chst|gs)\b/g, 'luegst'],
+    [/\bzieh mich\b/g, 'ziehe mich'],
+    [/\bselber\b/g, 'selbst'],
+    [/\bfahr selbst\b/g, 'fahre selbst'],
+    [/\bbleib (heute )?im bett\b/g, 'bleibe $1im bett'],
     // Notfälle mit Tippfehlern müssen trotzdem den Sicherheitshinweis auslösen.
     [/\bgestuer?tzt\b/g, 'gestuerzt'],
     [/\bhingefal+en\b/g, 'hingefallen'],
