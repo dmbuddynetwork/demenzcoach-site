@@ -328,7 +328,7 @@
           "name": "Wird meine Eingabe gespeichert oder verschickt?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Nein. Der Satz wird ausschließlich in deinem Browser mit einer festen Liste häufiger Situationen abgeglichen. Er wird nicht gespeichert, nicht an einen Server gesendet und nicht an Analyse-Dienste übertragen."
+            "text": "Bekannte Sätze werden nur in deinem Browser mit einer festen Liste abgeglichen und nicht gesendet. Kennt der Übersetzer einen Satz nicht, kannst du „KI fragen“ tippen. Dann geht nur dieser Satz über unseren Server an die KI von OpenAI. Wir speichern ihn nicht, und an Analyse-Dienste geht er nie. Gib deshalb keine Namen oder Adressen ein."
           }
         },
         {
@@ -429,7 +429,7 @@
             <button class="button" type="submit">Antwort finden</button>
           </div>
           <p class="translator-empty-hint" id="translator-empty-hint" role="status"></p>
-          <p class="translator-privacy" id="translator-privacy-note"><span aria-hidden="true">🔒</span> Wird nicht gespeichert und nicht gesendet.</p>
+          <p class="translator-privacy" id="translator-privacy-note"><span aria-hidden="true">🔒</span> Bleibt auf deinem Gerät – außer du tippst „KI fragen“.</p>
           <div class="translator-chips" role="group" aria-label="Häufige Sätze">
             <span>Oder einen Satz antippen:</span>
             <button type="button" class="translator-chip" data-translator-key="mutter">„Wo ist meine Mutter?“</button>
@@ -757,7 +757,7 @@
           </details>
           <details>
             <summary>Wird meine Eingabe gespeichert oder verschickt?</summary>
-            <p>Nein. Der Satz wird ausschließlich in deinem Browser mit einer festen Liste häufiger Situationen abgeglichen. Er wird nicht gespeichert, nicht an einen Server gesendet und nicht an Analyse-Dienste übertragen.</p>
+            <p>Bekannte Sätze werden nur in deinem Browser mit einer festen Liste abgeglichen und nicht gesendet. Kennt der Übersetzer einen Satz nicht, kannst du „KI fragen“ tippen. Dann geht nur dieser Satz über unseren Server an die KI von OpenAI. Wir speichern ihn nicht, und an Analyse-Dienste geht er nie. Gib deshalb keine Namen oder Adressen ein.</p>
           </details>
           <details>
             <summary>Ersetzt das Tool ärztlichen oder pflegerischen Rat?</summary>
@@ -798,6 +798,7 @@
   <script>window.demenzCoachSiteLocale={"menuOpen":"Menü öffnen","menuClose":"Menü schließen","privacyURL":"/datenschutz.html"};</script>
   <script src="../site.js"></script>
   <script src="translator-core.js"></script>
+  <script src="translator-ai.js"></script>
   <script src="translator.js"></script>
 </body>
 </html>

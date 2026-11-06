@@ -161,10 +161,12 @@
         note.focus({ preventScroll: true });
         return;
       }
+      const asked = input.value.trim() || result.says || '';
+      const box = aiBox(asked, 'feedback');
       const note = thanks(retry
-        ? 'Danke. Hier ist ein zweiter Versuch – und in der App kannst du eure Situation genauer beschreiben.'
-        : 'Danke für die Rückmeldung. In der App kannst du eure Situation genauer beschreiben.');
-      wrapper.replaceChildren(note);
+        ? (box ? 'Danke. Hier ist ein zweiter Versuch. Oder frag die KI nach einer Antwort für eure Lage:' : 'Danke. Hier ist ein zweiter Versuch.')
+        : (box ? 'Danke. Frag gern die KI nach einer Antwort für eure Lage:' : 'Danke für die Rückmeldung.'));
+      wrapper.replaceChildren(note, box || '');
       note.focus({ preventScroll: true });
       if (retry) retry.open('feedback');
     };
@@ -346,6 +348,64 @@
     element('span', { text })
   ]);
 
+  // KI für Sätze, die die feste Liste nicht kennt. Gesendet wird erst, wenn
+  // jemand „KI fragen“ tippt – vorher bleibt alles auf dem Gerät.
+  const ai = window.DemenzTranslatorAI;
+  const aiAnswer = (result) => {
+    const nodes = [];
+    if (result.safetyLevel === 'urgent') nodes.push(urgentNote(data.safetySignals.text));
+    if (result.safetyLevel === 'concern' && result.safetyMessage) {
+      nodes.push(element('aside', { className: 'safety-note', attributes: { role: 'note' } }, [element('span', { text: result.safetyMessage })]));
+    }
+    const first = element('h3', { className: 'translator-step', text: 'Was dahintersteckt', attributes: { tabindex: '-1' } });
+    nodes.push(first, element('p', { className: 'translator-meaning', text: result.meaning }));
+    nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
+    nodes.push(element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
+    nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
+    nodes.push(element('p', { className: 'translator-ai-label', text: 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
+    return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first };
+  };
+  const aiBox = (text, source) => {
+    if (!ai || !text || text.length < 2) return null;
+    const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
+    const box = element('div', { className: 'translator-ai' });
+    const ask = button('KI fragen', 'button translator-ai-button', async () => {
+      ask.disabled = true;
+      status.textContent = 'Einen Moment, die KI schreibt eine Antwort …';
+      track('translator_ai', { step: 'ask', source });
+      const result = await ai.ask(text);
+      track('translator_ai', { step: result.kind, source });
+      if (result.kind === 'answer' && Array.isArray(result.phrases)) {
+        const { node, focus } = aiAnswer(result);
+        // Die allgemeinen Ersatz-Sätze braucht es neben der KI-Antwort nicht mehr.
+        output.querySelector('.translator-fallback')?.remove();
+        box.replaceWith(node);
+        document.body.classList.remove('translator-answers-seen');
+        focus.setAttribute('tabindex', '-1');
+        focus.focus({ preventScroll: true });
+        focus.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        return;
+      }
+      if (result.kind === 'safety') {
+        const note = urgentNote(data.safetySignals.text);
+        box.replaceWith(note);
+        note.setAttribute('tabindex', '-1');
+        note.focus({ preventScroll: true });
+        return;
+      }
+      if (result.kind === 'off_topic') {
+        status.textContent = 'Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.';
+        return;
+      }
+      status.textContent = result.reason === 'busy'
+        ? 'Gerade kommen viele Fragen an. Bitte versuch es in ein paar Minuten noch einmal.'
+        : 'Die KI ist gerade nicht erreichbar. Bitte versuch es später noch einmal.';
+      ask.disabled = false;
+    });
+    box.append(ask, element('p', { className: 'translator-ai-note', text: 'Dafür geht dein Satz an die KI von OpenAI. Wir speichern ihn nicht. Bitte keine Namen eingeben.' }), status);
+    return box;
+  };
+
   const renderUnknown = ({ safetyHit, typed }) => {
     const nodes = [];
     if (safetyHit) nodes.push(urgentNote(data.safetySignals.text));
@@ -354,18 +414,21 @@
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
     nodes.push(heading);
     if (shown) nodes.push(element('p', { className: 'translator-meaning', text: 'Diesen Satz kenne ich noch nicht.' }));
+    nodes.push(aiBox(typed, 'unknown'));
     // Ähnliche Situationen zuerst: Sie führen am schnellsten zu genauen Sätzen.
     const similar = typed ? core.near(typed, data) : [];
     if (similar.length) {
       nodes.push(element('h3', { className: 'translator-step', text: 'Meinst du vielleicht:' }));
       nodes.push(element('div', { className: 'translator-chips translator-near' }, similar.map((candidate) => button(`„${candidate.says}“`, 'translator-chip', () => show(candidate, 'alternative')))));
     }
-    nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
-    nodes.push(element('div', { className: 'translator-phrases' }, [
-      element('div', { className: 'translator-phrase' }, [element('q', { text: core.personalize(fallback.phrases[0], personal, data.formal) })])
+    nodes.push(element('div', { className: 'translator-fallback' }, [
+      element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }),
+      element('div', { className: 'translator-phrases' }, [
+        element('div', { className: 'translator-phrase' }, [element('q', { text: core.personalize(fallback.phrases[0], personal, data.formal) })])
+      ]),
+      element('h3', { className: 'translator-step', text: 'Was spürst du bei der Person?' }),
+      feelingPicker('')
     ]));
-    nodes.push(element('h3', { className: 'translator-step', text: 'Was spürst du bei der Person?' }));
-    nodes.push(feelingPicker(''));
     nodes.push(suggestLink(typed));
     nodes.push(appCTA());
     output.replaceChildren(...nodes.filter(Boolean));
