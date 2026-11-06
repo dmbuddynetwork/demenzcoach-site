@@ -34,6 +34,8 @@
     [/\bbisn\b/g, 'bist du'],
     [/\bbinn\b/g, 'bin'],
     [/\bgehn\b/g, 'gehen'],
+    [/\babhaun\b/g, 'abhauen'],
+    [/\bvonner\b/g, 'von der'],
     [/\bgegesen\b/g, 'gegessen'],
     [/\blue(?:chst|gs)\b/g, 'luegst'],
     [/\bzieh mich\b/g, 'ziehe mich'],
