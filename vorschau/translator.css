@@ -354,6 +354,7 @@ body.translator-cta-visible .translator-sticky { display: none !important; }
 [data-page-type="translator-tool"] .translator-cluster .content-card-grid { margin: 0; padding: 0 12px 14px; }
 [data-page-type="translator-tool"] .translator-cluster > summary:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; border-radius: 16px; }
 [data-page-type^="translator"] .safety-urgent .translator-calls { margin: 10px 0 12px; }
+[data-page-type^="translator"] .safety-urgent .safety-lead { margin: 6px 0 0; font-weight: 700; }
 @media (min-width: 721px) {
 [data-page-type="translator-phrase"] .article-body :not(.phrase-list) > p,
   [data-page-type="translator-phrase"] .article-body li { font-size: 1.15rem; line-height: 1.6; max-width: 64ch; }

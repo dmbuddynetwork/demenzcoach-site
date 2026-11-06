@@ -298,6 +298,7 @@
     linkLabel: '',
     related: feeling.related,
     retry: feeling.retry,
+    urgentLead: feeling.urgentLead ?? null,
     url: `${toolURL}#gefuehl-${feeling.id}`
   }]));
 
@@ -349,9 +350,10 @@
     if (target === urgent) urgent.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
   };
-  const urgentNote = (text) => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
+  const urgentNote = (text, lead = '') => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
     // Im Notfall zuerst die Knöpfe zum Anrufen, dann die Erklärung.
     element('strong', { text: 'Erst die Sicherheit' }),
+    lead ? element('p', { className: 'safety-lead', text: lead }) : null,
     safetyCalls(text),
     element('span', { text })
   ]);
@@ -486,7 +488,11 @@
         element('span', { text: result.safety }),
         safetyCalls(result.safety, !safetyHit)
       ]));
-    } else if (safetyHit || result.safetyOnly) nodes.push(urgentNote(result.safetyOnly ? result.safety : data.safetySignals.text));
+    } else if (safetyHit || result.safetyOnly) {
+      const typedForLead = core.normalize(typed);
+      const lead = result.urgentLead?.cues?.some((cue) => typedForLead.includes(` ${cue}`)) ? result.urgentLead.text : '';
+      nodes.push(urgentNote(result.safetyOnly ? result.safety : data.safetySignals.text, lead));
+    }
 
     // Steht der getippte Satz schon als Überschrift da, braucht es keine Wiederholung.
     if (typed && core.normalize(typed) !== core.normalize(result.says ?? '')) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
