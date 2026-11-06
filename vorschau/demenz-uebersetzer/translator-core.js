@@ -107,7 +107,7 @@
   // Ein „=“ vorne heißt: nur als ganzes Wort („=klo“ trifft „Klo“, aber nicht „kloppen“).
   // Richtig geschriebene häufige Wörter sind keine Tippfehler: „Schuhe“ ist nicht „Schule“,
   // „sauer“ nicht „sauber“, „schreiben“ nicht „schreien“, „schlucken“ nicht „Schmuck“.
-  const noFuzzy = new Set(['nichts', 'schreiben', 'schreibt', 'schreibe', 'schreib', 'stimmung', 'schlucken', 'schluckt', 'schluck', 'schmeckt',
+  const noFuzzy = new Set(['nichts', 'betruege', 'schreiben', 'schreibt', 'schreibe', 'schreib', 'stimmung', 'schlucken', 'schluckt', 'schluck', 'schmeckt',
     'kauen', 'kaut', 'schuld', 'schuhe', 'schuhen', 'melden', 'merken', 'sauer', 'allen', 'kennen', 'legen', 'stellen', 'stiller',
     'muster', 'stammen', 'einladen', 'abbauen', 'baden', 'malen', 'spielen', 'singen', 'lesen', 'anrufer']);
 
@@ -199,7 +199,8 @@
       .filter((part) => !/^ (?:was|wie|darf|soll|kann|muss)(?: (?:soll|kann|darf|muss))? (?:ich|man)\b/.test(normalize(part)));
     const shown = new Set([best?.entry.key]);
     const also = [];
-    if (parts.length > 1) {
+    // Ein Betrugsfall ist eine Lage, kein zweites Anliegen („Ein Mann am Telefon sagt, er ist der Enkel“).
+    if (parts.length > 1 && best?.entry.key !== 'betrug') {
       parts.forEach((part) => {
         const top = rank(withoutMood(part), data.entries)[0]?.entry;
         if (top && !top.safetyOnly && !shown.has(top.key)) {
