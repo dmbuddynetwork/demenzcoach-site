@@ -493,6 +493,17 @@
     nodes.push(element('span', { className: 'eyebrow', text: result.selfCare ? 'Für dich' : result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
     const heading = element('h2', { text: result.feeling ? `Bei ${result.feeling}` : `„${result.says}“`, attributes: { tabindex: '-1' } });
     nodes.push(heading);
+    // Bei manchen Eingaben gehört der Hinweis „Wann ein Gespräch nicht ausreicht“ nach oben,
+    // zum Beispiel wenn jemand seit Tagen kaum trinkt.
+    const typedNormalized = core.normalize(typed);
+    const safetyFirst = Boolean(result.safety) && !result.safetyOnly && !safetyHit && !result.selfCare
+      && (result.safetyFirst ?? []).some((cue) => typedNormalized.includes(` ${cue}`));
+    const safetyAside = () => element('aside', { className: 'safety-note' }, [
+      element('strong', { text: 'Wann ein Gespräch nicht ausreicht' }),
+      element('span', { text: result.safety }),
+      safetyCalls(result.safety)
+    ]);
+    if (safetyFirst) nodes.push(safetyAside());
     // Weitere Anliegen kommen direkt nach den Sätzen: Der erste Satz zum Ausprobieren bleibt auf dem Handy oben.
     let alsoWrapper = null;
     if (also.length) {
@@ -564,13 +575,7 @@
     ].filter(Boolean);
     if (moreBlocks.length) nodes.push(element('div', { className: 'translator-more-group' }, moreBlocks));
 
-    if (result.safety && !result.safetyOnly && !safetyHit) {
-      nodes.push(element('aside', { className: 'safety-note' }, [
-        element('strong', { text: 'Wann ein Gespräch nicht ausreicht' }),
-        element('span', { text: result.safety }),
-        safetyCalls(result.safety)
-      ]));
-    }
+    if (result.safety && !result.safetyOnly && !safetyHit && !safetyFirst) nodes.push(safetyAside());
 
     const actions = element('div', { className: 'translator-result-links' });
     if (result.href) {
