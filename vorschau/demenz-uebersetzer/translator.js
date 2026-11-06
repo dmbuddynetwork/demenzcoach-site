@@ -161,9 +161,8 @@
   const appLinkFor = (result) => (result?.campaign ? appURL.replace('ct=seo_de_translator', `ct=${result.campaign}`) : appURL);
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
-      element('h2', { text: 'Hilfe für eure ganz eigene Situation' }),
-      element('p', { text: 'Mit der App Demenz Coach beschreibst du eure Lage in wenigen Worten und bekommst passende Sätze und einen nächsten Schritt.' }),
-      element('p', { text: 'Kostenloser Download, optionales Abo.' })
+      element('h2', { text: 'Für eure eigene Situation' }),
+      element('p', { text: 'In der App Demenz Coach beschreibst du eure Lage in wenigen Worten und bekommst passende Sätze. Kostenloser Download, optionales Abo.' })
     ]),
     element('div', { className: 'translator-app-visual' }, [
       element('img', {
@@ -611,4 +610,11 @@
     stickyBar.hidden = true;
     document.body.classList.add('translator-sticky-closed');
   });
+  // Ist der große App-Kasten im Bild, braucht es die Leiste nicht doppelt.
+  const syncSticky = () => {
+    const box = document.querySelector('.translator-app-cta')?.getBoundingClientRect();
+    document.body.classList.toggle('translator-cta-visible', Boolean(box && box.height && box.top < innerHeight && box.bottom > 0));
+  };
+  addEventListener('scroll', syncSticky, { passive: true });
+  addEventListener('resize', syncSticky, { passive: true });
 })();
