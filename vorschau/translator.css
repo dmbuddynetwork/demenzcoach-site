@@ -391,7 +391,7 @@ body[data-page-type^="translator"]:not(.translator-answers-seen) .translator-sti
 [data-page-type^="translator"] .translator-ai-note { margin: 8px 0 0; color: var(--muted); font-size: .95rem; line-height: 1.45; }
 [data-page-type^="translator"] .translator-ai-status:not(:empty) { margin: 10px 0 0; font-weight: 700; font-size: 1.05rem; }
 [data-page-type^="translator"] .translator-ai-avoid { margin: 14px 0 0; font-size: 1.05rem; line-height: 1.5; }
-[data-page-type^="translator"] .translator-ai-label { margin: 10px 0 0; color: var(--muted); font-size: .95rem; }
+[data-page-type^="translator"] .translator-ai-label { margin: 0 0 6px; color: var(--muted); font-size: .95rem; }
 [data-page-type^="translator"] .translator-feedback .translator-ai { flex-basis: 100%; }
 @media (min-width: 721px) {
 [data-page-type^="translator"] .translator-ai-button { width: auto; padding-inline: 28px; }

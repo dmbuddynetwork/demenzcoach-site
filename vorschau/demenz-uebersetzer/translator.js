@@ -357,13 +357,14 @@
     if (result.safetyLevel === 'concern' && result.safetyMessage) {
       nodes.push(element('aside', { className: 'safety-note', attributes: { role: 'note' } }, [element('span', { text: result.safetyMessage })]));
     }
+    // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
+    nodes.push(element('p', { className: 'translator-ai-label', text: 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
     const first = element('h3', { className: 'translator-step', text: 'Was dahintersteckt', attributes: { tabindex: '-1' } });
     nodes.push(first, element('p', { className: 'translator-meaning', text: result.meaning }));
     nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
     nodes.push(element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
-    nodes.push(element('p', { className: 'translator-ai-label', text: 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
-    return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first };
+    return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
   };
   const aiBox = (text, source) => {
     if (!ai || !text || text.length < 2) return null;
@@ -376,14 +377,15 @@
       const result = await ai.ask(text);
       track('translator_ai', { step: result.kind, source });
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
-        const { node, focus } = aiAnswer(result);
-        // Die allgemeinen Ersatz-Sätze braucht es neben der KI-Antwort nicht mehr.
+        const { node, focus, top } = aiAnswer(result);
+        // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
+        if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
         document.body.classList.remove('translator-answers-seen');
         focus.setAttribute('tabindex', '-1');
         focus.focus({ preventScroll: true });
-        focus.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        top.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
         return;
       }
       if (result.kind === 'safety') {
@@ -413,7 +415,7 @@
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
     nodes.push(heading);
-    if (shown) nodes.push(element('p', { className: 'translator-meaning', text: 'Diesen Satz kenne ich noch nicht.' }));
+    if (shown) nodes.push(element('p', { className: 'translator-meaning translator-unknown-note', text: 'Diesen Satz kenne ich noch nicht.' }));
     nodes.push(aiBox(typed, 'unknown'));
     // Ähnliche Situationen zuerst: Sie führen am schnellsten zu genauen Sätzen.
     const similar = typed ? core.near(typed, data) : [];
