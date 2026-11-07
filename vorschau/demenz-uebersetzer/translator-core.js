@@ -241,8 +241,8 @@
     const parts = String(text).split(/[.!?;\n]+|,\s*(?:(?:und|aber|oder)\s+)?|\s+(?:und|aber|oder)\s+/i)
       .map((part) => part.trim())
       .filter((part) => part.split(/\s+/).length >= 2)
-      // Fragen der Angehörigen selbst („Was soll ich tun“, „Darf ich lügen“) sind kein weiteres Anliegen.
-      .filter((part) => !/^ (?:was|wie|darf|soll|kann|muss)(?: (?:soll|kann|darf|muss))? (?:ich|man)\b/.test(normalize(part)));
+      // Fragen der Angehörigen selbst („Was soll ich tun“, „Darf ich lügen“, „Wie erkläre ich Mama“) sind kein weiteres Anliegen.
+      .filter((part) => !/^ (?:was|wie|darf|soll|kann|muss)(?: [a-z]+)? (?:ich|man)\b/.test(normalize(part)));
     const shown = new Set([best?.entry.key]);
     const also = [];
     // Ein Betrugsfall ist eine Lage, kein zweites Anliegen („Ein Mann am Telefon sagt, er ist der Enkel“).
