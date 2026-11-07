@@ -62,6 +62,7 @@
     .check input { flex: none; width: 26px; height: 26px; margin: 0; accent-color: var(--red); }
     .signup small { font-size: 13.5px; color: var(--soft); line-height: 1.45; }
     .signup small a { color: inherit; }
+    .form-error { color: var(--red); font-weight: 700; font-size: 16px; }
     .thanks { display: none; gap: 12px; padding: 22px; border-radius: 20px; background: #fff; border: 3px solid var(--red); }
     .thanks h3 { font-size: 26px; }
     .done .signup, .done .alt-actions { display: none; }
@@ -99,7 +100,12 @@
     .app ul { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
     .app li { padding-left: 34px; position: relative; }
     .app li::before { content: ""; position: absolute; left: 0; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--red); }
-    .byline { margin-top: 2px; font-size: 15px; color: var(--soft); }
+    .byline { display: flex; align-items: center; gap: 10px; margin-top: 4px; font-size: 15px; color: var(--soft); }
+    .byline img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: none; }
+    .debby-photos { display: grid; grid-template-columns: 3fr 2fr; gap: 12px; align-items: end; margin-top: 18px; }
+    .debby-photos img { width: 100%; border-radius: 18px; object-fit: cover; }
+    .debby-photos figure { margin: 0; }
+    .debby-photos figcaption { margin-top: 6px; font-size: 14px; color: var(--soft); text-align: center; }
     .byline a { color: var(--ink); font-weight: 700; }
     .story { display: grid; gap: 14px; margin-top: 16px; }
     .android-note { font-size: 16px; color: var(--soft); }
@@ -164,12 +170,12 @@
           <input id="email-1" type="email" name="EMAIL" autocomplete="email" inputmode="email" placeholder="Deine E-Mail-Adresse" required>
           <button class="btn" type="submit">Liste schicken</button>
           <small>Kostenlos. Ab und zu ein neuer Trick, Abmelden mit einem Klick. <a href="../datenschutz.html">Datenschutz</a></small>
-          <p class="byline">Gesammelt von <a href="#debby">Debby Frey, Altenpflegerin</a></p>
+          <p class="byline"><img src="debby-avatar.webp" width="40" height="40" alt="">Gesammelt von <a href="#debby">Debby Frey, Altenpflegerin</a></p>
         </form>
         <div class="alt-actions cta hidden" data-fallback>
           <button class="btn" type="button" data-print>Tricks ausdrucken</button>
           <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">Per WhatsApp weiterschicken</a>
-          <p class="byline">Gesammelt von <a href="#debby">Debby Frey, Altenpflegerin</a></p>
+          <p class="byline"><img src="debby-avatar.webp" width="40" height="40" alt="">Gesammelt von <a href="#debby">Debby Frey, Altenpflegerin</a></p>
         </div>
         <div class="thanks" role="status">
           <h3>Fast geschafft! 💌</h3>
@@ -264,6 +270,10 @@
       <div class="wrap">
         <span class="kicker">Wer dahintersteckt</span>
         <h2>Debby, Altenpflegerin</h2>
+        <div class="debby-photos">
+          <img src="debby.webp" width="360" height="480" alt="Debby Frey lächelt und hält ein Handy mit der Demenz Coach App" loading="lazy">
+          <figure><img src="debby-pflege.webp" width="720" height="960" alt="Debby Frey in Arbeitskleidung mit Namensschild Pflegefachfrau" loading="lazy"><figcaption>Debby im Pflegealltag</figcaption></figure>
+        </div>
         <div class="story">
           <p>Debby Frey hat als Altenpflegerin gearbeitet, in der Gerontopsychiatrie, in der Palliativpflege und in der Demenzbegleitung. Sie ist ausgebildete Validationspraktikerin. Das heißt: Sie weiß, wie man Menschen mit Demenz ruhig und auf Augenhöhe begegnet, gerade wenn es schwierig wird.</p>
           <p>Demenz kennt sie auch aus der eigenen Familie: Ihre Oma hatte Alzheimer. Sie weiß, wie anders es sich anfühlt, wenn es der eigene Mensch ist.</p>
@@ -310,7 +320,7 @@
   (function () {
     // Brevo-Formular-Adresse (Brevo > Kontakte > Formulare > Teilen > HTML-Code, Wert von action="...").
     // Leer = noch kein Brevo: statt E-Mail-Feld erscheinen Ausdrucken und WhatsApp.
-    var BREVO_FORM_URL = "";
+    var BREVO_FORM_URL = "https://dec91d68.sibforms.com/serve/MUIFAI2HfTIUoKp9ENpHgNxyL_mFiW5fH3NufR9CcjGgY5aHYiNuAlHKq7Em9oLLG-DBIqcBRWrFhbXMd67IDnSi0fi4qH4PeS_C-rFmphQdldbxcnIQA-Hcj9z2SJhiBaVw0x5MN1CP_HzjyPR0VBo8tTGTHTLmf9M52VWucHMQrvgrpz-vFZfyr5tEWOTq1UU8RFrEOw_AaJhVDA==";
 
     var ua = navigator.userAgent || "";
     var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
@@ -356,7 +366,18 @@
         data.append("locale", "de");
         var done = function () { box.classList.add("done"); };
         if (!BREVO_FORM_URL) { done(); return; }
-        fetch(BREVO_FORM_URL, { method: "POST", body: data, mode: "no-cors" }).then(done, done);
+        var btn = form.querySelector("button[type=submit]");
+        var label = btn.textContent; btn.disabled = true; btn.textContent = "Einen Moment …";
+        var fail = function () {
+          btn.disabled = false; btn.textContent = label;
+          var err = form.querySelector(".form-error");
+          if (!err) { err = document.createElement("p"); err.className = "form-error"; err.setAttribute("role", "alert"); form.appendChild(err); }
+          err.textContent = "Das hat leider nicht geklappt. Bitte prüf deine E-Mail-Adresse und versuch es noch einmal.";
+        };
+        fetch(BREVO_FORM_URL, { method: "POST", body: data, headers: { "Accept": "application/json" } })
+          .then(function (r) { return r.json().catch(function () { return { success: r.ok }; }); })
+          .then(function (j) { if (j && j.success) done(); else fail(); })
+          .catch(fail);
       });
     });
 
