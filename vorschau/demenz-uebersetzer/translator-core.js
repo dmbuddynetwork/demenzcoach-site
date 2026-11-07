@@ -130,6 +130,11 @@
     if (wholeWordOnly) return normalized.includes(` ${keyword} `) ? (1 + keyword.length / 20) * 2 : 0;
     // Ein „^“ vorne heißt: nur am Anfang der Eingabe (nach Sprecher und Pronomen), also „Mama weiß nicht, wer ich bin“, aber nicht „Ich weiß nicht, wer ich bin“.
     if (keyword.startsWith('^')) {
+      // „^…$“: genau das und nichts sonst, zum Beispiel nur das Wort „Geld“.
+      if (keyword.endsWith('$')) {
+        const exact = keyword.slice(1, -1);
+        return normalized.trim() === exact ? (exact.split(' ').length + exact.length / 20) * 2 : 0;
+      }
       const phrase = keyword.slice(1);
       return normalized.startsWith(` ${phrase} `) ? (phrase.split(' ').length + phrase.length / 20) * 2 : 0;
     }

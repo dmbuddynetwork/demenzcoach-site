@@ -409,9 +409,11 @@
         status.textContent = 'Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.';
         return;
       }
+      // Ohne Treffer gibt es darunter die Gefühle-Auswahl: dorthin führen statt nur „später“.
+      const next = source === 'unknown' ? ' Oder wähle unten, was du bei der Person spürst.' : '';
       status.textContent = result.reason === 'busy'
-        ? 'Gerade kommen viele Fragen an. Bitte versuch es in ein paar Minuten noch einmal.'
-        : 'Die KI ist gerade nicht erreichbar. Bitte versuch es später noch einmal.';
+        ? `Gerade kommen viele Fragen an. Bitte versuch es in ein paar Minuten noch einmal.${next}`
+        : `Die KI ist gerade nicht erreichbar.${next || ' Bitte versuch es später noch einmal.'}`;
       ask.disabled = false;
       onFail();
     });
