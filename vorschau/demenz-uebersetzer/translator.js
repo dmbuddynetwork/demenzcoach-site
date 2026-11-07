@@ -86,7 +86,9 @@
 
   const shareText = (result) => result.says
     ? `Hilfreich, wenn ein Mensch mit Demenz sagt „${result.says}“:`
-    : 'Kostenloser Demenz-Übersetzer für Angehörige:';
+    : result.feeling
+      ? `Demenz und ${result.feeling} – diese Sätze helfen:`
+      : 'Kostenloser Demenz-Übersetzer für Angehörige:';
 
   // Geteilt wird nur die öffentliche Seite des Ergebnisses, nie die Eingabe.
   const shareBlock = (result) => {

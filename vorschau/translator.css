@@ -108,7 +108,7 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
   .consent-banner, .consent-settings, .translator-copy, .translator-alternatives { display: none !important; }
 .translator-section { padding: 0; background: white; }
 .translator-result { border: 0; padding: 0; }
-.translator-result::after { content: "Demenz-Übersetzer · dmbuddynetwork.github.io/demenzcoach-site/demenz-uebersetzer/ · Allgemeine Kommunikationshilfe, keine medizinische Beratung. Notruf 112."; display: block; margin-top: 24px; font-size: .8rem; color: #444; }
+.translator-result::after { content: "Demenz-Übersetzer · dementiacoachapp.com · Allgemeine Kommunikationshilfe, keine medizinische Beratung. Notruf 112."; display: block; margin-top: 24px; font-size: .8rem; color: #444; }
 }
 .hero-translator-link { margin: 18px 0 0; color: var(--muted); font-size: .95rem; }
 .hero-translator-link a { color: var(--ink); font-weight: 750; }
