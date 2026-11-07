@@ -192,7 +192,7 @@
 
   // Ohne Sprung von einer Satz-Seite: erst die Länge wählen lassen.
   const renderStart = () => {
-    const short = element('button', { className: 'button', text: `Kurzrunde: ${shortLength} Situationen`, attributes: { type: 'button' } });
+    const short = element('button', { className: 'button', text: `${shortLength} Situationen`, attributes: { type: 'button' } });
     const all = element('button', { className: 'button button-light-outline trainer-all', text: `Alle ${allQuestions.length} Situationen`, attributes: { type: 'button' } });
     short.addEventListener('click', () => {
       track('trainer_start', { length: 'kurz' });
