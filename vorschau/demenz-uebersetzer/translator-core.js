@@ -162,7 +162,38 @@
 
   const moodIds = ['wut', 'trauer', 'angst'];
 
-  const match = (text, data) => {
+  // Lange Eingaben mit Vorgeschichte („Mein Vater ist 84 und hat seit zwei Jahren Demenz.
+  // Heute hat er …“): Sätze, die nur den Rahmen beschreiben (Alter, Diagnose, Wohnen,
+  // Umzug, Pflege), lenken sonst auf falsche Einträge wie „Ich bin doch nicht dement“.
+  const contextPatterns = [
+    / (?:demenz|alzheimer|dement)\b/,
+    / diagnose /,
+    / ist \d+ /,
+    / \d+ jahre alt /,
+    / (?:wohnt|wohnen|lebt|leben) (?:bei|zusammen|allein|alleine|im|in einem|seit|mit)\b/,
+    / (?:seit|nach) dem umzug /,
+    / (?:seit|nach) dem tod /,
+    / ich pflege /,
+    / pflege (?:meinen|meine|ihn|sie|mama|papa) /,
+    / (?:waren|war) beim arzt /,
+    / ich rufe jeden tag /,
+    / (?:ist|lebt|wohnt) (?:seit [a-z0-9 ]+ )?im (?:pflegeheim|heim) /
+  ];
+  const contextWish = / (?:will|willst|moechte|muss|sagt|fragt|sucht|ruft nach|schreit|weint|packt|laeuft|isst|trinkt|schlaeft|erkennt|denkt|glaubt|hat angst) /;
+  const plain = (value) => ` ${String(value).toLowerCase().replaceAll('ä', 'ae').replaceAll('ö', 'oe').replaceAll('ü', 'ue').replaceAll('ß', 'ss').replace(/[^a-z0-9]+/g, ' ').trim()} `;
+  const focusText = (text) => {
+    const sentences = String(text).split(/[.!?;\n]+/).map((part) => part.trim()).filter(Boolean);
+    if (sentences.length < 2) return String(text);
+    const kept = sentences.filter((sentence) => {
+      const value = plain(sentence);
+      // Verneinung („hat keine Demenz“) oder ein Anliegen im selben Satz („wohnt bei uns und will heim“) bleibt.
+      return / (?:nicht|kein|keine|nie) /.test(value) || contextWish.test(value) || !contextPatterns.some((pattern) => pattern.test(value));
+    });
+    return kept.length ? kept.join('. ') : String(text);
+  };
+
+  const match = (input, data) => {
+    const text = focusText(input);
     let ranked = rank(text, data.entries);
     // Sicherheits- und Entlastungssätze merken, bevor Gefühlswörter entfernt werden:
     // „Ich bin so wütend auf sie“ ist ein Satz über die Angehörigen selbst.
@@ -225,7 +256,7 @@
       also: also.slice(0, 3),
       entry: best?.entry ?? null,
       alternatives: alternatives.map((candidate) => candidate.entry).filter((entry) => !also.includes(entry)),
-      safetyHit: hasSafetySignal(text, data.safetySignals.keywords)
+      safetyHit: hasSafetySignal(input, data.safetySignals.keywords)
     };
   };
 
