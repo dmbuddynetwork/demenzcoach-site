@@ -70,6 +70,12 @@
     .confirmed { display: grid; gap: 4px; padding: 16px 20px; background: var(--red); color: #fff; font-size: 18px; text-align: center; }
     .confirmed strong { font-size: 22px; font-weight: 900; }
     .confirmed a { margin-top: 8px; color: #fff; font-weight: 700; }
+    .confirmed-app { margin-top: 10px; }
+    .confirmed .confirmed-btn { display: block; margin: 10px auto 2px; max-width: 360px; padding: 14px 18px; border-radius: 14px; background: #fff; color: var(--red); font-weight: 900; text-decoration: none; }
+    .sticky-cta { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,248,240,.96); box-shadow: 0 -4px 18px rgba(0,0,0,.12); transform: translateY(110%); transition: transform .25s ease; }
+    .sticky-cta.show { transform: none; }
+    .sticky-cta .btn { max-width: 560px; margin: 0 auto; min-height: 54px; }
+    @media print { .sticky-cta { display: none !important; } }
 
     section.block { padding: 44px 0; }
     .kicker { font-size: 15px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
@@ -168,7 +174,7 @@
         <form class="signup" data-signup novalidate>
           <label for="email-1">Hol dir alle 5 Tricks als Liste für den Kühlschrank:</label>
           <input id="email-1" type="email" name="EMAIL" autocomplete="email" inputmode="email" placeholder="Deine E-Mail-Adresse" required>
-          <button class="btn" type="submit">Liste schicken</button>
+          <button class="btn" type="submit">Ja, schick mir die Liste</button>
           <small>Kostenlos. Ab und zu ein neuer Trick, Abmelden mit einem Klick. <a href="../datenschutz.html">Datenschutz</a></small>
           <p class="byline"><img src="debby-avatar.webp" width="40" height="40" alt="">Gesammelt von <a href="#debby">Debby Frey, Altenpflegerin</a></p>
         </form>
@@ -238,7 +244,7 @@
           <form class="signup" data-signup novalidate>
             <label for="email-2">Wohin dürfen wir die Liste schicken?</label>
             <input id="email-2" type="email" name="EMAIL" autocomplete="email" inputmode="email" placeholder="Deine E-Mail-Adresse" required>
-            <button class="btn" type="submit">Liste schicken</button>
+            <button class="btn" type="submit">Ja, schick mir die Liste</button>
             <small>Kostenlos. Abmelden jederzeit mit einem Klick. <a href="../datenschutz.html">Datenschutz</a></small>
           </form>
           <div class="alt-actions cta hidden" data-fallback>
@@ -301,6 +307,8 @@
     </section>
   </main>
 
+  <div class="sticky-cta" aria-hidden="true"><a class="btn" href="#email-1" tabindex="-1">Kostenlose Liste holen</a></div>
+
   <footer class="foot">
     <div class="wrap">
       <details>
@@ -340,7 +348,12 @@
       var note = document.createElement("div");
       note.className = "confirmed";
       note.setAttribute("role", "status");
-      note.innerHTML = "<strong>Danke, du bist dabei! 💜</strong><span>Die Liste mit den 5 Tricks ist unterwegs in dein Postfach.</span><a href=\"https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F\">An die Familie weiterschicken</a>";
+      var wa = "https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F";
+      var app = "https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=lp_teller_bestaetigt&mt=8";
+      note.innerHTML = "<strong>Danke, du bist dabei! 💜</strong><span>Die Liste mit den 5 Tricks ist unterwegs in dein Postfach.</span>" +
+        (isIOS
+          ? "<span class=\"confirmed-app\">Du hast ein iPhone? Teste schon jetzt die erste Version der Demenz Coach App.</span><a class=\"confirmed-btn\" href=\"" + app + "\">App ansehen</a><a href=\"" + wa + "\">An die Familie weiterschicken</a>"
+          : "<a class=\"confirmed-btn\" href=\"" + wa + "\">An die Familie weiterschicken</a>");
       document.body.insertBefore(note, document.body.firstChild);
       document.querySelectorAll("[data-signup-box]").forEach(function (b) { b.classList.add("hidden"); });
     }
@@ -380,6 +393,25 @@
           .catch(fail);
       });
     });
+
+    // Mitlaufender Knopf: sichtbar, sobald das obere Formular aus dem Bild ist und das untere noch nicht zu sehen ist.
+    var sticky = document.querySelector(".sticky-cta");
+    var heroBox = document.querySelector(".hero [data-signup-box]");
+    var lowerBox = document.querySelectorAll("[data-signup-box]")[1];
+    if (sticky && heroBox && "IntersectionObserver" in window && !params.has("bestaetigt")) {
+      var vis = { hero: true, lower: false };
+      var upd = function () {
+        var hide = vis.hero || vis.lower || heroBox.classList.contains("done") || (lowerBox && lowerBox.classList.contains("done"));
+        sticky.classList.toggle("show", !hide);
+      };
+      new IntersectionObserver(function (e) { vis.hero = e[0].isIntersecting; upd(); }).observe(heroBox);
+      if (lowerBox) new IntersectionObserver(function (e) { vis.lower = e[0].isIntersecting; upd(); }).observe(lowerBox);
+      sticky.querySelector("a").addEventListener("click", function (ev) {
+        ev.preventDefault();
+        heroBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(function () { var i = document.getElementById("email-1"); if (i) i.focus({ preventScroll: true }); }, 450);
+      });
+    }
 
     document.querySelectorAll("[data-print]").forEach(function (b) {
       b.addEventListener("click", function () { window.print(); });
