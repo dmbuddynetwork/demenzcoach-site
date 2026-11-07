@@ -111,6 +111,9 @@
     .debby-photos { display: grid; grid-template-columns: 3fr 2fr; gap: 12px; align-items: end; margin-top: 18px; }
     .debby-photos img { width: 100%; border-radius: 18px; object-fit: cover; }
     .debby-photos figure { margin: 0; }
+    .debby-photos img.round { border-radius: 50%; aspect-ratio: 1; }
+    .cv { margin: 0; padding: 14px 16px 14px 36px; background: var(--cream); border-radius: 14px; font-weight: 700; }
+    .cv li { margin: 4px 0; }
     .signature { font-weight: 900; font-size: 22px; margin-top: 4px; }
     .debby-photos figcaption { margin-top: 6px; font-size: 14px; color: var(--soft); text-align: center; }
     .byline a { color: var(--ink); font-weight: 700; }
@@ -279,10 +282,16 @@
         <h2>Hallo, ich bin Debby</h2>
         <div class="debby-photos">
           <img src="debby.webp" width="360" height="480" alt="Debby Frey lächelt und hält ein Handy mit der Demenz Coach App" loading="lazy">
-          <figure><img src="debby-pflege.webp" width="720" height="960" alt="Debby Frey in Arbeitskleidung mit Namensschild Pflegefachfrau" loading="lazy"><figcaption>Debby im Pflegealltag</figcaption></figure>
+          <figure><img class="round" src="debby-portrait.webp" width="480" height="480" alt="Debby Frey in blauer Pflegekleidung, lächelnd" loading="lazy"><figcaption>Debby in der Pflege</figcaption></figure>
         </div>
         <div class="story">
-          <p>Ich bin Altenpflegerin und habe in der Gerontopsychiatrie, in der Palliativpflege und in der Demenzbegleitung gearbeitet. Ich bin ausgebildete Validationspraktikerin. Das heißt: Ich habe gelernt, Menschen mit Demenz ruhig und auf Augenhöhe zu begegnen, gerade wenn es schwierig wird.</p>
+          <p>Ich bin Altenpflegerin und habe viele Jahre mit Menschen mit Demenz gearbeitet. Dabei habe ich gelernt, ihnen ruhig und auf Augenhöhe zu begegnen, gerade wenn es schwierig wird.</p>
+          <ul class="cv">
+            <li>Examinierte Altenpflegerin seit 2011</li>
+            <li>Pflegefachkraft in Psychiatrie und Palliativpflege</li>
+            <li>Validation nach Richard, Basale Stimulation</li>
+            <li>Gefördert vom EXIST-Women-Gründerstipendium</li>
+          </ul>
           <p>Demenz kenne ich auch aus meiner eigenen Familie: Meine Oma hatte Alzheimer. Ich weiß, wie anders es sich anfühlt, wenn es der eigene Mensch ist.</p>
           <p>Deshalb habe ich Demenz Coach gegründet. Hier sammle ich kleine Tricks, die im Alltag wirklich helfen, und schreibe sie so auf, dass du sie sofort ausprobieren kannst.</p>
           <p class="signature">Deine Debby</p>
