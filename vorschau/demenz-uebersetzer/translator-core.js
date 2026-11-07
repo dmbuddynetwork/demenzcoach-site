@@ -23,6 +23,8 @@
     [/\bklau\b/g, 'klaue'],
     [/\bschimmer\b/g, 'ahnung'],
     [/\bmitm\b/g, 'mit dem'],
+    // „Im Heim“ beschreibt nur den Ort und ist kein Wunsch „heim“ (nach Hause).
+    [/\b(im|vom) heim\b/g, '$1 wohnheim'],
     [/\bvoll aus\b/g, 'aus'],
     [/\bmei\b/g, 'mein'],
     [/\bhoam\b/g, 'heim'],
@@ -228,10 +230,11 @@
     if (initialSafety && !ranked.some((candidate) => candidate.entry.key === initialSafety.entry.key)) ranked = [initialSafety, ...ranked];
     const safetyFirst = ranked.find((candidate) => candidate.entry.safetyOnly);
     // Schreiben Angehörige über sich selbst, gibt es keinen Beruhigungssatz für die erkrankte Person davor.
-    if (safetyFirst?.entry.selfCare) mood = null;
+    if (safetyFirst?.entry.selfCare || safetyFirst?.entry.key === 'pflegesorge') mood = null;
     if (safetyFirst && ranked[0] !== safetyFirst) ranked = [safetyFirst, ...ranked.filter((candidate) => candidate !== safetyFirst)];
     const best = ranked[0] ?? null;
-    const alternatives = best
+    // Betrug und Sorge um die Pflege sind eine eigene Lage: keine „Passt eher?“-Vorschläge daneben.
+    const alternatives = best && !['betrug', 'pflegesorge'].includes(best.entry.key)
       ? ranked.slice(1).filter((candidate) => candidate.score >= best.score * 0.5 && !candidate.entry.safetyOnly).slice(0, 2)
       : [];
     // Kein bekannter Satz, aber ein Gefühlswort („Sie hat Angst“)? Dann zum Gefühl.
@@ -245,8 +248,8 @@
       .filter((part) => !/^ (?:was|wie|darf|soll|kann|muss)(?: [a-z]+)? (?:ich|man)\b/.test(normalize(part)));
     const shown = new Set([best?.entry.key]);
     const also = [];
-    // Ein Betrugsfall ist eine Lage, kein zweites Anliegen („Ein Mann am Telefon sagt, er ist der Enkel“).
-    if (parts.length > 1 && best?.entry.key !== 'betrug') {
+    // Ein Betrugsfall oder eine Sorge um die Pflege ist eine Lage, kein zweites Anliegen („Ein Mann am Telefon sagt, er ist der Enkel“).
+    if (parts.length > 1 && !['betrug', 'pflegesorge'].includes(best?.entry.key)) {
       parts.forEach((part) => {
         const top = rank(withoutMood(part), data.entries)[0]?.entry;
         if (top && !top.safetyOnly && !shown.has(top.key)) {
