@@ -192,8 +192,8 @@
       element('h2', { text: 'Für eure eigene Situation' }),
       // Beim Treffer an den Satz anknüpfen: „Kommt das bei euch öfter vor?“ ist der ehrliche Grund für die App.
       element('p', { text: result?.says && !result.feeling && !result.selfCare
-        ? `Kommt „${result.says.replace(/[.!]+$/, '')}“ bei euch öfter vor? In der App Demenz Coach beschreibst du eure Lage in wenigen Worten und bekommst passende Sätze. Kostenlos laden, Abo nur, wenn du willst.`
-        : 'In der App Demenz Coach beschreibst du eure Lage in wenigen Worten und bekommst passende Sätze. Kostenlos laden, Abo nur, wenn du willst.' })
+        ? `Kommt „${result.says.replace(/[.!]+$/, '')}“ bei euch öfter vor? In der App Demenz Coach beschreibst du eure Lage und bekommst passende Sätze. Kostenlos laden, Abo nur, wenn du willst.`
+        : 'In der App Demenz Coach beschreibst du eure Lage und bekommst passende Sätze. Kostenlos laden, Abo nur, wenn du willst.' })
     ]),
     element('div', { className: 'translator-app-visual' }, [
       element('img', {

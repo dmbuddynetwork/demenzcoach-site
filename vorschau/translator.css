@@ -343,6 +343,7 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 body.translator-cta-visible .translator-sticky { display: none !important; }
 .translator-result .translator-app-visual img { display: none; }
 .translator-result .translator-app-visual { margin-top: 4px; }
+[data-page-type^="translator"] .translator-app-cta h2 { font-size: 1.35rem; line-height: 1.2; }
 }
 [data-page-type^="translator"] .translator-feedback .translator-share { margin-top: 0; }
 [data-page-type="translator-tool"] .content-library .topic-cluster { margin-top: 12px; }
