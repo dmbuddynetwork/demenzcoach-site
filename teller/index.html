@@ -157,7 +157,6 @@
           <label for="email-1">Hol dir alle 5 Tricks als Liste für den Kühlschrank:</label>
           <input id="email-1" type="email" name="EMAIL" autocomplete="email" inputmode="email" placeholder="Deine E-Mail-Adresse" required>
           <button class="btn" type="submit">Liste schicken</button>
-          <label class="check"><input type="checkbox" name="TESTER" value="1"> Ich teste die neue Demenz Coach App gern vorab mit</label>
           <small>Kostenlos. Ab und zu ein neuer Trick, Abmelden mit einem Klick. <a href="../datenschutz.html">Datenschutz</a></small>
         </form>
         <div class="alt-actions cta hidden" data-fallback>
@@ -226,7 +225,6 @@
             <label for="email-2">Wohin dürfen wir die Liste schicken?</label>
             <input id="email-2" type="email" name="EMAIL" autocomplete="email" inputmode="email" placeholder="Deine E-Mail-Adresse" required>
             <button class="btn" type="submit">Liste schicken</button>
-            <label class="check"><input type="checkbox" name="TESTER" value="1"> Ich teste die neue Demenz Coach App gern vorab mit</label>
             <small>Kostenlos. Abmelden jederzeit mit einem Klick. <a href="../datenschutz.html">Datenschutz</a></small>
           </form>
           <div class="alt-actions cta hidden" data-fallback>
@@ -266,7 +264,7 @@
             <li>Bekomm ruhige Sätze, die du sagen kannst</li>
             <li>Dazu kleine Tricks wie den roten Teller</li>
           </ul>
-          <p style="margin-top:16px">Trag dich oben für die Liste ein und setz das Häkchen. Dann gehörst du zu den Ersten, die sie ausprobieren, und hilfst mit, sie besser zu machen.</p>
+          <p style="margin-top:16px">Trag dich oben für die Liste ein. Dann erfährst du als Erste, wenn sie fertig ist.</p>
           <p class="android-note only-ios" style="margin-top:12px"><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=lp_teller_app&amp;mt=8" style="color:inherit">Die erste Version schon jetzt im App Store ansehen</a></p>
         </div>
       </div>
@@ -325,8 +323,6 @@
         if (!input.value || !input.checkValidity()) { input.focus(); input.reportValidity && input.reportValidity(); return; }
         var data = new FormData();
         data.append("EMAIL", input.value.trim());
-        var t = form.querySelector("input[name=TESTER]");
-        if (t && t.checked) data.append("TESTER", "1");
         data.append("email_address_check", "");
         data.append("locale", "de");
         var done = function () { box.classList.add("done"); };
