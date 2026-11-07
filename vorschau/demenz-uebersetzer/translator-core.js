@@ -202,7 +202,12 @@
     // Das Gefühl soll nicht das Thema überdecken. Ohne Gefühlswörter neu suchen und das
     // Gefühl als kurze erste Antwort mitgeben („Erst trösten …“).
     const moodFeelings = (data.feelings ?? []).filter((item) => moodIds.includes(item.id));
-    let mood = ranked.length ? rank(text, moodFeelings)[0]?.entry ?? null : null;
+    // In längeren Beschreibungen ist „Ich war so traurig“ das Gefühl der Angehörigen,
+    // kein Grund für „Erst trösten“ bei der erkrankten Person.
+    const moodText = String(text).split(/[.!?;\n]+/).filter((part) => part.trim()).length > 1
+      ? String(text).replace(/\bich (?:bin|war|fuehle mich|fühle mich|werde)(?: (?:so|sehr|total|ganz|oft|dann|einfach))* (?:traurig|wütend|wuetend|sauer|ängstlich|aengstlich|verzweifelt)\b[^.!?;\n]*/gi, ' ').replace(/\b(?:das )?macht mich(?: so| sehr)? traurig\b/gi, ' ')
+      : text;
+    let mood = ranked.length ? rank(moodText, moodFeelings)[0]?.entry ?? null : null;
     const withoutMood = (value) => (mood ? mood.keywords.reduce((result, keyword) => result.replace(new RegExp(` ${keyword}\\S*`, 'g'), ' '), normalize(value)) : value);
     if (mood) {
       const topic = rank(withoutMood(text), data.entries);
