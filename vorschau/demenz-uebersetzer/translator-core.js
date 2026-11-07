@@ -50,7 +50,8 @@
     [/\bvati\b/g, 'papa']
   ];
 
-  const speaker = /^(?:(?:mein|meine|unser|unsere|die|der) )?(?:vater|mutter|mama|mami|mutti|papa|vati|mann|frau|ehemann|ehefrau|partner|partnerin|oma|opa|omi|opi|schwiegermutter|schwiegervater|tante|onkel|bruder|schwester|patient|patientin|bewohner|bewohnerin|er|sie) (?=(?:sagt|meint|behauptet|denkt|glaubt|fragt|erzaehlt|ruft|will|erkennt|haelt|sucht|weiss|schreit|steht|isst|redet|spricht|langweilt|traut|wirft|weint|ist|wird|hat|laeuft|spuckt|sitzt|packt|versteckt|zieht|schlaeft|trinkt|schlaegt|beschimpft|bleibt|liegt|lacht|schimpft|kann|macht|geht|nimmt|klaut|sammelt|raeumt|vergisst|verweigert|beisst|kratzt|haut|tritt|jammert|klagt)\b)/;
+  // Ein Name nach der Person („Opa Heinz sagt …“, „Herr Weber will …“) gehört ebenfalls zum Sprecher.
+  const speaker = /^(?:(?:mein|meine|unser|unsere|die|der) )?(?:vater|mutter|mama|mami|mutti|papa|vati|mann|frau|ehemann|ehefrau|partner|partnerin|oma|opa|omi|opi|schwiegermutter|schwiegervater|tante|onkel|bruder|schwester|patient|patientin|bewohner|bewohnerin|herr|er|sie)(?: [a-z]+)? (?=(?:sagt|meint|behauptet|denkt|glaubt|fragt|erzaehlt|ruft|will|erkennt|haelt|sucht|weiss|schreit|steht|isst|redet|spricht|langweilt|traut|wirft|weint|ist|wird|hat|laeuft|spuckt|sitzt|packt|versteckt|zieht|schlaeft|trinkt|schlaegt|beschimpft|bleibt|liegt|lacht|schimpft|kann|macht|geht|nimmt|klaut|sammelt|raeumt|vergisst|verweigert|beisst|kratzt|haut|tritt|jammert|klagt)\b)/;
   const sayingVerb = /^(?:sagt|meint|behauptet|denkt|glaubt|erzaehlt)(?: (?:immer|staendig|dauernd|oft|wieder|jeden tag|abends|nachts))*(?: dass)? /;
 
   const normalize = (text) => {
