@@ -208,6 +208,8 @@ body.translator-has-result:not(.translator-sticky-closed) .consent-settings { bo
 [data-page-type="translator-phrase"] .translator-answer-first > section:first-child { padding-top: 12px; }
 [data-page-type="translator-phrase"] .translator-answer-first h2 { margin-top: 0; margin-bottom: 12px; }
 [data-page-type="translator-phrase"] .translator-meaning-block p:last-child { margin-bottom: 0; }
+[data-page-type="translator-phrase"] main h2 { font-size: 1.35rem; }
+[data-page-type="translator-phrase"] .article-body:not(.translator-answer-first) > section { padding-top: 22px; padding-bottom: 22px; }
 .translator-result > .eyebrow:not(.translator-eyebrow-keep) { display: none; }
 [data-page-type="translator-trainer"] .translator-hero .breadcrumbs { margin-bottom: 8px; font-size: .8rem; }
 [data-page-type="translator-trainer"] .translator-hero h1 { font-size: 1.6rem; line-height: 1.18; }

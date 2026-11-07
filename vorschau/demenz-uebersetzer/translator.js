@@ -539,7 +539,7 @@
     const retry = result.retry ? retryBlock(result) : null;
     // Erst verstehen, dann antworten: genau die zwei Fragen, mit denen jemand kommt.
     // Auf dem Handy mit großer Schrift soll der erste Antwortsatz schnell kommen: Unter
-    // „Was dahintersteckt“ steht nur der Kern (ein, zwei Sätze), der Rest unter „Mehr zum Hintergrund“.
+    // „Was dahintersteckt“ steht nur der Kern (ein, zwei Sätze), der Rest unter „Hintergrund“.
     const [lead, rest] = result.safetyOnly ? [result.short, ''] : splitLead(result.short);
     if (lead) {
       nodes.push(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
@@ -582,7 +582,7 @@
       items.length ? element('ul', {}, items.map((item) => element('li', { text: item }))) : null
     ] : []);
     const moreContent = [
-      ...section(rest ? 'Mehr zum Hintergrund' : 'Weitere mögliche Gründe', result.meanings ?? [], rest),
+      ...section(rest ? 'Hintergrund' : 'Weitere mögliche Gründe', result.meanings ?? [], rest),
       ...section('Eher vermeiden', result.avoid ?? [], result.avoid?.length ? 'Eher ungünstig ist es,' : ''),
       ...section('Was danach helfen kann', result.next ?? [])
     ].filter(Boolean);
