@@ -138,6 +138,7 @@
     [data-platform="android"] .only-ios, [data-platform="desktop"] .only-ios { display: none !important; }
     [data-platform="ios"] .not-ios { display: none !important; }
     .hidden { display: none !important; }
+    .no-form .sticky-cta, .no-form .intro { display: none !important; }
 
     @media (min-width: 900px) {
       .app { grid-template-columns: 240px 1fr; }
@@ -432,6 +433,11 @@
     }
 
     var formReady = !!BREVO_FORM_URL || params.has("vorschau");
+    // Ohne Formular gibt es nichts freizuschalten: alle Tricks offen, kein mitlaufender Knopf.
+    if (!formReady) {
+      document.body.classList.add("unlocked", "no-form");
+      document.querySelectorAll(".secret").forEach(function (s) { s.classList.remove("secret"); });
+    }
     document.querySelectorAll("[data-signup-box]").forEach(function (box) {
       var form = box.querySelector("[data-signup]");
       var fallback = box.querySelector("[data-fallback]");
