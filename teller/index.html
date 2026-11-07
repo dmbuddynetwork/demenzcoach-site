@@ -82,12 +82,22 @@
     .block h2 { margin-top: 6px; font-size: clamp(30px, 8vw, 40px); }
 
     .trick { margin-top: 30px; }
-    .trick img { width: 100%; max-height: 260px; object-fit: contain; background: #fff; }
+    .trick img { width: 100%; max-height: 210px; object-fit: contain; background: #fff; }
     .trick h3 { margin-top: 14px; font-size: 27px; display: flex; gap: 12px; align-items: baseline; }
     .num { flex: none; display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--red); color: #fff; font-size: 20px; }
     .trick p { margin-top: 8px; }
     .trick .proof { margin-top: 8px; font-size: 16px; color: var(--soft); }
     .trick + .trick { padding-top: 30px; border-top: 2px solid var(--line); }
+    .intro { margin-top: 8px; color: var(--soft); }
+    .trick.locked .full, .unlocked .trick.locked .teaser { display: none; }
+    .unlocked .trick.locked .full { display: block; }
+    .lock-note { display: block; margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: var(--cream); color: var(--ink); font-weight: 700; text-decoration: none; }
+    .lock-note u { color: var(--red); }
+    .secret { filter: blur(5px); user-select: none; }
+    .unlocked .secret { filter: none; }
+    .inbox-hint { font-size: 16px; color: var(--soft); }
+    .typo { margin-top: 8px; font-size: 17px; }
+    .typo button { font: inherit; font-weight: 700; color: var(--red); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 
     .fridge-area { background: var(--cream); }
     .fridge { position: relative; margin: 28px auto 6px; max-width: 360px; padding: 34px 26px 24px; background: #fff; border-radius: 6px; box-shadow: 0 14px 34px rgba(60,40,20,.16); transform: rotate(-2deg); }
@@ -188,6 +198,8 @@
         <div class="thanks" role="status">
           <h3>Fast geschafft! 💌</h3>
           <p>Schau in dein Postfach und tipp auf den Knopf in meiner Mail. Dann kommt die Liste sofort.</p>
+            <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Postfach öffnen</a>
+            <p class="inbox-hint">Die Mail kommt von „Debby vom Demenz Coach“. Nichts da? Schau bitte auch im Spam-Ordner.</p>
           <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">An die Familie weiterschicken</a>
         </div>
       </div>
@@ -199,6 +211,7 @@
       <div class="wrap">
         <span class="kicker">Kleiner Trick, große Wirkung</span>
         <h2>5 Tricks für den Alltag</h2>
+        <p class="intro">Zwei Tricks kannst du hier sofort lesen. Alle fünf bekommst du kostenlos als Liste.</p>
 
         <article class="trick">
           <img src="t-teller.webp" width="640" height="432" alt="Roter Teller mit Essen" loading="lazy">
@@ -212,23 +225,47 @@
           <p>Ein kräftig farbiger Becher, gut sichtbar hingestellt, wird viel öfter in die Hand genommen als ein Glas.</p>
           <p class="proof">Studie: fast doppelt so viel getrunken (gleiche Studie)</p>
         </article>
-        <article class="trick">
+        <article class="trick locked">
           <img src="t-tuer.webp" width="474" height="640" alt="Ältere Frau zeigt auf ihr Jugendfoto an der Zimmertür" loading="lazy">
-          <h3><span class="num">3</span>Ein Foto von früher an der Tür</h3>
-          <p>Ein großes Foto als junger Mensch und der Name an der Zimmertür. Das Gesicht von früher erkennen viele besser.</p>
-          <p class="proof">Kleine Studie: Zimmer viel öfter gefunden, 85 % statt 34 %</p>
+          <div class="teaser">
+            <h3><span class="num">3</span>Der Tür-Trick</h3>
+            <p>Damit Mama ihr Zimmer wiederfindet.</p>
+            <p class="proof">Studie: Zimmer mehr als doppelt so oft gefunden</p>
+            <a class="lock-note" href="#email-1" data-to-form>🔒 Wie es genau geht, steht in der Liste. <u>Kostenlos holen</u></a>
+          </div>
+          <div class="full">
+  <h3><span class="num">3</span>Ein Foto von früher an der Tür</h3>
+            <p>Ein großes Foto als junger Mensch und der Name an der Zimmertür. Das Gesicht von früher erkennen viele besser.</p>
+            <p class="proof">Kleine Studie: Zimmer viel öfter gefunden, 85 % statt 34 %</p>
+          </div>
         </article>
-        <article class="trick">
+        <article class="trick locked">
           <img src="t-lied.webp" width="640" height="499" alt="Tochter singt beim Anziehen, Mutter lächelt" loading="lazy">
-          <h3><span class="num">4</span>Ein Lied beim Anziehen</h3>
-          <p>Sing beim Waschen und Anziehen ein vertrautes Lied von früher. Oft summt die Person mit.</p>
-          <p class="proof">Studie aus Schweden: deutlich weniger Abwehr, mehr Freude</p>
+          <div class="teaser">
+            <h3><span class="num">4</span>Der Lied-Trick</h3>
+            <p>Wenn Waschen und Anziehen jeden Morgen zum Kampf wird.</p>
+            <p class="proof">Studie aus Schweden: deutlich weniger Abwehr</p>
+            <a class="lock-note" href="#email-1" data-to-form>🔒 Wie es genau geht, steht in der Liste. <u>Kostenlos holen</u></a>
+          </div>
+          <div class="full">
+  <h3><span class="num">4</span>Ein Lied beim Anziehen</h3>
+            <p>Sing beim Waschen und Anziehen ein vertrautes Lied von früher. Oft summt die Person mit.</p>
+            <p class="proof">Studie aus Schweden: deutlich weniger Abwehr, mehr Freude</p>
+          </div>
         </article>
-        <article class="trick">
+        <article class="trick locked">
           <img src="t-nacht.webp" width="640" height="405" alt="Älterer Mann geht nachts einem Lichtstreifen entlang zum Bad" loading="lazy">
-          <h3><span class="num">5</span>Ein Nachtlicht mit Bewegungsmelder</h3>
-          <p>Ein Licht am Boden vom Bett bis zum Bad, das von allein angeht. Niemand sucht mehr im Dunkeln den Schalter.</p>
-          <p class="proof">Studie mit 64 Senioren: weniger Angst vor Stürzen, besserer Schlaf</p>
+          <div class="teaser">
+            <h3><span class="num">5</span>Der Licht-Trick</h3>
+            <p>Wenn Papa nachts unruhig aufsteht.</p>
+            <p class="proof">Studie mit 64 Senioren: weniger Angst vor Stürzen</p>
+            <a class="lock-note" href="#email-1" data-to-form>🔒 Wie es genau geht, steht in der Liste. <u>Kostenlos holen</u></a>
+          </div>
+          <div class="full">
+  <h3><span class="num">5</span>Ein Nachtlicht mit Bewegungsmelder</h3>
+            <p>Ein Licht am Boden vom Bett bis zum Bad, das von allein angeht. Niemand sucht mehr im Dunkeln den Schalter.</p>
+            <p class="proof">Studie mit 64 Senioren: weniger Angst vor Stürzen, besserer Schlaf</p>
+          </div>
         </article>
       </div>
     </section>
@@ -240,7 +277,7 @@
         <p style="margin-top:10px">Alle 5 Tricks auf einer Seite. Zum Ausdrucken und Weitergeben an alle, die mithelfen.</p>
         <div class="fridge" aria-hidden="true">
           <strong>5 kleine Tricks bei Demenz</strong>
-          <ol><li>Roter Teller</li><li>Roter Becher</li><li>Foto von früher an der Tür</li><li>Ein Lied beim Anziehen</li><li>Nachtlicht mit Bewegungsmelder</li></ol>
+          <ol><li>Roter Teller</li><li>Roter Becher</li><li><span class="secret">Foto von früher an der Tür</span></li><li><span class="secret">Ein Lied beim Anziehen</span></li><li><span class="secret">Nachtlicht mit Bewegungsmelder</span></li></ol>
         </div>
         <div class="cta" data-signup-box>
           <form class="signup" data-signup novalidate>
@@ -256,6 +293,8 @@
           <div class="thanks" role="status">
             <h3>Fast geschafft! 💌</h3>
             <p>Schau in dein Postfach und tipp auf den Knopf in meiner Mail. Dann kommt die Liste sofort.</p>
+            <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Postfach öffnen</a>
+            <p class="inbox-hint">Die Mail kommt von „Debby vom Demenz Coach“. Nichts da? Schau bitte auch im Spam-Ordner.</p>
             <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">An die Familie weiterschicken</a>
           </div>
         </div>
@@ -347,6 +386,37 @@
       });
     }
 
+    // Bestätigte Nutzer (oder Link aus der Willkommensmail) sehen alle Tricks.
+    if (params.has("bestaetigt") || q.indexOf("mail") === 0) document.body.classList.add("unlocked");
+
+    document.querySelectorAll("[data-to-form]").forEach(function (a) {
+      a.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        var box = document.querySelector(".hero [data-signup-box]");
+        box.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(function () { var i = document.getElementById("email-1"); if (i) i.focus({ preventScroll: true }); }, 450);
+      });
+    });
+
+    // Häufige Tippfehler in der E-Mail-Domain
+    var TYPO = { "gmial.com": "gmail.com", "gmai.com": "gmail.com", "gmal.com": "gmail.com", "gamil.com": "gmail.com", "gmail.de": "gmail.com", "gmail.con": "gmail.com", "gmail.co": "gmail.com", "gmx.dee": "gmx.de", "gmx.d": "gmx.de", "gmx.ed": "gmx.de", "gxm.de": "gmx.de", "web.d": "web.de", "wed.de": "web.de", "web.dee": "web.de", "weg.de": "web.de", "tonline.de": "t-online.de", "t-onlin.de": "t-online.de", "t-online.d": "t-online.de", "hotmial.com": "hotmail.com", "hotmail.con": "hotmail.com", "yahooo.de": "yahoo.de", "yaho.de": "yahoo.de", "outlok.de": "outlook.de", "outlook.con": "outlook.com", "icloud.de": "icloud.com", "iclod.com": "icloud.com" };
+    var suggest = function (v) {
+      var i = v.lastIndexOf("@"); if (i < 1) return "";
+      var d = v.slice(i + 1).toLowerCase();
+      var fix = TYPO[d] || (/\.con$/.test(d) ? d.replace(/\.con$/, ".com") : "");
+      return fix ? v.slice(0, i + 1) + fix : "";
+    };
+    var INBOX = [
+      [/^(gmail|googlemail)\./, "https://mail.google.com/mail/u/0/#search/from%3Adementiacoachapp.com", "Gmail öffnen"],
+      [/^web\.de$/, "https://web.de/", "WEB.DE öffnen"],
+      [/^gmx\./, "https://www.gmx.net/", "GMX öffnen"],
+      [/^t-online\.de$/, "https://email.t-online.de/", "T-Online Mail öffnen"],
+      [/^yahoo\./, "https://mail.yahoo.com/", "Yahoo Mail öffnen"],
+      [/^(outlook|hotmail|live|msn)\./, "https://outlook.live.com/mail/", "Outlook öffnen"],
+      [/^(icloud|me|mac)\.com$/, "https://www.icloud.com/mail", "iCloud Mail öffnen"],
+      [/^freenet\.de$/, "https://email.freenet.de/", "Freenet Mail öffnen"]
+    ];
+
     if (params.has("bestaetigt")) {
       var note = document.createElement("div");
       note.className = "confirmed";
@@ -376,11 +446,30 @@
         e.preventDefault();
         var input = form.querySelector("input[type=email]");
         if (!input.value || !input.checkValidity()) { input.focus(); input.reportValidity && input.reportValidity(); return; }
+        var better = suggest(input.value.trim());
+        var tip = form.querySelector(".typo");
+        if (better && !form.dataset.typoShown) {
+          form.dataset.typoShown = "1";
+          if (!tip) { tip = document.createElement("p"); tip.className = "typo"; tip.setAttribute("role", "alert"); input.insertAdjacentElement("afterend", tip); }
+          tip.textContent = "Meintest du ";
+          var b = document.createElement("button"); b.type = "button"; b.textContent = better;
+          b.addEventListener("click", function () { input.value = better; tip.remove(); });
+          tip.appendChild(b); tip.appendChild(document.createTextNode("?"));
+          return;
+        }
+        if (tip) tip.remove();
         var data = new FormData();
         data.append("EMAIL", input.value.trim());
         data.append("email_address_check", "");
         data.append("locale", "de");
-        var done = function () { box.classList.add("done"); };
+        var done = function () {
+          box.classList.add("done");
+          var dom = input.value.trim().split("@").pop().toLowerCase();
+          var link = box.querySelector("[data-inbox]");
+          for (var k = 0; link && k < INBOX.length; k++) {
+            if (INBOX[k][0].test(dom)) { link.href = INBOX[k][1]; link.textContent = INBOX[k][2]; link.classList.remove("hidden"); break; }
+          }
+        };
         if (!BREVO_FORM_URL) { done(); return; }
         var btn = form.querySelector("button[type=submit]");
         var label = btn.textContent; btn.disabled = true; btn.textContent = "Einen Moment …";
