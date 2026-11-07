@@ -19,6 +19,8 @@ The GitHub Pages deployment rejects any release that still contains an incomplet
 The product homepage is available in 33 languages. Run
 `node scripts/refresh-localized-pages.mjs .` to regenerate their shared Lovable
 design, reciprocal language links, final Store screenshot galleries and sitemap.
+The German conversion landing in `de/` (own `landing.css`/`landing.js`, explicit
+DE storefront links) is hand-maintained and not touched by that generator.
 Then run `node scripts/validate-seo.mjs .`. The screenshot provenance, locale
 fallbacks and performance measurements are documented in
 `docs/multilingual-site-refresh.md`.
