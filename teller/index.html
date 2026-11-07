@@ -66,6 +66,9 @@
     .thanks h3 { font-size: 26px; }
     .done .signup, .done .alt-actions { display: none; }
     .done .thanks { display: grid; }
+    .confirmed { display: grid; gap: 4px; padding: 16px 20px; background: var(--red); color: #fff; font-size: 18px; text-align: center; }
+    .confirmed strong { font-size: 22px; font-weight: 900; }
+    .confirmed a { margin-top: 8px; color: #fff; font-weight: 700; }
 
     section.block { padding: 44px 0; }
     .kicker { font-size: 15px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
@@ -304,6 +307,15 @@
       document.querySelectorAll('a[href*="apps.apple.com"]').forEach(function (a) {
         a.href = a.href.replace(/ct=([a-z_]+)/, "ct=$1_" + q);
       });
+    }
+
+    if (params.has("bestaetigt")) {
+      var note = document.createElement("div");
+      note.className = "confirmed";
+      note.setAttribute("role", "status");
+      note.innerHTML = "<strong>Danke, du bist dabei! 💜</strong><span>Die Liste mit den 5 Tricks ist unterwegs in dein Postfach.</span><a href=\"https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F\">An die Familie weiterschicken</a>";
+      document.body.insertBefore(note, document.body.firstChild);
+      document.querySelectorAll("[data-signup-box]").forEach(function (b) { b.classList.add("hidden"); });
     }
 
     var formReady = !!BREVO_FORM_URL || params.has("vorschau");
