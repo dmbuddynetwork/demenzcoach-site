@@ -399,6 +399,13 @@ body[data-page-type^="translator"]:not(.translator-answers-seen) .translator-sti
 [data-page-type^="translator"] .translator-ai-button { width: auto; padding-inline: 28px; }
 }
 [data-page-type^="translator"] .translator-ai-answer > :first-child { scroll-margin-top: 100px; }
+@media (max-width: 720px) {
+[data-page-type^="translator"] .consent-banner { right: 8px; bottom: 8px; left: 8px; width: auto; gap: 10px; padding: 14px 16px; border-radius: 16px; }
+[data-page-type^="translator"] .consent-copy strong { font-family: var(--sans); font-size: 1.05rem; }
+[data-page-type^="translator"] .consent-copy p { margin-top: 4px; font-size: .9rem; line-height: 1.4; }
+[data-page-type^="translator"] .consent-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+[data-page-type^="translator"] .consent-button { width: 100%; min-height: 48px; padding: 8px 10px; }
+}
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 .translator-teaser .button-light-outline { color: var(--ink); background: var(--paper); border: 1px solid var(--line); }
