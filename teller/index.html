@@ -99,6 +99,9 @@
     .app ul { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
     .app li { padding-left: 34px; position: relative; }
     .app li::before { content: ""; position: absolute; left: 0; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--red); }
+    .byline { margin-top: 2px; font-size: 15px; color: var(--soft); }
+    .byline a { color: var(--ink); font-weight: 700; }
+    .story { display: grid; gap: 14px; margin-top: 16px; }
     .android-note { font-size: 16px; color: var(--soft); }
 
     .foot { padding: 30px 0 46px; font-size: 14px; color: var(--soft); border-top: 2px solid var(--line); }
@@ -161,10 +164,12 @@
           <input id="email-1" type="email" name="EMAIL" autocomplete="email" inputmode="email" placeholder="Deine E-Mail-Adresse" required>
           <button class="btn" type="submit">Liste schicken</button>
           <small>Kostenlos. Ab und zu ein neuer Trick, Abmelden mit einem Klick. <a href="../datenschutz.html">Datenschutz</a></small>
+          <p class="byline">Gesammelt von <a href="#debby">Debby Frey, Altenpflegerin</a></p>
         </form>
         <div class="alt-actions cta hidden" data-fallback>
           <button class="btn" type="button" data-print>Tricks ausdrucken</button>
           <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">Per WhatsApp weiterschicken</a>
+          <p class="byline">Gesammelt von <a href="#debby">Debby Frey, Altenpflegerin</a></p>
         </div>
         <div class="thanks" role="status">
           <h3>Fast geschafft! 💌</h3>
@@ -251,6 +256,18 @@
           <p class="quote">„Ach … ich weiß so viel nicht.“<span>Kommentar auf Facebook</span></p>
           <p class="quote">„Deshalb sind die Becher bei uns auf Arbeit rot.“<span>Kommentar einer Pflegekraft</span></p>
           <p class="quote">„Wenn sie nicht essen will, dann eben Kuchen vor dem Essen.“<span>Kommentar einer Tochter</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="debby">
+      <div class="wrap">
+        <span class="kicker">Wer dahintersteckt</span>
+        <h2>Debby, Altenpflegerin</h2>
+        <div class="story">
+          <p>Debby Frey hat als Altenpflegerin gearbeitet, in der Gerontopsychiatrie, in der Palliativpflege und in der Demenzbegleitung. Sie ist ausgebildete Validationspraktikerin. Das heißt: Sie weiß, wie man Menschen mit Demenz ruhig und auf Augenhöhe begegnet, gerade wenn es schwierig wird.</p>
+          <p>Demenz kennt sie auch aus der eigenen Familie: Ihre Oma hatte Alzheimer. Sie weiß, wie anders es sich anfühlt, wenn es der eigene Mensch ist.</p>
+          <p>Heute sammelt Debby kleine Tricks, die im Alltag wirklich helfen, und schreibt sie so auf, dass man sie sofort ausprobieren kann.</p>
         </div>
       </div>
     </section>
