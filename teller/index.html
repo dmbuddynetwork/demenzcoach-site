@@ -1,232 +1,327 @@
 <!doctype html>
 <html lang="de">
 <head>
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Der Rote-Teller-Trick bei Demenz und vier weitere kleine Alltagstricks fürs Essen, Trinken, Anziehen und die Nacht. Mit Studien, zum Ausdrucken.">
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <meta name="theme-color" content="#f7f7fc">
+  <meta name="description" content="Mama isst nicht mehr? Der Rote-Teller-Trick und 4 weitere kleine Alltagstricks bei Demenz. Mit Studien, als Liste für den Kühlschrank.">
+  <meta name="robots" content="noindex,follow">
+  <meta name="theme-color" content="#fff8f0">
   <meta name="apple-itunes-app" content="app-id=6790763941">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="website">
   <meta property="og:site_name" content="Demenz Coach">
   <meta property="og:locale" content="de_DE">
-  <meta property="og:title" content="Demenz: Der Rote-Teller-Trick und 4 weitere Alltagstricks">
-  <meta property="og:description" content="Kleine Tricks mit großer Wirkung für Pflegende. Mit Studien, zum Ausdrucken.">
+  <meta property="og:title" content="Mama isst nicht mehr? Der Rote-Teller-Trick">
+  <meta property="og:description" content="Und 4 weitere kleine Tricks bei Demenz, die Familien sofort ausprobieren können.">
   <meta property="og:url" content="https://dementiacoachapp.com/teller/">
   <meta property="og:image" content="https://dementiacoachapp.com/teller/roter-teller.webp">
-  <meta property="og:image:width" content="720">
-  <meta property="og:image:height" content="720">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Demenz: Der Rote-Teller-Trick und 4 weitere Alltagstricks">
-  <meta name="twitter:description" content="Kleine Tricks mit großer Wirkung für Pflegende. Mit Studien, zum Ausdrucken.">
-  <meta name="twitter:image" content="https://dementiacoachapp.com/teller/roter-teller.webp">
-  <title>Demenz: Der Rote-Teller-Trick und 4 weitere Alltagstricks | Demenz Coach</title>
+  <title>Mama isst nicht mehr? Der Rote-Teller-Trick | Demenz Coach</title>
   <link rel="canonical" href="https://dementiacoachapp.com/teller/">
-  <link rel="sitemap" type="application/xml" href="https://dementiacoachapp.com/sitemap.xml">
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicon-192.png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
-  <link rel="manifest" href="../site.webmanifest">
-  <link rel="stylesheet" href="../lovable-home.css?v=20260908f">
-  <link rel="stylesheet" href="../ratgeber/situations.css?v=20260908a">
+  <link rel="preload" href="lato-900.woff2" as="font" type="font/woff2" crossorigin>
   <style>
-    .teller-page { font-size: 1.15rem; }
-    .teller-page .article-body p, .teller-page .article-body li { line-height: 1.6; }
-    .teller-hero-img { display: block; width: 100%; max-width: 420px; height: auto; margin: 8px auto 24px; border-radius: 20px; background: #fff; }
-    .trick-card { margin: 0 0 20px; padding: 22px 22px 18px; border-radius: 18px; background: #fff; border: 2px solid #ece9f5; }
-    .trick-card h3 { margin: 0 0 8px; font-size: 1.35rem; line-height: 1.3; }
-    .trick-card p { margin: 0 0 10px; }
-    .trick-card .trick-proof { font-size: 1rem; color: #555; }
-    .trick-number { display: inline-block; min-width: 2.2em; margin-right: 6px; padding: 2px 10px; border-radius: 999px; background: #d62828; color: #fff; font-weight: 700; text-align: center; }
-    .teller-actions { display: grid; gap: 14px; margin: 28px 0; padding: 24px; border-radius: 20px; background: #fff; border: 2px solid #d62828; }
-    .teller-actions h2 { margin: 0; font-size: 1.5rem; }
-    .teller-actions p { margin: 0; }
-    .teller-actions .button { justify-content: center; min-height: 56px; font-size: 1.1rem; }
-    .button-secondary { background: #fff !important; color: inherit !important; border: 2px solid currentColor; }
-    .teller-note { font-size: 1rem; color: #555; }
-    [data-platform="android"] .only-ios, [data-platform="ios"] .only-android { display: none; }
+    @font-face { font-family: "Lato"; font-weight: 400; font-display: swap; src: url("lato-400.woff2") format("woff2"); }
+    @font-face { font-family: "Lato"; font-weight: 700; font-display: swap; src: url("lato-700.woff2") format("woff2"); }
+    @font-face { font-family: "Lato"; font-weight: 900; font-display: swap; src: url("lato-900.woff2") format("woff2"); }
+    :root { --red: #d62828; --red-dark: #b51f1f; --ink: #1d1b19; --soft: #5b5650; --cream: #fff8f0; --line: #eee4d8; }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: #fff; color: var(--ink); font: 400 19px/1.55 "Lato", system-ui, -apple-system, sans-serif; }
+    img { display: block; max-width: 100%; height: auto; }
+    .wrap { max-width: 600px; margin: 0 auto; padding: 0 20px; }
+    h1, h2, h3 { font-weight: 900; line-height: 1.12; margin: 0; letter-spacing: -0.01em; }
+    p { margin: 0; }
+
+    .top { display: flex; align-items: center; gap: 10px; padding: 14px 0; font-weight: 700; font-size: 17px; }
+    .top img { width: 34px; height: 34px; border-radius: 9px; }
+
+    .hero { background: var(--cream); padding-bottom: 36px; }
+    .pill { display: inline-block; margin-top: 8px; padding: 6px 14px; border-radius: 999px; background: #fff; border: 2px solid var(--line); font-size: 15px; font-weight: 700; color: var(--soft); }
+    .hero h1 { margin-top: 14px; font-size: clamp(34px, 9.4vw, 54px); }
+    .hero h1 em { font-style: normal; color: var(--red); }
+    .hero .lead { margin-top: 10px; font-size: 20px; color: var(--soft); }
+    .hero-img { width: 62%; max-width: 280px; margin: 14px auto 0; mix-blend-mode: multiply; }
+    .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+    .fact { background: #fff; border-radius: 18px; padding: 14px 16px; text-align: center; }
+    .fact b { display: block; font-size: 34px; font-weight: 900; color: var(--red); line-height: 1.1; }
+    .fact span { font-size: 16px; color: var(--soft); }
+    .facts-note { margin-top: 8px; font-size: 14px; color: var(--soft); text-align: center; }
+
+    .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 62px; padding: 14px 20px; border: 0; border-radius: 16px; background: var(--red); color: #fff; font: 900 21px/1.2 "Lato", sans-serif; text-decoration: none; cursor: pointer; text-align: center; }
+    .btn:active { background: var(--red-dark); }
+    .btn-ghost { background: #fff; color: var(--ink); border: 2px solid var(--ink); min-height: 58px; font-weight: 700; font-size: 19px; }
+    .cta { display: grid; gap: 12px; margin-top: 22px; }
+    .cta-hint { font-size: 15px; color: var(--soft); text-align: center; }
+
+    .signup { display: grid; gap: 10px; }
+    .signup label { font-weight: 700; font-size: 17px; }
+    .signup input[type=email] { width: 100%; min-height: 62px; padding: 0 18px; border: 2px solid #cfc6bb; border-radius: 16px; font: 400 20px "Lato", sans-serif; background: #fff; color: var(--ink); }
+    .signup input[type=email]:focus { outline: 3px solid rgba(214,40,40,.35); border-color: var(--red); }
+    .check { display: flex; gap: 12px; align-items: flex-start; font-weight: 400 !important; font-size: 17px !important; line-height: 1.4; padding: 6px 0; cursor: pointer; }
+    .check input { flex: none; width: 26px; height: 26px; margin: 0; accent-color: var(--red); }
+    .signup small { font-size: 13.5px; color: var(--soft); line-height: 1.45; }
+    .signup small a { color: inherit; }
+    .thanks { display: none; gap: 12px; padding: 22px; border-radius: 20px; background: #fff; border: 3px solid var(--red); }
+    .thanks h3 { font-size: 26px; }
+    .done .signup, .done .alt-actions { display: none; }
+    .done .thanks { display: grid; }
+
+    section.block { padding: 44px 0; }
+    .kicker { font-size: 15px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
+    .block h2 { margin-top: 6px; font-size: clamp(30px, 8vw, 40px); }
+
+    .trick { margin-top: 30px; }
+    .trick img { width: 100%; max-height: 260px; object-fit: contain; background: #fff; }
+    .trick h3 { margin-top: 14px; font-size: 27px; display: flex; gap: 12px; align-items: baseline; }
+    .num { flex: none; display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--red); color: #fff; font-size: 20px; }
+    .trick p { margin-top: 8px; }
+    .trick .proof { margin-top: 8px; font-size: 16px; color: var(--soft); }
+    .trick + .trick { padding-top: 30px; border-top: 2px solid var(--line); }
+
+    .fridge-area { background: var(--cream); }
+    .fridge { position: relative; margin: 28px auto 6px; max-width: 360px; padding: 34px 26px 24px; background: #fff; border-radius: 6px; box-shadow: 0 14px 34px rgba(60,40,20,.16); transform: rotate(-2deg); }
+    .fridge::before { content: ""; position: absolute; top: -14px; left: 50%; width: 34px; height: 34px; margin-left: -17px; border-radius: 50%; background: var(--red); box-shadow: 0 3px 6px rgba(0,0,0,.25); }
+    .fridge strong { display: block; font-size: 22px; font-weight: 900; }
+    .fridge ol { margin: 12px 0 0; padding-left: 24px; font-size: 18px; font-weight: 700; }
+    .fridge li { padding: 4px 0; }
+    .fridge li::marker { color: var(--red); }
+
+    .quotes { display: grid; gap: 14px; margin-top: 22px; }
+    .quote { padding: 18px 20px; border-left: 5px solid var(--red); background: var(--cream); border-radius: 0 16px 16px 0; font-size: 21px; font-weight: 700; }
+    .quote span { display: block; margin-top: 6px; font-size: 14px; font-weight: 400; color: var(--soft); }
+
+    .app { display: grid; gap: 20px; align-items: center; }
+    .phone { width: 240px; margin: 0 auto; }
+    .app ul { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .app li { padding-left: 34px; position: relative; }
+    .app li::before { content: ""; position: absolute; left: 0; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--red); }
+    .android-note { font-size: 16px; color: var(--soft); }
+
+    .foot { padding: 30px 0 46px; font-size: 14px; color: var(--soft); border-top: 2px solid var(--line); }
+    .foot details { margin-bottom: 16px; }
+    .foot summary { cursor: pointer; font-weight: 700; color: var(--ink); min-height: 44px; display: flex; align-items: center; }
+    .foot details p { margin-top: 8px; }
+    .foot nav { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; }
+    .foot a { color: inherit; }
+
+    [data-platform="android"] .only-ios, [data-platform="desktop"] .only-ios { display: none !important; }
+    [data-platform="ios"] .not-ios { display: none !important; }
+    .hidden { display: none !important; }
+
+    @media (min-width: 900px) {
+      .app { grid-template-columns: 240px 1fr; }
+    }
     @media print {
-      .site-header, .site-footer, .teller-actions, .article-cta, .breadcrumbs, .skip-link, .no-print { display: none !important; }
-      .teller-page { font-size: 12pt; }
-      .trick-card { break-inside: avoid; border: 1px solid #999; }
-      .teller-hero-img { max-width: 200px; }
+      .hero .cta, .cta, .fridge-area, .app-area, .quotes-area, .foot nav, .top, .facts-note { display: none !important; }
+      body { font-size: 12pt; }
+      .trick { break-inside: avoid; }
+      .trick img { max-height: 140px; }
+      .hero-img { max-width: 180px; }
     }
   </style>
-  <script type="application/ld+json">{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Article",
-      "@id": "https://dementiacoachapp.com/teller/#content",
-      "mainEntityOfPage": { "@id": "https://dementiacoachapp.com/teller/#webpage" },
-      "headline": "Demenz: Der Rote-Teller-Trick und 4 weitere Alltagstricks",
-      "description": "Der Rote-Teller-Trick bei Demenz und vier weitere kleine Alltagstricks fürs Essen, Trinken, Anziehen und die Nacht. Mit Studien, zum Ausdrucken.",
-      "inLanguage": "de",
-      "isAccessibleForFree": true,
-      "datePublished": "2026-11-07",
-      "dateModified": "2026-11-07",
-      "author": { "@id": "https://dementiacoachapp.com/#organization" },
-      "publisher": { "@id": "https://dementiacoachapp.com/#organization" },
-      "image": "https://dementiacoachapp.com/teller/roter-teller.webp",
-      "citation": [
-        "https://doi.org/10.1016/j.clnu.2003.09.015",
-        "https://doi.org/10.1111/j.1365-2702.2010.03386.x",
-        "https://doi.org/10.1159/000504883"
-      ]
-    },
-    {
-      "@type": "WebPage",
-      "@id": "https://dementiacoachapp.com/teller/#webpage",
-      "url": "https://dementiacoachapp.com/teller/",
-      "name": "Demenz: Der Rote-Teller-Trick und 4 weitere Alltagstricks",
-      "description": "Der Rote-Teller-Trick bei Demenz und vier weitere kleine Alltagstricks fürs Essen, Trinken, Anziehen und die Nacht. Mit Studien, zum Ausdrucken.",
-      "inLanguage": "de",
-      "isPartOf": { "@id": "https://dementiacoachapp.com/#website" },
-      "primaryImageOfPage": "https://dementiacoachapp.com/teller/roter-teller.webp"
-    },
-    {
-      "@type": "Organization",
-      "@id": "https://dementiacoachapp.com/#organization",
-      "name": "Demenz Coach",
-      "url": "https://dementiacoachapp.com/"
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://dementiacoachapp.com/#website",
-      "url": "https://dementiacoachapp.com/",
-      "name": "Demenz Coach",
-      "publisher": { "@id": "https://dementiacoachapp.com/#organization" }
-    }
-  ]
-}</script>
 </head>
-<body data-page-type="landing" data-page-language="de" data-page-slug="teller">
-  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="top"><img src="../assets/lovable-logo.jpg" width="34" height="34" alt="">Demenz Coach</div>
+      <span class="pill">Aus dem Video mit über 100.000 Aufrufen</span>
+      <h1>Mama isst nicht mehr? <em>Probier einen roten Teller.</em></h1>
+      <p class="lead">Und 4 weitere kleine Tricks, die Familien mit Demenz sofort ausprobieren können.</p>
+      <img class="hero-img" src="roter-teller.webp" width="720" height="720" alt="Zeichnung: Eine ältere Frau sitzt mit verschränkten Armen vor einem roten Teller.">
+      <div class="facts">
+        <div class="fact"><b>+25 %</b><span>mehr gegessen</span></div>
+        <div class="fact"><b>+84 %</b><span>mehr getrunken</span></div>
+      </div>
+      <p class="facts-note">mit rotem Geschirr, Studie der Boston University</p>
 
-  <header class="site-header">
-    <div class="container nav-wrap">
-      <a class="brand" href="../" aria-label="Demenz Coach">
-        <img class="brand-logo" src="../assets/lovable-logo.jpg" width="44" height="44" alt="">
-        <span>Demenz Coach</span>
-      </a>
-      <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-nav">
-        <span class="sr-only">Menü öffnen</span><span></span><span></span>
-      </button>
-      <nav id="site-nav" class="site-nav" aria-label="Hauptnavigation">
-        <a href="../">Startseite</a>
-        <a href="../ratgeber/">Ratgeber</a>
-        <a class="button button-small" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=lp_teller_nav&amp;mt=8" data-store-link="lp_teller_nav">App entdecken</a>
-      </nav>
+      <div class="cta" data-signup-box>
+        <form class="signup" data-signup novalidate>
+          <label for="email-1">Die 5 Tricks als Liste für den Kühlschrank</label>
+          <input id="email-1" type="email" name="EMAIL" autocomplete="email" inputmode="email" placeholder="Deine E-Mail-Adresse" required>
+          <button class="btn" type="submit">Liste schicken</button>
+          <label class="check"><input type="checkbox" name="TESTER" value="1"> Ich teste die neue Demenz Coach App gern vorab mit</label>
+          <small>Kostenlos. Ab und zu ein neuer kleiner Trick, Abmelden mit einem Klick. <a href="../datenschutz.html">Datenschutz</a></small>
+        </form>
+        <div class="alt-actions cta hidden" data-fallback>
+          <button class="btn" type="button" data-print>Tricks ausdrucken</button>
+          <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">Per WhatsApp weiterschicken</a>
+        </div>
+        <div class="thanks" role="status">
+          <h3>Fast geschafft! 💌</h3>
+          <p>Schau in dein Postfach und tipp auf den Knopf in unserer Mail. Dann kommt die Liste sofort.</p>
+          <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">An die Familie weiterschicken</a>
+        </div>
+      </div>
     </div>
   </header>
-  <main id="main" class="content-main">
-    <article class="seo-article teller-page">
-      <div class="container content-narrow">
-        <header class="article-header">
-          <span class="eyebrow">Kleiner Trick, große Wirkung</span>
-          <h1>Mama isst nicht mehr? Der Rote-Teller-Trick</h1>
-          <p class="article-lead">Das Video mit dem roten Teller haben über 100.000 Menschen gesehen. Hier ist der Trick zum Nachlesen, dazu vier weitere kleine Alltagstricks, die Familien mit Demenz helfen können.</p>
-        </header>
-        <img class="teller-hero-img" src="roter-teller.webp" width="720" height="720" alt="Zeichnung: Eine ältere Frau sitzt mit verschränkten Armen vor einem roten Teller mit Essen.">
 
-        <div class="article-body">
-          <section>
-            <div class="trick-card">
-              <h3><span class="trick-number">1</span>Ein roter Teller</h3>
-              <p>Viele Menschen mit Demenz sehen Kontraste schlechter. Helles Essen auf einem weißen Teller verschwimmt dann fast. Auf einem kräftig roten Teller ist das Essen viel besser zu erkennen.</p>
-              <p>Und: Nicht drängeln. Setz dich lieber dazu und iss selbst mit. Viele machen es dann einfach nach.</p>
-              <p class="trick-proof">Studie: In einer kleinen Studie der Boston University (2004) aßen Menschen mit fortgeschrittener Demenz von rotem Geschirr im Schnitt rund ein Viertel mehr. Kräftiges Blau wirkte auch, blasse Farben nicht.</p>
-            </div>
-            <p class="only-ios no-print"><a class="text-link" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=lp_teller_top&amp;mt=8" data-store-link="lp_teller_top">Mehr Hilfe für schwierige Momente: Demenz Coach App fürs iPhone →</a></p>
-            <div class="trick-card">
-              <h3><span class="trick-number">2</span>Ein roter Becher</h3>
-              <p>Dasselbe gilt fürs Trinken. Ein Becher in kräftiger Farbe, gut sichtbar hingestellt, wird viel öfter in die Hand genommen als ein durchsichtiges Glas.</p>
-              <p class="trick-proof">Studie: In derselben Studie tranken die Menschen aus rotem Geschirr fast doppelt so viel.</p>
-            </div>
-            <div class="trick-card">
-              <h3><span class="trick-number">3</span>Ein Foto von früher an der Zimmertür</h3>
-              <p>Häng ein großes Foto der Person als junger Mensch und ihren Namen an die eigene Zimmertür. Das eigene Gesicht von früher erkennen viele besser als das von heute.</p>
-              <p class="trick-proof">Studie: In einer kleinen Studie mit drei Bewohnerinnen fanden sie ihr Zimmer vorher in 34 % der Fälle, mit Foto und Namensschild in 85 %.</p>
-            </div>
-            <div class="trick-card">
-              <h3><span class="trick-number">4</span>Ein Lied von früher beim Anziehen</h3>
-              <p>Sing beim Waschen und Anziehen ein vertrautes Lied von früher. Das lenkt ab, macht die Stimmung leichter, und oft summt die Person mit.</p>
-              <p class="trick-proof">Studie: In Schweden wehrten sich Menschen mit schwerer Demenz deutlich weniger gegen die Morgenpflege, wenn die Pflegenden dabei sangen. Sie wirkten fröhlicher und wacher.</p>
-            </div>
-            <div class="trick-card">
-              <h3><span class="trick-number">5</span>Ein Nachtlicht mit Bewegungsmelder</h3>
-              <p>Ein Licht am Boden vom Bett bis zum Bad, das von allein angeht. So muss niemand im Dunkeln den Schalter suchen.</p>
-              <p class="trick-proof">Studie: In einer Studie mit 64 älteren Menschen zu Hause hatten sie nachts deutlich weniger Angst zu stürzen und schliefen besser. Die Studie war mit Senioren allgemein, nicht nur mit Menschen mit Demenz.</p>
-            </div>
-          </section>
-        </div>
+  <main>
+    <section class="block">
+      <div class="wrap">
+        <span class="kicker">Kleiner Trick, große Wirkung</span>
+        <h2>5 Tricks für den Alltag</h2>
 
-        <aside class="teller-actions only-ios" aria-labelledby="ios-title">
-          <h2 id="ios-title">Mehr solche Tricks, genau für deine Situation</h2>
-          <p>Die Demenz Coach App gibt dir in schwierigen Momenten sofort Worte und Ideen, die passen. Für iPhone und iPad.</p>
-          <a class="button" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=lp_teller&amp;mt=8" data-store-link="lp_teller">Demenz Coach im App Store</a>
-          <button class="button button-secondary no-print" type="button" data-print>Tricks ausdrucken</button>
-        </aside>
-
-        <aside class="teller-actions only-android" aria-labelledby="android-title">
-          <h2 id="android-title">Für den Kühlschrank oder die Familie</h2>
-          <p>Druck dir die fünf Tricks aus, oder schick sie jemandem, der Mama oder Papa pflegt.</p>
-          <button class="button" type="button" data-print>Tricks ausdrucken</button>
-          <a class="button button-secondary" data-whatsapp href="https://wa.me/?text=5%20kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">Per WhatsApp weiterschicken</a>
-          <p class="teller-note">Die Demenz Coach App gibt es im Moment nur für iPhone und iPad. Eine Android-Version ist noch nicht verfügbar.</p>
-        </aside>
-
-        <aside class="safety-note"><strong>Allgemeine Alltagshilfe, keine medizinische Beratung.</strong><span>Bei starkem Gewichtsverlust, häufigem Verschlucken oder wenn jemand kaum noch trinkt: bitte ärztlichen Rat holen.</span></aside>
-
-        <section class="article-sources" aria-labelledby="sources-title"><h2 id="sources-title">Quellen</h2>
-          <p>Dunne, Neargarder, Cipolloni, Cronin-Golomb (2004): Visual contrast enhances food and liquid intake in advanced Alzheimer's disease. <a href="https://doi.org/10.1016/j.clnu.2003.09.015" rel="noopener">Clinical Nutrition 23(4)</a></p>
-          <p>Nolan, Mathews, Harrison (2001): Using external memory aids to increase room finding by older adults with dementia. American Journal of Alzheimer's Disease and Other Dementias 16(4)</p>
-          <p>Hammar, Emami, Götell, Engström (2011): The impact of caregivers' singing on expressions of emotion and resistance during morning care situations in persons with dementia. <a href="https://doi.org/10.1111/j.1365-2702.2010.03386.x" rel="noopener">Journal of Clinical Nursing 20(7-8)</a></p>
-          <p>Thölking, Lamers, Olde Rikkert (2020): Automated nightlights for older adults living at home. <a href="https://doi.org/10.1159/000504883" rel="noopener">Gerontology 66(3)</a></p>
-          <p><small>Kleine Studien, die Ergebnisse gelten nicht für jeden. Probier aus, was bei euch passt.</small></p>
-        </section>
-        <section class="related-guides no-print" aria-labelledby="related-guides-title"><span class="eyebrow">Weiterlesen</span><h2 id="related-guides-title">Das könnte ebenfalls helfen</h2><div class="related-guide-grid"><a class="related-guide-link" href="../ratgeber/demenz-immer-dieselbe-frage.html"><span>Ratgeber für Angehörige</span><strong>Immer dieselbe Frage</strong></a>
-<a class="related-guide-link" href="../ratgeber/pflegende-angehoerige-ueberfordert.html"><span>Ratgeber für Angehörige</span><strong>Wenn dir alles zu viel wird</strong></a></div></section>
+        <article class="trick">
+          <img src="t-teller.webp" width="640" height="432" alt="Roter Teller mit Essen" loading="lazy">
+          <h3><span class="num">1</span>Ein roter Teller</h3>
+          <p>Helles Essen auf weißem Teller verschwimmt bei Demenz oft. Auf Rot sieht man es. Und: nicht drängeln, lieber dazusetzen und mitessen.</p>
+          <p class="proof">Studie: rund ein Viertel mehr gegessen (Boston University, 2004)</p>
+        </article>
+        <article class="trick">
+          <img src="t-becher.webp" width="640" height="555" alt="Ältere Frau trinkt aus einem roten Becher" loading="lazy">
+          <h3><span class="num">2</span>Ein roter Becher</h3>
+          <p>Ein kräftig farbiger Becher, gut sichtbar hingestellt, wird viel öfter in die Hand genommen als ein Glas.</p>
+          <p class="proof">Studie: fast doppelt so viel getrunken (gleiche Studie)</p>
+        </article>
+        <article class="trick">
+          <img src="t-tuer.webp" width="474" height="640" alt="Ältere Frau zeigt auf ihr Jugendfoto an der Zimmertür" loading="lazy">
+          <h3><span class="num">3</span>Ein Foto von früher an der Tür</h3>
+          <p>Ein großes Foto als junger Mensch und der Name an der Zimmertür. Das Gesicht von früher erkennen viele besser.</p>
+          <p class="proof">Kleine Studie: Zimmer viel öfter gefunden, 85 % statt 34 %</p>
+        </article>
+        <article class="trick">
+          <img src="t-lied.webp" width="640" height="499" alt="Tochter singt beim Anziehen, Mutter lächelt" loading="lazy">
+          <h3><span class="num">4</span>Ein Lied beim Anziehen</h3>
+          <p>Sing beim Waschen und Anziehen ein vertrautes Lied von früher. Oft summt die Person mit.</p>
+          <p class="proof">Studie aus Schweden: deutlich weniger Abwehr, mehr Freude</p>
+        </article>
+        <article class="trick">
+          <img src="t-nacht.webp" width="640" height="405" alt="Älterer Mann geht nachts einem Lichtstreifen entlang zum Bad" loading="lazy">
+          <h3><span class="num">5</span>Ein Nachtlicht mit Bewegungsmelder</h3>
+          <p>Ein Licht am Boden vom Bett bis zum Bad, das von allein angeht. Niemand sucht mehr im Dunkeln den Schalter.</p>
+          <p class="proof">Studie mit 64 Senioren: weniger Angst vor Stürzen, besserer Schlaf</p>
+        </article>
       </div>
-    </article>
+    </section>
+
+    <section class="block fridge-area">
+      <div class="wrap">
+        <span class="kicker">Gratis</span>
+        <h2>Die Liste für den Kühlschrank</h2>
+        <p style="margin-top:10px">Alle 5 Tricks auf einer Seite. Zum Ausdrucken und Weitergeben an alle, die mithelfen.</p>
+        <div class="fridge" aria-hidden="true">
+          <strong>5 kleine Tricks bei Demenz</strong>
+          <ol><li>Roter Teller</li><li>Roter Becher</li><li>Foto von früher an der Tür</li><li>Ein Lied beim Anziehen</li><li>Nachtlicht mit Bewegungsmelder</li></ol>
+        </div>
+        <div class="cta" data-signup-box>
+          <form class="signup" data-signup novalidate>
+            <label for="email-2">Wohin dürfen wir die Liste schicken?</label>
+            <input id="email-2" type="email" name="EMAIL" autocomplete="email" inputmode="email" placeholder="Deine E-Mail-Adresse" required>
+            <button class="btn" type="submit">Liste schicken</button>
+            <label class="check"><input type="checkbox" name="TESTER" value="1"> Ich teste die neue Demenz Coach App gern vorab mit</label>
+            <small>Kostenlos. Abmelden jederzeit mit einem Klick. <a href="../datenschutz.html">Datenschutz</a></small>
+          </form>
+          <div class="alt-actions cta hidden" data-fallback>
+            <button class="btn" type="button" data-print>Tricks ausdrucken</button>
+            <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">Per WhatsApp weiterschicken</a>
+          </div>
+          <div class="thanks" role="status">
+            <h3>Fast geschafft! 💌</h3>
+            <p>Schau in dein Postfach und tipp auf den Knopf in unserer Mail. Dann kommt die Liste sofort.</p>
+            <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">An die Familie weiterschicken</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block quotes-area">
+      <div class="wrap">
+        <span class="kicker">Unter dem Video</span>
+        <h2>Ihr seid nicht allein</h2>
+        <div class="quotes">
+          <p class="quote">„Ach … ich weiß so viel nicht.“<span>Kommentar auf Facebook</span></p>
+          <p class="quote">„Deshalb sind die Becher bei uns auf Arbeit rot.“<span>Kommentar einer Pflegekraft</span></p>
+          <p class="quote">„Wenn sie nicht essen will, dann eben Kuchen vor dem Essen.“<span>Kommentar einer Tochter</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="block fridge-area app-area">
+      <div class="wrap app">
+        <img class="phone" src="../assets/app-de-help.webp" width="720" height="1566" alt="Bildschirm der Demenz Coach App">
+        <div>
+          <span class="kicker">Gerade in Arbeit</span>
+          <h2>Wir entwickeln die Demenz Coach App</h2>
+          <p style="margin-top:10px">Für die schwierigen Momente im Alltag:</p>
+          <ul>
+            <li>Beschreib kurz, was gerade passiert</li>
+            <li>Bekomm ruhige Sätze, die du sagen kannst</li>
+            <li>Dazu kleine Tricks wie den roten Teller</li>
+          </ul>
+          <p style="margin-top:16px">Trag dich oben für die Liste ein und setz das Häkchen. Dann gehörst du zu den Ersten, die sie ausprobieren, und hilfst mit, sie besser zu machen.</p>
+          <p class="android-note only-ios" style="margin-top:12px"><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=lp_teller_app&amp;mt=8" style="color:inherit">Die erste Version schon jetzt im App Store ansehen</a></p>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <a class="brand" href="../"><img class="brand-logo" src="../assets/lovable-logo.jpg" width="44" height="44" alt=""><span>Demenz Coach</span></a>
-      <p>Kein Ersatz für medizinische Beratung oder örtliche Notfallhilfe.</p>
-      <nav aria-label="Support">
-        <a href="../ratgeber/">Alle Ratgeber</a>
-        <a href="../support.html">Support</a>
-        <a href="../datenschutz.html">Datenschutz</a>
-        <a href="../nutzungsbedingungen.html">Nutzungsbedingungen</a>
-        <a href="../impressum.html">Impressum</a>
-      </nav>
+  <footer class="foot">
+    <div class="wrap">
+      <details>
+        <summary>Quellen</summary>
+        <p>Dunne u. a. (2004), Clinical Nutrition 23(4): <a href="https://doi.org/10.1016/j.clnu.2003.09.015" rel="noopener">doi.org/10.1016/j.clnu.2003.09.015</a></p>
+        <p>Nolan, Mathews, Harrison (2001), American Journal of Alzheimer's Disease and Other Dementias 16(4)</p>
+        <p>Hammar u. a. (2011), Journal of Clinical Nursing 20(7-8): <a href="https://doi.org/10.1111/j.1365-2702.2010.03386.x" rel="noopener">doi.org/10.1111/j.1365-2702.2010.03386.x</a></p>
+        <p>Thölking u. a. (2020), Gerontology 66(3), Studie mit Senioren allgemein: <a href="https://doi.org/10.1159/000504883" rel="noopener">doi.org/10.1159/000504883</a></p>
+        <p>Kleine Studien, die Ergebnisse gelten nicht für jeden. Probier aus, was bei euch passt.</p>
+      </details>
+      <p>Allgemeine Alltagshilfe, keine medizinische Beratung. Bei starkem Gewichtsverlust, häufigem Verschlucken oder wenn jemand kaum noch trinkt, bitte ärztlichen Rat holen.</p>
+      <nav><a href="../">Demenz Coach</a><a href="../ratgeber/">Ratgeber</a><a href="../impressum.html">Impressum</a><a href="../datenschutz.html">Datenschutz</a></nav>
     </div>
   </footer>
+
   <script>
   (function () {
+    // Brevo-Formular-Adresse (Brevo > Kontakte > Formulare > Teilen > HTML-Code, Wert von action="...").
+    // Leer = noch kein Brevo: statt E-Mail-Feld erscheinen Ausdrucken und WhatsApp.
+    var BREVO_FORM_URL = "";
+
     var ua = navigator.userAgent || "";
     var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
     var isAndroid = /Android/.test(ua);
     document.body.setAttribute("data-platform", isIOS ? "ios" : (isAndroid ? "android" : "desktop"));
-    // ?q=fb_kommentar -> App-Store-Kampagne lp_teller_fb_kommentar (App Store Connect > Quellen)
-    var q = (new URLSearchParams(location.search).get("q") || "").toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 20);
+
+    var params = new URLSearchParams(location.search);
+    // ?q=fb_kommentar -> App-Store-Kampagne lp_teller_..._fb_kommentar (App Store Connect > Quellen)
+    var q = (params.get("q") || "").toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 16);
     if (q) {
       document.querySelectorAll('a[href*="apps.apple.com"]').forEach(function (a) {
         a.href = a.href.replace(/ct=([a-z_]+)/, "ct=$1_" + q);
       });
     }
+
+    var formReady = !!BREVO_FORM_URL || params.has("vorschau");
+    document.querySelectorAll("[data-signup-box]").forEach(function (box) {
+      var form = box.querySelector("[data-signup]");
+      var fallback = box.querySelector("[data-fallback]");
+      var hint = box.querySelector(".cta-hint");
+      if (!formReady) {
+        form.classList.add("hidden");
+        if (hint) hint.classList.add("hidden");
+        fallback.classList.remove("hidden");
+        return;
+      }
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var input = form.querySelector("input[type=email]");
+        if (!input.value || !input.checkValidity()) { input.focus(); input.reportValidity && input.reportValidity(); return; }
+        var data = new FormData();
+        data.append("EMAIL", input.value.trim());
+        var t = form.querySelector("input[name=TESTER]");
+        if (t && t.checked) data.append("TESTER", "1");
+        data.append("email_address_check", "");
+        data.append("locale", "de");
+        var done = function () { box.classList.add("done"); };
+        if (!BREVO_FORM_URL) { done(); return; }
+        fetch(BREVO_FORM_URL, { method: "POST", body: data, mode: "no-cors" }).then(done, done);
+      });
+    });
+
     document.querySelectorAll("[data-print]").forEach(function (b) {
       b.addEventListener("click", function () { window.print(); });
     });
   })();
   </script>
-  <script>window.demenzCoachSiteLocale={
-  "menuOpen": "Menü öffnen",
-  "menuClose": "Menü schließen",
-  "privacyURL": "../datenschutz.html"
-};</script>
-  <script src="../lovable-home.js?v=20260908f"></script>
 </body>
 </html>
