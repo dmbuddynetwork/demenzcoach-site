@@ -16,8 +16,8 @@ const walk = (directory, prefix = "") => {
     if (entry.name.startsWith(".")) continue;
     // vorschau/: nicht indexierte Testversionen (noindex), eigenes Layout, nicht Teil der Live-Seiten.
     if (!prefix && entry.name === "vorschau") continue;
-    // teller/: Landingpage für Social-Media-Traffic (noindex), eigenes Layout.
-    if (!prefix && entry.name === "teller") continue;
+    // teller/ und plate/ (EN): Landingpages für Social-Media-Traffic (noindex), eigenes Layout.
+    if (!prefix && (entry.name === "teller" || entry.name === "plate")) continue;
     const relative = path.posix.join(prefix, entry.name);
     const absolute = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(absolute, relative);
