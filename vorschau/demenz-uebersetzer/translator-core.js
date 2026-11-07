@@ -16,6 +16,7 @@
     [/\bgehts\b/g, 'geht es'],
     [/\bgibts\b/g, 'gibt es'],
     [/\bheeme?\b/g, 'heim'],
+    [/\b(?:hasue|huase|hause|hauze)\b/g, 'hause'],
     [/\bpennt\b/g, 'schlaeft'],
     [/\bpennen\b/g, 'schlafen'],
     [/\bschiss\b/g, 'angst'],
@@ -127,6 +128,11 @@
     const wholeWordOnly = rawKeyword.startsWith('=');
     const keyword = wholeWordOnly ? rawKeyword.slice(1) : rawKeyword;
     if (wholeWordOnly) return normalized.includes(` ${keyword} `) ? (1 + keyword.length / 20) * 2 : 0;
+    // Ein „^“ vorne heißt: nur am Anfang der Eingabe (nach Sprecher und Pronomen), also „Mama weiß nicht, wer ich bin“, aber nicht „Ich weiß nicht, wer ich bin“.
+    if (keyword.startsWith('^')) {
+      const phrase = keyword.slice(1);
+      return normalized.startsWith(` ${phrase} `) ? (phrase.split(' ').length + phrase.length / 20) * 2 : 0;
+    }
     // Ein „$“ hinten heißt: nur am Ende der Eingabe („Ich kann nicht mehr“, aber nicht „… mehr laufen“).
     if (keyword.endsWith('$')) {
       const phrase = keyword.slice(0, -1);
@@ -217,7 +223,7 @@
       const normalizedText = normalize(text);
       const tokens = normalizedText.trim().split(' ').filter(Boolean);
       const moodPhrase = ranked[0].entry.keywords.some((keyword) => keyword.includes(' ')
-        && mood.keywords.some((word) => keyword.replace(/^=/, '').split(' ').includes(word))
+        && mood.keywords.some((word) => keyword.replace(/^[=^]/, '').replace(/\$$/, '').split(' ').includes(word))
         && keywordWeight(normalizedText, tokens, keyword) > 0);
       if (!moodPhrase && topic.length && topic[0].entry.key !== ranked[0].entry.key) {
         // Alternativen ebenfalls ohne Gefühlswörter, sonst steht „Lass mich in Ruhe“ nur wegen „wütend“ daneben.
@@ -313,7 +319,7 @@
     const ranked = data.entries
       .filter((entry) => !entry.safetyOnly)
       .map((entry) => {
-        const vocab = new Set([entry.says, ...(entry.variants ?? []), ...entry.keywords.map((keyword) => keyword.replace(/^=/, ''))].flatMap(contentWords).map(stem));
+        const vocab = new Set([entry.says, ...(entry.variants ?? []), ...entry.keywords.map((keyword) => keyword.replace(/^[=^]/, '').replace(/\$$/, ''))].flatMap(contentWords).map(stem));
         return { entry, score: words.filter((word) => vocab.has(stem(word))).length };
       })
       .filter((candidate) => candidate.score > 0)
