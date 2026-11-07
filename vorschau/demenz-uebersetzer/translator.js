@@ -567,20 +567,23 @@
     }
     if (retry) nodes.push(retry.toggle, retry.block);
 
-    // Antwort zuerst, Hintergrund zum Aufklappen: hält das Ergebnis auf dem Handy kurz.
-    const more = (title, items, intro, always = false) => items.length || always
-      ? element('details', { className: 'translator-more' }, [
-        element('summary', { text: title }),
-        intro ? element('p', { text: intro }) : null,
-        items.length ? element('ul', {}, items.map((item) => element('li', { text: item }))) : null
-      ])
-      : null;
-    const moreBlocks = [
-      more(rest ? 'Mehr zum Hintergrund' : 'Weitere mögliche Gründe', result.meanings, rest, Boolean(rest)),
-      more('Was du eher vermeiden solltest', result.avoid, 'Eher ungünstig ist es,'),
-      more('Was danach helfen kann', result.next)
+    // Antwort zuerst, alles Weitere in EINER Klappe: Für Menschen über 60 ist eine Klappe
+    // leichter als drei. Innen kurze Zwischenüberschriften.
+    const section = (title, items, intro) => (items.length || intro ? [
+      element('h4', { className: 'translator-more-title', text: title }),
+      intro ? element('p', { text: intro }) : null,
+      items.length ? element('ul', {}, items.map((item) => element('li', { text: item }))) : null
+    ] : []);
+    const moreContent = [
+      ...section(rest ? 'Mehr zum Hintergrund' : 'Weitere mögliche Gründe', result.meanings ?? [], rest),
+      ...section('Eher vermeiden', result.avoid ?? [], result.avoid?.length ? 'Eher ungünstig ist es,' : ''),
+      ...section('Was danach helfen kann', result.next ?? [])
     ].filter(Boolean);
-    if (moreBlocks.length) nodes.push(element('div', { className: 'translator-more-group' }, moreBlocks));
+    if (moreContent.length) {
+      nodes.push(element('div', { className: 'translator-more-group' }, [
+        element('details', { className: 'translator-more' }, [element('summary', { text: 'Mehr dazu' }), ...moreContent])
+      ]));
+    }
 
     if (result.safety && !result.safetyOnly && !safetyHit && !safetyFirst) nodes.push(safetyAside());
 
