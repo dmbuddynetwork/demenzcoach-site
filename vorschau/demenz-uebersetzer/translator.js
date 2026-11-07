@@ -495,9 +495,10 @@
     }
 
     // Steht der getippte Satz schon als Überschrift da, braucht es keine Wiederholung.
-    if (typed && core.normalize(typed) !== core.normalize(result.says ?? '')) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
-    nodes.push(element('span', { className: 'eyebrow', text: result.selfCare ? 'Für dich' : result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
-    const heading = element('h2', { text: result.feeling ? `Bei ${result.feeling}` : `„${result.says}“`, attributes: { tabindex: '-1' } });
+    if (typed && (result.selfCare || core.normalize(typed) !== core.normalize(result.says ?? ''))) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
+    // Entlastung spricht dich direkt an, statt dir einen Satz wie „Ich kann nicht mehr.“ in den Mund zu legen.
+    if (!result.selfCare) nodes.push(element('span', { className: 'eyebrow', text: result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
+    const heading = element('h2', { text: result.selfCare ? 'Das ist gerade viel für dich.' : result.feeling ? `Bei ${result.feeling}` : `„${result.says}“`, attributes: { tabindex: '-1' } });
     nodes.push(heading);
     // Bei manchen Eingaben gehört der Hinweis „Wann ein Gespräch nicht ausreicht“ nach oben,
     // zum Beispiel wenn jemand seit Tagen kaum trinkt.
@@ -514,7 +515,7 @@
     let alsoWrapper = null;
     if (also.length) {
       alsoWrapper = element('div', { className: 'translator-also', attributes: { role: 'group', 'aria-label': 'Weitere Anliegen in deiner Eingabe' } }, [
-        element('p', { className: 'translator-also-title', text: also.length > 1 ? 'Du hast noch mehr beschrieben:' : 'Du hast noch etwas beschrieben:' })
+        element('p', { className: 'translator-also-title', text: result.selfCare ? 'Für das Gespräch mit der Person:' : also.length > 1 ? 'Du hast noch mehr beschrieben:' : 'Du hast noch etwas beschrieben:' })
       ]);
       also.forEach((candidate) => {
         alsoWrapper.append(button(`„${candidate.says}“ →`, 'translator-chip', () => show(candidate, 'also')));
