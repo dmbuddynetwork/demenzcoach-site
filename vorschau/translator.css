@@ -406,6 +406,13 @@ body[data-page-type^="translator"]:not(.translator-answers-seen) .translator-sti
 [data-page-type^="translator"] .consent-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 [data-page-type^="translator"] .consent-button { width: 100%; min-height: 48px; padding: 8px 10px; }
 }
+@media (max-width: 380px) {
+[data-page-type="translator-trainer"] .trainer-situation { font-size: 1.08rem; line-height: 1.28; }
+[data-page-type="translator-trainer"] .trainer-ask { margin-bottom: 6px; font-size: .95rem; }
+[data-page-type="translator-trainer"] .trainer-options { gap: 8px; }
+[data-page-type="translator-trainer"] .trainer-option { padding: 9px 12px; font-size: .98rem; line-height: 1.3; }
+[data-page-type="translator-trainer"] .trainer-progress { margin-bottom: 8px; }
+}
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 .translator-teaser .button-light-outline { color: var(--ink); background: var(--paper); border: 1px solid var(--line); }
