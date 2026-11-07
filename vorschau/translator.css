@@ -377,6 +377,7 @@ body.translator-cta-visible .translator-sticky { display: none !important; }
 [data-page-type="translator-tool"] .translator-result .translator-copy,
   [data-page-type="translator-tool"] .translator-result .text-link { font-size: 1.1rem; }
 [data-page-type="translator-tool"] .translator-result .translator-app-cta p { max-width: none; }
+[data-page-type^="translator"] .translator-app-cta h2, [data-page-type^="translator"] .translator-static-cta h2 { font-size: 1.6rem; line-height: 1.2; }
 }
 [data-page-type^="translator"] .translator-call { gap: .4em; }
 [data-page-type^="translator"] .translator-empty-hint { margin: 8px 0 0; color: #8a2a12; font-weight: 700; font-size: 1.05rem; }
