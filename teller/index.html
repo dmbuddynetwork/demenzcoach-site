@@ -201,7 +201,8 @@
         </div>
         <div class="thanks" role="status">
           <h3>Fast geschafft! 💌</h3>
-          <p>Schau in dein Postfach und tipp auf den Knopf in meiner Mail. Dann kommt die Liste sofort.</p>
+          <p><strong>Alle 5 Tricks sind jetzt unten freigeschaltet.</strong> <a href="#tricks" data-to-tricks>Zu den Tricks ↓</a></p>
+            <p>Damit ich dir die Liste zum Ausdrucken und neue Tricks schicken darf, tipp bitte noch auf den Knopf in meiner Mail.</p>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Postfach öffnen</a>
             <p class="inbox-hint">Die Mail kommt von „Debby vom Demenz Coach“. Nichts da? Schau bitte auch im Spam-Ordner.</p>
           <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">An die Familie weiterschicken</a>
@@ -296,7 +297,8 @@
           </div>
           <div class="thanks" role="status">
             <h3>Fast geschafft! 💌</h3>
-            <p>Schau in dein Postfach und tipp auf den Knopf in meiner Mail. Dann kommt die Liste sofort.</p>
+            <p><strong>Alle 5 Tricks sind jetzt unten freigeschaltet.</strong> <a href="#tricks" data-to-tricks>Zu den Tricks ↓</a></p>
+            <p>Damit ich dir die Liste zum Ausdrucken und neue Tricks schicken darf, tipp bitte noch auf den Knopf in meiner Mail.</p>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Postfach öffnen</a>
             <p class="inbox-hint">Die Mail kommt von „Debby vom Demenz Coach“. Nichts da? Schau bitte auch im Spam-Ordner.</p>
             <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">An die Familie weiterschicken</a>
@@ -473,6 +475,9 @@
         data.append("locale", "de");
         var done = function () {
           box.classList.add("done");
+          // Sofort-Nutzen: alle Tricks direkt auf der Seite freischalten
+          document.body.classList.add("unlocked");
+          document.querySelectorAll(".secret").forEach(function (s) { s.classList.remove("secret"); });
           var dom = input.value.trim().split("@").pop().toLowerCase();
           var link = box.querySelector("[data-inbox]");
           for (var k = 0; link && k < INBOX.length; k++) {
@@ -513,6 +518,14 @@
         setTimeout(function () { var i = document.getElementById("email-1"); if (i) i.focus({ preventScroll: true }); }, 450);
       });
     }
+
+    document.addEventListener("click", function (ev) {
+      var a = ev.target.closest && ev.target.closest("[data-to-tricks]");
+      if (!a) return;
+      ev.preventDefault();
+      var first = document.querySelector("article.locked");
+      if (first) first.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
 
     document.querySelectorAll("[data-print]").forEach(function (b) {
       b.addEventListener("click", function () { window.print(); });
