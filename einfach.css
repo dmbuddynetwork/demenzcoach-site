@@ -146,9 +146,9 @@ body.einfach .e-tile:hover { border-color: var(--e-purple); }
 body.einfach .e-tile:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 2px; }
 body.einfach .e-tile img { display: block; width: 100%; max-width: 180px; height: 130px; object-fit: contain; }
 body.einfach .e-tile span { display: block; }
-body.einfach .e-tiles-more { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 60px; margin-top: 12px; padding: 14px 18px; background: var(--e-lav) !important; color: var(--e-lav-text) !important; border: 0; border-radius: 14px; font: inherit; font-weight: 700; cursor: pointer; }
-body.einfach .e-tiles-more:hover { background: #e2def3 !important; }
-body.einfach .e-tiles-more[hidden] { display: none; }
+body.einfach .e-tiles-more-block { margin-top: 40px; }
+body.einfach h2.e-moments-title { margin: 0 0 12px; font-size: var(--e-size) !important; font-weight: 700 !important; }
+#e-tiles-end { height: 1px; }
 @media (min-width: 720px) {
   body.einfach .e-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   body.einfach .e-tile img { height: 150px; }
@@ -305,3 +305,47 @@ body.einfach .translator-teaser .button { width: 100%; }
 
 /* App-Store-Hinweise nur auf iPhone/iPad (Daniel, 8. Nov): Skript im <head> setzt html.app-check und html.is-ios. */
 html.app-check:not(.is-ios) :is(.e-app, .translator-app-cta, .translator-static-cta, .e-header nav a[href*="apps.apple.com"]) { display: none !important; }
+
+/* ---------- Ziel-Frage vor der Antwort (wie in der App, Daniel 8. Nov) ---------- */
+body.einfach .translator-goal-question { margin: 8px 0 12px; font-weight: 600; }
+body.einfach .translator-goals { display: grid; gap: 12px; }
+body.einfach .translator-goal { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 64px; margin: 0; padding: 14px 20px; background: var(--e-purple) !important; color: #fff !important; border: 0 !important; border-radius: 14px !important; font: inherit; font-weight: 700 !important; text-align: center; cursor: pointer; box-shadow: none !important; }
+body.einfach .translator-goal:hover { background: var(--e-purple-dark) !important; }
+body.einfach .translator-goal::after { content: none !important; }
+body.einfach .translator-goal-chosen { margin: 0 0 12px; color: var(--e-muted) !important; font-size: var(--e-small) !important; }
+body.einfach .translator-other-goals { display: grid; gap: 10px; margin-top: 12px; }
+body.einfach .translator-goal-list { margin: 4px 0 12px; padding-left: 22px !important; }
+body.einfach .translator-goal-list li { margin: 0 0 6px; }
+
+/* Anrede direkt über den Sätzen; die Felder für Namen öffnen über „Namen einsetzen“. */
+body.einfach .translator-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+body.einfach .translator-quick > span { color: var(--e-muted); }
+body.einfach .translator-quick .translator-chip { width: auto; min-height: 44px; padding: 8px 16px; }
+body.einfach .translator-quick .translator-chip::after { content: none !important; }
+body.einfach .translator-quick .translator-chip[aria-pressed="true"] { background: var(--e-purple) !important; color: #fff !important; }
+body.einfach .translator-personal-quiet:not([open]) { display: none !important; }
+body.einfach .translator-personal-quiet > summary { display: none !important; }
+body.einfach .translator-personal-quiet .translator-personal-body { margin-top: 0; }
+
+/* Sätze merken */
+body.einfach .translator-phrase .translator-save { flex: 0 0 auto; align-self: center; }
+body.einfach .translator-save { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin: 0; padding: 6px 12px; background: var(--e-card) !important; color: var(--e-lav-text) !important; border: 1px solid var(--e-line) !important; border-radius: 999px !important; font: inherit; font-size: var(--e-small) !important; font-weight: 700; cursor: pointer; box-shadow: none !important; }
+body.einfach .translator-save[aria-pressed="true"] { background: var(--e-lav) !important; border-color: var(--e-lav) !important; }
+body.einfach .translator-save::after { content: none !important; }
+body.einfach .translator-saved { margin: 24px 0 8px; padding: 20px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+body.einfach .translator-saved[hidden] { display: none; }
+body.einfach .translator-saved h2 { margin: 0 0 12px; }
+body.einfach .translator-saved .translator-phrases { display: grid; gap: 10px; }
+body.einfach .translator-saved .translator-privacy { margin: 12px 0 0; }
+
+/* Ruhiger Sicherheitshinweis bei normalen Antworten: kleiner Text, Nummern als schlichte Links. */
+body.einfach .safety-note.safety-quiet { padding: 16px 0 0 !important; background: none !important; border: 0 !important; border-top: 1px solid var(--e-line) !important; border-radius: 0 !important; color: var(--e-muted) !important; }
+body.einfach .safety-quiet, body.einfach .safety-quiet * { font-size: var(--e-small) !important; }
+body.einfach .safety-quiet strong { color: var(--e-text); margin-bottom: 2px; }
+body.einfach .translator-call-link { color: inherit !important; font-weight: 700; white-space: nowrap; }
+/* Handy: „Merken“ unter den Satz (rechts), damit der Satz die ganze Breite behält. */
+@media (max-width: 719px) {
+  body.einfach .translator-phrase:has(> .translator-save) { flex-wrap: wrap; }
+  body.einfach .translator-phrase:has(> .translator-save) > q { flex: 1 1 calc(100% - 40px); }
+  body.einfach .translator-phrase > .translator-save { margin-left: auto; min-height: 40px; }
+}

@@ -302,6 +302,93 @@
     return details;
   };
 
+  // Ziel-Frage vor der Antwort wie in der App (Daniel, 8. Nov 16:32: „Vor der Antwort wie in der App“).
+  // Drei Ziele je Situation, das erste nach der Situation benannt, eines immer praktische Tipps.
+  // Die Antwort selbst bleibt die geprüfte feste Antwort; das Ziel bestimmt, was zuerst und ausführlich kommt.
+  // Keine Ziel-Frage bei Sicherheitshinweisen, Entlastung, Gefühlen, geteilten Links und auf anderen Sprachen.
+  const goalNow = {
+    nachhause: 'Jetzt beruhigen', waschen: 'Jetzt fürs Waschen gewinnen', schongegessen: 'Jetzt zum Essen bewegen',
+    hunger: 'Jetzt beim Essen beruhigen', abend: 'Jetzt am Abend beruhigen', auto: 'Jetzt ohne Streit reagieren',
+    mutter: 'Jetzt liebevoll antworten', wer: 'Jetzt ruhig reagieren', geld: 'Jetzt den Vorwurf entschärfen',
+    arbeit: 'Jetzt beruhigen', bett: 'Jetzt ins Bett begleiten', wobin: 'Jetzt Sicherheit geben', uhrzeit: 'Jetzt beruhigen',
+    luegen: 'Jetzt den Vorwurf entschärfen', jemand: 'Jetzt Sicherheit geben', ruhe: 'Jetzt Ruhe und Abstand geben',
+    tabletten: 'Jetzt ohne Druck reagieren', heim: 'Jetzt Sicherheit geben', eingesperrt: 'Jetzt Sicherheit geben',
+    kinder: 'Jetzt liebevoll antworten', partner: 'Jetzt liebevoll antworten', besuch: 'Jetzt das Warten leichter machen',
+    vergiftet: 'Jetzt Vertrauen ins Essen geben', krank: 'Jetzt ohne Streit reagieren', dumm: 'Jetzt trösten und Mut machen',
+    langweilig: 'Jetzt etwas Schönes zusammen tun', allein: 'Jetzt Nähe geben', aufstehen: 'Jetzt beruhigen',
+    liegen: 'Jetzt zum Aufstehen gewinnen', umziehen: 'Jetzt fürs Umziehen gewinnen', ausziehen: 'Jetzt ruhig reagieren',
+    toilette: 'Jetzt zur Toilette begleiten', einkaufen: 'Jetzt beruhigen', anrufen: 'Jetzt beruhigen',
+    nachbarn: 'Jetzt Sicherheit geben', haustier: 'Jetzt liebevoll antworten', kalt: 'Jetzt für Wärme sorgen',
+    untreue: 'Jetzt den Vorwurf entschärfen', kind: 'Jetzt helfen, ohne zu bevormunden', tagespflege: 'Jetzt für die Tagespflege gewinnen'
+  };
+  const goalsFor = (entry) => {
+    if (ui || !entry || entry.safetyOnly || entry.selfCare || entry.feeling || !entry.phrases?.length) return null;
+    return [
+      { id: 'jetzt', label: goalNow[entry.key] ?? 'Jetzt die richtigen Worte finden' },
+      { id: 'verstehen', label: 'Verstehen, was dahintersteckt' },
+      { id: 'tipps', label: 'Tipps, damit es leichter wird' }
+    ];
+  };
+  const askGoal = (entry, options = {}) => {
+    const goals = goalsFor(entry);
+    if (!goals) { render(entry, options); return; }
+    const heading = element('h2', { text: `„${entry.says}“`, attributes: { tabindex: '-1' } });
+    output.replaceChildren(...[
+      options.typed && core.normalize(options.typed) !== core.normalize(entry.says ?? '') ? element('p', { className: 'translator-echo', text: `Deine Eingabe: „${options.typed}“` }) : null,
+      heading,
+      element('p', { className: 'translator-goal-question', text: 'Was möchtest du jetzt erreichen?' }),
+      element('div', { className: 'translator-goals', attributes: { role: 'group', 'aria-label': 'Dein Ziel' } }, goals.map((goal) => button(goal.label, 'translator-goal', () => {
+        track('translator_goal', { goal: goal.id, result_key: entry.key });
+        render(entry, { ...options, goal: goal.id });
+      })))
+    ].filter(Boolean));
+    output.hidden = false;
+    document.body.classList.add('translator-has-result');
+    heading.focus({ preventScroll: true });
+    output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  };
+
+  // Sätze merken (Daniel, 8. Nov): nur in diesem Browser (translator-saved.js), nur Sätze aus den festen Antworten.
+  const savedStore = window.DemenzSavedPhrases ?? null;
+  let saveButtons = [];
+  const saveButton = (result, original) => {
+    if (!savedStore || ui || result.selfCare || !result.key) return null;
+    const item = { key: result.key, says: result.says || '', text: original };
+    const node = button('', 'translator-save', () => {
+      const on = savedStore.toggle(item);
+      track('translator_save', { step: on ? 'saved' : 'removed', result_key: result.key });
+    });
+    const set = (on) => {
+      node.setAttribute('aria-pressed', String(on));
+      node.setAttribute('aria-label', on ? 'Gemerkt – nicht mehr merken' : 'Satz merken');
+      node.replaceChildren(element('span', { text: on ? '♥' : '♡', attributes: { 'aria-hidden': 'true' } }), ` ${on ? 'Gemerkt' : 'Merken'}`);
+    };
+    set(savedStore.has(item));
+    saveButtons.push({ node, item, set });
+    return node;
+  };
+  const savedBox = document.getElementById('translator-saved');
+  const renderSaved = () => {
+    saveButtons = saveButtons.filter(({ node }) => node.isConnected);
+    saveButtons.forEach(({ item, set }) => set(savedStore.has(item)));
+    if (!savedBox || !savedStore) return;
+    const items = savedStore.list();
+    savedBox.hidden = !items.length;
+    if (!items.length) { savedBox.replaceChildren(); return; }
+    savedBox.replaceChildren(
+      element('h2', { text: 'Meine Sätze' }),
+      element('div', { className: 'translator-phrases' }, items.map((item) => element('div', { className: 'translator-phrase translator-saved-phrase' }, [
+        element('q', { text: core.personalize(item.text, personal, data.formal) }),
+        button('Entfernen', 'translator-save', () => {
+          savedStore.remove(item);
+          track('translator_save', { step: 'removed_list', result_key: item.key });
+        })
+      ]))),
+      element('p', { className: 'translator-privacy', text: 'Nur auf diesem Gerät gespeichert.' })
+    );
+  };
+  savedStore?.onChange(renderSaved);
+
   // Gefühle als eigene Ergebnisse: Einstieg, wenn ein Satz unbekannt ist oder nicht passt.
   const feelingEntries = new Map((data.feelings ?? []).map((feeling) => [feeling.id, {
     key: `gefuehl-${feeling.id}`,
@@ -369,6 +456,19 @@
     const target = urgent && (urgent.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING) ? urgent : heading;
     if (target === urgent) urgent.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
+  };
+  // Nummern im Text als schlichte Links (tel:), ohne roten Knopf.
+  const quietCalls = (text) => {
+    const span = element('span');
+    let restText = text;
+    while (restText) {
+      const hits = callNumbers.map((call) => ({ call, match: call.pattern.exec(restText) })).filter(({ match }) => match).sort((a, b) => a.match.index - b.match.index);
+      if (!hits.length) { span.append(restText); break; }
+      const { call, match } = hits[0];
+      span.append(restText.slice(0, match.index), element('a', { className: 'translator-call-link', text: match[0], attributes: { href: `tel:${call.tel}` } }));
+      restText = restText.slice(match.index + match[0].length);
+    }
+    return span;
   };
   const urgentNote = (text, lead = '') => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
     // Im Notfall zuerst die Knöpfe zum Anrufen (112 immer vorn), dann die Erklärung.
@@ -609,7 +709,7 @@
 
   const moodLead = ui?.moodLead ?? { wut: 'Zuerst beruhigen', trauer: 'Zuerst trösten', angst: 'Zuerst Sicherheit geben' };
 
-  const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null } = {}) => {
+  const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null, goal = '' } = {}) => {
     if (!entry) {
       renderUnknown({ safetyHit, typed });
       return;
@@ -643,10 +743,12 @@
       && (result.safetyFirst ?? []).some((cue) => typedNormalized.includes(` ${cue}`));
     // Runde 197: Oben steht der Hinweis unter der kurzen Überschrift „Erst die Sicherheit“ (eine Zeile statt zwei),
     // damit der erste Satz auf dem Handy näher rückt. Unten bleibt „Wann ein Gespräch nicht ausreicht“.
-    const safetyAside = (first = false) => element('aside', { className: first ? 'safety-note safety-first' : 'safety-note' }, [
+    // Normale Antworten: Hinweis ruhig als kleiner Text mit antippbaren Nummern (Daniel, 8. Nov: „Notruf/Polizei
+    // nicht so krass verlinken“). Echte Notfälle (safety-urgent, „Erst die Sicherheit“) behalten die Anruf-Knöpfe.
+    const safetyAside = (first = false) => element('aside', { className: first ? 'safety-note safety-first' : 'safety-note safety-quiet' }, [
       element('strong', { text: first ? 'Erst die Sicherheit' : 'Wann ein Gespräch nicht ausreicht' }),
-      element('span', { text: result.safety }),
-      safetyCalls(result.safety)
+      first ? element('span', { text: result.safety }) : quietCalls(result.safety),
+      first ? safetyCalls(result.safety) : null
     ]);
     if (safetyFirst) nodes.push(safetyAside(true));
     // Weitere Anliegen kommen direkt nach den Sätzen: Der erste Satz zum Ausprobieren bleibt auf dem Handy oben.
@@ -675,17 +777,37 @@
     // Wie in der App: Erklärung, Sätze und der nächste Schritt stehen zusammen in EINER Karte.
     const answerCard = element('div', { className: 'translator-answer' });
     nodes.push(answerCard);
+    const goals = goal ? goalsFor(result) : null;
+    const chosenGoal = goals?.find((candidate) => candidate.id === goal) ?? null;
+    // Gewähltes Ziel als ruhige graue Zeile oben in der Karte (wie in der App, nie wie ein Knopf).
+    if (chosenGoal) answerCard.append(element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }));
     // Passende Zeichnung oben in der Karte (nur wenn die Seite eine mitliefert, siehe answer-drawings.json).
     if (result.image && !result.safetyOnly && !result.selfCare) {
       answerCard.append(element('img', { className: 'translator-answer-art', attributes: { src: result.image, alt: '', width: String(result.imageWidth ?? 480), height: String(result.imageHeight ?? 400), decoding: 'async' } }));
     }
+    // Bausteine der Karte; die Reihenfolge richtet sich nach dem Ziel.
+    const meaningBlock = [];
     if (lead) {
-      answerCard.append(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
-      answerCard.append(element('p', { className: 'translator-meaning', text: lead }));
+      meaningBlock.push(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
+      meaningBlock.push(element('p', { className: 'translator-meaning', text: lead }));
+      // Ziel „Verstehen“: Hintergrund und mögliche Gründe direkt in der Karte statt in einer Klappe.
+      if (goal === 'verstehen') {
+        if (rest) meaningBlock.push(element('p', { className: 'translator-meaning', text: rest }));
+        if (result.meanings?.length) meaningBlock.push(element('ul', { className: 'translator-goal-list' }, result.meanings.map((item) => element('li', { text: item }))));
+      }
     }
+    const phraseBlock = [];
+    const doBlock = [];
+    let panel = null;
     if (result.phrases.length) {
-      answerCard.append(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
+      phraseBlock.push(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
       const phraseList = element('div', { className: 'translator-phrases' });
+      // Anrede direkt über den Sätzen (Daniel, 8. Nov: Personalisieren sichtbar statt in einer Klappe).
+      let quickToggles = [];
+      const syncQuick = () => {
+        quickToggles.forEach((toggle, index) => toggle.setAttribute('aria-pressed', String(Boolean(index) === personal.formal)));
+        panel?.querySelectorAll('.translator-personal-toggle .translator-chip').forEach((toggle, index) => toggle.setAttribute('aria-pressed', String(Boolean(index) === personal.formal)));
+      };
       const paint = () => {
         // Bei Wut, Tränen oder Angst kommt zuerst ein kurzer beruhigender Satz.
         const first = mood && mood.phrases?.length ? [{ original: mood.phrases[0], lead: moodLead[mood.id] }] : [];
@@ -699,23 +821,67 @@
           return element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : exampleHint ? 'translator-phrase translator-phrase-example' : 'translator-phrase' }, [
             lead ? element('span', { className: 'translator-mood-lead', text: lead }) : null,
             exampleHint ? element('span', { className: 'translator-example-name', text: '„Anna“ ist ein Beispiel – trag unten deinen Namen ein.' }) : null,
-            element('q', { text })
+            element('q', { text }),
+            saveButton(result, original)
           ]);
         }));
+        syncQuick();
       };
+      const repaint = () => { paint(); retry?.refresh(); renderSaved(); };
+      if (!result.selfCare && ui?.formality !== false && !ui) {
+        const quick = element('div', { className: 'translator-quick', attributes: { role: 'group', 'aria-label': 'Anrede' } }, [element('span', { text: 'Anrede:' })]);
+        quickToggles = [false, true].map((formal) => {
+          const toggle = button(formal ? 'Sie' : 'du', 'translator-chip', () => {
+            personal.formal = formal;
+            trackPersonal('formal');
+            repaint();
+          }, { 'aria-pressed': String(personal.formal === formal) });
+          quick.append(toggle);
+          return toggle;
+        });
+        quick.append(button('Namen einsetzen', 'translator-chip translator-quick-name', () => {
+          if (!panel) return;
+          panel.open = true;
+          panel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+          panel.querySelector('input')?.focus({ preventScroll: true });
+        }));
+        phraseBlock.push(quick);
+      }
       paint();
+      phraseBlock.push(phraseList);
       // Auf dem Handy muss der erste Satz ohne Scrollen sichtbar sein: Sätze zuerst, Anpassen und Erklärung danach.
       const usesExampleName = result.phrases.some((original) => /\bAnna\b/.test(original));
       // Runde 198: Wie bei der KI-Antwort (und in der App) ein konkreter Schritt direkt unter den Sätzen.
       const doNow = !result.selfCare && !result.safetyOnly && result.next?.length ? result.next[0] : '';
-      const doNodes = doNow ? [
-        element('h3', { className: 'translator-step', text: 'Das kannst du tun' }),
-        element('p', { className: 'translator-meaning translator-do', text: doNow })
-      ] : [];
-      answerCard.append(phraseList, ...doNodes);
-      nodes.push(alsoWrapper, result.selfCare ? null : personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
+      if (goal === 'tipps' && result.next?.length) {
+        // Ziel „Tipps“: alle Tipps und „Eher vermeiden“ direkt in der Karte.
+        doBlock.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
+        doBlock.push(element('ul', { className: 'translator-goal-list' }, result.next.map((item) => element('li', { text: item }))));
+        if (result.avoid?.length) {
+          doBlock.push(element('h3', { className: 'translator-step', text: 'Eher vermeiden' }));
+          doBlock.push(element('ul', { className: 'translator-goal-list' }, result.avoid.map((item) => element('li', { text: item }))));
+        }
+      } else if (doNow) {
+        doBlock.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
+        doBlock.push(element('p', { className: 'translator-meaning translator-do', text: doNow }));
+      }
+      panel = result.selfCare ? null : personalPanel(repaint, { open: usesExampleName });
+      // Mit der Anrede-Zeile in der Karte braucht es keine zweite Zeile „Sätze persönlich machen“: Die Felder öffnen über „Namen einsetzen“.
+      if (panel && phraseBlock.some((node) => node.classList?.contains('translator-quick'))) panel.classList.add('translator-personal-quiet');
+      nodes.push(alsoWrapper, panel);
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
+    }
+    const order = goal === 'jetzt' ? [phraseBlock, doBlock, meaningBlock]
+      : goal === 'tipps' ? [doBlock, phraseBlock, meaningBlock]
+        : [meaningBlock, phraseBlock, doBlock];
+    answerCard.append(...order.flat());
+    // Die anderen Ziele bleiben unter der Antwort antippbar (wie in der App, helle Zeilen).
+    if (chosenGoal) {
+      nodes.push(element('div', { className: 'translator-other-goals', attributes: { role: 'group', 'aria-label': 'Anderes Ziel' } }, goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {
+        track('translator_goal', { goal: candidate.id, result_key: result.key, step: 'switch' });
+        render(result, { safetyHit, alternatives, also, typed, mood, goal: candidate.id });
+      }))));
     }
     if (retry) nodes.push(retry.toggle, retry.block);
 
@@ -726,7 +892,9 @@
       intro ? element('p', { text: intro }) : null,
       items.length ? element('ul', {}, items.map((item) => element('li', { text: item }))) : null
     ] : []);
-    const moreContent = [
+    // Mit Ziel stehen Hintergrund und Tipps hinter den anderen Ziel-Zeilen: keine zusätzliche Klappe
+    // (Daniel, 8. Nov: „‚Mehr dazu‘ ist komisch“). Ohne Ziel (geteilter Link) heißt die Klappe klarer.
+    const moreContent = chosenGoal ? [] : [
       ...section(rest ? 'Hintergrund' : 'Weitere mögliche Gründe', result.meanings ?? [], rest),
       ...section('Eher vermeiden', result.avoid ?? [], result.avoid?.length ? 'Eher ungünstig ist es,' : ''),
       ...section('Was danach helfen kann', !result.selfCare && !result.safetyOnly && result.phrases.length ? (result.next ?? []).slice(1) : (result.next ?? []))
@@ -740,7 +908,7 @@
     if (moreContent.length) {
       nodes.push(element('div', { className: 'translator-more-group' }, [
         element('details', { className: 'translator-more' }, [
-          element('summary', { text: 'Mehr dazu' }),
+          element('summary', { text: 'Hintergrund und weitere Tipps' }),
           ...moreContent,
           deeper.length ? element('div', { className: 'translator-result-links translator-more-links' }, deeper) : null
         ].filter(Boolean))
@@ -792,7 +960,7 @@
   function show(entry, source) {
     input.value = entry.says;
     grow();
-    render(entry);
+    askGoal(entry);
     setHash(entry.key);
     track('translator_result', { result_key: entry.key, input_source: source, safety_hint: 'no' });
   }
@@ -825,7 +993,7 @@
       return;
     }
     const knownPhrase = entry && entry.says === text;
-    render(entry, { safetyHit, alternatives, also, mood, typed: knownPhrase ? '' : text });
+    (safetyHit ? render : askGoal)(entry, { safetyHit, alternatives, also, mood, typed: knownPhrase ? '' : text });
     setHash(entry?.key);
     track('translator_result', { result_key: entry?.key ?? 'none', input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no', multiple: also.length ? 'yes' : 'no', mood: mood?.id ?? 'none' });
   });
@@ -859,6 +1027,7 @@
   };
   openFromHash();
   window.addEventListener('hashchange', openFromHash);
+  renderSaved();
 
   // Zurück von Kasse oder Anmeldung: den gemerkten Satz (nur sessionStorage dieses Tabs) gleich übersetzen.
   const pendingSentence = window.DemenzKiFreigabe?.takePending();

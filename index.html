@@ -132,51 +132,17 @@
           <p class="translator-privacy e-privacy" id="translator-privacy-note">Es gelten <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a> und <a href="/datenschutz.html#ki-uebersetzer">Datenschutz</a> (inkl. KI).</p>
         </form>
         <div id="translator-result" class="translator-result" hidden></div>
+        <section id="translator-saved" class="translator-saved" aria-label="Meine Sätze" hidden></section>
         <div class="e-moments-block e-tiles-block">
           <p class="e-moments-title">Oder tippe auf eine Situation:</p>
-          <ul class="e-tiles" id="e-tiles" role="list">
+          <ul class="e-tiles" role="list">
             <li><button type="button" class="e-tile" data-translator-key="nachhause"><img src="/assets/zeichnungen/nach-hause.webp" width="480" height="664" alt="" decoding="async"><span>Will nach Hause</span></button></li>
             <li><button type="button" class="e-tile" data-translator-key="waschen"><img src="/assets/zeichnungen/tuch-mama.webp" width="480" height="505" alt="" decoding="async"><span>Will nicht duschen</span></button></li>
             <li><button type="button" class="e-tile" data-translator-key="schongegessen"><img src="/assets/zeichnungen/together.webp" width="480" height="284" alt="" loading="lazy" decoding="async"><span>Will nichts essen</span></button></li>
             <li><button type="button" class="e-tile" data-translator-key="abend"><img src="/assets/zeichnungen/sunset.webp" width="480" height="382" alt="" loading="lazy" decoding="async"><span>Unruhig am Abend</span></button></li>
             <li><button type="button" class="e-tile" data-translator-key="auto"><img src="/assets/zeichnungen/car.webp" width="480" height="384" alt="" loading="lazy" decoding="async"><span>Will Auto fahren</span></button></li>
             <li><button type="button" class="e-tile" data-translator-key="mutter"><img src="/assets/zeichnungen/s-dead.webp" width="480" height="411" alt="" loading="lazy" decoding="async"><span>Fragt nach der Mutter</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="wer"><img src="/assets/zeichnungen/s-recognize.webp" width="480" height="402" alt="" loading="lazy" decoding="async"><span>Erkennt mich nicht</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="geld"><img src="/assets/zeichnungen/s-money.webp" width="480" height="396" alt="" loading="lazy" decoding="async"><span>Sagt, Geld wurde gestohlen</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="arbeit"><img src="/assets/zeichnungen/work.webp" width="480" height="486" alt="" loading="lazy" decoding="async"><span>Will zur Arbeit</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="bett"><img src="/assets/zeichnungen/s-evening.webp" width="480" height="458" alt="" loading="lazy" decoding="async"><span>Will nicht ins Bett</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="wobin"><img src="/assets/zeichnungen/uhr-mama.webp" width="480" height="443" alt="" loading="lazy" decoding="async"><span>Fragt: Wo bin ich?</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="uhrzeit"><img src="/assets/zeichnungen/s-coat.webp" width="480" height="471" alt="" loading="lazy" decoding="async"><span>Will ständig los</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="luegen"><img src="/assets/zeichnungen/s-accuse.webp" width="480" height="501" alt="" loading="lazy" decoding="async"><span>Sagt, ich lüge</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="jemand"><img src="/assets/zeichnungen/s-fear.webp" width="480" height="413" alt="" loading="lazy" decoding="async"><span>Sieht jemanden im Zimmer</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="ruhe"><img src="/assets/zeichnungen/wuetend-ruhig.webp" width="480" height="319" alt="" loading="lazy" decoding="async"><span>Will in Ruhe gelassen werden</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="tabletten"><img src="/assets/zeichnungen/s-meds.webp" width="480" height="270" alt="" loading="lazy" decoding="async"><span>Will keine Tabletten</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="heim"><img src="/assets/zeichnungen/leave.webp" width="480" height="585" alt="" loading="lazy" decoding="async"><span>Will nicht ins Heim</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="eingesperrt"><img src="/assets/zeichnungen/tuer-hall.webp" width="480" height="264" alt="" loading="lazy" decoding="async"><span>Fühlt sich eingesperrt</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="kinder"><img src="/assets/zeichnungen/child.webp" width="480" height="453" alt="" loading="lazy" decoding="async"><span>Sucht die Kinder</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="partner"><img src="/assets/zeichnungen/paywall-fotoalbum.webp" width="480" height="322" alt="" loading="lazy" decoding="async"><span>Sucht den Partner</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="besuch"><img src="/assets/zeichnungen/visit.webp" width="480" height="430" alt="" loading="lazy" decoding="async"><span>Wartet auf Besuch</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="hunger"><img src="/assets/zeichnungen/together.webp" width="480" height="284" alt="" loading="lazy" decoding="async"><span>Sagt, es gab nichts zu essen</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="vergiftet"><img src="/assets/zeichnungen/plates.webp" width="480" height="147" alt="" loading="lazy" decoding="async"><span>Glaubt, das Essen ist vergiftet</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="krank"><img src="/assets/zeichnungen/words.webp" width="480" height="424" alt="" loading="lazy" decoding="async"><span>Sagt: Ich bin nicht dement</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="dumm"><img src="/assets/zeichnungen/s-cry.webp" width="480" height="454" alt="" loading="lazy" decoding="async"><span>Fühlt sich nutzlos</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="langweilig"><img src="/assets/zeichnungen/s-apathy.webp" width="480" height="334" alt="" loading="lazy" decoding="async"><span>Langweilt sich</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="allein"><img src="/assets/zeichnungen/v-haende.webp" width="480" height="408" alt="" loading="lazy" decoding="async"><span>Will nicht allein sein</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="aufstehen"><img src="/assets/zeichnungen/getup.webp" width="480" height="399" alt="" loading="lazy" decoding="async"><span>Will sofort aufstehen</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="liegen"><img src="/assets/zeichnungen/nacht-room.webp" width="480" height="292" alt="" loading="lazy" decoding="async"><span>Will im Bett bleiben</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="umziehen"><img src="/assets/zeichnungen/lied-refuse.webp" width="480" height="330" alt="" loading="lazy" decoding="async"><span>Will sich nicht umziehen</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="ausziehen"><img src="/assets/zeichnungen/trick-kleidung.webp" width="480" height="890" alt="" loading="lazy" decoding="async"><span>Zieht sich aus</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="toilette"><img src="/assets/zeichnungen/wc-mama.webp" width="480" height="767" alt="" loading="lazy" decoding="async"><span>Will nicht aufs Klo</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="einkaufen"><img src="/assets/zeichnungen/s-keys.webp" width="480" height="421" alt="" loading="lazy" decoding="async"><span>Will einkaufen gehen</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="anrufen"><img src="/assets/zeichnungen/v-handy.webp" width="480" height="629" alt="" loading="lazy" decoding="async"><span>Will sofort telefonieren</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="nachbarn"><img src="/assets/zeichnungen/noise.webp" width="480" height="422" alt="" loading="lazy" decoding="async"><span>Misstraut den Nachbarn</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="haustier"><img src="/assets/zeichnungen/v-garten.webp" width="480" height="442" alt="" loading="lazy" decoding="async"><span>Sucht das Haustier</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="kalt"><img src="/assets/zeichnungen/s-cold.webp" width="480" height="349" alt="" loading="lazy" decoding="async"><span>Friert ständig</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="untreue"><img src="/assets/zeichnungen/s-jealous.webp" width="480" height="654" alt="" loading="lazy" decoding="async"><span>Wirft mir Untreue vor</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="kind"><img src="/assets/zeichnungen/accuse.webp" width="480" height="379" alt="" loading="lazy" decoding="async"><span>Fühlt sich bevormundet</span></button></li>
-            <li hidden><button type="button" class="e-tile" data-translator-key="tagespflege"><img src="/assets/zeichnungen/daycare.webp" width="480" height="455" alt="" loading="lazy" decoding="async"><span>Will nicht zur Tagespflege</span></button></li>
           </ul>
-          <button type="button" class="e-tiles-more" id="e-tiles-more">Weitere Situationen zeigen</button>
         </div>
         <noscript><p>Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der <a href="/demenz-uebersetzer/">Übersicht</a>.</p></noscript>
         <div class="e-offers">
@@ -197,6 +163,46 @@
             <p class="e-muted">Mit allen Antworten, als Liste für den Kühlschrank. Kostenlos per E-Mail.</p>
             <div id="home-signup"></div>
           </section>
+        </div>
+        <div class="e-moments-block e-tiles-block e-tiles-more-block">
+          <h2 class="e-moments-title" id="e-tiles-more-title">Weitere Situationen</h2>
+          <ul class="e-tiles" id="e-tiles" role="list" aria-labelledby="e-tiles-more-title">
+            <li><button type="button" class="e-tile" data-translator-key="wer"><img src="/assets/zeichnungen/s-recognize.webp" width="480" height="402" alt="" loading="lazy" decoding="async"><span>Erkennt mich nicht</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="geld"><img src="/assets/zeichnungen/s-money.webp" width="480" height="396" alt="" loading="lazy" decoding="async"><span>Sagt, Geld wurde gestohlen</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="arbeit"><img src="/assets/zeichnungen/work.webp" width="480" height="486" alt="" loading="lazy" decoding="async"><span>Will zur Arbeit</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="bett"><img src="/assets/zeichnungen/s-evening.webp" width="480" height="458" alt="" loading="lazy" decoding="async"><span>Will nicht ins Bett</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="wobin"><img src="/assets/zeichnungen/uhr-mama.webp" width="480" height="443" alt="" loading="lazy" decoding="async"><span>Fragt: Wo bin ich?</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="uhrzeit"><img src="/assets/zeichnungen/s-coat.webp" width="480" height="471" alt="" loading="lazy" decoding="async"><span>Will ständig los</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="luegen"><img src="/assets/zeichnungen/s-accuse.webp" width="480" height="501" alt="" loading="lazy" decoding="async"><span>Sagt, ich lüge</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="jemand"><img src="/assets/zeichnungen/s-fear.webp" width="480" height="413" alt="" loading="lazy" decoding="async"><span>Sieht jemanden im Zimmer</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="ruhe"><img src="/assets/zeichnungen/wuetend-ruhig.webp" width="480" height="319" alt="" loading="lazy" decoding="async"><span>Will in Ruhe gelassen werden</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="tabletten"><img src="/assets/zeichnungen/s-meds.webp" width="480" height="270" alt="" loading="lazy" decoding="async"><span>Will keine Tabletten</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="heim"><img src="/assets/zeichnungen/leave.webp" width="480" height="585" alt="" loading="lazy" decoding="async"><span>Will nicht ins Heim</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="eingesperrt"><img src="/assets/zeichnungen/tuer-hall.webp" width="480" height="264" alt="" loading="lazy" decoding="async"><span>Fühlt sich eingesperrt</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="kinder"><img src="/assets/zeichnungen/child.webp" width="480" height="453" alt="" loading="lazy" decoding="async"><span>Sucht die Kinder</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="partner"><img src="/assets/zeichnungen/paywall-fotoalbum.webp" width="480" height="322" alt="" loading="lazy" decoding="async"><span>Sucht den Partner</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="besuch"><img src="/assets/zeichnungen/visit.webp" width="480" height="430" alt="" loading="lazy" decoding="async"><span>Wartet auf Besuch</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="hunger"><img src="/assets/zeichnungen/together.webp" width="480" height="284" alt="" loading="lazy" decoding="async"><span>Sagt, es gab nichts zu essen</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="vergiftet"><img src="/assets/zeichnungen/plates.webp" width="480" height="147" alt="" loading="lazy" decoding="async"><span>Glaubt, das Essen ist vergiftet</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="krank"><img src="/assets/zeichnungen/words.webp" width="480" height="424" alt="" loading="lazy" decoding="async"><span>Sagt: Ich bin nicht dement</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="dumm"><img src="/assets/zeichnungen/s-cry.webp" width="480" height="454" alt="" loading="lazy" decoding="async"><span>Fühlt sich nutzlos</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="langweilig"><img src="/assets/zeichnungen/s-apathy.webp" width="480" height="334" alt="" loading="lazy" decoding="async"><span>Langweilt sich</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="allein"><img src="/assets/zeichnungen/v-haende.webp" width="480" height="408" alt="" loading="lazy" decoding="async"><span>Will nicht allein sein</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="aufstehen"><img src="/assets/zeichnungen/getup.webp" width="480" height="399" alt="" loading="lazy" decoding="async"><span>Will sofort aufstehen</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="liegen"><img src="/assets/zeichnungen/nacht-room.webp" width="480" height="292" alt="" loading="lazy" decoding="async"><span>Will im Bett bleiben</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="umziehen"><img src="/assets/zeichnungen/lied-refuse.webp" width="480" height="330" alt="" loading="lazy" decoding="async"><span>Will sich nicht umziehen</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="ausziehen"><img src="/assets/zeichnungen/trick-kleidung.webp" width="480" height="890" alt="" loading="lazy" decoding="async"><span>Zieht sich aus</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="toilette"><img src="/assets/zeichnungen/wc-mama.webp" width="480" height="767" alt="" loading="lazy" decoding="async"><span>Will nicht aufs Klo</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="einkaufen"><img src="/assets/zeichnungen/s-keys.webp" width="480" height="421" alt="" loading="lazy" decoding="async"><span>Will einkaufen gehen</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="anrufen"><img src="/assets/zeichnungen/v-handy.webp" width="480" height="629" alt="" loading="lazy" decoding="async"><span>Will sofort telefonieren</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="nachbarn"><img src="/assets/zeichnungen/noise.webp" width="480" height="422" alt="" loading="lazy" decoding="async"><span>Misstraut den Nachbarn</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="haustier"><img src="/assets/zeichnungen/v-garten.webp" width="480" height="442" alt="" loading="lazy" decoding="async"><span>Sucht das Haustier</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="kalt"><img src="/assets/zeichnungen/s-cold.webp" width="480" height="349" alt="" loading="lazy" decoding="async"><span>Friert ständig</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="untreue"><img src="/assets/zeichnungen/s-jealous.webp" width="480" height="654" alt="" loading="lazy" decoding="async"><span>Wirft mir Untreue vor</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="kind"><img src="/assets/zeichnungen/accuse.webp" width="480" height="379" alt="" loading="lazy" decoding="async"><span>Fühlt sich bevormundet</span></button></li>
+            <li><button type="button" class="e-tile" data-translator-key="tagespflege"><img src="/assets/zeichnungen/daycare.webp" width="480" height="455" alt="" loading="lazy" decoding="async"><span>Will nicht zur Tagespflege</span></button></li>
+          </ul>
+          <div id="e-tiles-end" aria-hidden="true"></div>
         </div>
       </div>
     </section>
@@ -220,10 +226,11 @@
   <script src="/demenz-uebersetzer/translator-core.js"></script>
   <script src="/demenz-uebersetzer/translator-ai.js"></script>
   <script src="/demenz-uebersetzer/translator-signup.js"></script>
+  <script src="/demenz-uebersetzer/translator-saved.js"></script>
   <script src="/abo/abo-config.js"></script>
   <script src="/abo/ki-freigabe.js"></script>
   <script src="/demenz-uebersetzer/translator.js"></script>
-  <script>(function(){var list=document.getElementById('e-tiles'),more=document.getElementById('e-tiles-more');if(!list||!more)return;var step=6;function rest(){return list.querySelectorAll('li[hidden]');}function reveal(){var h=rest();for(var i=0;i<step&&i<h.length;i++)h[i].hidden=false;if(!rest().length){more.hidden=true;if(io)io.disconnect();}}var io=null;more.addEventListener('click',function(){reveal();if(!io&&'IntersectionObserver' in window&&rest().length){io=new IntersectionObserver(function(e){if(e[0].isIntersecting)reveal();},{rootMargin:'200px'});io.observe(more);}});if(!rest().length)more.hidden=true;})();</script>
+  <script>(function(){var list=document.getElementById('e-tiles'),end=document.getElementById('e-tiles-end');if(!list||!end||!('IntersectionObserver' in window))return;var step=6,items=[].slice.call(list.children);items.forEach(function(li,i){if(i>=step)li.hidden=true;});function rest(){return list.querySelectorAll('li[hidden]');}var io=new IntersectionObserver(function(e){if(!e[0].isIntersecting)return;var h=rest();for(var i=0;i<step&&i<h.length;i++)h[i].hidden=false;if(!rest().length)io.disconnect();else{io.unobserve(end);io.observe(end);}},{rootMargin:'400px 0px'});io.observe(end);})();</script>
   <script>(function(){var b=window.DemenzTranslatorSignup&&window.DemenzTranslatorSignup.box();if(b){document.getElementById('home-signup').append(b);}else{document.getElementById('liste').hidden=true;}})();</script>
 </body>
 </html>
