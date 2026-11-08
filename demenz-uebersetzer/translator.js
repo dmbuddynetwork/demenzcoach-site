@@ -522,7 +522,7 @@
     if (share.stored) {
       const undo = button('Nicht speichern', 'translator-copy', async () => {
         undo.disabled = true;
-        const ok = await ai.share({ sentence: share.sentence, token: share.token, undo: true });
+        const ok = await ai.share({ ...share, undo: true });
         track('translator_ai', { step: ok ? 'share_undone' : 'share_undo_failed', source: 'answer' });
         if (ok) {
           undo.hidden = true;
