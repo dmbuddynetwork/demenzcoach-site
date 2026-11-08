@@ -360,7 +360,8 @@ body.translator-cta-visible .translator-sticky { display: none !important; }
 [data-page-type="translator-tool"] .translator-cluster .content-card-grid { margin: 0; padding: 0 12px 14px; }
 [data-page-type="translator-tool"] .translator-cluster > summary:focus-visible { outline: 3px solid var(--green); outline-offset: 2px; border-radius: 16px; }
 [data-page-type^="translator"] .safety-urgent .translator-calls { margin: 10px 0 12px; }
-[data-page-type^="translator"] .safety-note { overflow-wrap: break-word; }
+/* Runde 194: Die Spalte darf nicht breiter als der Kasten werden, sonst ragen Knöpfe und Text bei großer Schrift hinaus. */
+[data-page-type^="translator"] .safety-note { overflow-wrap: break-word; grid-template-columns: minmax(0, 1fr); }
 [data-page-type^="translator"] .safety-urgent .safety-lead { margin: 6px 0 0; font-weight: 700; }
 @media (min-width: 721px) {
 [data-page-type="translator-phrase"] .article-body :not(.phrase-list) > p,
@@ -381,6 +382,12 @@ body.translator-cta-visible .translator-sticky { display: none !important; }
 [data-page-type^="translator"] .translator-app-cta h2, [data-page-type^="translator"] .translator-static-cta h2 { font-size: 1.6rem; line-height: 1.2; }
 }
 [data-page-type^="translator"] .translator-call { gap: .4em; }
+[data-page-type^="translator"] .translator-call { overflow-wrap: anywhere; }
+[data-page-type^="translator"] .translator-result-links .button { white-space: normal; max-width: 100%; }
+@media (max-width: 720px) {
+[data-page-type^="translator"] .translator-call { padding: 8px 12px; }
+[data-page-type^="translator"] .safety-note { padding: 18px; }
+}
 [data-page-type^="translator"] .translator-empty-hint { margin: 8px 0 0; color: #8a2a12; font-weight: 700; font-size: 1.05rem; }
 [data-page-type^="translator"] .translator-empty-hint:empty { margin: 0; }
 [data-page-type^="translator"] .translator-feedback > span[tabindex]:focus { outline: none; }

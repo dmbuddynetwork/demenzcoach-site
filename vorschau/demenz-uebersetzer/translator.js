@@ -336,7 +336,7 @@
     { pattern: /\b112\b/, label: 'Notruf 112', tel: '112' },
     { pattern: /\b110\b/, label: 'Polizei 110', tel: '110' },
     { pattern: /116 117/, label: 'Bereitschafts\u00ADdienst 116 117', tel: '116117' },
-    { pattern: /0800 111 0 111/, label: 'TelefonSeelsorge 0800 111 0 111', tel: '08001110111' }
+    { pattern: /0800 111 0 111/, label: 'Telefon\u00ADSeelsorge 0800 111 0 111', tel: '08001110111' }
   ];
   // Bei Entlastung für Angehörige steht das Gespräch (TelefonSeelsorge) vor dem Notruf.
   const safetyCalls = (text, listenFirst = false) => {
