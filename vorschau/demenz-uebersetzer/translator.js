@@ -655,29 +655,26 @@
       ...section('Eher vermeiden', result.avoid ?? [], result.avoid?.length ? 'Eher ungünstig ist es,' : ''),
       ...section('Was danach helfen kann', !result.selfCare && !result.safetyOnly && result.phrases.length ? (result.next ?? []).slice(1) : (result.next ?? []))
     ].filter(Boolean);
+    // Runde 199 (schlankes Layout): Ratgeber- und Übungs-Link stehen im Aufklappbereich „Mehr dazu“,
+    // unter der Antwort bleibt nur „Neuen Satz übersetzen“.
+    const deeper = [
+      result.href ? element('a', { className: 'text-link', text: `${result.linkLabel} →`, attributes: { href: result.href, 'data-related-link': result.key } }) : null,
+      result.trainer ? element('a', { className: 'text-link', text: 'Diese Situation üben →', attributes: { href: result.trainer, 'data-related-link': 'gespraechstrainer' } }) : null
+    ].filter(Boolean);
     if (moreContent.length) {
       nodes.push(element('div', { className: 'translator-more-group' }, [
-        element('details', { className: 'translator-more' }, [element('summary', { text: 'Mehr dazu' }), ...moreContent])
+        element('details', { className: 'translator-more' }, [
+          element('summary', { text: 'Mehr dazu' }),
+          ...moreContent,
+          deeper.length ? element('div', { className: 'translator-result-links translator-more-links' }, deeper) : null
+        ].filter(Boolean))
       ]));
     }
 
     if (result.safety && !result.safetyOnly && !safetyHit && !safetyFirst) nodes.push(safetyAside());
 
     const actions = element('div', { className: 'translator-result-links' });
-    if (result.href) {
-      actions.append(element('a', {
-        className: 'text-link',
-        text: `${result.linkLabel} →`,
-        attributes: { href: result.href, 'data-related-link': result.key }
-      }));
-    }
-    if (result.trainer) {
-      actions.append(element('a', {
-        className: 'text-link',
-        text: 'Diese Situation üben →',
-        attributes: { href: result.trainer, 'data-related-link': 'gespraechstrainer' }
-      }));
-    }
+    if (!moreContent.length) actions.append(...deeper);
     actions.append(button('Neuen Satz übersetzen', 'translator-copy', () => {
       input.value = '';
       grow();
