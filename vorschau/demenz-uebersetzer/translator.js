@@ -523,12 +523,14 @@
     const typedNormalized = core.normalize(typed);
     const safetyFirst = Boolean(result.safety) && !result.safetyOnly && !safetyHit && !result.selfCare
       && (result.safetyFirst ?? []).some((cue) => typedNormalized.includes(` ${cue}`));
-    const safetyAside = () => element('aside', { className: 'safety-note' }, [
-      element('strong', { text: 'Wann ein Gespräch nicht ausreicht' }),
+    // Runde 197: Oben steht der Hinweis unter der kurzen Überschrift „Erst die Sicherheit“ (eine Zeile statt zwei),
+    // damit der erste Satz auf dem Handy näher rückt. Unten bleibt „Wann ein Gespräch nicht ausreicht“.
+    const safetyAside = (first = false) => element('aside', { className: first ? 'safety-note safety-first' : 'safety-note' }, [
+      element('strong', { text: first ? 'Erst die Sicherheit' : 'Wann ein Gespräch nicht ausreicht' }),
       element('span', { text: result.safety }),
       safetyCalls(result.safety)
     ]);
-    if (safetyFirst) nodes.push(safetyAside());
+    if (safetyFirst) nodes.push(safetyAside(true));
     // Weitere Anliegen kommen direkt nach den Sätzen: Der erste Satz zum Ausprobieren bleibt auf dem Handy oben.
     let alsoWrapper = null;
     if (also.length) {

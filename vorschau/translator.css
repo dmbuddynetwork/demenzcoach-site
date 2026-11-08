@@ -387,6 +387,7 @@ body.translator-cta-visible .translator-sticky { display: none !important; }
 @media (max-width: 720px) {
 [data-page-type^="translator"] .translator-call { padding: 8px 12px; }
 [data-page-type^="translator"] .safety-note { padding: 18px; }
+[data-page-type^="translator"] .translator-result .safety-note { padding: 16px 14px; border-left-width: 4px; }
 }
 [data-page-type^="translator"] .translator-empty-hint { margin: 8px 0 0; color: #8a2a12; font-weight: 700; font-size: 1.05rem; }
 [data-page-type^="translator"] .translator-empty-hint:empty { margin: 0; }
