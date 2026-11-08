@@ -343,6 +343,7 @@
       for (const table of tables) for (const card of table.querySelectorAll("[data-plan]")) card.setAttribute("aria-checked", String(card.dataset.plan === key));
       for (const node of document.querySelectorAll("[data-start-price]")) node.textContent = `Dein Abo beginnt: ${priceText(plan)}. Vorher online kündbar.`;
       for (const node of document.querySelectorAll("[data-start-fine]")) node.textContent = fineText();
+      for (const node of document.querySelectorAll("[data-start-bar]")) node.textContent = barLine();
     };
     const tag = (cents, days, was) => el("span", { class: "start-tag" }, [
       was ? el("s", { text: perDay(was, days) }) : null,
@@ -372,7 +373,9 @@
       tables.push(group);
       return el("div", {}, [group, el("p", { class: "start-small start-center", text: "Alle Preise inklusive gesetzlicher Umsatzsteuer (MwSt.)." })]);
     };
-    const cta = () => el("button", { type: "button", class: "abo-button start-cta", text: "Meinen Plan holen", onclick: checkout });
+    const cta = () => el("button", { type: "button", class: "abo-button start-cta", text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos testen` : "Meinen Plan holen", onclick: checkout });
+    // Feste Leiste unten (Noom, Headway, Calm): Probezeit und Preis kurz, Knopf geht direkt zur Kasse.
+    const barLine = () => `${offer.trialDays > 0 ? "Dann " : "Nur "}${plan === "yearly" ? (deal ? `${euro(firstYear)} im 1. Jahr` : `${euro(offer.yearly)} pro Jahr`) : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
     const fineText = () => (offer.trialDays > 0
       ? `${offer.trialDays} Tage kostenlos, heute zahlst du 0,00 €. Danach ${priceText(plan)}, bis du kündigst. Vorher online kündbar.`
       : `Du zahlst ${priceText(plan)}, bis du kündigst. Online kündbar.`);
@@ -412,25 +415,23 @@
     ];
 
     return [
-      el("div", { class: "start-bar" }, [
-        el("p", { class: "start-bar-text" }, deal
-          ? ["Willkommenspreis für das erste Jahr"]
-          : [name ? `Plan für ${name} ist bereit` : "Dein Plan ist bereit"]),
-        el("button", { type: "button", class: "start-bar-button", text: "Plan holen", onclick: scrollToPlans })
-      ]),
-      compare,
-      el("p", { class: "start-small start-center", text: "Beispielhafte Darstellung, kein Versprechen." }),
       el("h1", { class: "start-center", text: name ? `Dein Plan für ${name} ist fertig` : "Dein Plan ist fertig" }),
       el("ul", { class: "start-tags", role: "list" }, tags.map(([term, value]) => el("li", {}, [el("span", { text: term }), el("strong", { text: value })]))),
       deal ? el("div", { class: "start-promo" }, [
         el("p", { class: "start-promo-text" }, [el("strong", { text: "Willkommenspreis" }),
           el("span", { text: `Erstes Jahr ${euro(firstYear)}, danach ${euro(offer.yearly)} im Jahr` })])
       ]) : null,
+      offer.trialDays > 0 ? el("p", { class: "start-trial" }, [
+        el("strong", { text: `${offer.trialDays} Tage kostenlos testen` }),
+        el("span", { text: "Heute zahlst du 0,00 €. Vorher online kündbar." })
+      ]) : null,
       el("h2", { class: "start-section start-center", text: "Wähle deinen Plan" }),
       table(),
       cta(),
       fine(),
       safe(),
+      compare,
+      el("p", { class: "start-small start-center", text: "Beispielhafte Darstellung, kein Versprechen." }),
       el("h2", { class: "start-section start-center", text: "Das bekommst du" }),
       el("img", { class: "start-art", src: "../assets/zeichnungen/v-tanzen.webp", width: "600", height: "650", alt: "" }),
       el("ul", { class: "start-checks", role: "list" }, gets.map((text) => el("li", { text }))),
@@ -458,6 +459,13 @@
         el("a", { href: "/nutzungsbedingungen.html", text: "Nutzungsbedingungen" }), " und die ",
         el("a", { href: "/abo/widerruf.html", text: "Widerrufsbelehrung" }),
         ". Allgemeine Kommunikations- und Alltagshilfe, kein Medizinprodukt."
+      ]),
+      el("div", { class: "start-bar" }, [
+        el("p", { class: "start-bar-text" }, [
+          el("b", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein Plan ist bereit" }),
+          el("span", { "data-start-bar": "", text: barLine() })
+        ]),
+        el("button", { type: "button", class: "start-bar-button", text: offer.trialDays > 0 ? "Kostenlos testen" : "Plan holen", onclick: checkout })
       ])
     ];
   }
@@ -501,7 +509,8 @@
     $("back").style.visibility = ["relation", "building", "email"].includes(name) ? "hidden" : "visible";
     $("progress").hidden = done;
     $("count").hidden = done;
-    $("footer").hidden = name !== "relation" && name !== "plan";
+    // Rechtliche Links (AGB, Datenschutz, Impressum, Widerruf, Kündigen) stehen auf jedem Schritt unten, klein.
+    $("footer").hidden = false;
     window.scrollTo({ top: 0 });
     if (name !== "plan") track(`quiz_${name}`);
   }

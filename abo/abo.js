@@ -96,8 +96,16 @@ $("plan-next").addEventListener("click", async () => {
   track("begin_checkout", { plan: state.plan, source: state.source }, { event: "InitiateCheckout" });
   await ensureFirebase();
   if (state.user) return goToPay();
-  show("account");
+  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Ein stilles Gast-Konto trägt den Kauf, die Nummer kommt auf der Danke-Seite dazu.
+  try {
+    state.user = (await state.firebase.signInAnonymously(state.auth)).user;
+    track("sign_up", { method: "guest" });
+    return goToPay();
+  } catch {
+    show("account");
+  }
 });
+$("have-account").addEventListener("click", () => show("account"));
 for (const back of document.querySelectorAll("[data-back]")) back.addEventListener("click", () => show(back.dataset.back));
 
 // --- Schritt 2: Konto (Firebase Auth, dasselbe Projekt wie die App) ---------------------------------
@@ -184,7 +192,7 @@ $("code-confirm").addEventListener("click", async () => {
 // --- Schritt 3: Bezahlen -------------------------------------------------------------------------
 function goToPay() {
   show("pay");
-  const who = state.user.email || state.user.phoneNumber || "";
+  const who = state.user.isAnonymous ? "" : (state.user.email || state.user.phoneNumber || "");
   $("signed-in-as").textContent = who ? `Angemeldet als ${who}` : "";
   if (state.user.email) return startCheckout();
   $("email-block").hidden = false;
@@ -305,6 +313,45 @@ async function confirmPayment() {
 }
 $("pay-button").addEventListener("click", confirmPayment);
 
+// --- Konto nach dem Kauf: Gast-Konto bekommt die Telefonnummer (UID und damit Stripe/Adapty-Zuordnung bleiben gleich) ----
+let linkConfirmation;
+let linkRecaptcha;
+async function offerAccountLink() {
+  try {
+    await ensureFirebase();
+    if (!state.user?.isAnonymous) return;
+    $("link-card").hidden = false;
+    track("account_link_shown", { source: state.source });
+  } catch { /* Konto später im Plan nachholbar */ }
+}
+$("link-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const raw = $("link-phone").value.replace(/[\s/()-]/gu, "");
+  const phone = raw.startsWith("00") ? `+${raw.slice(2)}` : raw.startsWith("0") ? `+49${raw.slice(1)}` : raw;
+  if (!/^\+\d{8,15}$/u.test(phone)) return fail("Bitte gib deine Telefonnummer mit Vorwahl ein, zum Beispiel +49 170 1234567.");
+  try {
+    linkRecaptcha ??= new state.firebase.RecaptchaVerifier(state.auth, "link-recaptcha", { size: "invisible" });
+    linkConfirmation = await state.firebase.linkWithPhoneNumber(state.user, phone, linkRecaptcha);
+    $("link-code-block").hidden = false;
+    $("link-code").focus();
+  } catch (error) {
+    fail(error?.code === "auth/credential-already-in-use"
+      ? "Diese Nummer hat schon ein App-Konto. Schreib uns bitte kurz über das Kontaktformular, wir verbinden dein Abo."
+      : "Die SMS konnte nicht geschickt werden. Prüf bitte die Nummer.");
+  }
+});
+$("link-confirm").addEventListener("click", async () => {
+  try {
+    state.user = (await linkConfirmation.confirm($("link-code").value.trim())).user;
+    track("account_linked", { source: state.source });
+    $("link-card").hidden = true;
+  } catch (error) {
+    fail(error?.code === "auth/credential-already-in-use"
+      ? "Diese Nummer hat schon ein App-Konto. Schreib uns bitte kurz über das Kontaktformular, wir verbinden dein Abo."
+      : "Der Code stimmt nicht. Bitte prüf ihn noch einmal.");
+  }
+});
+
 // --- Abo verwalten (Stripe-Kundenportal) ----------------------------------------------------------
 async function openPortal() {
   try {
@@ -386,6 +433,7 @@ if (params.get("status") === "fertig") {
   // Probezeit gestartet: heute 0 €. Echter Umsatz steht in Stripe/Adapty.
   track("purchase", { plan: state.plan, source: state.source, value: 0, currency: "EUR" }, { event: "Purchase", values: { value: 0, currency: "EUR" } });
   offerYearlySwitch();
+  offerAccountLink();
   const sessionID = params.get("session_id");
   if (sessionID) {
     api(`/session-status?session_id=${encodeURIComponent(sessionID)}`).then((status) => {
