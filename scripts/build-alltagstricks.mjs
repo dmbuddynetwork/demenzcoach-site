@@ -111,15 +111,15 @@ const html = `<!doctype html>
   <link rel="stylesheet" href="../einfach.css">
   <style>
     .tricks-main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 24px; }
-    .trick-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; padding: 0; list-style: none; }
-    .trick-jump a { display: inline-block; padding: 8px 14px; border-radius: 999px; background: var(--e-lav); color: var(--e-lav-text); text-decoration: none; font-size: var(--e-small) !important; font-weight: 600; }
+    .trick-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px !important; padding: 0 !important; list-style: none; }
+    body.einfach .trick-jump a { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--e-lav); color: var(--e-lav-text); text-decoration: none; font-size: var(--e-small) !important; font-weight: 600; }
     .trick-group { margin: 0 0 32px; scroll-margin-top: 16px; }
     .trick-grid { display: grid; gap: 16px; }
     .trick { display: grid; gap: 12px; padding: 16px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); scroll-margin-top: 16px; }
     .trick img { display: block; width: 100%; max-height: 220px; object-fit: contain; }
     .trick h3 { margin: 0 0 6px; }
     .trick p:last-child { margin-bottom: 0; }
-    .trick-links, .trick-links a { font-size: var(--e-small) !important; color: var(--e-muted); }
+    body.einfach .trick-links, body.einfach .trick-links a { font-size: var(--e-small) !important; color: var(--e-muted); }
     .trick-links a { color: var(--e-purple); }
     .trick:target { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
     .trick-cta { margin: 8px 0 24px; padding: 20px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); text-align: center; }
