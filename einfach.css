@@ -375,3 +375,17 @@ body.einfach .translator-said-art { flex: 0 0 34%; max-width: 210px; width: 34%;
 }
 body.einfach .translator-answer .translator-goal-chosen { margin-bottom: 14px; }
 @media (min-width: 720px) { body.einfach h2.translator-said-bubble { font-size: 1.75rem !important; padding: 20px 26px !important; } }
+
+/* ---------- Alltagstrick in der Antwort und als Kacheln im Archiv (Daniel, 8. Nov) ---------- */
+body.einfach .translator-trick { display: flex; align-items: center; gap: 16px; margin: 14px 0 4px; padding: 16px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 18px; }
+body.einfach .translator-trick-art { flex: 0 0 30%; width: 30%; max-width: 160px; height: auto; max-height: 150px; object-fit: contain; }
+body.einfach .translator-trick-text { flex: 1 1 auto; min-width: 0; }
+body.einfach .translator-trick-text p { margin: 0 0 6px !important; }
+body.einfach .translator-trick-label { color: var(--e-purple) !important; font-size: var(--e-small) !important; font-weight: 700 !important; }
+body.einfach .translator-trick-title { font-weight: 800 !important; }
+body.einfach .translator-trick-link { display: inline-block; margin-top: 2px; font-size: var(--e-small); font-weight: 700; }
+@media (max-width: 480px) { body.einfach .translator-trick { align-items: flex-start; } }
+body.einfach .e-tiles .e-tiles-heading { grid-column: 1 / -1; margin: 20px 0 4px; }
+body.einfach .e-tiles .e-tiles-heading h2 { margin: 0 0 4px; }
+body.einfach .e-tiles .e-tiles-heading p { margin: 0; }
+body.einfach a.e-tile { text-decoration: none; }

@@ -882,9 +882,23 @@
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
     }
-    const order = goal === 'jetzt' ? [phraseBlock, doBlock, meaningBlock]
-      : goal === 'tipps' ? [doBlock, phraseBlock, meaningBlock]
-        : [meaningBlock, phraseBlock, doBlock];
+    // Alltagstrick zur Situation direkt unter „Das kannst du tun“ (Daniel, 8. Nov: wie der rote Teller).
+    // Kommt fest aus den Seitendaten (nie aus KI oder Eingabe), Notfall und Entlastung bekommen keinen.
+    const trick = result.trick && !result.safetyOnly && !result.selfCare ? result.trick : null;
+    const trickBlock = trick ? [element('div', { className: 'translator-trick' }, [
+      element('img', { className: 'translator-trick-art', attributes: { src: trick.image, alt: '', width: String(trick.imageWidth ?? 480), height: String(trick.imageHeight ?? 400), loading: 'lazy', decoding: 'async' } }),
+      element('div', { className: 'translator-trick-text' }, [
+        element('p', { className: 'translator-trick-label', text: 'Dieser Trick hilft' }),
+        element('p', { className: 'translator-trick-title', text: trick.title }),
+        element('p', { text: trick.text }),
+        element('a', { className: 'text-link translator-trick-link', text: 'Alle Tricks', attributes: { href: trick.href, 'data-related-link': 'alltagstricks' } })
+      ])
+    ])] : [];
+    if (trick && !doBlock.length) trickBlock.unshift(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
+    const doWithTrick = [...doBlock, ...trickBlock];
+    const order = goal === 'jetzt' ? [phraseBlock, doWithTrick, meaningBlock]
+      : goal === 'tipps' ? [doWithTrick, phraseBlock, meaningBlock]
+        : [meaningBlock, phraseBlock, doWithTrick];
     answerCard.append(...[...order.flat(), quickRow].filter(Boolean));
     // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
     // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
