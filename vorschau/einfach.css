@@ -10,7 +10,7 @@
   --e-muted: #55504a;
   --e-purple: #47408c;
   --e-purple-dark: #352f6e;
-  --e-purple-soft: #f1f0f8;
+  --e-purple-soft: #f2efe9;
   --e-red: #a3322a;
   --e-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --e-size: 1.1875rem;
@@ -205,3 +205,18 @@ body.einfach [tabindex="-1"]:focus { outline: none; }
 body.einfach .translator-more-group { padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
 /* Handy: Feld höher, damit es auch mit dem Einwilligungs-Banner sichtbar bleibt. */
 @media (max-width: 720px) { .e-hero .e-lead { display: none; } body.einfach .translator-card { margin-top: 8px; } }
+
+/* Übersetzer-Seiten ohne lovable-home.css: Grundraster */
+body.einfach .container { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
+body.einfach .content-narrow { max-width: 760px; }
+body.einfach main .section, body.einfach main > section { padding-block: 28px; }
+body.einfach .breadcrumbs, body.einfach nav[aria-label="Brotkrumen"] { margin: 8px 0 0; }
+body.einfach details > summary { cursor: pointer; min-height: 48px; padding-block: 8px; }
+body.einfach ul, body.einfach ol { padding-left: 1.3em; }
+body.einfach ::placeholder { font-size: inherit !important; font-family: inherit; color: #847d74; }
+body.einfach .phrase-list blockquote, body.einfach .phrase-list > p, body.einfach .phrase-list li { margin: 0 0 10px !important; padding: 14px 16px !important; background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: 12px !important; font-weight: 700; }
+body.einfach .phrase-list { margin: 0; padding: 0; list-style: none; }
+body.einfach .breadcrumbs { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+body.einfach :is(.safety-note, .article-cta, .translator-static-cta) { margin-block: 20px; }
+body.einfach .translator-static-cta { background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: var(--e-radius) !important; padding: 20px !important; color: var(--e-text) !important; }
+body.einfach .translator-static-cta :is(h2, p) { color: var(--e-text) !important; }
