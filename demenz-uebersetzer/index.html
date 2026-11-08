@@ -33,7 +33,7 @@
   <link rel="stylesheet" href="../translator.css">
   <link rel="stylesheet" href="../einfach.css">
   <link rel="stylesheet" href="/abo/ki-freigabe.css">
-  <script>(function(){var d=document.documentElement,u=navigator.userAgent||'';d.classList.add('app-check');if(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))d.classList.add('is-ios');document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href*="apps.apple.com"]');if(a){a.target='_blank';a.rel='noopener';}},true);})();</script>
+  <script>(function(){var d=document.documentElement,u=navigator.userAgent||'';d.classList.add('app-check');try{if(localStorage.getItem('demenzcoach.textSize.v1')==='large')d.classList.add('e-large');}catch(e){}document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('[data-font-toggle]');if(!b)return;var on=d.classList.toggle('e-large');b.setAttribute('aria-pressed',String(on));try{if(on)localStorage.setItem('demenzcoach.textSize.v1','large');else localStorage.removeItem('demenzcoach.textSize.v1');}catch(e){}});document.addEventListener('DOMContentLoaded',function(){var b=document.querySelector('[data-font-toggle]');if(b)b.setAttribute('aria-pressed',String(d.classList.contains('e-large')));});if(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))d.classList.add('is-ios');document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href*="apps.apple.com"]');if(a){a.target='_blank';a.rel='noopener';}},true);})();</script>
   <script type="application/ld+json">{
   "@context": "https://schema.org",
   "@graph": [
@@ -393,7 +393,7 @@
   <header class="e-header">
     <div class="e-wrap">
       <a class="e-brand" href="/" aria-label="Demenz Coach Startseite"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
-      <nav aria-label="Hauptnavigation"><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=seo_de_nav&amp;mt=8" data-store-link="seo-de-nav">Zur App</a></nav>
+      <nav aria-label="Hauptnavigation"><button type="button" class="e-font-toggle" data-font-toggle aria-pressed="false" aria-label="Schrift größer" title="Schrift größer">A+</button><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=seo_de_nav&amp;mt=8" data-store-link="seo-de-nav">Zur App</a></nav>
     </div>
   </header>
   <main id="main" class="content-main">
