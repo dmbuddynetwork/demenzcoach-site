@@ -26,6 +26,7 @@
 .translator-result .article-cta { margin: 28px 0 0; }
 .translator-phrase { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; padding: 14px 16px; background: var(--ivory); border-left: 4px solid var(--sage); border-radius: 0 12px 12px 0; }
 .translator-phrase q { font-family: var(--serif); font-size: 1.15rem; quotes: "„" "“"; }
+html[lang="en"] .translator-phrase q { quotes: "“" "”"; }
 .translator-phrase-mood { flex-wrap: wrap; row-gap: 4px; background: var(--sage-soft); border-left-color: var(--sage-dark); }
 .translator-mood-lead { flex-basis: 100%; font-size: .8rem; font-weight: 700; color: var(--sage-dark); }
 .translator-phrase-example { flex-wrap: wrap; row-gap: 4px; }

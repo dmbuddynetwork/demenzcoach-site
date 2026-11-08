@@ -17,9 +17,16 @@
   if (!dataElement || !form || !input || !output || !core) return;
 
   const data = JSON.parse(dataElement.textContent);
+  // Andere Sprachen (zuerst Englisch): Texte und Einstellungen der Oberfläche kommen aus data.ui,
+  // übersetzt von translator-locale.js. Auf deutschen Seiten fehlt data.ui, alles bleibt wie bisher.
+  const ui = data.ui ?? null;
+  const tr = window.DemenzTranslatorLocale?.create(ui) ?? ((text) => text);
+  const translatedAttributes = new Set(['alt', 'aria-label', 'placeholder', 'title']);
+  const phraseHash = ui?.phraseHash ?? 'satz-';
+  const feelingHash = ui?.feelingHash ?? 'gefuehl-';
   const entryByKey = new Map(data.entries.map((entry) => [entry.key, entry]));
   const toolURL = data.toolURL;
-  const appURL = 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=seo_de_translator&mt=8';
+  const appURL = ui?.appURL ?? 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=seo_de_translator&mt=8';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const track = (name, parameters) => {
@@ -30,9 +37,9 @@
   const element = (tag, options = {}, children = []) => {
     const node = document.createElement(tag);
     if (options.className) node.className = options.className;
-    if (options.text) node.textContent = options.text;
-    Object.entries(options.attributes ?? {}).forEach(([name, value]) => node.setAttribute(name, value));
-    children.filter(Boolean).forEach((child) => node.append(child));
+    if (options.text) node.textContent = tr(options.text);
+    Object.entries(options.attributes ?? {}).forEach(([name, value]) => node.setAttribute(name, translatedAttributes.has(name) ? tr(value) : value));
+    children.filter(Boolean).forEach((child) => node.append(typeof child === 'string' ? tr(child) : child));
     return node;
   };
 
@@ -45,13 +52,13 @@
   // Symbole (Daumen, Hörer) nur fürs Auge: Vorlesen soll nur „Ja“ oder
   // „Notruf 112“ sagen, nicht „Daumen hoch Ja“.
   const withIcon = (node, icon, label) => {
-    node.replaceChildren(element('span', { text: icon, attributes: { 'aria-hidden': 'true' } }), ` ${label}`);
+    node.replaceChildren(element('span', { text: icon, attributes: { 'aria-hidden': 'true' } }), ` ${tr(label)}`);
     return node;
   };
 
   const flash = (node, text) => {
     const original = node.textContent;
-    node.textContent = text;
+    node.textContent = tr(text);
     setTimeout(() => { node.textContent = original; }, 1800);
   };
 
@@ -93,12 +100,12 @@
   // Geteilt wird nur die öffentliche Seite des Ergebnisses, nie die Eingabe.
   const shareBlock = (result) => {
     const url = result.url || toolURL;
-    const text = shareText(result);
+    const text = tr(shareText(result));
     // Ein einziger Knopf: Teilen-Menü des Handys, sonst WhatsApp.
     if (navigator.share) {
       return element('div', { className: 'translator-share' }, [button('Mit Familie teilen', 'translator-copy', async () => {
         try {
-          await navigator.share({ title: 'Demenz-Übersetzer', text, url });
+          await navigator.share({ title: tr('Demenz-Übersetzer'), text, url });
           track('translator_share', { result_key: result.key, method: 'native' });
         } catch {
           // Abgebrochen – nichts zu tun.
@@ -186,14 +193,13 @@
 
   // App-Link je Situation mit eigenem Kampagnen-Token (fester Schlüssel, nie Text),
   // damit messbar wird, welche Situationen zur App führen.
-  const appLinkFor = (result) => (result?.campaign ? appURL.replace('ct=seo_de_translator', `ct=${result.campaign}`) : appURL);
-  // Am Computer lässt sich die iPhone-App nicht laden: dort zeigt die Karte einen QR-Code (nur breite Bildschirme mit Maus).
-  const qrFigure = () => element('figure', { className: 'translator-qr' }, [
-    element('img', { attributes: { src: '../assets/app-qr-de.svg', width: '112', height: '112', loading: 'lazy', alt: 'QR-Code zur App Demenz Coach im App Store' } }),
-    element('figcaption', { text: 'Mit der iPhone-Kamera scannen' })
-  ]);
+  const appLinkFor = (result) => (result?.campaign ? appURL.replace(/ct=[^&]+/, `ct=${result.campaign}`) : appURL);
   // E-Mail-Liste (translator-signup.js): nur sichtbar, wenn das Skript geladen ist.
   const signupBox = () => window.DemenzTranslatorSignup?.box((step) => track('translator_signup', { step }));
+  // Am Computer lässt sich die iPhone-App nicht direkt laden, und einen QR-Code nutzt die Zielgruppe nicht
+  // (Daniel, 8. Nov). Dort kommt deshalb zuerst die E-Mail-Liste, dann der App-Hinweis.
+  const onComputer = () => window.matchMedia?.('(min-width: 900px) and (hover: hover) and (pointer: fine)').matches === true;
+  const offers = (result) => (onComputer() ? [signupBox(), appCTA(result)] : [appCTA(result), signupBox()]);
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
       element('h2', { text: 'Für eure eigene Situation' }),
@@ -205,7 +211,7 @@
     element('div', { className: 'translator-app-visual' }, [
       element('img', {
         attributes: {
-          src: '../assets/app-de-help.webp',
+          src: ui?.appImage ?? '../assets/app-de-help.webp',
           width: '720',
           height: '1566',
           loading: 'lazy',
@@ -217,8 +223,7 @@
         className: 'button',
         text: 'Kostenlos im App Store',
         attributes: { href: appLinkFor(result), 'data-store-link': result?.key ? `translator-result-${result.key}` : 'translator-result' }
-      }),
-      qrFigure()
+      })
     ])
   ]);
 
@@ -290,7 +295,8 @@
         roleSelect
       ]),
       field('callName', 'So nennst du die Person', 'z. B. Mama, Opa, Frau Weber', 'call_name'),
-      formality,
+      // Englisch kennt kein du/Sie: dort keine Anrede-Wahl.
+      ui?.formality === false ? null : formality,
       element('p', { className: 'translator-privacy', text: '🔒 Wird nicht gespeichert und nicht gesendet.' })
     ]));
     return details;
@@ -312,7 +318,7 @@
     related: feeling.related,
     retry: feeling.retry,
     urgentLead: feeling.urgentLead ?? null,
-    url: `${toolURL}#gefuehl-${feeling.id}`
+    url: `${toolURL}#${feelingHash}${feeling.id}`
   }]));
 
   const feelingPicker = (title) => {
@@ -326,6 +332,7 @@
   };
 
   const suggestLink = (typed) => {
+    if (!data.suggestMail) return null;
     const body = typed ? `Gesagt wurde: „${typed}“\n\nSituation (optional, ohne Namen):\n` : 'Gesagt wurde:\n\nSituation (optional, ohne Namen):\n';
     const link = element('a', {
       className: 'translator-copy',
@@ -340,7 +347,7 @@
   };
 
   // Nummern im Sicherheitshinweis als große Anruf-Knöpfe: im Notfall antippen statt abtippen.
-  const callNumbers = [
+  const callNumbers = ui?.callNumbers ? ui.callNumbers.map(({ pattern, label, tel }) => ({ pattern: new RegExp(pattern), label, tel })) : [
     { pattern: /\b112\b/, label: 'Notruf 112', tel: '112' },
     { pattern: /\b110\b/, label: 'Polizei 110', tel: '110' },
     { pattern: /116 117/, label: 'Bereitschafts\u00ADdienst 116 117', tel: '116117' },
@@ -378,8 +385,10 @@
   const ai = window.DemenzTranslatorAI;
   const aiAnswer = (result) => {
     const nodes = [];
-    if (result.safetyLevel === 'urgent') nodes.push(urgentNote(data.safetySignals.text));
-    if (result.safetyLevel === 'concern' && result.safetyMessage) {
+    // Ohne Stufen (englische Seiten): bei jedem Sicherheitshinweis der KI derselbe feste Hinweis.
+    const ungraded = ui?.gradedSafety === false && result.safetyLevel !== 'standard';
+    if (result.safetyLevel === 'urgent' || ungraded) nodes.push(urgentNote(data.safetySignals.text));
+    if (!ungraded && result.safetyLevel === 'concern' && result.safetyMessage) {
       nodes.push(element('aside', { className: 'safety-note', attributes: { role: 'note' } }, [element('span', { text: result.safetyMessage })]));
     }
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
@@ -395,14 +404,15 @@
     }
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
     nodes.push(disclaimer(true));
-    if (result.share?.sentence && result.share?.token) nodes.push(shareBox(result.share));
+    // Anonymes Teilen gibt es vorerst nur auf Deutsch (der Server bietet es sonst auch nicht an).
+    if (ui?.anonShare !== false && result.share?.sentence && result.share?.token) nodes.push(shareBox(result.share));
     return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
   };
   // Haftungs- und Gesundheitshinweis unter jeder Antwort (Daniel, 8. Nov), kurz und gut lesbar.
   const disclaimer = (fromAI = false) => element('p', { className: 'translator-disclaimer' }, [
     ...(fromAI ? ['KI-Antworten können Fehler enthalten. '] : []),
     'Allgemeine Hinweise ohne Gewähr, kein Ersatz für ärztlichen Rat. ',
-    element('a', { className: 'text-link', text: 'Nutzungsbedingungen', attributes: { href: '/nutzungsbedingungen.html' } })
+    element('a', { className: 'text-link', text: 'Nutzungsbedingungen', attributes: { href: ui?.termsURL ?? '/nutzungsbedingungen.html' } })
   ]);
   // Daniels Wahl (8. Nov) „nur bereinigt sammeln“: freiwillig, auf Knopfdruck, und man sieht genau,
   // was geteilt wird. Daraus entstehen später neue Satz-Seiten und Einträge in der App.
@@ -456,6 +466,20 @@
   // Runde 198 (Daniels Wahl „Automatisch“): Unbekannte Sätze gehen ohne Knopf an die KI.
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
+  // KI-Freigabe der Web-Kasse (/abo/ki-freigabe.js, Daniel 8. Nov: „1 gratis, dann Probezeit“).
+  // Aus, solange translatorGate.enabled nicht true ist; bekannte Sätze bleiben immer frei, Englisch auch.
+  // Gesperrt: Angebotskarte statt Warte-Ansicht. Der Sicherheitshinweis darüber und „Meinst du vielleicht“
+  // bleiben stehen; onFail zeigt die Gefühle-Auswahl und den allgemeinen Satz.
+  const aiLocked = async (box, text, source, waiting) => {
+    const gate = window.DemenzKiFreigabe;
+    if (!gate) return false;
+    const access = await gate.check({ language: (document.documentElement.lang || 'de').slice(0, 2) });
+    if (access.allowed) return false;
+    waiting.remove();
+    box.replaceChildren(gate.offerCard({ sentence: text }));
+    track('translator_ai', { step: 'limit', source });
+    return true;
+  };
   const aiBox = (text, source, onFail = () => {}, { auto = false } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
@@ -464,14 +488,16 @@
     const run = async () => {
       ask.disabled = true;
       ask.hidden = auto;
-      status.textContent = 'Einen Moment, die KI schreibt eine Antwort …';
+      status.textContent = tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
+      if (await aiLocked(box, text, source, waiting)) { onFail(); return; }
       const result = await ai.ask(text, { formal: personal.formal });
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
+        window.DemenzKiFreigabe?.noteAnswer();
         const { node, focus, top } = aiAnswer(result);
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
@@ -496,17 +522,17 @@
         return;
       }
       if (result.kind === 'off_topic') {
-        status.textContent = 'Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.';
+        status.textContent = tr('Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.');
         output.querySelector('.translator-fallback')?.remove();
         output.querySelector('.translator-suggest')?.remove();
         return;
       }
       // Ohne Treffer gibt es darunter die Gefühle-Auswahl: dorthin führen statt nur „später“.
       const next = source === 'unknown' ? ' Wähle unten, was du bei der Person spürst.' : '';
-      status.textContent = result.reason === 'busy'
+      status.textContent = tr(result.reason === 'busy'
         ? `Gerade kommen viele Fragen an.${next || ' Bitte versuch es in ein paar Minuten noch einmal.'}`
-        : `Die KI ist gerade nicht erreichbar.${next || ' Bitte versuch es später noch einmal.'}`;
-      ask.textContent = 'Noch einmal versuchen';
+        : `Die KI ist gerade nicht erreichbar.${next || ' Bitte versuch es später noch einmal.'}`);
+      ask.textContent = tr('Noch einmal versuchen');
       ask.hidden = false;
       ask.disabled = false;
       onFail();
@@ -560,8 +586,7 @@
     nodes.push(fallbackBox);
     nodes.push(disclaimer());
     nodes.push(suggestLink(typed));
-    nodes.push(appCTA());
-    nodes.push(signupBox());
+    nodes.push(...offers());
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
@@ -582,7 +607,7 @@
     return [lead, sentences.slice(index).join(' ')];
   };
 
-  const moodLead = { wut: 'Zuerst beruhigen', trauer: 'Zuerst trösten', angst: 'Zuerst Sicherheit geben' };
+  const moodLead = ui?.moodLead ?? { wut: 'Zuerst beruhigen', trauer: 'Zuerst trösten', angst: 'Zuerst Sicherheit geben' };
 
   const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null } = {}) => {
     if (!entry) {
@@ -647,12 +672,19 @@
     // Auf dem Handy mit großer Schrift soll der erste Antwortsatz schnell kommen: Unter
     // „Was dahintersteckt“ steht nur der Kern (ein, zwei Sätze), der Rest unter „Hintergrund“.
     const [lead, rest] = result.safetyOnly ? [result.short, ''] : splitLead(result.short);
+    // Wie in der App: Erklärung, Sätze und der nächste Schritt stehen zusammen in EINER Karte.
+    const answerCard = element('div', { className: 'translator-answer' });
+    nodes.push(answerCard);
+    // Passende Zeichnung oben in der Karte (nur wenn die Seite eine mitliefert, siehe answer-drawings.json).
+    if (result.image && !result.safetyOnly && !result.selfCare) {
+      answerCard.append(element('img', { className: 'translator-answer-art', attributes: { src: result.image, alt: '', width: String(result.imageWidth ?? 480), height: String(result.imageHeight ?? 400), decoding: 'async' } }));
+    }
     if (lead) {
-      nodes.push(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
-      nodes.push(element('p', { className: 'translator-meaning', text: lead }));
+      answerCard.append(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
+      answerCard.append(element('p', { className: 'translator-meaning', text: lead }));
     }
     if (result.phrases.length) {
-      nodes.push(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
+      answerCard.append(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
       const phraseList = element('div', { className: 'translator-phrases' });
       const paint = () => {
         // Bei Wut, Tränen oder Angst kommt zuerst ein kurzer beruhigender Satz.
@@ -680,7 +712,8 @@
         element('h3', { className: 'translator-step', text: 'Das kannst du tun' }),
         element('p', { className: 'translator-meaning translator-do', text: doNow })
       ] : [];
-      nodes.push(phraseList, ...doNodes, alsoWrapper, result.selfCare ? null : personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
+      answerCard.append(phraseList, ...doNodes);
+      nodes.push(alsoWrapper, result.selfCare ? null : personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
     }
@@ -731,8 +764,7 @@
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
       nodes.push(feedbackBlock(result, retry));
-      nodes.push(appCTA(result));
-      nodes.push(signupBox());
+      nodes.push(...offers(result));
     }
 
     output.replaceChildren(...nodes.filter(Boolean));
@@ -745,7 +777,7 @@
   };
 
   const setHash = (key) => {
-    const hash = key && key !== 'none' ? `#satz-${key}` : '';
+    const hash = key && key !== 'none' ? `#${phraseHash}${key}` : '';
     history.replaceState(null, '', `${location.pathname}${hash}`);
   };
 
@@ -753,7 +785,7 @@
     const entry = feelingEntries.get(id);
     if (!entry) return;
     render(entry);
-    history.replaceState(null, '', `${location.pathname}#gefuehl-${id}`);
+    history.replaceState(null, '', `${location.pathname}#${feelingHash}${id}`);
     track('translator_result', { result_key: entry.key, input_source: source, safety_hint: 'no' });
   }
 
@@ -779,7 +811,7 @@
     const text = input.value.trim();
     if (!text) {
       // Leeres Feld: sagen, was fehlt – sichtbar und für Vorlesen.
-      emptyHint.textContent = 'Bitte zuerst einen Satz eintippen – oder unten einen antippen.';
+      emptyHint.textContent = tr('Bitte zuerst einen Satz eintippen – oder unten einen antippen.');
       input.focus();
       return;
     }
@@ -788,7 +820,7 @@
     const feelingEntry = !entry && feeling ? feelingEntries.get(feeling.id) : null;
     if (feelingEntry) {
       render(feelingEntry, { safetyHit, typed: text });
-      history.replaceState(null, '', `${location.pathname}#gefuehl-${feeling.id}`);
+      history.replaceState(null, '', `${location.pathname}#${feelingHash}${feeling.id}`);
       track('translator_result', { result_key: feelingEntry.key, input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no' });
       return;
     }
@@ -813,11 +845,11 @@
 
   // Geteilte Links wie …/demenz-uebersetzer/#satz-mutter öffnen das Ergebnis direkt.
   const openFromHash = () => {
-    if (location.hash.startsWith('#gefuehl-')) {
-      showFeeling(location.hash.slice(9), 'link');
+    if (location.hash.startsWith(`#${feelingHash}`)) {
+      showFeeling(location.hash.slice(feelingHash.length + 1), 'link');
       return;
     }
-    const key = location.hash.startsWith('#satz-') ? location.hash.slice(6) : '';
+    const key = location.hash.startsWith(`#${phraseHash}`) ? location.hash.slice(phraseHash.length + 1) : '';
     const entry = entryByKey.get(key);
     if (!entry) return;
     input.value = entry.says;
@@ -827,6 +859,14 @@
   };
   openFromHash();
   window.addEventListener('hashchange', openFromHash);
+
+  // Zurück von Kasse oder Anmeldung: den gemerkten Satz (nur sessionStorage dieses Tabs) gleich übersetzen.
+  const pendingSentence = window.DemenzKiFreigabe?.takePending();
+  if (pendingSentence) {
+    input.value = pendingSentence;
+    grow();
+    form.requestSubmit();
+  }
 
   // Beim Drucken alle aufklappbaren Abschnitte zeigen.
   window.addEventListener('beforeprint', () => {

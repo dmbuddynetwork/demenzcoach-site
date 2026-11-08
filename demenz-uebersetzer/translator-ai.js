@@ -6,6 +6,8 @@
 // Speicherung (store: false) und gibt nur geprüfte, kurze Antworten zurück.
 (function (root) {
   const endpoint = 'https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web';
+  // Englische Seiten (<html lang="en">) bitten um eine englische Antwort. Deutsch schickt kein Sprachfeld.
+  const language = typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'en' : '';
 
   const ask = async (text, { formal = false } = {}) => {
     const controller = new AbortController();
@@ -17,7 +19,9 @@
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: String(text).trim().slice(0, 200), formal: formal === true }),
+        body: JSON.stringify(language === 'en'
+          ? { text: String(text).trim().slice(0, 200), formal: false, language: 'en' }
+          : { text: String(text).trim().slice(0, 200), formal: formal === true }),
         signal: controller.signal
       });
       if (response.status === 429) return { kind: 'error', reason: 'busy' };

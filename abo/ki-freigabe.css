@@ -1,0 +1,11 @@
+/* Angebotskarte im Übersetzer (ki-freigabe.js): Farben aus einfach.css, mit Werten der App als Ersatz. */
+.ki-angebot { background: var(--e-card, #fff); border: 1px solid var(--e-line, #d6d3dc); border-radius: var(--e-radius, 16px);
+  padding: 20px; margin: 16px 0; color: var(--e-text, #1c1b1f); font-size: var(--e-size, 1.1875rem); line-height: 1.45; }
+.ki-angebot p { margin: 0 0 12px; }
+.ki-angebot-titel { font-weight: 700; }
+.ki-angebot-knopf { display: flex; align-items: center; justify-content: center; min-height: 56px; margin: 4px 0 12px; padding: 12px 18px;
+  border-radius: 14px; background: var(--e-purple, #47408c); color: #fff; font-weight: 700; text-decoration: none; text-align: center; }
+.ki-angebot-knopf:hover, .ki-angebot-knopf:focus-visible { background: var(--e-purple-dark, #362f6e); }
+.ki-angebot-klein { font-size: var(--e-small, .9375rem); color: var(--e-muted, #55525e); }
+.ki-angebot-klein a { color: var(--e-purple, #47408c); font-weight: 600; }
+.ki-angebot > :last-child { margin-bottom: 0; }
