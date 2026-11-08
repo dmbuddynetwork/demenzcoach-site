@@ -395,8 +395,15 @@
       nodes.push(element('p', { className: 'translator-meaning translator-ai-next', text: result.nextStep }));
     }
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
+    nodes.push(disclaimer(true));
     return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
   };
+  // Haftungs- und Gesundheitshinweis unter jeder Antwort (Daniel, 8. Nov), kurz und gut lesbar.
+  const disclaimer = (fromAI = false) => element('p', { className: 'translator-disclaimer' }, [
+    ...(fromAI ? ['KI-Antworten können Fehler enthalten. '] : []),
+    'Allgemeine Hinweise ohne Gewähr, kein Ersatz für ärztlichen Rat. ',
+    element('a', { className: 'text-link', text: 'Nutzungsbedingungen', attributes: { href: '/nutzungsbedingungen.html' } })
+  ]);
   // Warte-Ansicht in Form der Antwort: so wirkt die Wartezeit kürzer und nichts springt.
   const aiWaiting = () => element('div', { className: 'translator-ai-wait', attributes: { 'aria-hidden': 'true' } }, [
     element('span', { className: 'translator-skeleton translator-skeleton-title' }),
@@ -427,6 +434,8 @@
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
         output.querySelector('.translator-near-group')?.remove();
+        // Die KI-Antwort bringt ihren eigenen Hinweis mit („KI-Antworten können Fehler enthalten“).
+        output.querySelector('.translator-disclaimer')?.remove();
         if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
         document.body.classList.remove('translator-answers-seen');
@@ -507,6 +516,7 @@
     ]);
     if (box) fallbackBox.hidden = true;
     nodes.push(fallbackBox);
+    nodes.push(disclaimer());
     nodes.push(suggestLink(typed));
     nodes.push(appCTA());
     output.replaceChildren(...nodes.filter(Boolean));
@@ -676,6 +686,7 @@
       input.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
     }));
     nodes.push(actions);
+    nodes.push(disclaimer());
 
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
