@@ -192,6 +192,8 @@
     element('img', { attributes: { src: '../assets/app-qr-de.svg', width: '112', height: '112', loading: 'lazy', alt: 'QR-Code zur App Demenz Coach im App Store' } }),
     element('figcaption', { text: 'Mit der iPhone-Kamera scannen' })
   ]);
+  // E-Mail-Liste (translator-signup.js): nur sichtbar, wenn das Skript geladen ist.
+  const signupBox = () => window.DemenzTranslatorSignup?.box((step) => track('translator_signup', { step }));
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
       element('h2', { text: 'Für eure eigene Situation' }),
@@ -361,24 +363,15 @@
     if (target === urgent) urgent.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
   };
-  const urgentNote = (text, lead = '', doctorFirst = false) => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
-    // Im Notfall zuerst die Knöpfe zum Anrufen, dann die Erklärung.
+  const urgentNote = (text, lead = '') => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
+    // Im Notfall zuerst die Knöpfe zum Anrufen (112 immer vorn), dann die Erklärung.
     element('strong', { text: 'Erst die Sicherheit' }),
     lead ? element('p', { className: 'safety-lead', text: lead }) : null,
-    safetyCalls(text, doctorFirst),
+    safetyCalls(text),
     element('span', { text })
   ]);
-  // Nur Schmerzen oder Fieber, nichts Akutes: kurzer Hinweis, 116 117 zuerst.
-  const mildOnly = (typed) => {
-    const mild = data.safetySignals.mild;
-    if (!mild || !typed) return false;
-    const normalized = core.normalize(typed);
-    const has = (cue) => normalized.includes(` ${cue}`);
-    return mild.cues.some(has) && !mild.not.some(has);
-  };
-  const generalNote = (typed, lead = '') => (mildOnly(typed) && !lead
-    ? urgentNote(data.safetySignals.mild.text, '', true)
-    : urgentNote(data.safetySignals.text, lead));
+  // Ein einziger, ungestufter Hinweis: Das Tool schätzt nicht ein, wie dringend etwas ist.
+  const generalNote = (lead = '') => urgentNote(data.safetySignals.text, lead);
 
   // KI für Sätze, die die feste Liste nicht kennt. Bekannte Sätze bleiben auf dem Gerät;
   // unbekannte gehen automatisch an die KI (Hinweis unter dem Eingabefeld).
@@ -532,7 +525,7 @@
 
   const renderUnknown = ({ safetyHit, typed }) => {
     const nodes = [];
-    if (safetyHit) nodes.push(generalNote(typed));
+    if (safetyHit) nodes.push(generalNote());
     // Gleicher Aufbau wie ein Treffer: oben der Satz, dann klar, was jetzt hilft.
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
@@ -568,6 +561,7 @@
     nodes.push(disclaimer());
     nodes.push(suggestLink(typed));
     nodes.push(appCTA());
+    nodes.push(signupBox());
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
@@ -608,7 +602,7 @@
     } else if (safetyHit || result.safetyOnly) {
       const typedForLead = core.normalize(typed);
       const lead = result.urgentLead?.cues?.some((cue) => typedForLead.includes(` ${cue}`)) ? result.urgentLead.text : '';
-      nodes.push(result.safetyOnly ? urgentNote(result.safety, lead) : generalNote(typed, lead));
+      nodes.push(result.safetyOnly ? urgentNote(result.safety, lead) : generalNote(lead));
     }
 
     // Steht der getippte Satz schon als Überschrift da, braucht es keine Wiederholung.
@@ -738,6 +732,7 @@
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
       nodes.push(feedbackBlock(result, retry));
       nodes.push(appCTA(result));
+      nodes.push(signupBox());
     }
 
     output.replaceChildren(...nodes.filter(Boolean));

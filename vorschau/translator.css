@@ -471,6 +471,18 @@ body[data-page-type="translator-tool"] .translator-section { padding-top: 32px; 
 [data-page-type^="translator"] .translator-share-ai { margin: 18px 0 0; padding: 16px; border: 1px solid var(--line); border-radius: 14px; }
 [data-page-type^="translator"] .translator-share-ai p { margin: 0 0 12px; }
 [data-page-type^="translator"] .translator-share-ai .translator-share-status { margin: 10px 0 0; }
+[data-page-type^="translator"] .translator-signup { margin: 24px 0 0; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+[data-page-type^="translator"] .translator-signup-form { display: grid; gap: 12px; }
+[data-page-type^="translator"] .translator-signup label { font-weight: 700; font-size: 1.15rem; line-height: 1.35; }
+[data-page-type^="translator"] .translator-signup input[type="email"] { width: 100%; min-height: 56px; padding: 0 16px; border: 2px solid var(--line); border-radius: 14px; font: inherit; font-size: 1.1rem; background: #fff; color: inherit; }
+[data-page-type^="translator"] .translator-signup input[type="email"]:focus { outline: 3px solid currentColor; outline-offset: 2px; }
+[data-page-type^="translator"] .translator-signup .button { width: 100%; min-height: 56px; }
+[data-page-type^="translator"] .translator-signup small { font-size: 0.95rem; line-height: 1.45; }
+[data-page-type^="translator"] .translator-signup-status:empty { display: none; }
+[data-page-type^="translator"] .translator-signup-status { margin: 12px 0 0; }
+[data-page-type^="translator"] .translator-signup-done p { margin: 6px 0 14px; }
+[data-page-type^="translator"] .translator-signup-confirmed { margin: 0 0 18px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+[data-page-type^="translator"] .translator-signup-confirmed p { margin: 6px 0 0; }
 [data-page-type^="translator"] .translator-share-ai .translator-share-status:empty { display: none; }
 [data-page-type^="translator"] .translator-share-ai button[hidden] { display: none; }
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
