@@ -198,7 +198,8 @@
         </div>
         <div class="thanks" role="status">
           <h3>Almost done! 💌</h3>
-          <p>Check your inbox and tap the button in my email. The list will arrive right away.</p>
+          <p><strong>All 5 tricks are now unlocked below.</strong> <a href="#tricks" data-to-tricks>Go to the tricks ↓</a></p>
+            <p>So I can email you the printable list and new tricks, please tap the button in my email.</p>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Open your inbox</a>
             <p class="inbox-hint">The email comes from “Debby from Dementia Coach”. Nothing there? Please check your spam folder too.</p>
           <a class="btn btn-ghost" href="https://wa.me/?text=Small%20tricks%20for%20dementia%2C%20like%20the%20red%20plate%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fplate%2F">Share with your family</a>
@@ -293,7 +294,8 @@
           </div>
           <div class="thanks" role="status">
             <h3>Almost done! 💌</h3>
-            <p>Check your inbox and tap the button in my email. The list will arrive right away.</p>
+            <p><strong>All 5 tricks are now unlocked below.</strong> <a href="#tricks" data-to-tricks>Go to the tricks ↓</a></p>
+            <p>So I can email you the printable list and new tricks, please tap the button in my email.</p>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Open your inbox</a>
             <p class="inbox-hint">The email comes from “Debby from Dementia Coach”. Nothing there? Please check your spam folder too.</p>
             <a class="btn btn-ghost" href="https://wa.me/?text=Small%20tricks%20for%20dementia%2C%20like%20the%20red%20plate%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fplate%2F">Share with your family</a>
@@ -470,6 +472,9 @@
         data.append("locale", "en");
         var done = function () {
           box.classList.add("done");
+          // Sofort-Nutzen: alle Tricks direkt auf der Seite freischalten
+          document.body.classList.add("unlocked");
+          document.querySelectorAll(".secret").forEach(function (s) { s.classList.remove("secret"); });
           var dom = input.value.trim().split("@").pop().toLowerCase();
           var link = box.querySelector("[data-inbox]");
           for (var k = 0; link && k < INBOX.length; k++) {
@@ -510,6 +515,14 @@
         setTimeout(function () { var i = document.getElementById("email-1"); if (i) i.focus({ preventScroll: true }); }, 450);
       });
     }
+
+    document.addEventListener("click", function (ev) {
+      var a = ev.target.closest && ev.target.closest("[data-to-tricks]");
+      if (!a) return;
+      ev.preventDefault();
+      var first = document.querySelector("article.locked");
+      if (first) first.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
 
     document.querySelectorAll("[data-print]").forEach(function (b) {
       b.addEventListener("click", function () { window.print(); });
