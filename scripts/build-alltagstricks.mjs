@@ -37,8 +37,8 @@ for (const [slug] of Object.values(pages)) {
 
 const store = (ct) => `https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=${ct}&amp;mt=8`;
 const categories = Object.entries(data.categories);
-const title = "Alltagstricks bei Demenz: 54 kleine Hilfen mit Bildern | Demenz Coach";
-const description = "Roter Teller, Bild an der Toilettentür, Tafel für den Tag: 54 einfache Alltagstricks für Angehörige von Menschen mit Demenz, jeder mit Zeichnung.";
+const title = `Alltagstricks bei Demenz: ${data.tricks.length} kleine Hilfen mit Bildern | Demenz Coach`;
+const description = `Roter Teller, Bild an der Toilettentür, Tafel für den Tag: ${data.tricks.length} einfache Alltagstricks für Angehörige von Menschen mit Demenz, jeder mit Zeichnung.`;
 
 // Gleiches Aussehen wie die Ergebnisseite des Übersetzers (Daniel, 8. Nov 17:01: „soll wie eine Seite wirken“):
 // dieselbe Trick-Karte wie unter „Das kannst du tun“, Themen als Überschriften wie „Das kannst du sagen“,
