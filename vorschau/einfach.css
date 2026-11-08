@@ -220,3 +220,4 @@ body.einfach .breadcrumbs { display: flex; flex-wrap: wrap; gap: 4px 8px; }
 body.einfach :is(.safety-note, .article-cta, .translator-static-cta) { margin-block: 20px; }
 body.einfach .translator-static-cta { background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: var(--e-radius) !important; padding: 20px !important; color: var(--e-text) !important; }
 body.einfach .translator-static-cta :is(h2, p) { color: var(--e-text) !important; }
+body.einfach :is(.translator-section, .translator-hero, .content-library, main > section) { background: transparent !important; }
