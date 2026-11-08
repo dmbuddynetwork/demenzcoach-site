@@ -797,12 +797,13 @@
       }
     }
     const phraseBlock = [];
+    let quickRow = null;
     const doBlock = [];
     let panel = null;
     if (result.phrases.length) {
       phraseBlock.push(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
       const phraseList = element('div', { className: 'translator-phrases' });
-      // Anrede direkt über den Sätzen (Daniel, 8. Nov: Personalisieren sichtbar statt in einer Klappe).
+      // Anrede als kleine Zeile unten in der Karte (Daniel, 8. Nov: sichtbar, aber nicht über den Sätzen, das lenkt ab).
       let quickToggles = [];
       const syncQuick = () => {
         quickToggles.forEach((toggle, index) => toggle.setAttribute('aria-pressed', String(Boolean(index) === personal.formal)));
@@ -845,7 +846,7 @@
           panel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
           panel.querySelector('input')?.focus({ preventScroll: true });
         }));
-        phraseBlock.push(quick);
+        quickRow = quick;
       }
       paint();
       phraseBlock.push(phraseList);
@@ -867,7 +868,7 @@
       }
       panel = result.selfCare ? null : personalPanel(repaint, { open: usesExampleName });
       // Mit der Anrede-Zeile in der Karte braucht es keine zweite Zeile „Sätze persönlich machen“: Die Felder öffnen über „Namen einsetzen“.
-      if (panel && phraseBlock.some((node) => node.classList?.contains('translator-quick'))) panel.classList.add('translator-personal-quiet');
+      if (panel && quickRow) panel.classList.add('translator-personal-quiet');
       nodes.push(alsoWrapper, panel);
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
@@ -875,7 +876,7 @@
     const order = goal === 'jetzt' ? [phraseBlock, doBlock, meaningBlock]
       : goal === 'tipps' ? [doBlock, phraseBlock, meaningBlock]
         : [meaningBlock, phraseBlock, doBlock];
-    answerCard.append(...order.flat());
+    answerCard.append(...[...order.flat(), quickRow].filter(Boolean));
     // Die anderen Ziele bleiben unter der Antwort antippbar (wie in der App, helle Zeilen).
     if (chosenGoal) {
       nodes.push(element('div', { className: 'translator-other-goals', attributes: { role: 'group', 'aria-label': 'Anderes Ziel' } }, goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {

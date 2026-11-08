@@ -318,9 +318,10 @@ body.einfach .translator-goal-list { margin: 4px 0 12px; padding-left: 22px !imp
 body.einfach .translator-goal-list li { margin: 0 0 6px; }
 
 /* Anrede direkt über den Sätzen; die Felder für Namen öffnen über „Namen einsetzen“. */
-body.einfach .translator-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+body.einfach .translator-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 16px 0 0; padding-top: 12px; border-top: 1px solid var(--e-line); }
+body.einfach .translator-quick, body.einfach .translator-quick * { font-size: var(--e-small) !important; }
 body.einfach .translator-quick > span { color: var(--e-muted); }
-body.einfach .translator-quick .translator-chip { width: auto; min-height: 44px; padding: 8px 16px; }
+body.einfach .translator-quick .translator-chip { width: auto; min-height: 40px; padding: 6px 14px; font-weight: 600 !important; }
 body.einfach .translator-quick .translator-chip::after { content: none !important; }
 body.einfach .translator-quick .translator-chip[aria-pressed="true"] { background: var(--e-purple) !important; color: #fff !important; }
 body.einfach .translator-personal-quiet:not([open]) { display: none !important; }
