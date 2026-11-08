@@ -1,0 +1,10 @@
+# Nur für Bauen und Prüfen, nicht für Besucher
+.git
+.github
+.assetsignore
+wrangler.jsonc
+cloudflare-worker.js
+node_modules
+scripts
+docs
+README.md

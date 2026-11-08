@@ -1,0 +1,15 @@
+// Cloudflare-Hosting von dementiacoachapp.com (Workers mit statischen Dateien, seit 8. Nov 2026).
+// html_handling "none": Adressen wie /datenschutz.html bleiben wie auf GitHub Pages (kein Umleiten auf /datenschutz).
+// Fehlende Ordner-Startseiten und 404 übernimmt cloudflare-worker.js. Nicht ausgeliefert: siehe .assetsignore.
+{
+  "name": "dementiacoachapp",
+  "main": "cloudflare-worker.js",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "html_handling": "none",
+    "not_found_handling": "none"
+  },
+  "observability": { "enabled": false }
+}
