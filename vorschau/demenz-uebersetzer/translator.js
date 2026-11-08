@@ -415,6 +415,26 @@
   // was geteilt wird. Daraus entstehen später neue Satz-Seiten und Einträge in der App.
   const shareBox = (share) => {
     const status = element('p', { className: 'translator-share-status', attributes: { role: 'status' } });
+    // Automatisch gespeichert (erst nach Anwaltscheck per Remote Config): offen zeigen, was, und abwählbar.
+    if (share.stored) {
+      const undo = button('Nicht speichern', 'translator-copy', async () => {
+        undo.disabled = true;
+        const ok = await ai.share({ sentence: share.sentence, token: share.token, undo: true });
+        track('translator_ai', { step: ok ? 'share_undone' : 'share_undo_failed', source: 'answer' });
+        if (ok) {
+          undo.hidden = true;
+          status.textContent = 'Erledigt, der Satz ist gelöscht.';
+        } else {
+          undo.disabled = false;
+          status.textContent = 'Das hat gerade nicht geklappt. Bitte später noch einmal.';
+        }
+      });
+      return element('div', { className: 'translator-share-ai' }, [
+        element('p', { text: `Zur Verbesserung des Übersetzers haben wir nur diese anonyme Fassung gespeichert: „${share.sentence}“. Deine Eingabe speichern wir nicht.` }),
+        undo,
+        status
+      ]);
+    }
     const send = button('Anonym teilen', 'translator-copy', async () => {
       send.disabled = true;
       const ok = await ai.share(share);

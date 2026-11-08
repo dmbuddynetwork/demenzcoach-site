@@ -33,7 +33,7 @@
 
   // Freiwillig und erst nach Antippen von „Anonym teilen“: Zurück geht nur die von der KI
   // bereinigte Fassung samt Server-Prüfzeichen, nie der eingegebene Satz.
-  const share = async ({ sentence, token } = {}) => {
+  const share = async ({ sentence, token, undo = false } = {}) => {
     if (typeof sentence !== 'string' || typeof token !== 'string') return false;
     try {
       const response = await fetch(`${endpoint}/share`, {
@@ -42,7 +42,7 @@
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sentence, token })
+        body: JSON.stringify(undo === true ? { sentence, token, undo: true } : { sentence, token })
       });
       return response.ok;
     } catch {
