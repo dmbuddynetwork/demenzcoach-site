@@ -466,6 +466,20 @@
   // Runde 198 (Daniels Wahl „Automatisch“): Unbekannte Sätze gehen ohne Knopf an die KI.
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
+  // KI-Freigabe der Web-Kasse (/abo/ki-freigabe.js, Daniel 8. Nov: „1 gratis, dann Probezeit“).
+  // Aus, solange translatorGate.enabled nicht true ist; bekannte Sätze bleiben immer frei, Englisch auch.
+  // Gesperrt: Angebotskarte statt Warte-Ansicht. Der Sicherheitshinweis darüber und „Meinst du vielleicht“
+  // bleiben stehen; onFail zeigt die Gefühle-Auswahl und den allgemeinen Satz.
+  const aiLocked = async (box, text, source, waiting) => {
+    const gate = window.DemenzKiFreigabe;
+    if (!gate) return false;
+    const access = await gate.check({ language: (document.documentElement.lang || 'de').slice(0, 2) });
+    if (access.allowed) return false;
+    waiting.remove();
+    box.replaceChildren(gate.offerCard({ sentence: text }));
+    track('translator_ai', { step: 'limit', source });
+    return true;
+  };
   const aiBox = (text, source, onFail = () => {}, { auto = false } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
@@ -477,11 +491,13 @@
       status.textContent = tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
+      if (await aiLocked(box, text, source, waiting)) { onFail(); return; }
       const result = await ai.ask(text, { formal: personal.formal });
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
+        window.DemenzKiFreigabe?.noteAnswer();
         const { node, focus, top } = aiAnswer(result);
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
@@ -843,6 +859,14 @@
   };
   openFromHash();
   window.addEventListener('hashchange', openFromHash);
+
+  // Zurück von Kasse oder Anmeldung: den gemerkten Satz (nur sessionStorage dieses Tabs) gleich übersetzen.
+  const pendingSentence = window.DemenzKiFreigabe?.takePending();
+  if (pendingSentence) {
+    input.value = pendingSentence;
+    grow();
+    form.requestSubmit();
+  }
 
   // Beim Drucken alle aufklappbaren Abschnitte zeigen.
   window.addEventListener('beforeprint', () => {

@@ -272,3 +272,8 @@ body.einfach .e-muted { color: var(--e-muted); }
   .e-side > .e-hero-art { order: -2; }
   .e-side > #liste { order: -1; }
 }
+
+/* Angebotskarte der KI-Freigabe (/abo/ki-freigabe.css) ohne zweiten Rahmen; Knopftext weiß. */
+body.einfach .translator-ai:has(.ki-angebot) { padding: 0 !important; border: 0 !important; background: none !important; }
+body.einfach .translator-ai .ki-angebot { margin: 0; }
+body.einfach .ki-angebot-knopf, body.einfach .ki-angebot-knopf:visited { color: #fff !important; text-decoration: none !important; }
