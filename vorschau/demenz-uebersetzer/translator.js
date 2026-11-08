@@ -194,13 +194,12 @@
   // App-Link je Situation mit eigenem Kampagnen-Token (fester Schlüssel, nie Text),
   // damit messbar wird, welche Situationen zur App führen.
   const appLinkFor = (result) => (result?.campaign ? appURL.replace(/ct=[^&]+/, `ct=${result.campaign}`) : appURL);
-  // Am Computer lässt sich die iPhone-App nicht laden: dort zeigt die Karte einen QR-Code (nur breite Bildschirme mit Maus).
-  const qrFigure = () => (ui?.qr === false ? null : element('figure', { className: 'translator-qr' }, [
-    element('img', { attributes: { src: '../assets/app-qr-de.svg', width: '112', height: '112', loading: 'lazy', alt: 'QR-Code zur App Demenz Coach im App Store' } }),
-    element('figcaption', { text: 'Mit der iPhone-Kamera scannen' })
-  ]));
   // E-Mail-Liste (translator-signup.js): nur sichtbar, wenn das Skript geladen ist.
   const signupBox = () => window.DemenzTranslatorSignup?.box((step) => track('translator_signup', { step }));
+  // Am Computer lässt sich die iPhone-App nicht direkt laden, und einen QR-Code nutzt die Zielgruppe nicht
+  // (Daniel, 8. Nov). Dort kommt deshalb zuerst die E-Mail-Liste, dann der App-Hinweis.
+  const onComputer = () => window.matchMedia?.('(min-width: 900px) and (hover: hover) and (pointer: fine)').matches === true;
+  const offers = (result) => (onComputer() ? [signupBox(), appCTA(result)] : [appCTA(result), signupBox()]);
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
       element('h2', { text: 'Für eure eigene Situation' }),
@@ -224,8 +223,7 @@
         className: 'button',
         text: 'Kostenlos im App Store',
         attributes: { href: appLinkFor(result), 'data-store-link': result?.key ? `translator-result-${result.key}` : 'translator-result' }
-      }),
-      qrFigure()
+      })
     ])
   ]);
 
@@ -572,8 +570,7 @@
     nodes.push(fallbackBox);
     nodes.push(disclaimer());
     nodes.push(suggestLink(typed));
-    nodes.push(appCTA());
-    nodes.push(signupBox());
+    nodes.push(...offers());
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
@@ -751,8 +748,7 @@
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
       nodes.push(feedbackBlock(result, retry));
-      nodes.push(appCTA(result));
-      nodes.push(signupBox());
+      nodes.push(...offers(result));
     }
 
     output.replaceChildren(...nodes.filter(Boolean));

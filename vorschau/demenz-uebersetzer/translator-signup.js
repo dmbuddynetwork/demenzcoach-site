@@ -56,7 +56,8 @@
     input.setAttribute('inputmode', 'email');
     const button = make('button', 'button', 'Liste kostenlos holen');
     button.type = 'submit';
-    const small = make('small', '', 'Ab und zu ein neuer Satz mit Antwort. Abmelden mit einem Klick. ');
+    // Einwilligung klar benennen: Mit dem Absenden kommen Liste und gelegentliche E-Mails (Double-Opt-in folgt).
+    const small = make('small', '', 'Du bekommst die Liste und ab und zu einen neuen Satz per E-Mail. Abmelden jederzeit mit einem Klick. ');
     const privacy = make('a', 'text-link', 'Datenschutz');
     privacy.href = '/datenschutz.html#e-mail-liste';
     small.append(privacy);

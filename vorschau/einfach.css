@@ -186,12 +186,6 @@ body.einfach .translator-app-cta { display: grid; gap: 12px; }
 body.einfach .translator-app-cta h2 { margin: 0 0 6px; }
 body.einfach .translator-app-visual { display: grid; gap: 12px; justify-items: stretch; }
 body.einfach .translator-app-visual > img { display: none; }
-body.einfach .translator-qr { display: none !important; }
-@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
-  body.einfach .translator-app-visual { grid-template-columns: auto auto; align-items: center; justify-content: start; gap: 24px; }
-  body.einfach .translator-qr { display: flex !important; flex-direction: column; align-items: center; gap: 6px; margin: 0; }
-  body.einfach .translator-qr img { display: block !important; width: 104px; height: 104px; }
-}
 body.einfach .translator-signup-form { display: grid; gap: 12px; }
 body.einfach .translator-signup input { width: 100%; min-height: 56px; padding: 12px 16px; border: 1px solid var(--e-line); border-radius: 14px; background: #fff; }
 body.einfach .translator-signup .button { width: 100%; }
@@ -260,7 +254,6 @@ body.einfach .e-app > img { display: block; width: 160px; margin: 0 auto 12px; }
 body.einfach .e-app h2 { margin: 0 0 12px; }
 body.einfach .e-app .e-checks { margin-bottom: 20px; }
 body.einfach .e-muted { color: var(--e-muted); }
-.e-qr { display: none; }
 #home-signup .translator-signup { margin: 0; padding: 0 !important; border: 0 !important; background: none !important; }
 #home-signup .translator-signup label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (min-width: 900px) {
@@ -270,6 +263,7 @@ body.einfach .e-muted { color: var(--e-muted); }
   body.einfach .e-app > img { display: none; }
 }
 @media (min-width: 900px) and (hover: hover) and (pointer: fine) {
-  .e-qr { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 16px 0 0; }
-  .e-qr img { width: 112px; height: 112px; }
+  /* Am Computer: E-Mail-Liste direkt unter der Zeichnung, App-Karte darunter (kein QR-Code). */
+  .e-side > .e-hero-art { order: -2; }
+  .e-side > #liste { order: -1; }
 }
