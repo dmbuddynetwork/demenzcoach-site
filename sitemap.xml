@@ -554,4 +554,9 @@
   <url>
     <loc>https://dementiacoachapp.com/en/dementia-translator/im-not-going-to-day-care.html</loc>
   </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/"/>
+  </url>
 </urlset>

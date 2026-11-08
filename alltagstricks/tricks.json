@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "note": "Alltagstricks fuer Demenz Coach (App + Website). Nicht medizinisch: keine Wirkversprechen, keine Medikamente, keine Diagnosen. Rot nur, wenn die Farbe selbst der Trick ist.",
+  "categories": {
+    "essen": "Essen", "trinken": "Trinken", "bad": "Bad und Toilette", "orientierung": "Orientierung",
+    "schlaf": "Abend und Nacht", "sicherheit": "Sicherheit", "kleidung": "Kleidung",
+    "beschaeftigung": "Beschäftigung und Ruhe", "gespraech": "Gespräch und Begegnung"
+  },
+  "tricks": [
+    {"id":"teller-rot","category":"essen","title":"Roter Teller","text":"Serviere das Essen auf einem roten Teller. Darauf hebt sich das Essen deutlich ab.","situations":["eat","cold"],"drawing":"illu-plate-red"},
+    {"id":"unterlage-einfarbig","category":"essen","title":"Einfarbige Unterlage","text":"Lege eine einfarbige Unterlage auf den Tisch und räume Muster, Deko und Gläser weg. So bleibt nur das Essen im Blick.","situations":["eat"],"drawing":"illu-trick-unterlage"},
+    {"id":"eins-nach-dem-anderen","category":"essen","title":"Immer nur ein Gericht","text":"Stelle nur Teller und Besteck hin. Das nächste Gericht kommt erst, wenn das erste weg ist.","situations":["eat","cold"],"drawing":"illu-trick-ein-gericht"},
+    {"id":"fingerfood","category":"essen","title":"Essen zum Anfassen","text":"Schneide Brot, Obst und Gemüse in kleine Stücke zum Greifen. Dann braucht es kein Besteck.","situations":["eat","walk"],"drawing":"illu-plates"},
+    {"id":"gemeinsam-essen","category":"essen","title":"Gemeinsam essen","text":"Setz dich dazu und iss selbst mit. Viele machen einfach nach, was sie sehen.","situations":["eat","apathy"],"drawing":"illu-together"},
+    {"id":"nur-loeffel","category":"essen","title":"Nur ein Löffel","text":"Lege statt Messer und Gabel nur einen Löffel hin. Das ist einfacher zu greifen.","situations":["eat"],"drawing":"illu-trick-loeffel"},
+    {"id":"lieblingsessen","category":"essen","title":"Lieblingsessen von früher","text":"Koche etwas, das die Person von früher kennt. Der Duft aus der Küche macht oft neugierig.","situations":["eat","cold"],"drawing":"illu-trick-lieblingsessen"},
+
+    {"id":"becher-farbig","category":"trinken","title":"Farbiger Becher","text":"Nimm einen bunten Becher, der sich vom Tisch abhebt, und fülle ihn nur halb voll.","situations":["drink"],"drawing":"illu-becher-red"},
+    {"id":"getraenke-ueberall","category":"trinken","title":"Getränke überall","text":"Stelle in jedem Raum ein gefülltes Glas oder eine Tasse hin, die man gut sieht.","situations":["drink"],"drawing":"illu-trick-getraenke"},
+    {"id":"anstossen","category":"trinken","title":"Anstoßen","text":"Nimm selbst ein Glas und stoße an. Gemeinsam trinken fällt leichter.","situations":["drink","apathy"],"drawing":"illu-becher-drink"},
+
+    {"id":"wc-sitz-farbig","category":"bad","title":"Farbiger Toilettensitz","text":"Ein farbiger Toilettensitz hebt sich vom weißen Becken ab. So findet man ihn leichter.","situations":["bathroom","accident"],"drawing":"illu-wc-red"},
+    {"id":"tuer-bild","category":"bad","title":"Bild an der Toilettentür","text":"Hänge ein Bild einer Toilette in Augenhöhe an die Tür und lasse die Tür offen stehen.","situations":["bathroom","night"],"drawing":"illu-tuer-door"},
+    {"id":"nachtlicht-weg","category":"bad","title":"Licht auf dem Weg","text":"Ein Nachtlicht mit Bewegungsmelder zeigt nachts den Weg zur Toilette.","situations":["night","bathroom"],"drawing":"illu-nacht-sensor"},
+    {"id":"bad-vorwaermen","category":"bad","title":"Bad vorwärmen","text":"Wärme das Bad vor und lege ein großes Handtuch um die Schultern. Decke beim Waschen ab, was gerade nicht dran ist.","situations":["wash","bath"],"drawing":"illu-tuch-towel"},
+    {"id":"lied-beim-waschen","category":"bad","title":"Lieblingslied beim Waschen","text":"Summt oder singt zusammen ein Lied, das die Person mag. Das lenkt ab und macht es freundlicher.","situations":["wash","teeth"],"drawing":"illu-lied-sing"},
+    {"id":"erst-die-haende","category":"bad","title":"Erst nur die Hände","text":"Beginne mit einem warmen Waschlappen an Händen und Gesicht. Der Rest folgt später oder ein anderes Mal.","situations":["bath","wash"],"drawing":"illu-trick-waschlappen"},
+    {"id":"zaehne-nebeneinander","category":"bad","title":"Zähne nebeneinander putzen","text":"Putze dir neben der Person die Zähne. Sie macht oft einfach mit.","situations":["teeth"],"drawing":"illu-teeth"},
+    {"id":"handcreme","category":"bad","title":"Handcreme","text":"Creme der Person die Hände ein. Das ist eine ruhige Berührung, für die es keine Worte braucht.","situations":["cry","apathy","anger"],"drawing":"illu-hand-cream"},
+    {"id":"duschhocker","category":"bad","title":"Duschhocker","text":"Mit einem Duschhocker kann die Person im Sitzen duschen. Das gibt Halt und ist weniger anstrengend.","situations":["wash","bath"],"drawing":"illu-trick-duschhocker"},
+
+    {"id":"uhr-mit-datum","category":"orientierung","title":"Uhr mit Wochentag","text":"Hänge eine große Uhr auf, die Wochentag und Datum zeigt, dort wo die Person oft sitzt.","situations":["morning","repeat","getup"],"drawing":"illu-uhr-clock"},
+    {"id":"antwort-zettel","category":"orientierung","title":"Antwort auf den Zettel","text":"Schreibe die Antwort in großer Schrift auf einen Zettel. Bei der nächsten Frage zeigst du darauf.","situations":["repeat"],"drawing":"illu-trick-zettel"},
+    {"id":"tagestafel","category":"orientierung","title":"Tafel für den Tag","text":"Schreibe auf eine Tafel, was heute ansteht, groß und mit wenigen Wörtern. Streiche Erledigtes gemeinsam durch.","situations":["morning","repeat","getup","daycare"],"drawing":"illu-trick-tagestafel"},
+    {"id":"fotoalbum","category":"orientierung","title":"Fotoalbum","text":"Schaut zusammen ein Album mit alten Fotos an. Bilder von früher geben Gesprächsstoff.","situations":["home","dead","child","recognize","jealous"],"drawing":"illu-trick-fotoalbum"},
+    {"id":"fotos-mit-namen","category":"orientierung","title":"Fotos mit Namen","text":"Stelle Fotos der Familie auf und schreibe die Namen in großer Schrift dazu.","situations":["recognize","visit"],"drawing":"illu-trick-namen-fotos"},
+    {"id":"schrank-bilder","category":"orientierung","title":"Bilder am Schrank","text":"Klebe außen auf Schränke und Schubladen ein Bild von dem, was darin liegt.","situations":["dress","rummage"],"drawing":"illu-trick-schrank-bilder"},
+    {"id":"vorhaenge-auf","category":"orientierung","title":"Vorhänge auf","text":"Öffne morgens die Vorhänge und lasse Tageslicht herein. Das markiert den Beginn des Tages.","situations":["getup","morning"],"drawing":"illu-licht-window"},
+    {"id":"fester-platz","category":"orientierung","title":"Fester Platz für Wichtiges","text":"Gib Schlüsseln, Brille und Geldbeutel einen festen, sichtbaren Platz, zum Beispiel ein Schlüsselbrett.","situations":["keys","accuse"],"drawing":"illu-trick-schluesselbrett"},
+
+    {"id":"tageslicht-spaziergang","category":"schlaf","title":"Raus an die Luft","text":"Plane vormittags einen kurzen Spaziergang ein. Frische Luft und Tageslicht gehören für viele zum Tagesrhythmus.","situations":["night","evening","walk","apathy"],"drawing":"illu-walk"},
+    {"id":"abendritual","category":"schlaf","title":"Immer derselbe Abend","text":"Mache jeden Abend dasselbe in derselben Reihenfolge, zum Beispiel Tee, Waschen, Lieblingslied. Das gibt Halt.","situations":["evening","night","getup"],"drawing":"illu-trick-abendritual"},
+    {"id":"gleichmaessiges-licht","category":"schlaf","title":"Gleichmäßiges Licht","text":"Schalte am Abend die Lampen an und ziehe die Vorhänge zu. So gibt es keine dunklen Ecken und keine Spiegelungen.","situations":["evening","sunset","fear"],"drawing":"illu-licht-inner"},
+    {"id":"ruhige-musik","category":"schlaf","title":"Ruhige Musik","text":"Schalte den Fernseher aus und spiele leise Musik, die die Person kennt.","situations":["tv","evening","anger","noise"],"drawing":"illu-lied-speaker"},
+
+    {"id":"armband","category":"sicherheit","title":"Armband mit Telefonnummer","text":"Ein Armband oder eine Karte in der Jacke mit Namen und deiner Telefonnummer hilft, wenn die Person allein unterwegs ist.","situations":["leave","walk","follow"],"drawing":"illu-trick-armband"},
+    {"id":"tuerglocke","category":"sicherheit","title":"Glocke an der Tür","text":"Hänge eine Glocke oder einen Türmelder an die Wohnungstür. So hörst du, wenn jemand hinausgeht.","situations":["leave","night"],"drawing":"illu-trick-tuerglocke"},
+    {"id":"aktuelles-foto","category":"sicherheit","title":"Aktuelles Foto bereit","text":"Mache ab und zu ein neues Foto der Person und halte es griffbereit. Sage den Nachbarn Bescheid.","situations":["leave","walk"],"drawing":"illu-trick-foto-bereit"},
+    {"id":"mantel-weg","category":"sicherheit","title":"Mantel und Schlüssel außer Sicht","text":"Hänge Mantel, Schuhe und Schlüssel in einen Schrank. Was man nicht sieht, erinnert nicht ans Gehen.","situations":["leave","car","work"],"drawing":"illu-trick-mantel-weg"},
+    {"id":"spiegel-abdecken","category":"sicherheit","title":"Spiegel abdecken","text":"Hänge ein Tuch über den Spiegel oder nimm ihn aus dem Raum.","situations":["mirror"],"drawing":"illu-mirror"},
+    {"id":"eigenes-portemonnaie","category":"sicherheit","title":"Eigenes Portemonnaie","text":"Gib der Person ein Portemonnaie mit etwas Kleingeld, das sie behalten darf.","situations":["money","accuse"],"drawing":"illu-trick-portemonnaie"},
+    {"id":"garderobenhaken","category":"sicherheit","title":"Haken für die Jacke","text":"Hänge in Sichtweite einen Haken auf. Die Jacke hängt dort sichtbar, und die Person holt sie selbst, wenn sie hinaus möchte.","situations":["coat"],"drawing":"illu-trick-garderobe"},
+
+    {"id":"kleidung-bereitlegen","category":"kleidung","title":"Kleidung bereitlegen","text":"Lege die Kleidung in der Reihenfolge zum Anziehen hin, das Erste oben.","situations":["dress","shoes","accident","getup"],"drawing":"illu-trick-kleidung"},
+    {"id":"klettverschluss","category":"kleidung","title":"Klettverschluss und Gummibund","text":"Schuhe mit Klettverschluss und Hosen mit Gummibund lassen sich leichter anziehen.","situations":["dress","shoes","accident"],"drawing":"illu-trick-klett"},
+    {"id":"schuhe-laufrichtung","category":"kleidung","title":"Schuhe in Laufrichtung","text":"Stelle die Schuhe so hin, dass die Spitzen zur Person zeigen und sie hineinschlüpfen kann.","situations":["shoes"],"drawing":"illu-shoes"},
+
+    {"id":"sortierkiste","category":"beschaeftigung","title":"Kiste zum Sortieren","text":"Gib der Person eine Kiste mit ungefährlichen Dingen zum Sortieren, zum Beispiel Socken, Wäscheklammern oder Stoffreste.","situations":["rummage","work","apathy","walk"],"drawing":"illu-trick-sortierkiste"},
+    {"id":"waesche-falten","category":"beschaeftigung","title":"Wäsche falten","text":"Bitte um Hilfe beim Falten von Handtüchern. Eine bekannte Handarbeit gibt das Gefühl, gebraucht zu werden.","situations":["work","follow","apathy","getup"],"drawing":"illu-trick-waesche"},
+    {"id":"haende-halten","category":"beschaeftigung","title":"Hand halten","text":"Setze dich dazu und halte die Hand der Person. Eine ruhige Berührung braucht keine Worte.","situations":["anger","cry","fear","jealous"],"drawing":"illu-hand-massage"},
+    {"id":"lieblingslied","category":"beschaeftigung","title":"Lieblingslied","text":"Spiele oder summe ein Lied aus der Jugend der Person. Alte Lieder kennen viele Menschen noch Wort für Wort.","situations":["anger","apathy","evening","words"],"drawing":"illu-lied-notes"},
+    {"id":"fummeldecke","category":"beschaeftigung","title":"Fummeldecke","text":"Eine Decke mit Knöpfen, Bändern und Stoffen zum Anfassen beschäftigt unruhige Hände.","situations":["walk","anger","apathy"],"drawing":"illu-trick-fummeldecke"},
+    {"id":"ruhige-ecke","category":"beschaeftigung","title":"Ruhige Ecke","text":"Richte einen Platz ein, an den man sich zurückziehen kann, mit Sessel, Decke und wenig Lärm.","situations":["noise","visit"],"drawing":"illu-noise"},
+
+    {"id":"zwei-moeglichkeiten","category":"gespraech","title":"Nur zwei Möglichkeiten","text":"Biete höchstens zwei Möglichkeiten an, zum Beispiel Tee oder Kaffee. Eine offene Frage überfordert schnell.","situations":["help","doctor","wash","dress"],"drawing":"illu-trick-wahl"},
+    {"id":"augenhoehe","category":"gespraech","title":"Auf Augenhöhe","text":"Gehe auf Augenhöhe, sprich langsam und leise und nur einen Satz nach dem anderen.","situations":["fear","anger","recognize"],"drawing":"illu-wuetend-ruhig"},
+    {"id":"name-nennen","category":"gespraech","title":"Immer wieder vorstellen","text":"Sage freundlich deinen Namen und wer du bist, auch zum fünften Mal am Tag.","situations":["recognize","carer","visit"],"drawing":"illu-trick-vorstellen"},
+    {"id":"vertrautes-mitnehmen","category":"gespraech","title":"Etwas Vertrautes mitnehmen","text":"Nimm zu Terminen eine Lieblingsjacke, die Handtasche oder ein Foto mit. Das gibt Sicherheit an fremden Orten.","situations":["doctor","daycare"],"drawing":"illu-trick-vertraut"},
+    {"id":"bildkarten","category":"gespraech","title":"Karten mit Bildern","text":"Lege Karten mit Bildern bereit, zum Beispiel Glas, Toilette, Bett. Die Person kann darauf zeigen, wenn Worte fehlen.","situations":["words"],"drawing":"illu-trick-bildkarten"},
+    {"id":"kurzer-abschied","category":"gespraech","title":"Kurzer Abschied","text":"Verabschiede dich kurz und freundlich und schreibe die Abholzeit auf einen Zettel.","situations":["daycare","carer","follow"],"drawing":"illu-daycare"},
+    {"id":"feste-pflegekraft","category":"gespraech","title":"Immer dieselbe Person","text":"Bitte den Pflegedienst um feste Personen und feste Zeiten. Vertraute Gesichter machen es leichter.","situations":["carer"],"drawing":"illu-carer"}
+  ]
+}
