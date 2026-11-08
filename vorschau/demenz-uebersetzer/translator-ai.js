@@ -1,6 +1,7 @@
 // KI-Antwort für Sätze, die der Übersetzer nicht kennt.
 // Wird nur für Sätze aufgerufen, die die feste Liste nicht kennt (automatisch, Hinweis unter dem Feld). Gesendet wird
 // nur der eingegebene Satz (höchstens 200 Zeichen) und ob du oder Sie – ohne Cookies, ohne Kennung.
+// Teilen (nur auf Knopfdruck) schickt allein die bereinigte Fassung der KI zurück.
 // Der Server (Demenz Coach, Firebase) prüft Notfälle, fragt OpenAI ohne
 // Speicherung (store: false) und gibt nur geprüfte, kurze Antworten zurück.
 (function (root) {
@@ -30,5 +31,24 @@
     }
   };
 
-  root.DemenzTranslatorAI = { ask, endpoint };
+  // Freiwillig und erst nach Antippen von „Anonym teilen“: Zurück geht nur die von der KI
+  // bereinigte Fassung samt Server-Prüfzeichen, nie der eingegebene Satz.
+  const share = async ({ sentence, token } = {}) => {
+    if (typeof sentence !== 'string' || typeof token !== 'string') return false;
+    try {
+      const response = await fetch(`${endpoint}/share`, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'omit',
+        referrerPolicy: 'no-referrer',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sentence, token })
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  };
+
+  root.DemenzTranslatorAI = { ask, share, endpoint };
 })(typeof window !== 'undefined' ? window : globalThis);

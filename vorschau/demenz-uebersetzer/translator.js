@@ -402,6 +402,7 @@
     }
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
     nodes.push(disclaimer(true));
+    if (result.share?.sentence && result.share?.token) nodes.push(shareBox(result.share));
     return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
   };
   // Haftungs- und Gesundheitshinweis unter jeder Antwort (Daniel, 8. Nov), kurz und gut lesbar.
@@ -410,6 +411,28 @@
     'Allgemeine Hinweise ohne Gewähr, kein Ersatz für ärztlichen Rat. ',
     element('a', { className: 'text-link', text: 'Nutzungsbedingungen', attributes: { href: '/nutzungsbedingungen.html' } })
   ]);
+  // Daniels Wahl (8. Nov) „nur bereinigt sammeln“: freiwillig, auf Knopfdruck, und man sieht genau,
+  // was geteilt wird. Daraus entstehen später neue Satz-Seiten und Einträge in der App.
+  const shareBox = (share) => {
+    const status = element('p', { className: 'translator-share-status', attributes: { role: 'status' } });
+    const send = button('Anonym teilen', 'translator-copy', async () => {
+      send.disabled = true;
+      const ok = await ai.share(share);
+      track('translator_ai', { step: ok ? 'shared' : 'share_failed', source: 'answer' });
+      if (ok) {
+        send.hidden = true;
+        status.textContent = 'Danke! Der Satz ist geteilt.';
+      } else {
+        send.disabled = false;
+        status.textContent = 'Das hat gerade nicht geklappt. Bitte später noch einmal.';
+      }
+    });
+    return element('div', { className: 'translator-share-ai' }, [
+      element('p', { text: `Hilf anderen Familien: Teile diesen Satz anonym. Geteilt wird nur „${share.sentence}“, ohne deine Eingabe.` }),
+      send,
+      status
+    ]);
+  };
   // Warte-Ansicht in Form der Antwort: so wirkt die Wartezeit kürzer und nichts springt.
   const aiWaiting = () => element('div', { className: 'translator-ai-wait', attributes: { 'aria-hidden': 'true' } }, [
     element('span', { className: 'translator-skeleton translator-skeleton-title' }),
