@@ -94,26 +94,25 @@ body.einfach :is(.translator-copy, .translator-retry-ai, .translator-personal > 
 body.einfach :is(.translator-personal, .translator-more)[open] > summary::after { transform: rotate(90deg); }
 
 /* ---------- Kopf und Fuß ---------- */
-.e-wrap { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
+.e-wrap { width: min(760px, calc(100% - 32px)); margin: 0 auto; }
 body.einfach .container { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
 body.einfach .content-narrow { max-width: 680px; }
 .e-header .e-wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
 body.einfach .e-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--e-text) !important; font-weight: 700; text-decoration: none; }
 .e-brand img { width: 32px; height: 32px; border-radius: 8px; }
 .e-header nav a { font-weight: 600; text-decoration: none; }
-.e-footer { margin-top: 40px; padding: 24px 0 88px; border-top: 1px solid var(--e-line); }
+.e-footer { margin-top: 40px; padding: 24px 0 8px; border-top: 1px solid var(--e-line); }
 .e-footer nav { display: flex; flex-wrap: wrap; gap: 0 20px; margin: 0 0 8px; }
 body.einfach .e-footer nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--e-muted); }
 
 /* ---------- Eingabe wie in der App ---------- */
 .e-hero { padding: 8px 0 16px; }
-.e-hero-grid { display: grid; gap: 24px; align-items: start; }
-.e-hero-grid > div { max-width: 640px; }
+/* Startseite: eine Spalte auf allen Bildschirmen (Daniel, 8. Nov: keine feste zweite Spalte). */
 .e-hero-art { display: none; }
 @media (min-width: 900px) {
-  .e-hero { padding: 32px 0 24px; }
-  .e-hero-grid { grid-template-columns: minmax(0, 640px) 340px; justify-content: space-between; gap: 48px; }
-  .e-hero-art { display: block; margin-top: 72px; }
+  .e-hero { padding: 24px 0 24px; }
+  body.einfach .e-home .e-hero-art { display: block; width: auto; height: 200px; margin: 0 auto 16px; }
+  body.einfach .e-home h1 { text-align: center; font-size: 2.5rem !important; margin-bottom: 24px; }
 }
 body.einfach .translator-card { margin: 0; padding: 0 !important; background: none !important; border: 0 !important; box-shadow: none !important; }
 body.einfach .translator-form-title { margin: 0 0 12px; }
@@ -250,30 +249,39 @@ body.einfach .translator-phrase q { flex: 1 1 0; font-weight: 600 !important; li
 body.einfach .translator-result > h2:first-of-type::before { display: none; }
 body.einfach .translator-result > h2:first-of-type { font-weight: 700 !important; }
 
-/* Startseite: rechte Spalte */
-.e-hero-grid { grid-template-columns: minmax(0, 1fr); }
-.e-side { display: grid; gap: 16px; align-content: start; margin-top: 24px; }
-body.einfach .e-card { padding: 20px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+/* Startseite: App und Liste unter den Momenten, als volle Karten in derselben Spalte */
+.e-offers { display: flex; flex-direction: column; gap: 16px; margin-top: 32px; }
+body.einfach .e-card { padding: 24px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+body.einfach .e-card h2 { margin: 0 0 8px; }
 body.einfach .e-app { text-align: center; }
 body.einfach .e-app > img { display: block; width: 160px; margin: 0 auto 12px; }
 body.einfach .e-app h2 { margin: 0 0 12px; }
 body.einfach .e-app .e-checks { margin-bottom: 20px; }
+body.einfach .e-app .e-store { width: 100%; }
 body.einfach .e-muted { color: var(--e-muted); }
+#home-signup { margin-top: 16px; }
 #home-signup .translator-signup { margin: 0; padding: 0 !important; border: 0 !important; background: none !important; }
 #home-signup .translator-signup label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@media (min-width: 900px) {
-  .e-hero-grid { grid-template-columns: minmax(0, 640px) 360px; }
-  .e-side { margin-top: 0; }
-  body.einfach .e-hero-art { margin: 0 auto 8px; width: 300px; }
-  body.einfach .e-app > img { display: none; }
+@media (min-width: 720px) {
+  /* Breiter Bildschirm: Zeichnung links, Text und Knopf rechts – eine Karte, keine zweite Seitenspalte. */
+  body.einfach .e-app { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 24px; align-items: center; text-align: left; }
+  body.einfach .e-app > img { width: 180px; margin: 0; }
+  body.einfach .e-app .e-store { width: auto; padding-inline: 32px; }
 }
 @media (min-width: 900px) and (hover: hover) and (pointer: fine) {
-  /* Am Computer: E-Mail-Liste direkt unter der Zeichnung, App-Karte darunter (kein QR-Code). */
-  .e-side > .e-hero-art { order: -2; }
-  .e-side > #liste { order: -1; }
+  /* Am Computer zuerst die E-Mail-Liste (iPhone-App dort nicht ladbar, kein QR-Code), dann die App. */
+  .e-offers > #liste { order: -1; }
 }
+/* Sobald eine Antwort da ist, bringt sie App und Liste selbst mit: keine doppelten Karten unten. */
+.e-home:has(#translator-result:not([hidden])) :is(.e-offers, .e-hero-art) { display: none !important; }
+/* Kein QR-Code (Daniel, 8. Nov: „Die Zielgruppe kann keinen QR-Code eingeben“). */
+body.einfach .translator-qr { display: none !important; }
 
 /* Angebotskarte der KI-Freigabe (/abo/ki-freigabe.css) ohne zweiten Rahmen; Knopftext weiß. */
 body.einfach .translator-ai:has(.ki-angebot) { padding: 0 !important; border: 0 !important; background: none !important; }
 body.einfach .translator-ai .ki-angebot { margin: 0; }
 body.einfach .ki-angebot-knopf, body.einfach .ki-angebot-knopf:visited { color: #fff !important; text-decoration: none !important; }
+
+/* Übungs-Hinweis auf der Übersetzer-Seite: Text und Knopf untereinander (lief bei ~770 px über den Rand). */
+body.einfach .translator-teaser { display: grid; gap: 16px; }
+body.einfach .translator-teaser .button { width: 100%; }

@@ -113,14 +113,15 @@
   <header class="e-header">
     <div class="e-wrap">
       <a class="e-brand" href="/" aria-label="Demenz Coach Startseite"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+      <nav aria-label="Hauptnavigation"><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_nav&amp;mt=8" data-store-link="home-nav">Zur App</a></nav>
     </div>
   </header>
   <main id="main">
-    <section id="top" class="e-hero" aria-labelledby="home-title">
-      <div class="e-wrap e-hero-grid">
-        <div class="e-main">
-          <h1 id="home-title">Demenz: Was soll ich sagen?</h1>
-          <form class="translator-card" id="translator-form" autocomplete="off">
+    <section id="top" class="e-hero e-home" aria-labelledby="home-title">
+      <div class="e-wrap">
+        <img class="e-hero-art" src="/assets/zeichnungen/nach-hause-ruhig.webp" width="720" height="702" alt="" decoding="async" fetchpriority="low">
+        <h1 id="home-title">Demenz: Was soll ich sagen?</h1>
+        <form class="translator-card" id="translator-form" autocomplete="off">
           <label class="sr-only" for="translator-input">Satz, den die Person mit Demenz gesagt hat</label>
           <div class="translator-input-row">
             <textarea id="translator-input" rows="3" maxlength="200" placeholder="Zum Beispiel: Mama will nach Hause." enterkeyhint="go" aria-describedby="translator-empty-hint translator-privacy-note"></textarea>
@@ -129,8 +130,8 @@
           <p class="translator-empty-hint" id="translator-empty-hint" role="status"></p>
           <p class="translator-privacy e-privacy" id="translator-privacy-note">Es gelten <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a> und <a href="/datenschutz.html#ki-uebersetzer">Datenschutz</a> (inkl. KI).</p>
         </form>
-          <div id="translator-result" class="translator-result" hidden></div>
-          <div class="e-moments-block">
+        <div id="translator-result" class="translator-result" hidden></div>
+        <div class="e-moments-block">
           <p class="e-moments-title">Oder tippe auf einen typischen Moment:</p>
           <ul class="e-moments" role="list">
             <li><button type="button" class="e-moment" data-translator-key="nachhause"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></svg><span>Will nach Hause</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
@@ -142,26 +143,26 @@
             <li><a class="e-moment" href="/demenz-uebersetzer/" data-related-link="demenz-uebersetzer"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg><span>Alle 40 Sätze ansehen</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a></li>
           </ul>
         </div>
-          <noscript><p>Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der <a href="/demenz-uebersetzer/">Übersicht</a>.</p></noscript>
-        </div>
-        <aside class="e-side" aria-label="App und Liste">
-          <img class="e-hero-art" src="/assets/zeichnungen/nach-hause-ruhig.webp" width="720" height="702" alt="" decoding="async">
+        <noscript><p>Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der <a href="/demenz-uebersetzer/">Übersicht</a>.</p></noscript>
+        <div class="e-offers">
           <section id="app" class="e-card e-app" aria-labelledby="app-title">
             <img src="/assets/zeichnungen/v-umarmung.webp" width="480" height="489" alt="" loading="lazy" decoding="async">
-            <h2 id="app-title">Die richtigen Worte bei Demenz. Auch als App.</h2>
-            <ul class="e-checks">
-              <li>Ruhige Sätze für schwere Momente</li>
-              <li>Für jede Situation, in deinen Worten</li>
-              <li>Kostenlos laden, Abo nur, wenn du willst</li>
-            </ul>
-            <a class="button e-store" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_app&amp;mt=8" data-store-link="home-app">Kostenlos im App Store</a>
+            <div class="e-app-text">
+              <h2 id="app-title">Die richtigen Worte bei Demenz. Auch als App.</h2>
+              <ul class="e-checks">
+                <li>Ruhige Sätze für schwere Momente</li>
+                <li>Für jede Situation, in deinen Worten</li>
+                <li>Kostenlos laden, Abo nur, wenn du willst</li>
+              </ul>
+              <a class="button e-store" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_app&amp;mt=8" data-store-link="home-app">Kostenlos im App Store</a>
+            </div>
           </section>
           <section id="liste" class="e-card" aria-labelledby="liste-title">
             <h2 id="liste-title">Alle Sätze zum Ausdrucken</h2>
             <p class="e-muted">Mit allen Antworten, als Liste für den Kühlschrank. Kostenlos per E-Mail.</p>
             <div id="home-signup"></div>
           </section>
-        </aside>
+        </div>
       </div>
     </section>
   </main>
