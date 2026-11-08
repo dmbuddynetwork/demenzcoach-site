@@ -414,33 +414,24 @@
           <h2 id="translator-form-title" class="translator-form-title">Was hat die Person gesagt?</h2>
           <label class="sr-only" for="translator-input">Satz, den die Person mit Demenz gesagt hat</label>
           <div class="translator-input-row">
-            <textarea id="translator-input" rows="1" maxlength="200" placeholder="Satz hier eintippen" enterkeyhint="go" aria-describedby="translator-empty-hint translator-privacy-note"></textarea>
-            <button class="button" type="submit">Antwort finden</button>
+            <textarea id="translator-input" rows="3" maxlength="200" placeholder="Zum Beispiel: Mama will nach Hause." enterkeyhint="go" aria-describedby="translator-empty-hint translator-privacy-note"></textarea>
+            <button class="button" type="submit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M21.6 2.4a.9.9 0 0 0-.95-.2L2.9 9.1a.9.9 0 0 0-.05 1.67l7.2 3.17 3.17 7.2a.9.9 0 0 0 1.67-.05l6.9-17.75a.9.9 0 0 0-.2-.95ZM10.6 12.2 5.6 10l12.2-4.75-7.2 6.95Zm1.2 1.2 6.95-7.2L14 18.4l-2.2-5Z"/></svg><span>Antwort finden</span></button>
           </div>
           <p class="translator-empty-hint" id="translator-empty-hint" role="status"></p>
-          <p class="translator-privacy" id="translator-privacy-note"><span aria-hidden="true">🔒</span> Unbekannte Sätze beantwortet eine KI (OpenAI). Wir speichern nichts, außer du teilst einen Satz anonym. Bitte ohne Namen.</p>
-          <div class="translator-chips" role="group" aria-label="Häufige Sätze">
-            <span>Oder einen Satz antippen:</span>
-            <button type="button" class="translator-chip" data-translator-key="mutter">„Wo ist meine Mutter?“</button>
-            <button type="button" class="translator-chip" data-translator-key="nachhause">„Ich will nach Hause.“</button>
-            <button type="button" class="translator-chip" data-translator-key="wer">„Wer sind Sie?“</button>
-            <button type="button" class="translator-chip" data-translator-key="geld">„Du hast mein Geld gestohlen!“</button>
-            <button type="button" class="translator-chip" data-translator-key="arbeit">„Ich muss zur Arbeit.“</button>
-            <button type="button" class="translator-chip" data-translator-key="uhrzeit">„Wann gehen wir?“</button>
-            <button type="button" class="translator-chip" data-translator-key="ruhe">„Lass mich in Ruhe!“</button>
-            <button type="button" class="translator-chip" data-translator-key="waschen">„Ich will nicht duschen.“</button>
-          </div>
-          <div class="translator-chips" role="group" aria-label="Nach Gefühl">
-            <span>Oder nach Gefühl:</span>
-            <button type="button" class="translator-chip translator-chip-feeling" data-translator-feeling="angst">Angst</button>
-            <button type="button" class="translator-chip translator-chip-feeling" data-translator-feeling="wut">Wut</button>
-            <button type="button" class="translator-chip translator-chip-feeling" data-translator-feeling="trauer">Traurigkeit</button>
-            <button type="button" class="translator-chip translator-chip-feeling" data-translator-feeling="unruhe">Unruhe</button>
-            <button type="button" class="translator-chip translator-chip-feeling" data-translator-feeling="misstrauen">Misstrauen</button>
-            <button type="button" class="translator-chip translator-chip-feeling" data-translator-feeling="sehnsucht">Sehnsucht</button>
-          </div>
+          <details class="translator-privacy e-privacy" id="translator-privacy-note"><summary><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6v.2"/></svg><span>Unbekannte Sätze beantwortet eine KI (OpenAI).</span></summary><p>Wir speichern nichts, außer du teilst einen Satz anonym. Bitte ohne Namen. <a href="/datenschutz.html">Datenschutz</a></p></details>
         </form>
         <div id="translator-result" class="translator-result" hidden></div>
+        <div class="e-moments-block">
+          <p class="e-moments-title">Oder tippe auf einen typischen Moment:</p>
+          <ul class="e-moments" role="list">
+            <li><button type="button" class="e-moment" data-translator-key="nachhause"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></svg><span>Will nach Hause</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="mutter"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><circle cx="12" cy="10" r="3"/><path d="M7 18c.8-2.6 2.7-4 5-4s4.2 1.4 5 4"/></svg><span>Fragt nach der Mutter</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="wer"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.6"/><path d="M12 16.8v.2"/></svg><span>Erkennt mich nicht</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="geld"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z"/><path d="M4 7.5 15 4.5v3"/><path d="M16 13.5h4"/></svg><span>Sagt, Geld wurde gestohlen</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="arbeit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="1.5"/><path d="M9 7.5V5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M3.5 12.5h17"/></svg><span>Will zur Arbeit</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="waschen"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V6a3 3 0 0 1 6 0"/><path d="M8.5 9h5a2.5 2.5 0 0 0-5 0Z"/><path d="M10 13v1.2M13 13v1.2M16 13v1.2M11.5 16.5v1.2M14.5 16.5v1.2"/></svg><span>Will nicht duschen</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+          </ul>
+        </div>
         <noscript><p class="translator-privacy">Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der Übersicht unten.</p></noscript>
       </div>
     </section>

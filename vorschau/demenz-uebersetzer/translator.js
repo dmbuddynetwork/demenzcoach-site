@@ -659,12 +659,15 @@
     // Auf dem Handy mit großer Schrift soll der erste Antwortsatz schnell kommen: Unter
     // „Was dahintersteckt“ steht nur der Kern (ein, zwei Sätze), der Rest unter „Hintergrund“.
     const [lead, rest] = result.safetyOnly ? [result.short, ''] : splitLead(result.short);
+    // Wie in der App: Erklärung, Sätze und der nächste Schritt stehen zusammen in EINER Karte.
+    const answerCard = element('div', { className: 'translator-answer' });
+    nodes.push(answerCard);
     if (lead) {
-      nodes.push(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
-      nodes.push(element('p', { className: 'translator-meaning', text: lead }));
+      answerCard.append(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
+      answerCard.append(element('p', { className: 'translator-meaning', text: lead }));
     }
     if (result.phrases.length) {
-      nodes.push(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
+      answerCard.append(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
       const phraseList = element('div', { className: 'translator-phrases' });
       const paint = () => {
         // Bei Wut, Tränen oder Angst kommt zuerst ein kurzer beruhigender Satz.
@@ -692,7 +695,8 @@
         element('h3', { className: 'translator-step', text: 'Das kannst du tun' }),
         element('p', { className: 'translator-meaning translator-do', text: doNow })
       ] : [];
-      nodes.push(phraseList, ...doNodes, alsoWrapper, result.selfCare ? null : personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
+      answerCard.append(phraseList, ...doNodes);
+      nodes.push(alsoWrapper, result.selfCare ? null : personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
     }

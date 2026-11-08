@@ -79,7 +79,6 @@
   <header class="e-header">
     <div class="e-wrap">
       <a class="e-brand" href="/vorschau/" aria-label="Demenz Coach Startseite"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
-      <nav aria-label="Hauptnavigation"><a href="#app">Zur App</a></nav>
     </div>
   </header>
   <main id="main">
@@ -87,69 +86,44 @@
       <div class="e-wrap e-hero-grid">
         <div>
           <h1 id="home-title">Demenz: Was soll ich sagen?</h1>
-          <p class="e-lead">Schreib auf, was die Person gesagt hat. Du bekommst ruhige Sätze, die du sagen kannst.</p>
           <form class="translator-card" id="translator-form" autocomplete="off">
-          <h2 id="translator-form-title" class="translator-form-title">Was hat die Person gesagt?</h2>
           <label class="sr-only" for="translator-input">Satz, den die Person mit Demenz gesagt hat</label>
           <div class="translator-input-row">
-            <textarea id="translator-input" rows="1" maxlength="200" placeholder="Satz hier eintippen" enterkeyhint="go" aria-describedby="translator-empty-hint translator-privacy-note"></textarea>
-            <button class="button" type="submit">Antwort finden</button>
+            <textarea id="translator-input" rows="3" maxlength="200" placeholder="Zum Beispiel: Mama will nach Hause." enterkeyhint="go" aria-describedby="translator-empty-hint translator-privacy-note"></textarea>
+            <button class="button" type="submit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M21.6 2.4a.9.9 0 0 0-.95-.2L2.9 9.1a.9.9 0 0 0-.05 1.67l7.2 3.17 3.17 7.2a.9.9 0 0 0 1.67-.05l6.9-17.75a.9.9 0 0 0-.2-.95ZM10.6 12.2 5.6 10l12.2-4.75-7.2 6.95Zm1.2 1.2 6.95-7.2L14 18.4l-2.2-5Z"/></svg><span>Antwort finden</span></button>
           </div>
           <p class="translator-empty-hint" id="translator-empty-hint" role="status"></p>
-          <p class="translator-privacy" id="translator-privacy-note"><span aria-hidden="true">🔒</span> Unbekannte Sätze beantwortet eine KI (OpenAI). Wir speichern nichts, außer du teilst einen Satz anonym. Bitte ohne Namen.</p>
+          <details class="translator-privacy e-privacy" id="translator-privacy-note"><summary><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6v.2"/></svg><span>Unbekannte Sätze beantwortet eine KI (OpenAI).</span></summary><p>Wir speichern nichts, außer du teilst einen Satz anonym. Bitte ohne Namen. <a href="/datenschutz.html">Datenschutz</a></p></details>
         </form>
           <div id="translator-result" class="translator-result" hidden></div>
+          <div class="e-moments-block">
+          <p class="e-moments-title">Oder tippe auf einen typischen Moment:</p>
+          <ul class="e-moments" role="list">
+            <li><button type="button" class="e-moment" data-translator-key="nachhause"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></svg><span>Will nach Hause</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="mutter"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><circle cx="12" cy="10" r="3"/><path d="M7 18c.8-2.6 2.7-4 5-4s4.2 1.4 5 4"/></svg><span>Fragt nach der Mutter</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="wer"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.6"/><path d="M12 16.8v.2"/></svg><span>Erkennt mich nicht</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="geld"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z"/><path d="M4 7.5 15 4.5v3"/><path d="M16 13.5h4"/></svg><span>Sagt, Geld wurde gestohlen</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="arbeit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="1.5"/><path d="M9 7.5V5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M3.5 12.5h17"/></svg><span>Will zur Arbeit</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><button type="button" class="e-moment" data-translator-key="waschen"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V6a3 3 0 0 1 6 0"/><path d="M8.5 9h5a2.5 2.5 0 0 0-5 0Z"/><path d="M10 13v1.2M13 13v1.2M16 13v1.2M11.5 16.5v1.2M14.5 16.5v1.2"/></svg><span>Will nicht duschen</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></li>
+            <li><a class="e-moment" href="/vorschau/demenz-uebersetzer/" data-related-link="demenz-uebersetzer"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg><span>Alle 40 Sätze ansehen</span><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></a></li>
+          </ul>
+        </div>
           <noscript><p>Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der <a href="/vorschau/demenz-uebersetzer/">Übersicht</a>.</p></noscript>
         </div>
         <img class="e-hero-art" src="/vorschau/assets/zeichnungen/nach-hause-ruhig.webp" width="720" height="702" alt="" decoding="async">
       </div>
     </section>
 
-    <section class="e-section" aria-labelledby="tiles-title">
+    <section id="app" class="e-section e-app" aria-labelledby="app-title">
       <div class="e-wrap">
-        <h2 id="tiles-title" class="e-tiles-title">Oder tippe auf einen Satz:</h2>
-        <ul class="e-tiles">
-          <li><button type="button" class="e-tile" data-translator-key="nachhause"><img src="/vorschau/assets/zeichnungen/nach-hause.webp" width="480" height="664" alt="" loading="lazy" decoding="async"><span>„Ich will nach Hause.“</span></button></li>
-          <li><button type="button" class="e-tile" data-translator-key="mutter"><img src="/vorschau/assets/zeichnungen/s-dead.webp" width="480" height="411" alt="" loading="lazy" decoding="async"><span>„Wo ist meine Mutter?“</span></button></li>
-          <li><button type="button" class="e-tile" data-translator-key="wer"><img src="/vorschau/assets/zeichnungen/s-recognize.webp" width="480" height="402" alt="" loading="lazy" decoding="async"><span>„Wer sind Sie?“</span></button></li>
-          <li><button type="button" class="e-tile" data-translator-key="geld"><img src="/vorschau/assets/zeichnungen/s-money.webp" width="480" height="396" alt="" loading="lazy" decoding="async"><span>„Du hast mein Geld gestohlen!“</span></button></li>
-          <li><button type="button" class="e-tile" data-translator-key="arbeit"><img src="/vorschau/assets/zeichnungen/work.webp" width="480" height="486" alt="" loading="lazy" decoding="async"><span>„Ich muss zur Arbeit.“</span></button></li>
-          <li><button type="button" class="e-tile" data-translator-key="waschen"><img src="/vorschau/assets/zeichnungen/tuch-mama.webp" width="480" height="505" alt="" loading="lazy" decoding="async"><span>„Ich will nicht duschen.“</span></button></li>
+        <img src="/vorschau/assets/zeichnungen/v-umarmung.webp" width="480" height="489" alt="" loading="lazy" decoding="async">
+        <h2 id="app-title" class="e-title">Die richtigen Worte bei Demenz. Auch als App.</h2>
+        <ul class="e-checks">
+          <li>Ruhige Sätze für schwere Momente</li>
+          <li>Für jede Situation, in deinen Worten</li>
+          <li>Kostenlos laden, Abo nur, wenn du willst</li>
         </ul>
-        <p style="margin-top:16px"><a class="text-link" href="/vorschau/demenz-uebersetzer/" data-related-link="demenz-uebersetzer">Alle Sätze ansehen</a></p>
-      </div>
-    </section>
-
-    <section id="app" class="e-section" aria-labelledby="app-title">
-      <div class="e-wrap">
-        <div class="e-card e-split">
-          <img src="/vorschau/assets/zeichnungen/tochter-handy.webp" width="560" height="755" alt="" decoding="async">
-          <div>
-            <h2 id="app-title" class="e-title">Hilfe für jeden Tag: die App Demenz Coach</h2>
-            <ul class="e-checks">
-              <li>Du beschreibst eure Lage in eigenen Worten.</li>
-              <li>Du bekommst passende Sätze und einen nächsten Schritt.</li>
-              <li>Kostenlos laden, Abo nur, wenn du willst.</li>
-            </ul>
-            <a class="button e-store" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_app&amp;mt=8" data-store-link="home-app">Kostenlos im App Store</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="liste" class="e-section" aria-labelledby="liste-title">
-      <div class="e-wrap e-split">
-        <img src="/vorschau/assets/zeichnungen/paywall-fotoalbum.webp" width="560" height="376" alt="" loading="lazy" decoding="async">
-        <div id="home-signup">
-          <h2 id="liste-title" class="e-title">Alle Sätze zum Ausdrucken</h2>
-          <p>Mit allen Antworten, als Liste für den Kühlschrank. Kostenlos per E-Mail.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="e-section" aria-label="Sicherheit">
-      <div class="e-wrap">
-        <aside class="safety-note"><strong>Sicherheit zuerst</strong><span>Der Übersetzer gibt allgemeine Hinweise ohne Gewähr und ersetzt keine ärztliche Beratung. Kein Medizinprodukt. Bei Gefahr, Sturz, Atemnot, Bewusstlosigkeit oder wenn du unsicher bist: Notruf <a href="tel:112">112</a>. Ärztlichen Rat bekommst du in der Hausarztpraxis, außerhalb der Sprechzeiten unter <a href="tel:116117">116 117</a>. Dieses Tool kann nicht einschätzen, wie dringend etwas ist.</span></aside>
+        <a class="button e-store" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_app&amp;mt=8" data-store-link="home-app">Kostenlos im App Store</a>
       </div>
     </section>
   </main>
@@ -173,6 +147,5 @@
   <script src="/vorschau/demenz-uebersetzer/translator-ai.js"></script>
   <script src="/vorschau/demenz-uebersetzer/translator-signup.js"></script>
   <script src="/vorschau/demenz-uebersetzer/translator.js"></script>
-  <script>(function(){var s=document.getElementById('home-signup');var b=window.DemenzTranslatorSignup&&window.DemenzTranslatorSignup.box();if(b){s.append(b);}else{document.getElementById('liste').hidden=true;}})();</script>
 </body>
 </html>
