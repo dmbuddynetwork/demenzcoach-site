@@ -302,3 +302,6 @@ body.einfach .ki-angebot-knopf, body.einfach .ki-angebot-knopf:visited { color: 
 /* Übungs-Hinweis auf der Übersetzer-Seite: Text und Knopf untereinander (lief bei ~770 px über den Rand). */
 body.einfach .translator-teaser { display: grid; gap: 16px; }
 body.einfach .translator-teaser .button { width: 100%; }
+
+/* App-Store-Hinweise nur auf iPhone/iPad (Daniel, 8. Nov): Skript im <head> setzt html.app-check und html.is-ios. */
+html.app-check:not(.is-ios) :is(.e-app, .translator-app-cta, .translator-static-cta, .e-header nav a[href*="apps.apple.com"]) { display: none !important; }
