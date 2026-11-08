@@ -450,3 +450,7 @@ body[data-page-type="translator-phrase"].einfach .article-body h2 { margin: 32px
 body[data-page-type="translator-phrase"].einfach .article-body h3 { margin: 20px 0 6px !important; font-size: 1.0625rem !important; font-weight: 800 !important; }
 body[data-page-type="translator-phrase"].einfach .article-body p, body[data-page-type="translator-phrase"].einfach .article-body li { line-height: 1.6 !important; }
 body[data-page-type="translator-phrase"].einfach section.translator-trick { margin: 8px 0 8px; }
+/* „Noch ein Trick“ als ruhiger hellila Knopf neben „Alle Tricks“. */
+body.einfach .translator-trick-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 6px; }
+body.einfach .translator-trick-next { display: inline-flex; align-items: center; min-height: 44px; margin: 0; padding: 6px 14px; background: var(--e-lav) !important; color: var(--e-lav-text) !important; border: 0 !important; border-radius: 999px !important; font: inherit; font-size: var(--e-small) !important; font-weight: 700 !important; cursor: pointer; }
+body.einfach .translator-trick-next::after { content: none !important; }

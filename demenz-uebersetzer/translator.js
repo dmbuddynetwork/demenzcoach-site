@@ -907,18 +907,36 @@
     }
     // Alltagstrick zur Situation direkt unter „Das kannst du tun“ (Daniel, 8. Nov: wie der rote Teller).
     // Kommt fest aus den Seitendaten (nie aus KI oder Eingabe), Notfall und Entlastung bekommen keinen.
-    const trick = result.trick && !result.safetyOnly && !result.selfCare ? result.trick : null;
-    const trickLink = trick ? element('a', { className: 'text-link translator-trick-link', text: 'Alle Tricks', attributes: { href: trick.href } }) : null;
-    trickLink?.addEventListener('click', () => track('translator_trick', { result_key: result.key, trick_id: trick.id }));
-    const trickBlock = trick ? [element('div', { className: 'translator-trick' }, [
-      element('img', { className: 'translator-trick-art', attributes: { src: trick.image, alt: '', width: String(trick.imageWidth ?? 480), height: String(trick.imageHeight ?? 400), loading: 'lazy', decoding: 'async' } }),
-      element('div', { className: 'translator-trick-text' }, [
-        element('p', { className: 'translator-trick-label', text: 'Dieser Trick hilft' }),
-        element('p', { className: 'translator-trick-title', text: trick.title }),
-        element('p', { text: trick.text }),
+    // „Noch ein Trick“ zeigt den nächsten passenden (Debby/Daniel, 8. Nov), danach wieder den ersten.
+    const tricks = !result.safetyOnly && !result.selfCare && Array.isArray(result.tricks) ? result.tricks.filter((item) => item?.title) : [];
+    const trick = tricks[0] ?? null;
+    let trickBlock = [];
+    if (trick) {
+      let shown = 0;
+      const art = element('img', { className: 'translator-trick-art', attributes: { src: trick.image, alt: '', width: String(trick.imageWidth ?? 480), height: String(trick.imageHeight ?? 400), loading: 'lazy', decoding: 'async' } });
+      const title = element('p', { className: 'translator-trick-title', text: trick.title });
+      const body = element('p', { text: trick.text });
+      const trickLink = element('a', { className: 'text-link translator-trick-link', text: 'Alle Tricks', attributes: { href: trick.href } });
+      trickLink.addEventListener('click', () => track('translator_trick', { result_key: result.key, trick_id: tricks[shown].id }));
+      const links = element('div', { className: 'translator-trick-links' }, [
+        tricks.length > 1 ? button('Noch ein Trick', 'translator-trick-next', () => {
+          shown = (shown + 1) % tricks.length;
+          const next = tricks[shown];
+          art.setAttribute('src', next.image);
+          art.setAttribute('width', String(next.imageWidth ?? 480));
+          art.setAttribute('height', String(next.imageHeight ?? 400));
+          title.textContent = next.title;
+          body.textContent = next.text;
+          trickLink.setAttribute('href', next.href);
+          track('translator_trick', { result_key: result.key, trick_id: next.id, step: 'next' });
+        }) : null,
         trickLink
-      ])
-    ])] : [];
+      ]);
+      trickBlock = [element('div', { className: 'translator-trick', attributes: { 'aria-live': 'polite' } }, [
+        art,
+        element('div', { className: 'translator-trick-text' }, [element('p', { className: 'translator-trick-label', text: 'Dieser Trick hilft' }), title, body, links])
+      ])];
+    }
     if (trick && !doBlock.length) trickBlock.unshift(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
     const doWithTrick = [...doBlock, ...trickBlock];
     const order = goal === 'jetzt' ? [phraseBlock, doWithTrick, meaningBlock]
