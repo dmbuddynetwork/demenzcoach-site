@@ -11,5 +11,7 @@
     "html_handling": "none",
     "not_found_handling": "none"
   },
-  "observability": { "enabled": false }
+  "observability": { "enabled": false },
+  // Branch-Builds in Cloudflare laufen mit "npx wrangler preview" und brauchen diesen Block (sonst schlägt jeder PR-Build fehl).
+  "previews": {}
 }
