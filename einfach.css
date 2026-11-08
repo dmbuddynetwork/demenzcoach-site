@@ -389,3 +389,8 @@ body.einfach .e-tiles .e-tiles-heading { grid-column: 1 / -1; margin: 20px 0 4px
 body.einfach .e-tiles .e-tiles-heading h2 { margin: 0 0 4px; }
 body.einfach .e-tiles .e-tiles-heading p { margin: 0; }
 body.einfach a.e-tile { text-decoration: none; }
+/* Gewähltes Ziel als positive Bestätigung mit Häkchen (Daniel, 8. Nov 16:51). */
+body.einfach .translator-answer .translator-goal-chosen { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 18px !important; padding: 10px 16px 10px 12px; background: #e7f4ea; color: #1d5e33 !important; border-radius: 999px; font-size: var(--e-small) !important; font-weight: 700; }
+body.einfach .translator-answer .translator-goal-chosen::before {
+  content: ""; flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: #2e7d4a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 16px no-repeat;
+}
