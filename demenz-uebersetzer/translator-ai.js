@@ -1,7 +1,7 @@
 // KI-Antwort für Sätze, die der Übersetzer nicht kennt.
 // Wird nur für Sätze aufgerufen, die die feste Liste nicht kennt (automatisch, Hinweis unter dem Feld). Gesendet wird
 // nur der eingegebene Satz (höchstens 200 Zeichen) und ob du oder Sie – ohne Cookies, ohne Kennung.
-// Teilen (nur auf Knopfdruck) schickt allein die bereinigte Fassung der KI zurück.
+// Teilen schickt allein die bereinigte Fassung der KI (mit Sprachkürzel außer Deutsch) zurück.
 // Der Server (Demenz Coach, Firebase) prüft Notfälle, fragt OpenAI ohne
 // Speicherung (store: false) und gibt nur geprüfte, kurze Antworten zurück.
 (function (root) {
@@ -37,8 +37,12 @@
 
   // Freiwillig und erst nach Antippen von „Anonym teilen“: Zurück geht nur die von der KI
   // bereinigte Fassung samt Server-Prüfzeichen, nie der eingegebene Satz.
-  const share = async ({ sentence, token, undo = false } = {}) => {
+  // Andere Sprachen als Deutsch schicken ihr Kürzel mit (der Server prüft es mit dem Prüfzeichen).
+  const share = async ({ sentence, token, language: shareLanguage, undo = false } = {}) => {
     if (typeof sentence !== 'string' || typeof token !== 'string') return false;
+    const payload = { sentence, token };
+    if (typeof shareLanguage === 'string' && shareLanguage !== 'de') payload.language = shareLanguage;
+    if (undo === true) payload.undo = true;
     try {
       const response = await fetch(`${endpoint}/share`, {
         method: 'POST',
@@ -46,7 +50,7 @@
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(undo === true ? { sentence, token, undo: true } : { sentence, token })
+        body: JSON.stringify(payload)
       });
       return response.ok;
     } catch {
