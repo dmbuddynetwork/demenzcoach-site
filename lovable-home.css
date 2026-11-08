@@ -573,8 +573,13 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   border-radius: 8px;
 }
 .consent-button { border: 1px solid white; }
-.consent-decline { color: white; background: transparent; }
-.consent-accept { color: var(--ink-dark); background: white; }
+/* Ablehnen und Erlauben sehen gleich aus: keine Wahl wird optisch bevorzugt. */
+.consent-decline, .consent-accept, .consent-save { color: var(--ink-dark); background: white; }
+.consent-choices { display: grid; gap: 10px; }
+.consent-choices[hidden] { display: none; }
+.consent-choice { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: .95rem; cursor: pointer; }
+.consent-choice input { width: 22px; height: 22px; flex: 0 0 auto; accent-color: white; }
+.consent-choose { align-self: center; min-height: 44px; padding: 0 8px; color: inherit; background: none; border: 0; font: inherit; font-size: .86rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .consent-settings {
   position: fixed;
   z-index: 19;
@@ -993,3 +998,4 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+.consent-banner:has(.consent-choose) { flex-direction: column; align-items: stretch; }

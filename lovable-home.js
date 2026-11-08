@@ -35,25 +35,51 @@ document.addEventListener('keydown', (event) => {
 
 const mobileLayout = window.matchMedia('(max-width: 720px)');
 
+// Eine Einwilligung für die ganze Website (auch /start/ und die Web-Kasse):
+// - Statistik: Google Analytics 4, erst nach „Erlauben“.
+// - Werbung messen: Meta- und TikTok-Pixel. Nur auf Seiten mit <body data-marketing-pixels>
+//   und nur, wenn unten Pixel-IDs eingetragen sind; sonst fragt der Banner nur nach Statistik.
+// Ohne Einwilligung lädt nichts davon. Eingetippte Texte gehen nie an diese Dienste.
+const marketingPixelIDs = { meta: '', tiktok: '' };
+
 const websiteAnalytics = (() => {
   const measurementID = 'G-5NRN1EMJDC';
   const consentKey = 'demenzcoach.analyticsConsent.v1';
+  const marketingKey = 'demenzcoach.marketingConsent.v1';
+  const marketingOnPage = document.body?.hasAttribute('data-marketing-pixels') === true
+    && Boolean(marketingPixelIDs.meta || marketingPixelIDs.tiktok);
   let tagLoaded = false;
+  let pixelsLoaded = false;
 
-  const readConsent = () => {
+  const read = (key) => {
     try {
-      return window.localStorage.getItem(consentKey);
+      return window.localStorage.getItem(key);
     } catch {
       return null;
     }
   };
 
-  const storeConsent = (value) => {
+  const store = (key, value) => {
     try {
-      window.localStorage.setItem(consentKey, value);
+      window.localStorage.setItem(key, value);
     } catch {
       // The choice still applies for the current page when storage is unavailable.
     }
+  };
+  let sessionChoice = {};
+  const readConsent = () => read(consentKey) ?? sessionChoice[consentKey] ?? null;
+  const readMarketing = () => read(marketingKey) ?? sessionChoice[marketingKey] ?? null;
+  const remember = (key, value) => {
+    sessionChoice = { ...sessionChoice, [key]: value };
+    store(key, value);
+  };
+
+  // Einzige Stelle, die fremde Skripte lädt (die Vorschau schaltet genau diese Zeile ab).
+  const addScript = (src) => {
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = src;
+    document.head.appendChild(script);
   };
 
   const gtag = function () {
@@ -85,29 +111,68 @@ const websiteAnalytics = (() => {
       content_group: pageContext.page_type,
       ...pageContext
     });
-
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementID}`;
-    document.head.appendChild(script);
+    addScript(`https://www.googletagmanager.com/gtag/js?id=${measurementID}`);
   };
 
-  const clearAnalyticsCookies = () => {
+  const loadPixels = () => {
+    if (pixelsLoaded || !marketingOnPage) return;
+    pixelsLoaded = true;
+    if (marketingPixelIDs.meta && !window.fbq) {
+      const fbq = function () {
+        if (fbq.callMethod) fbq.callMethod.apply(fbq, arguments);
+        else fbq.queue.push(arguments);
+      };
+      Object.assign(fbq, { push: fbq, loaded: true, version: '2.0', queue: [] });
+      window.fbq = fbq;
+      window._fbq = window._fbq || fbq;
+      // Keine automatische Erfassung von Knöpfen und Seiteninhalten.
+      fbq('set', 'autoConfig', false, marketingPixelIDs.meta);
+      fbq('init', marketingPixelIDs.meta);
+      fbq('track', 'PageView');
+      addScript('https://connect.facebook.net/en_US/fbevents.js');
+    }
+    if (marketingPixelIDs.tiktok && !window.ttq) {
+      const id = marketingPixelIDs.tiktok;
+      const ttq = [];
+      window.TiktokAnalyticsObject = 'ttq';
+      ttq.methods = ['page', 'track', 'identify', 'instances', 'debug', 'on', 'off', 'once', 'ready', 'alias', 'group', 'enableCookie', 'disableCookie', 'holdConsent', 'revokeConsent', 'grantConsent'];
+      ttq.setAndDefer = (target, method) => {
+        target[method] = function () {
+          target.push([method, ...arguments]);
+        };
+      };
+      ttq.methods.forEach((method) => ttq.setAndDefer(ttq, method));
+      ttq.instance = (instanceID) => {
+        const instance = ttq._i[instanceID] || [];
+        ttq.methods.forEach((method) => ttq.setAndDefer(instance, method));
+        return instance;
+      };
+      const source = 'https://analytics.tiktok.com/i18n/pixel/events.js';
+      ttq._i = { [id]: Object.assign([], { _u: source }) };
+      ttq._t = { [id]: Date.now() };
+      ttq._o = { [id]: {} };
+      window.ttq = ttq;
+      ttq.page();
+      addScript(`${source}?sdkid=${encodeURIComponent(id)}&lib=ttq`);
+    }
+  };
+
+  const clearCookies = (prefixes) => {
     document.cookie.split(';').forEach((cookie) => {
       const name = cookie.split('=')[0].trim();
-      if (!name.startsWith('_ga')) return;
+      if (!prefixes.some((prefix) => name.startsWith(prefix))) return;
       document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`;
       document.cookie = `${name}=; Max-Age=0; path=/; domain=.${location.hostname}; SameSite=Lax`;
     });
   };
 
   const grant = () => {
-    storeConsent('granted');
+    remember(consentKey, 'granted');
     loadTag();
   };
 
   const deny = () => {
-    storeConsent('denied');
+    remember(consentKey, 'denied');
     if (tagLoaded) {
       gtag('consent', 'update', {
         analytics_storage: 'denied',
@@ -116,7 +181,21 @@ const websiteAnalytics = (() => {
         ad_personalization: 'denied'
       });
     }
-    clearAnalyticsCookies();
+    clearCookies(['_ga']);
+  };
+
+  const grantMarketing = () => {
+    remember(marketingKey, 'granted');
+    loadPixels();
+  };
+
+  const denyMarketing = () => {
+    remember(marketingKey, 'denied');
+    if (pixelsLoaded) {
+      window.fbq?.('consent', 'revoke');
+      window.ttq?.revokeConsent?.();
+    }
+    clearCookies(['_fbp', '_fbc', '_ttp', 'ttcsid']);
   };
 
   const track = (name, parameters = {}) => {
@@ -125,23 +204,46 @@ const websiteAnalytics = (() => {
     gtag('event', name, { ...pageContext, ...parameters });
   };
 
-  return { deny, grant, loadTag, readConsent, track };
+  // Werbe-Ereignisse (z. B. Lead, InitiateCheckout, Purchase): nur feste Namen und Zahlen, nie Texte.
+  const metaStandard = new Set(['PageView', 'ViewContent', 'Lead', 'CompleteRegistration', 'InitiateCheckout', 'AddPaymentInfo', 'Purchase', 'Subscribe', 'StartTrial']);
+  const trackMarketing = (name, parameters = {}) => {
+    if (!marketingOnPage || readMarketing() !== 'granted') return;
+    loadPixels();
+    window.fbq?.(metaStandard.has(name) ? 'track' : 'trackCustom', name, parameters);
+    window.ttq?.track?.(name === 'Purchase' ? 'CompletePayment' : name, parameters);
+  };
+
+  return { deny, denyMarketing, grant, grantMarketing, loadPixels, loadTag, marketingOnPage, readConsent, readMarketing, track, trackMarketing };
 })();
 
 const fallbackAnalyticsCopy = usesEnglish
   ? {
-      title: 'Your privacy choice',
-      text: 'With your permission, Google Analytics records visited pages and technical usage. It does not receive situations you enter, form content or other personal care details.',
-      decline: 'Necessary only',
-      accept: 'Allow analytics',
+      title: 'May we count visits?',
+      marketingTitle: 'May we count visits and measure ads?',
+      text: 'With your permission, Google Analytics counts which pages are used and how. What you type is never sent. Data may be transferred to the USA. You can change your choice at any time under “Privacy settings”.',
+      marketingText: 'With your permission, Google Analytics counts which pages are used, and Meta (Facebook, Instagram) and TikTok measure which of our ads work. What you type is never sent. Data may be transferred to the USA. You can change your choice at any time under “Privacy settings”.',
+      decline: 'Decline',
+      accept: 'Allow',
+      acceptAll: 'Allow all',
+      choose: 'Choose individually',
+      statistics: 'Count visits (Google Analytics)',
+      marketing: 'Measure ads (Meta, TikTok)',
+      save: 'Save choice',
       privacy: 'Privacy policy',
       settings: 'Privacy settings'
     }
   : {
-      title: 'Deine Datenschutzwahl',
-      text: 'Mit deiner Einwilligung erfasst Google Analytics aufgerufene Seiten und technische Nutzung. Eingegebene Situationen, Formularinhalte oder persönliche Pflegedetails werden nicht übertragen.',
-      decline: 'Nur notwendige',
-      accept: 'Analyse erlauben',
+      title: 'Dürfen wir Besuche zählen?',
+      marketingTitle: 'Dürfen wir Besuche zählen und Werbung messen?',
+      text: 'Mit deiner Einwilligung zählt Google Analytics, welche Seiten wie genutzt werden. Was du eintippst, wird nie übertragen. Dabei können Daten in die USA gehen. Du kannst das jederzeit unter „Datenschutz-Einstellungen“ ändern.',
+      marketingText: 'Mit deiner Einwilligung zählt Google Analytics, welche Seiten genutzt werden, und Meta (Facebook, Instagram) und TikTok messen, welche unserer Anzeigen wirken. Was du eintippst, wird nie übertragen. Dabei können Daten in die USA gehen. Du kannst das jederzeit unter „Datenschutz-Einstellungen“ ändern.',
+      decline: 'Ablehnen',
+      accept: 'Erlauben',
+      acceptAll: 'Alle erlauben',
+      choose: 'Einzeln auswählen',
+      statistics: 'Besuche zählen (Google Analytics)',
+      marketing: 'Werbung messen (Meta, TikTok)',
+      save: 'Auswahl speichern',
       privacy: 'Datenschutzerklärung',
       settings: 'Datenschutz-Einstellungen'
     };
@@ -149,8 +251,12 @@ const analyticsCopy = {
   ...fallbackAnalyticsCopy,
   ...(localizedSiteCopy.analytics ?? {})
 };
-const privacyURL = localizedSiteCopy.privacyURL
-  ?? (usesEnglish ? 'privacy-en.html' : 'datenschutz.html');
+// Andere Sprachen haben einen eigenen Text ohne Anbieternamen: den Anbieter dann anhängen.
+const consentText = websiteAnalytics.marketingOnPage
+  ? analyticsCopy.marketingText
+  : /Google/.test(analyticsCopy.text) ? analyticsCopy.text : `${analyticsCopy.text} (Google Analytics)`;
+// Absolute Adresse, damit der Link auch in Unterordnern wie /start/ oder /ratgeber/ stimmt.
+const privacyURL = new URL(localizedSiteCopy.privacyURL ?? (usesEnglish ? 'privacy-en.html' : 'datenschutz.html'), `${location.origin}/`).pathname;
 
 const consentBanner = document.createElement('section');
 consentBanner.className = 'consent-banner';
@@ -159,13 +265,19 @@ consentBanner.setAttribute('role', 'region');
 consentBanner.setAttribute('aria-labelledby', 'consent-title');
 consentBanner.innerHTML = `
   <div class="consent-copy">
-    <strong id="consent-title">${analyticsCopy.title}</strong>
-    <p>${analyticsCopy.text} <a href="${privacyURL}">${analyticsCopy.privacy}</a></p>
+    <strong id="consent-title">${websiteAnalytics.marketingOnPage ? analyticsCopy.marketingTitle : analyticsCopy.title}</strong>
+    <p>${consentText} <a href="${privacyURL}">${analyticsCopy.privacy}</a></p>
+  </div>
+  <div class="consent-choices" hidden>
+    <label class="consent-choice"><input type="checkbox" name="statistics"> <span>${analyticsCopy.statistics}</span></label>
+    <label class="consent-choice"><input type="checkbox" name="marketing"> <span>${analyticsCopy.marketing}</span></label>
+    <button class="consent-button consent-save" type="button">${analyticsCopy.save}</button>
   </div>
   <div class="consent-actions">
     <button class="consent-button consent-decline" type="button">${analyticsCopy.decline}</button>
-    <button class="consent-button consent-accept" type="button">${analyticsCopy.accept}</button>
-  </div>`;
+    <button class="consent-button consent-accept" type="button">${websiteAnalytics.marketingOnPage ? analyticsCopy.acceptAll : analyticsCopy.accept}</button>
+  </div>
+  ${websiteAnalytics.marketingOnPage ? `<button class="consent-choose" type="button" aria-expanded="false">${analyticsCopy.choose}</button>` : ''}`;
 document.body.appendChild(consentBanner);
 
 const consentSettingsButton = document.createElement('button');
@@ -173,6 +285,9 @@ consentSettingsButton.className = 'consent-settings';
 consentSettingsButton.type = 'button';
 consentSettingsButton.textContent = analyticsCopy.settings;
 document.body.appendChild(consentSettingsButton);
+
+const consentChoices = consentBanner.querySelector('.consent-choices');
+const consentChooseButton = consentBanner.querySelector('.consent-choose');
 
 const showConsentBanner = () => {
   consentBanner.hidden = false;
@@ -182,26 +297,54 @@ const showConsentBanner = () => {
 
 const hideConsentBanner = () => {
   consentBanner.hidden = true;
+  consentChoices.hidden = true;
+  consentChooseButton?.setAttribute('aria-expanded', 'false');
+  if (consentChooseButton) consentChooseButton.hidden = false;
   consentSettingsButton.hidden = false;
   if (mobileLayout.matches && menuButton) menuButton.focus({ preventScroll: true });
   else consentSettingsButton.focus({ preventScroll: true });
 };
 
-consentBanner.querySelector('.consent-decline').addEventListener('click', () => {
-  websiteAnalytics.deny();
+const applyConsent = (statistics, marketing) => {
+  if (statistics) websiteAnalytics.grant();
+  else websiteAnalytics.deny();
+  if (websiteAnalytics.marketingOnPage) {
+    if (marketing) websiteAnalytics.grantMarketing();
+    else websiteAnalytics.denyMarketing();
+  }
   hideConsentBanner();
-});
+};
 
-consentBanner.querySelector('.consent-accept').addEventListener('click', () => {
-  websiteAnalytics.grant();
-  hideConsentBanner();
+consentBanner.querySelector('.consent-decline').addEventListener('click', () => applyConsent(false, false));
+consentBanner.querySelector('.consent-accept').addEventListener('click', () => applyConsent(true, true));
+consentChooseButton?.addEventListener('click', () => {
+  consentChoices.querySelector('[name="statistics"]').checked = websiteAnalytics.readConsent() === 'granted';
+  consentChoices.querySelector('[name="marketing"]').checked = websiteAnalytics.readMarketing() === 'granted';
+  consentChoices.hidden = false;
+  consentChooseButton.setAttribute('aria-expanded', 'true');
+  consentChooseButton.hidden = true;
+  consentChoices.querySelector('input').focus();
 });
+consentBanner.querySelector('.consent-save').addEventListener('click', () => applyConsent(
+  consentChoices.querySelector('[name="statistics"]').checked,
+  consentChoices.querySelector('[name="marketing"]').checked
+));
 
 consentSettingsButton.addEventListener('click', showConsentBanner);
 
-if (websiteAnalytics.readConsent() === 'granted') {
-  websiteAnalytics.loadTag();
-} else if (websiteAnalytics.readConsent() === null) {
+// Für eigene Seiten wie /start/ und die Web-Kasse: dieselbe Einwilligung, nie eigene Banner.
+window.DemenzConsent = {
+  statistics: () => websiteAnalytics.readConsent() === 'granted',
+  marketing: () => websiteAnalytics.marketingOnPage && websiteAnalytics.readMarketing() === 'granted',
+  open: showConsentBanner,
+  track: websiteAnalytics.track,
+  trackMarketing: websiteAnalytics.trackMarketing
+};
+
+if (websiteAnalytics.readConsent() === 'granted') websiteAnalytics.loadTag();
+if (websiteAnalytics.marketingOnPage && websiteAnalytics.readMarketing() === 'granted') websiteAnalytics.loadPixels();
+if (websiteAnalytics.readConsent() === null
+  || (websiteAnalytics.marketingOnPage && websiteAnalytics.readMarketing() === null)) {
   showConsentBanner();
 }
 

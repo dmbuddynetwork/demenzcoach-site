@@ -220,11 +220,16 @@ body.einfach .consent-copy p a { font-size: var(--e-small) !important; }
 body.einfach .consent-copy a { color: var(--e-purple); }
 body.einfach .consent-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 body.einfach .consent-button { min-height: 52px; padding: 8px 12px; border-radius: 14px; font-weight: 700 !important; cursor: pointer; }
-body.einfach .consent-decline { background: var(--e-lav); color: var(--e-lav-text); border: 0; }
-body.einfach .consent-accept { background: var(--e-purple); color: #fff; border: 0; }
+/* Ablehnen und Erlauben gleich gestaltet (keine Wahl optisch bevorzugt). */
+body.einfach :is(.consent-decline, .consent-accept, .consent-save) { background: var(--e-purple); color: #fff; border: 0; }
+body.einfach .consent-choices { display: grid; gap: 8px; }
+body.einfach .consent-choices[hidden] { display: none; }
+body.einfach .consent-choice { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
+body.einfach .consent-choice input { width: 24px; height: 24px; flex: 0 0 auto; accent-color: var(--e-purple); }
+body.einfach .consent-choose { min-height: 44px; padding: 4px 8px; background: none; border: 0; color: var(--e-muted); text-decoration: underline; cursor: pointer; font-size: var(--e-small) !important; }
 body.einfach .consent-settings { display: block; margin: 0 auto 24px; padding: 8px 12px; min-height: 44px; background: none; border: 0; color: var(--e-muted); text-decoration: underline; cursor: pointer; font-size: var(--e-small) !important; }
 body.einfach .consent-settings[hidden] { display: none; }
-@media (min-width: 720px) { body.einfach .consent-banner { flex-direction: row; align-items: center; } body.einfach .consent-actions { flex: 0 0 auto; } }
+@media (min-width: 720px) { body.einfach .consent-banner:not(:has(.consent-choose)) { flex-direction: row; align-items: center; } body.einfach .consent-actions { flex: 0 0 auto; } }
 body.einfach .e-privacy > summary span { font-size: .875rem !important; }
 body.einfach .translator-retry { margin-block: 12px; padding: 20px !important; background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: var(--e-radius) !important; }
 body.einfach .translator-result:not([hidden]) + .e-moments-block .e-moments-title { margin-top: 32px; }
