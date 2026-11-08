@@ -8,7 +8,7 @@
   },
   "tricks": [
     {"id":"teller-rot","category":"essen","title":"Roter Teller","text":"Serviere das Essen auf einem roten Teller. Darauf hebt sich das Essen deutlich ab.","situations":["eat","cold"],"drawing":"illu-plate-red"},
-    {"id":"erst-riechen","category":"essen","title":"Erst riechen lassen","text":"Biete das Essen zuerst zum Riechen an. Der Duft weckt oft die Lust auf Essen.","situations":["eat"],"drawing":"illu-trick-riechen"},
+    {"id":"erst-riechen","category":"essen","title":"Erst riechen lassen","text":"Biete das Essen zuerst zum Riechen an, bevor der Teller kommt.","situations":["eat"],"drawing":"illu-trick-riechen"},
     {"id":"kraeftig-wuerzen","category":"essen","title":"Kräftiger würzen","text":"Würze ruhig etwas kräftiger, zum Beispiel mit Kräutern. Im Alter schmeckt man oft weniger.","situations":["eat"],"drawing":"illu-trick-wuerzen"},
     {"id":"zaehne-pruefen","category":"essen","title":"Zähne und Prothese nachsehen","text":"Fällt das Kauen schwer, schau nach Zähnen und Prothese. Drückt etwas, lass es in der Zahnarztpraxis nachsehen.","situations":["eat"],"drawing":"illu-trick-zaehne"},
     {"id":"unterlage-einfarbig","category":"essen","title":"Einfarbige Unterlage","text":"Lege eine einfarbige Unterlage auf den Tisch und räume Muster, Deko und Gläser weg. So bleibt nur das Essen im Blick.","situations":["eat"],"drawing":"illu-trick-unterlage"},
