@@ -662,6 +662,10 @@
     // Wie in der App: Erklärung, Sätze und der nächste Schritt stehen zusammen in EINER Karte.
     const answerCard = element('div', { className: 'translator-answer' });
     nodes.push(answerCard);
+    // Passende Zeichnung oben in der Karte (nur wenn die Seite eine mitliefert, siehe answer-drawings.json).
+    if (result.image && !result.safetyOnly && !result.selfCare) {
+      answerCard.append(element('img', { className: 'translator-answer-art', attributes: { src: result.image, alt: '', width: String(result.imageWidth ?? 480), height: String(result.imageHeight ?? 400), decoding: 'async' } }));
+    }
     if (lead) {
       answerCard.append(element('h3', { className: 'translator-step', text: result.meaningTitle || (result.feeling ? 'Was jetzt hilft' : 'Was dahintersteckt') }));
       answerCard.append(element('p', { className: 'translator-meaning', text: lead }));

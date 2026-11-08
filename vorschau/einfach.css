@@ -234,3 +234,42 @@ body.einfach .consent-settings[hidden] { display: none; }
 body.einfach .e-privacy > summary span { font-size: .875rem !important; }
 body.einfach .translator-retry { margin-block: 12px; padding: 20px !important; background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: var(--e-radius) !important; }
 body.einfach .translator-result:not([hidden]) + .e-moments-block .e-moments-title { margin-top: 32px; }
+body.einfach p.e-privacy, body.einfach p.e-privacy a { font-size: .875rem !important; color: var(--e-muted) !important; }
+body.einfach p.e-privacy { margin: 10px 0 0; }
+
+/* ---------- Runde 3 (Daniel, 8. Nov 09:32): Zeichnung in der Antwort, Sätze als Sprechblasen, rechte Spalte ---------- */
+body.einfach .translator-answer-art { display: block; width: auto; max-width: 64%; height: 180px; object-fit: contain; margin: 0 auto 16px; }
+body.einfach .translator-phrases { gap: 10px; }
+body.einfach .translator-phrase { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 12px; padding: 14px 16px !important; background: var(--e-bg) !important; border-radius: 14px !important; }
+body.einfach .translator-phrase::before {
+  content: ""; flex: 0 0 auto; width: 22px; height: 22px; margin-top: .15em; background: var(--e-purple);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3C6.5 3 2 6.7 2 11.2c0 2.3 1.2 4.4 3.1 5.9L4.3 21l4.4-2.3c1 .3 2.1.4 3.3.4 5.5 0 10-3.7 10-8.2S17.5 3 12 3Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3C6.5 3 2 6.7 2 11.2c0 2.3 1.2 4.4 3.1 5.9L4.3 21l4.4-2.3c1 .3 2.1.4 3.3.4 5.5 0 10-3.7 10-8.2S17.5 3 12 3Z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+body.einfach .translator-phrase:has(.translator-mood-lead, .translator-example-name) { flex-wrap: wrap; }
+body.einfach .translator-phrase q { flex: 1 1 0; font-weight: 600 !important; line-height: 1.4 !important; }
+body.einfach .translator-result > h2:first-of-type::before { display: none; }
+body.einfach .translator-result > h2:first-of-type { font-weight: 700 !important; }
+
+/* Startseite: rechte Spalte */
+.e-hero-grid { grid-template-columns: minmax(0, 1fr); }
+.e-side { display: grid; gap: 16px; align-content: start; margin-top: 24px; }
+body.einfach .e-card { padding: 20px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+body.einfach .e-app { text-align: center; }
+body.einfach .e-app > img { display: block; width: 160px; margin: 0 auto 12px; }
+body.einfach .e-app h2 { margin: 0 0 12px; }
+body.einfach .e-app .e-checks { margin-bottom: 20px; }
+body.einfach .e-muted { color: var(--e-muted); }
+.e-qr { display: none; }
+#home-signup .translator-signup { margin: 0; padding: 0 !important; border: 0 !important; background: none !important; }
+#home-signup .translator-signup label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (min-width: 900px) {
+  .e-hero-grid { grid-template-columns: minmax(0, 640px) 360px; }
+  .e-side { margin-top: 0; }
+  body.einfach .e-hero-art { margin: 0 auto 8px; width: 300px; }
+  body.einfach .e-app > img { display: none; }
+}
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .e-qr { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 16px 0 0; }
+  .e-qr img { width: 112px; height: 112px; }
+}
