@@ -454,3 +454,34 @@ body[data-page-type="translator-phrase"].einfach section.translator-trick { marg
 body.einfach .translator-trick-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 6px; }
 body.einfach .translator-trick-next { display: inline-flex; align-items: center; min-height: 44px; margin: 0; padding: 6px 14px; background: var(--e-lav) !important; color: var(--e-lav-text) !important; border: 0 !important; border-radius: 999px !important; font: inherit; font-size: var(--e-small) !important; font-weight: 700 !important; cursor: pointer; }
 body.einfach .translator-trick-next::after { content: none !important; }
+
+/* ---------- EN/Sprachen (Thread „Englische Seite und Sprachseiten“, 8. Nov 2026) ----------
+   Englischer Übersetzer und index-en.html nutzen nur die Klassen oben. Hier nur die App-Seiten der
+   31 weiteren Sprachen (body.e-loc): Sprachwahl im Kopf, Bildschirmfotos als Raster, App-Knöpfe nur auf iPhone/iPad. */
+html.app-check:not(.is-ios) .e-ios-only { display: none !important; }
+body.einfach .e-ios-only .e-store { width: 100%; }
+@media (min-width: 721px) { body.einfach .e-ios-only .e-store { width: auto; padding-inline: 32px; } }
+.e-loc .e-header nav { display: flex; align-items: center; gap: 16px; }
+.e-lang { position: relative; }
+body.einfach .e-lang > summary { display: flex; align-items: center; min-height: 44px; color: var(--e-purple); font-weight: 600; cursor: pointer; list-style: none; }
+.e-lang > summary::-webkit-details-marker { display: none; }
+.e-lang > summary::after { content: ""; width: 8px; height: 8px; margin-inline-start: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); }
+.e-lang[open] > summary::after { transform: translateY(2px) rotate(225deg); }
+.e-lang-menu { position: absolute; z-index: 40; inset-inline-end: 0; top: calc(100% + 4px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 8px; width: min(340px, calc(100vw - 32px)); max-height: 70vh; overflow: auto; padding: 8px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); box-shadow: 0 8px 24px rgba(28, 27, 31, .12); }
+body.einfach .e-lang-menu a { display: flex; align-items: center; min-height: 44px; padding: 0 10px; border-radius: 10px; color: var(--e-text); text-decoration: none; }
+body.einfach .e-lang-menu a:hover { background: var(--e-lav); }
+body.einfach .e-lang-menu a[aria-current="page"] { background: var(--e-lav); color: var(--e-lav-text); font-weight: 700; }
+.e-loc .e-hero > .e-wrap > :is(.e-card, .e-loc-screens) { margin-top: 32px; }
+.e-loc .e-hero > .e-wrap > .e-ios-only { margin: 20px 0 0; }
+.e-loc .e-card .e-checks { display: grid; margin-bottom: 8px; text-align: start; }
+.e-loc .e-card .e-ios-only { margin: 16px 0 0; }
+body.einfach .screenshot-language-note { color: var(--e-muted); font-size: var(--e-small) !important; }
+.e-shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0 0; padding: 0; list-style: none; }
+.e-shots li, .e-shots figure { margin: 0; }
+.e-shots img { display: block; width: 100%; border: 1px solid var(--e-line); border-radius: 18px; background: var(--e-card); }
+body.einfach .e-shots figcaption { margin-top: 8px; color: var(--e-text) !important; font-weight: 600; text-align: center; }
+@media (min-width: 721px) { .e-shots { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; } }
+/* Lange Wörter auf schmalen Handys (z. B. Russisch „Разрешить аналитику“): Einwilligungs-Knöpfe umbrechen. */
+body.e-loc .consent-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+body.e-loc :is(.consent-button, main, .e-footer) { overflow-wrap: anywhere; }
+body.e-loc .e-brand span, .e-lang > summary { white-space: nowrap; }
