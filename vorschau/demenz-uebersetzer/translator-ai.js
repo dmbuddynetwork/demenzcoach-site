@@ -1,5 +1,5 @@
 // KI-Antwort für Sätze, die der Übersetzer nicht kennt.
-// Wird nur aufgerufen, wenn jemand ausdrücklich „KI fragen“ tippt. Gesendet wird
+// Wird nur für Sätze aufgerufen, die die feste Liste nicht kennt (automatisch, Hinweis unter dem Feld). Gesendet wird
 // nur der eingegebene Satz (höchstens 200 Zeichen) und ob du oder Sie – ohne Cookies, ohne Kennung.
 // Der Server (Demenz Coach, Firebase) prüft Notfälle, fragt OpenAI ohne
 // Speicherung (store: false) und gibt nur geprüfte, kurze Antworten zurück.

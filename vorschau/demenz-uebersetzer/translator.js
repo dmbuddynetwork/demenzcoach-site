@@ -374,8 +374,8 @@
     ? urgentNote(data.safetySignals.mild.text, '', true)
     : urgentNote(data.safetySignals.text, lead));
 
-  // KI für Sätze, die die feste Liste nicht kennt. Gesendet wird erst, wenn
-  // jemand „KI fragen“ tippt – vorher bleibt alles auf dem Gerät.
+  // KI für Sätze, die die feste Liste nicht kennt. Bekannte Sätze bleiben auf dem Gerät;
+  // unbekannte gehen automatisch an die KI (Hinweis unter dem Eingabefeld).
   const ai = window.DemenzTranslatorAI;
   const aiAnswer = (result) => {
     const nodes = [];
@@ -389,29 +389,52 @@
     nodes.push(first, element('p', { className: 'translator-meaning', text: result.meaning }));
     nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
     nodes.push(element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
+    // Runde 198: Wie in der App gibt es einen konkreten nächsten Schritt.
+    if (typeof result.nextStep === 'string' && result.nextStep) {
+      nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
+      nodes.push(element('p', { className: 'translator-meaning translator-ai-next', text: result.nextStep }));
+    }
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
     return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
   };
-  const aiBox = (text, source, onFail = () => {}) => {
+  // Warte-Ansicht in Form der Antwort: so wirkt die Wartezeit kürzer und nichts springt.
+  const aiWaiting = () => element('div', { className: 'translator-ai-wait', attributes: { 'aria-hidden': 'true' } }, [
+    element('span', { className: 'translator-skeleton translator-skeleton-title' }),
+    element('span', { className: 'translator-skeleton' }),
+    element('span', { className: 'translator-skeleton translator-skeleton-quote' }),
+    element('span', { className: 'translator-skeleton translator-skeleton-short' })
+  ]);
+  // Runde 198 (Daniels Wahl „Automatisch“): Unbekannte Sätze gehen ohne Knopf an die KI.
+  // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
+  // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
+  const aiBox = (text, source, onFail = () => {}, { auto = false } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
-    const ask = button('KI fragen', 'button translator-ai-button', async () => {
+    const waiting = aiWaiting();
+    const run = async () => {
       ask.disabled = true;
+      ask.hidden = auto;
       status.textContent = 'Einen Moment, die KI schreibt eine Antwort …';
-      track('translator_ai', { step: 'ask', source });
+      if (auto) box.append(waiting);
+      track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
       const result = await ai.ask(text, { formal: personal.formal });
+      waiting.remove();
       track('translator_ai', { step: result.kind, source });
+      if (!box.isConnected) return;
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
         const { node, focus, top } = aiAnswer(result);
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
+        output.querySelector('.translator-near-group')?.remove();
         if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
         document.body.classList.remove('translator-answers-seen');
-        focus.setAttribute('tabindex', '-1');
-        focus.focus({ preventScroll: true });
-        top.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        if (!auto) {
+          focus.setAttribute('tabindex', '-1');
+          focus.focus({ preventScroll: true });
+          top.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        }
         return;
       }
       if (result.kind === 'safety') {
@@ -423,17 +446,29 @@
       }
       if (result.kind === 'off_topic') {
         status.textContent = 'Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.';
+        output.querySelector('.translator-fallback')?.remove();
+        output.querySelector('.translator-suggest')?.remove();
         return;
       }
       // Ohne Treffer gibt es darunter die Gefühle-Auswahl: dorthin führen statt nur „später“.
-      const next = source === 'unknown' ? ' Oder wähle unten, was du bei der Person spürst.' : '';
+      const next = source === 'unknown' ? ' Wähle unten, was du bei der Person spürst.' : '';
       status.textContent = result.reason === 'busy'
-        ? `Gerade kommen viele Fragen an. Bitte versuch es in ein paar Minuten noch einmal.${next}`
+        ? `Gerade kommen viele Fragen an.${next || ' Bitte versuch es in ein paar Minuten noch einmal.'}`
         : `Die KI ist gerade nicht erreichbar.${next || ' Bitte versuch es später noch einmal.'}`;
+      ask.textContent = 'Noch einmal versuchen';
+      ask.hidden = false;
       ask.disabled = false;
       onFail();
-    });
-    box.append(ask, element('p', { className: 'translator-ai-note', text: 'Dein Satz geht dafür an OpenAI. Wir speichern ihn nicht. Bitte ohne Namen.' }), status);
+    };
+    const ask = button('KI fragen', 'button translator-ai-button', run);
+    // Bei einem Fehler steht erst die Erklärung, dann der Knopf zum erneuten Versuch.
+    box.append(...(auto ? [status, ask] : [ask, status]));
+    if (!auto) box.append(element('p', { className: 'translator-ai-note', text: 'Dein Satz geht dafür an OpenAI. Wir speichern ihn nicht. Bitte ohne Namen.' }));
+    if (auto) {
+      ask.hidden = true;
+      // Erst nach dem Einhängen starten, damit die Warte-Ansicht an der richtigen Stelle steht.
+      requestAnimationFrame(() => { run(); });
+    }
     return box;
   };
 
@@ -444,29 +479,34 @@
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
     nodes.push(heading);
-    if (shown) nodes.push(element('p', { className: 'translator-meaning translator-unknown-note', text: 'Diesen Satz kenne ich noch nicht.' }));
+    if (shown && !(ai && typed.length >= 2)) nodes.push(element('p', { className: 'translator-meaning translator-unknown-note', text: 'Diesen Satz kenne ich noch nicht.' }));
     // Mit KI-Knopf ist die Gefühle-Auswahl ein Weg zu viel. Sie erscheint erst,
     // wenn die KI nicht antworten kann (oder es keinen KI-Knopf gibt).
     const feelings = element('div', { className: 'translator-feelings-step' }, [
       element('h3', { className: 'translator-step', text: 'Was spürst du bei der Person?' }),
       feelingPicker('')
     ]);
-    const box = aiBox(typed, 'unknown', () => { feelings.hidden = false; });
+    const box = aiBox(typed, 'unknown', () => { feelings.hidden = false; if (fallbackBox) fallbackBox.hidden = false; }, { auto: true });
     if (box) feelings.hidden = true;
     nodes.push(box);
     // Ähnliche Situationen zuerst: Sie führen am schnellsten zu genauen Sätzen.
     const similar = typed ? core.near(typed, data) : [];
     if (similar.length) {
-      nodes.push(element('h3', { className: 'translator-step', text: 'Meinst du vielleicht:' }));
-      nodes.push(element('div', { className: 'translator-chips translator-near' }, similar.map((candidate) => button(`„${candidate.says}“`, 'translator-chip', () => show(candidate, 'alternative')))));
+      nodes.push(element('div', { className: 'translator-near-group' }, [
+        element('h3', { className: 'translator-step', text: 'Meinst du vielleicht:' }),
+        element('div', { className: 'translator-chips translator-near' }, similar.map((candidate) => button(`„${candidate.says}“`, 'translator-chip', () => show(candidate, 'alternative'))))
+      ]));
     }
-    nodes.push(element('div', { className: 'translator-fallback' }, [
+    // Während die KI schreibt, steht hier nichts Allgemeines – erst wenn sie nicht antworten kann.
+    const fallbackBox = element('div', { className: 'translator-fallback' }, [
       element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }),
       element('div', { className: 'translator-phrases' }, [
         element('div', { className: 'translator-phrase' }, [element('q', { text: core.personalize(fallback.phrases[0], personal, data.formal) })])
       ]),
       feelings
-    ]));
+    ]);
+    if (box) fallbackBox.hidden = true;
+    nodes.push(fallbackBox);
     nodes.push(suggestLink(typed));
     nodes.push(appCTA());
     output.replaceChildren(...nodes.filter(Boolean));
@@ -581,7 +621,13 @@
       paint();
       // Auf dem Handy muss der erste Satz ohne Scrollen sichtbar sein: Sätze zuerst, Anpassen und Erklärung danach.
       const usesExampleName = result.phrases.some((original) => /\bAnna\b/.test(original));
-      nodes.push(phraseList, alsoWrapper, result.selfCare ? null : personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
+      // Runde 198: Wie bei der KI-Antwort (und in der App) ein konkreter Schritt direkt unter den Sätzen.
+      const doNow = !result.selfCare && !result.safetyOnly && result.next?.length ? result.next[0] : '';
+      const doNodes = doNow ? [
+        element('h3', { className: 'translator-step', text: 'Das kannst du tun' }),
+        element('p', { className: 'translator-meaning translator-do', text: doNow })
+      ] : [];
+      nodes.push(phraseList, ...doNodes, alsoWrapper, result.selfCare ? null : personalPanel(() => { paint(); retry?.refresh(); }, { open: usesExampleName }));
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
     }
@@ -597,7 +643,7 @@
     const moreContent = [
       ...section(rest ? 'Hintergrund' : 'Weitere mögliche Gründe', result.meanings ?? [], rest),
       ...section('Eher vermeiden', result.avoid ?? [], result.avoid?.length ? 'Eher ungünstig ist es,' : ''),
-      ...section('Was danach helfen kann', result.next ?? [])
+      ...section('Was danach helfen kann', !result.selfCare && !result.safetyOnly && result.phrases.length ? (result.next ?? []).slice(1) : (result.next ?? []))
     ].filter(Boolean);
     if (moreContent.length) {
       nodes.push(element('div', { className: 'translator-more-group' }, [
