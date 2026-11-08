@@ -163,7 +163,8 @@ body.einfach .translator-result > h2:first-of-type::before {
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3C6.5 3 2 6.7 2 11.2c0 2.3 1.2 4.4 3.1 5.9L4.3 21l4.4-2.3c1 .3 2.1.4 3.3.4 5.5 0 10-3.7 10-8.2S17.5 3 12 3Z'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3C6.5 3 2 6.7 2 11.2c0 2.3 1.2 4.4 3.1 5.9L4.3 21l4.4-2.3c1 .3 2.1.4 3.3.4 5.5 0 10-3.7 10-8.2S17.5 3 12 3Z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-body.einfach :is(.translator-answer, .translator-ai-answer) { padding: 20px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+/* Keine weiße Außenkarte um die Antwort (Daniel, 8. Nov: doppelte Verschachtelung ist schlecht): Inhalt steht direkt auf dem Hintergrund, nur die Sprechblasen sind weiß. */
+body.einfach :is(.translator-answer, .translator-ai-answer) { padding: 0; background: none; border: 0; border-radius: 0; }
 body.einfach .translator-answer:empty { display: none; }
 body.einfach .translator-result .translator-step { margin: 0 0 6px !important; padding: 0 !important; color: var(--e-purple) !important; font-weight: 600 !important; border: 0; background: none !important; }
 body.einfach .translator-answer .translator-step ~ .translator-step { margin-top: 16px !important; padding-top: 16px !important; border-top: 1px solid var(--e-line) !important; }
@@ -255,7 +256,7 @@ body.einfach p.e-privacy { margin: 10px 0 0; }
 /* ---------- Runde 3 (Daniel, 8. Nov 09:32): Zeichnung in der Antwort, Sätze als Sprechblasen, rechte Spalte ---------- */
 body.einfach .translator-answer-art { display: block; width: auto; max-width: 64%; height: 180px; object-fit: contain; margin: 0 auto 16px; }
 body.einfach .translator-phrases { gap: 10px; }
-body.einfach .translator-phrase { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 12px; padding: 14px 16px !important; background: var(--e-bg) !important; border-radius: 14px !important; }
+body.einfach .translator-phrase { display: flex !important; flex-direction: row !important; align-items: flex-start; gap: 12px; padding: 14px 16px !important; background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: 14px !important; }
 body.einfach .translator-phrase::before {
   content: ""; flex: 0 0 auto; width: 22px; height: 22px; margin-top: .15em; background: var(--e-purple);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3C6.5 3 2 6.7 2 11.2c0 2.3 1.2 4.4 3.1 5.9L4.3 21l4.4-2.3c1 .3 2.1.4 3.3.4 5.5 0 10-3.7 10-8.2S17.5 3 12 3Z'/%3E%3C/svg%3E") center / contain no-repeat;
@@ -313,7 +314,16 @@ body.einfach .translator-goal { display: flex; align-items: center; justify-cont
 body.einfach .translator-goal:hover { background: var(--e-purple-dark) !important; }
 body.einfach .translator-goal::after { content: none !important; }
 body.einfach .translator-goal-chosen { margin: 0 0 12px; color: var(--e-muted) !important; font-size: var(--e-small) !important; }
-body.einfach .translator-other-goals { display: grid; gap: 10px; margin-top: 12px; }
+/* Unter der Antwort: andere Ziele + „Zweiter Versuch“ als eine ruhige weiße Liste mit Trennlinien. */
+body.einfach .translator-next { margin: 20px 0 8px; }
+body.einfach .translator-next-title { margin: 0 0 8px; color: var(--e-muted) !important; font-size: var(--e-small) !important; font-weight: 600; }
+body.einfach .translator-next-rows { background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); overflow: hidden; }
+body.einfach .translator-next-rows > .translator-copy { min-height: 56px; padding: 12px 18px; background: transparent !important; color: var(--e-purple) !important; border-radius: 0 !important; border-top: 1px solid var(--e-line) !important; font-weight: 600 !important; }
+body.einfach .translator-next-rows > .translator-copy:first-child { border-top: 0 !important; }
+body.einfach .translator-next-rows > .translator-copy:hover { background: var(--e-lav) !important; }
+body.einfach .translator-next-rows > .translator-copy::after { width: 20px; height: 20px; }
+body.einfach .translator-next:not(:has(.translator-copy:not([hidden]))) { display: none; }
+body.einfach .translator-retry-toggle[hidden] { display: none !important; }
 body.einfach .translator-goal-list { margin: 4px 0 12px; padding-left: 22px !important; }
 body.einfach .translator-goal-list li { margin: 0 0 6px; }
 
@@ -350,3 +360,18 @@ body.einfach .translator-call-link { color: inherit !important; font-weight: 700
   body.einfach .translator-phrase:has(> .translator-save) > q { flex: 1 1 calc(100% - 40px); }
   body.einfach .translator-phrase > .translator-save { margin-left: auto; min-height: 40px; }
 }
+
+/* ---------- Gehörter Satz als Sprechblase mit Zeichnung daneben (wie App-Store-Bilder, Daniel 8. Nov) ---------- */
+body.einfach .translator-said { display: flex; align-items: center; gap: 14px; margin: 0 0 20px; }
+body.einfach .translator-said-text { flex: 1 1 auto; min-width: 0; }
+body.einfach .translator-said-label { margin: 0 0 8px !important; color: var(--e-purple) !important; font-size: var(--e-small) !important; font-weight: 700 !important; }
+body.einfach h2.translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 16px 20px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
+body.einfach h2.translator-said-bubble::before { display: none !important; }
+body.einfach h2.translator-said-bubble::after { content: ""; position: absolute; left: 30px; bottom: -9px; width: 16px; height: 16px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
+body.einfach .translator-said-with-art h2.translator-said-bubble::after { left: auto; right: -9px; bottom: auto; top: calc(50% - 8px); border-bottom: 0; border-top: 1px solid var(--e-line); }
+body.einfach .translator-said-art { flex: 0 0 34%; max-width: 210px; width: 34%; height: auto; max-height: 210px; object-fit: contain; }
+@media (max-width: 480px) {
+  body.einfach h2.translator-said-bubble { padding: 14px 16px !important; font-size: 1.25rem !important; }
+}
+body.einfach .translator-answer .translator-goal-chosen { margin-bottom: 14px; }
+@media (min-width: 720px) { body.einfach h2.translator-said-bubble { font-size: 1.75rem !important; padding: 20px 26px !important; } }

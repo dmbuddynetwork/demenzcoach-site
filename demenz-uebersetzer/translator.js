@@ -329,13 +329,25 @@
       { id: 'tipps', label: 'Tipps, damit es leichter wird' }
     ];
   };
+  // Der gehörte Satz als weiße Sprechblase mit Zeichnung daneben, wie auf den App-Store-Bildern
+  // (Daniel, 8. Nov: „stell das in eine Sprechblase, als würde das gesagt werden“).
+  const saidBlock = (says, entry, heading) => {
+    const art = entry?.image && !entry.safetyOnly && !entry.selfCare
+      ? element('img', { className: 'translator-said-art', attributes: { src: entry.image, alt: '', width: String(entry.imageWidth ?? 480), height: String(entry.imageHeight ?? 400), decoding: 'async' } })
+      : null;
+    heading.classList.add('translator-said-bubble');
+    return element('div', { className: art ? 'translator-said translator-said-with-art' : 'translator-said' }, [
+      element('div', { className: 'translator-said-text' }, [element('p', { className: 'translator-said-label', text: 'Du hörst:' }), heading]),
+      art
+    ].filter(Boolean));
+  };
   const askGoal = (entry, options = {}) => {
     const goals = goalsFor(entry);
     if (!goals) { render(entry, options); return; }
     const heading = element('h2', { text: `„${entry.says}“`, attributes: { tabindex: '-1' } });
     output.replaceChildren(...[
       options.typed && core.normalize(options.typed) !== core.normalize(entry.says ?? '') ? element('p', { className: 'translator-echo', text: `Deine Eingabe: „${options.typed}“` }) : null,
-      heading,
+      saidBlock(entry.says, entry, heading),
       element('p', { className: 'translator-goal-question', text: 'Was möchtest du jetzt erreichen?' }),
       element('div', { className: 'translator-goals', attributes: { role: 'group', 'aria-label': 'Dein Ziel' } }, goals.map((goal) => button(goal.label, 'translator-goal', () => {
         track('translator_goal', { goal: goal.id, result_key: entry.key });
@@ -655,7 +667,7 @@
     // Gleicher Aufbau wie ein Treffer: oben der Satz, dann klar, was jetzt hilft.
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
-    nodes.push(heading);
+    nodes.push(shown ? saidBlock(shown, null, heading) : heading);
     if (shown && !(ai && typed.length >= 2)) nodes.push(element('p', { className: 'translator-meaning translator-unknown-note', text: 'Diesen Satz kenne ich noch nicht.' }));
     // Mit KI-Knopf ist die Gefühle-Auswahl ein Weg zu viel. Sie erscheint erst,
     // wenn die KI nicht antworten kann (oder es keinen KI-Knopf gibt).
@@ -733,9 +745,9 @@
     // Steht der getippte Satz schon als Überschrift da, braucht es keine Wiederholung.
     if (typed && (result.selfCare || core.normalize(typed) !== core.normalize(result.says ?? ''))) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
     // Entlastung spricht dich direkt an, statt dir einen Satz wie „Ich kann nicht mehr.“ in den Mund zu legen.
-    if (!result.selfCare) nodes.push(element('span', { className: 'eyebrow', text: result.feeling ? 'Nach Gefühl' : 'Übersetzung' }));
+    if (result.feeling) nodes.push(element('span', { className: 'eyebrow', text: 'Nach Gefühl' }));
     const heading = element('h2', { text: result.selfCare ? 'Das ist gerade viel für dich.' : result.feeling ? `Bei ${result.feeling}` : `„${result.says}“`, attributes: { tabindex: '-1' } });
-    nodes.push(heading);
+    nodes.push(result.selfCare || result.feeling ? heading : saidBlock(result.says, result, heading));
     // Bei manchen Eingaben gehört der Hinweis „Wann ein Gespräch nicht ausreicht“ nach oben,
     // zum Beispiel wenn jemand seit Tagen kaum trinkt.
     const typedNormalized = core.normalize(typed);
@@ -781,10 +793,7 @@
     const chosenGoal = goals?.find((candidate) => candidate.id === goal) ?? null;
     // Gewähltes Ziel als ruhige graue Zeile oben in der Karte (wie in der App, nie wie ein Knopf).
     if (chosenGoal) answerCard.append(element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }));
-    // Passende Zeichnung oben in der Karte (nur wenn die Seite eine mitliefert, siehe answer-drawings.json).
-    if (result.image && !result.safetyOnly && !result.selfCare) {
-      answerCard.append(element('img', { className: 'translator-answer-art', attributes: { src: result.image, alt: '', width: String(result.imageWidth ?? 480), height: String(result.imageHeight ?? 400), decoding: 'async' } }));
-    }
+    // Die Zeichnung steht oben neben der Sprechblase (saidBlock), nicht mehr in der Karte.
     // Bausteine der Karte; die Reihenfolge richtet sich nach dem Ziel.
     const meaningBlock = [];
     if (lead) {
@@ -877,14 +886,30 @@
       : goal === 'tipps' ? [doBlock, phraseBlock, meaningBlock]
         : [meaningBlock, phraseBlock, doBlock];
     answerCard.append(...[...order.flat(), quickRow].filter(Boolean));
-    // Die anderen Ziele bleiben unter der Antwort antippbar (wie in der App, helle Zeilen).
-    if (chosenGoal) {
-      nodes.push(element('div', { className: 'translator-other-goals', attributes: { role: 'group', 'aria-label': 'Anderes Ziel' } }, goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {
-        track('translator_goal', { goal: candidate.id, result_key: result.key, step: 'switch' });
-        render(result, { safetyHit, alternatives, also, typed, mood, goal: candidate.id });
-      }))));
+    // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
+    // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
+    const nextRows = chosenGoal ? goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {
+      track('translator_goal', { goal: candidate.id, result_key: result.key, step: 'switch' });
+      render(result, { safetyHit, alternatives, also, typed, mood, goal: candidate.id });
+    })) : [];
+    // Runde 199 (schlankes Layout): Ratgeber- und Übungs-Link stehen im Aufklappbereich „Mehr dazu“,
+    // unter der Antwort bleibt nur „Neuen Satz übersetzen“.
+    const deeper = [
+      result.href ? element('a', { className: 'text-link', text: `${result.linkLabel} →`, attributes: { href: result.href, 'data-related-link': result.key } }) : null,
+      result.trainer ? element('a', { className: 'text-link', text: 'Diese Situation üben →', attributes: { href: result.trainer, 'data-related-link': 'gespraechstrainer' } }) : null
+    ].filter(Boolean);
+    if (retry) nextRows.push(retry.toggle);
+    // Mit Ziel stehen Ratgeber und Üben als Zeilen in derselben Liste statt als große unterstrichene Links.
+    const deeperInList = Boolean(chosenGoal);
+    if (deeperInList) deeper.forEach((link) => { link.className = 'translator-copy'; link.textContent = link.textContent.replace(/\s*→$/, ''); });
+    if (deeperInList) nextRows.push(...deeper);
+    if (nextRows.length) {
+      nodes.push(element('div', { className: 'translator-next' }, [
+        chosenGoal ? element('p', { className: 'translator-next-title', text: 'Mehr zu dieser Situation' }) : null,
+        element('div', { className: 'translator-next-rows', attributes: { role: 'group', 'aria-label': 'Mehr zu dieser Situation' } }, nextRows)
+      ].filter(Boolean)));
     }
-    if (retry) nodes.push(retry.toggle, retry.block);
+    if (retry) nodes.push(retry.block);
 
     // Antwort zuerst, alles Weitere in EINER Klappe: Für Menschen über 60 ist eine Klappe
     // leichter als drei. Innen kurze Zwischenüberschriften.
@@ -900,12 +925,6 @@
       ...section('Eher vermeiden', result.avoid ?? [], result.avoid?.length ? 'Eher ungünstig ist es,' : ''),
       ...section('Was danach helfen kann', !result.selfCare && !result.safetyOnly && result.phrases.length ? (result.next ?? []).slice(1) : (result.next ?? []))
     ].filter(Boolean);
-    // Runde 199 (schlankes Layout): Ratgeber- und Übungs-Link stehen im Aufklappbereich „Mehr dazu“,
-    // unter der Antwort bleibt nur „Neuen Satz übersetzen“.
-    const deeper = [
-      result.href ? element('a', { className: 'text-link', text: `${result.linkLabel} →`, attributes: { href: result.href, 'data-related-link': result.key } }) : null,
-      result.trainer ? element('a', { className: 'text-link', text: 'Diese Situation üben →', attributes: { href: result.trainer, 'data-related-link': 'gespraechstrainer' } }) : null
-    ].filter(Boolean);
     if (moreContent.length) {
       nodes.push(element('div', { className: 'translator-more-group' }, [
         element('details', { className: 'translator-more' }, [
@@ -919,7 +938,7 @@
     if (result.safety && !result.safetyOnly && !safetyHit && !safetyFirst) nodes.push(safetyAside());
 
     const actions = element('div', { className: 'translator-result-links' });
-    if (!moreContent.length) actions.append(...deeper);
+    if (!moreContent.length && !deeperInList) actions.append(...deeper);
     actions.append(button('Neuen Satz übersetzen', 'translator-copy', () => {
       input.value = '';
       grow();
