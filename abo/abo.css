@@ -1,0 +1,72 @@
+/* Web-Kasse Demenz Coach. Regeln (Daniel, Nov 2026): warmes Weiß, weiße Karten mit feinem grauem
+   Rand, Lila #47408C nur für Tippbares, fast schwarzer Text, nur zwei Schriftgrößen. */
+:root {
+  /* Dieselben Werte wie einfach.css der Website (Stil der App, Daniel 8. Nov 2026). */
+  --paper: #f6f5f2;
+  --card: #ffffff;
+  --line: #d6d3dc;
+  --ink: #1c1b1f;
+  --ink-2: #55525e;
+  --purple: #47408c;
+  --purple-dark: #362f6e;
+  --purple-ink: #ffffff;
+  --lav: #ece9f7;
+  --lav-ink: #2e2870;
+  --error: #a3261f;
+  --small: .9375rem;
+  --big: 1.875rem;
+  --body: 1.1875rem;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 var(--body)/1.5 var(--sans); }
+a { color: var(--purple); }
+.abo-page { max-width: 34rem; margin: 0 auto; padding: 20px 16px 48px; }
+.abo-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.abo-brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 700; }
+.abo-brand img { width: 40px; height: 40px; border-radius: 10px; }
+h1 { font-size: var(--big); line-height: 1.15; margin: 0 0 16px; font-weight: 700; }
+h2 { font-size: var(--body); line-height: 1.3; margin: 0 0 8px; font-weight: 700; }
+p { margin: 0 0 12px; }
+.abo-muted { color: var(--ink-2); }
+.abo-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; margin: 0 0 14px; }
+.abo-checks { list-style: none; padding: 0; margin: 0 0 18px; }
+.abo-checks li { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 8px; }
+.abo-checks li::before { content: "✓"; color: var(--purple); font-weight: 700; }
+.abo-plan { display: flex; gap: 14px; align-items: center; width: 100%; text-align: left; font: inherit; color: inherit;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin: 0 0 12px; cursor: pointer; }
+.abo-plan[aria-checked="true"] { border: 2px solid var(--purple); padding: 15px; }
+.abo-plan .abo-radio { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); }
+.abo-plan[aria-checked="true"] .abo-radio { border: 7px solid var(--purple); }
+.abo-plan .abo-plan-text { flex: 1; }
+.abo-plan strong { display: block; }
+.abo-badge { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 999px; background: var(--purple); color: var(--purple-ink); font-weight: 700; }
+.abo-button { display: block; width: 100%; min-height: 56px; border: 0; border-radius: 14px; background: var(--purple); color: var(--purple-ink);
+  font: 700 var(--body)/1.2 var(--sans); padding: 16px; cursor: pointer; text-align: center; text-decoration: none; }
+.abo-button[disabled] { opacity: .55; cursor: default; }
+.abo-button-light { background: var(--card); color: var(--purple); border: 1px solid var(--line); }
+.abo-button + .abo-button, .abo-button + p, p + .abo-button { margin-top: 12px; }
+.abo-link-button { background: none; border: 0; padding: 8px 0; color: var(--purple); font: inherit; text-decoration: underline; cursor: pointer; }
+label { display: block; font-weight: 700; margin: 0 0 6px; }
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"], textarea, select {
+  width: 100%; min-height: 52px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card);
+  color: var(--ink); font: 400 var(--body)/1.4 var(--sans); margin: 0 0 14px; }
+textarea { min-height: 96px; resize: vertical; }
+input:focus, textarea:focus, button:focus-visible, a:focus-visible { outline: 3px solid rgba(71, 64, 140, .35); outline-offset: 2px; }
+fieldset { border: 0; padding: 0; margin: 0 0 14px; }
+legend { font-weight: 700; margin: 0 0 8px; padding: 0; }
+.abo-choice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 0; font-weight: 400; margin: 0; }
+.abo-choice input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--purple); flex: none; }
+.abo-error { color: var(--error); font-weight: 700; }
+.abo-summary { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px; }
+.abo-steps { color: var(--ink-2); margin: 0 0 8px; }
+#express-checkout, #payment-element { margin: 0 0 14px; }
+.abo-divider { display: flex; align-items: center; gap: 10px; color: var(--ink-2); margin: 4px 0 14px; }
+.abo-divider::before, .abo-divider::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+.abo-footer { font-size: var(--small); margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.abo-footer a { color: var(--ink-2); }
+.abo-footer .abo-cancel-link { color: var(--purple); font-weight: 700; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media print { .abo-top, .abo-footer, .abo-noprint { display: none !important; } body { background: #fff; } }

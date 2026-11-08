@@ -18,6 +18,8 @@ const walk = (directory, prefix = "") => {
     if (!prefix && entry.name === "vorschau") continue;
     // teller/ und plate/ (EN): Landingpages für Social-Media-Traffic (noindex), eigenes Layout.
     if (!prefix && (entry.name === "teller" || entry.name === "plate")) continue;
+    // abo/ und start/: Kassen- und Werbeseiten mit eigenen Regeln (noindex), keine SEO-Seiten.
+    if (!prefix && (entry.name === "abo" || entry.name === "start")) continue;
     const relative = path.posix.join(prefix, entry.name);
     const absolute = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(absolute, relative);
