@@ -462,6 +462,12 @@ body.translator-has-result .translator-static-cta { display: none; }
 body[data-page-type="translator-tool"] .section { padding: 56px 0; }
 body[data-page-type="translator-tool"] .translator-section { padding-top: 32px; }
 [data-page-type^="translator"] .translator-more-links { margin-top: 18px; }
+[data-page-type^="translator"] .translator-qr { display: none; }
+@media (min-width: 1100px) and (hover: hover) and (pointer: fine) {
+[data-page-type^="translator"] .translator-qr { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 14px 0 0; }
+[data-page-type^="translator"] .translator-qr img { width: 112px; height: 112px; padding: 6px; background: #fff; border-radius: 10px; }
+[data-page-type^="translator"] .translator-qr figcaption { color: inherit; font-size: .95rem; text-align: center; }
+}
 .preview-banner { position: relative; z-index: 60; padding: 8px 16px; background: #fff3c4; color: #4a3b00; font: 600 .9rem/1.4 var(--sans); text-align: center; }
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 @media (min-width: 900px) { .footer-grid > p { min-width: 14rem; } .footer-grid nav { max-width: 34rem; } }

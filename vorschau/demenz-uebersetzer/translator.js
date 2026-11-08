@@ -187,6 +187,11 @@
   // App-Link je Situation mit eigenem Kampagnen-Token (fester Schlüssel, nie Text),
   // damit messbar wird, welche Situationen zur App führen.
   const appLinkFor = (result) => (result?.campaign ? appURL.replace('ct=seo_de_translator', `ct=${result.campaign}`) : appURL);
+  // Am Computer lässt sich die iPhone-App nicht laden: dort zeigt die Karte einen QR-Code (nur breite Bildschirme mit Maus).
+  const qrFigure = () => element('figure', { className: 'translator-qr' }, [
+    element('img', { attributes: { src: '../assets/app-qr-de.svg', width: '112', height: '112', loading: 'lazy', alt: 'QR-Code zur App Demenz Coach im App Store' } }),
+    element('figcaption', { text: 'Mit der iPhone-Kamera scannen' })
+  ]);
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
       element('h2', { text: 'Für eure eigene Situation' }),
@@ -210,7 +215,8 @@
         className: 'button',
         text: 'Kostenlos im App Store',
         attributes: { href: appLinkFor(result), 'data-store-link': result?.key ? `translator-result-${result.key}` : 'translator-result' }
-      })
+      }),
+      qrFigure()
     ])
   ]);
 
