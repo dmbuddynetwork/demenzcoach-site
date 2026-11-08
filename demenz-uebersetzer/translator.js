@@ -381,6 +381,27 @@
     saveButtons.push({ node, item, set });
     return node;
   };
+  // Satz an die Familie schicken (Daniel, 8. Nov 17:02): Teilen-Menü des Handys, sonst WhatsApp.
+  // Geteilt wird nur der feste Satz (ohne eingetragene Namen) und die öffentliche Seite der Situation mit eigenem Vorschaubild.
+  const phraseShareButton = (result, original) => {
+    if (ui || result.selfCare || result.safetyOnly || !result.url || !result.says) return null;
+    const plain = core.personalize(original, { formal: personal.formal, callName: '', me: '', role: '' }, data.formal);
+    const text = `„${plain}“ – das kann man sagen, wenn ein Mensch mit Demenz sagt: „${result.says}“. Mehr Sätze und Tipps:`;
+    const label = 'Satz teilen';
+    if (navigator.share) {
+      return button('', 'translator-phrase-share', async () => {
+        try {
+          await navigator.share({ text, url: result.url });
+          track('translator_share', { result_key: result.key, method: 'native', step: 'phrase' });
+        } catch {
+          // Abgebrochen – nichts zu tun.
+        }
+      }, { 'aria-label': label, title: label });
+    }
+    const link = element('a', { className: 'translator-phrase-share', attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${text} ${result.url}`)}`, rel: 'noopener', target: '_blank', 'aria-label': label, title: label } });
+    link.addEventListener('click', () => track('translator_share', { result_key: result.key, method: 'whatsapp', step: 'phrase' }));
+    return link;
+  };
   const savedBox = document.getElementById('translator-saved');
   const renderSaved = () => {
     saveButtons = saveButtons.filter(({ node }) => node.isConnected);
@@ -834,7 +855,7 @@
             lead ? element('span', { className: 'translator-mood-lead', text: lead }) : null,
             exampleHint ? element('span', { className: 'translator-example-name', text: '„Anna“ ist ein Beispiel – trag unten deinen Namen ein.' }) : null,
             element('q', { text }),
-            saveButton(result, original)
+            element('div', { className: 'translator-phrase-actions' }, [saveButton(result, original), phraseShareButton(result, original)])
           ]);
         }));
         syncQuick();
@@ -886,16 +907,36 @@
     }
     // Alltagstrick zur Situation direkt unter „Das kannst du tun“ (Daniel, 8. Nov: wie der rote Teller).
     // Kommt fest aus den Seitendaten (nie aus KI oder Eingabe), Notfall und Entlastung bekommen keinen.
-    const trick = result.trick && !result.safetyOnly && !result.selfCare ? result.trick : null;
-    const trickBlock = trick ? [element('div', { className: 'translator-trick' }, [
-      element('img', { className: 'translator-trick-art', attributes: { src: trick.image, alt: '', width: String(trick.imageWidth ?? 480), height: String(trick.imageHeight ?? 400), loading: 'lazy', decoding: 'async' } }),
-      element('div', { className: 'translator-trick-text' }, [
-        element('p', { className: 'translator-trick-label', text: 'Dieser Trick hilft' }),
-        element('p', { className: 'translator-trick-title', text: trick.title }),
-        element('p', { text: trick.text }),
-        element('a', { className: 'text-link translator-trick-link', text: 'Alle Tricks', attributes: { href: trick.href, 'data-related-link': 'alltagstricks' } })
-      ])
-    ])] : [];
+    // „Noch ein Trick“ zeigt den nächsten passenden (Debby/Daniel, 8. Nov), danach wieder den ersten.
+    const tricks = !result.safetyOnly && !result.selfCare && Array.isArray(result.tricks) ? result.tricks.filter((item) => item?.title) : [];
+    const trick = tricks[0] ?? null;
+    let trickBlock = [];
+    if (trick) {
+      let shown = 0;
+      const art = element('img', { className: 'translator-trick-art', attributes: { src: trick.image, alt: '', width: String(trick.imageWidth ?? 480), height: String(trick.imageHeight ?? 400), loading: 'lazy', decoding: 'async' } });
+      const title = element('p', { className: 'translator-trick-title', text: trick.title });
+      const body = element('p', { text: trick.text });
+      const trickLink = element('a', { className: 'text-link translator-trick-link', text: 'Alle Tricks', attributes: { href: trick.href } });
+      trickLink.addEventListener('click', () => track('translator_trick', { result_key: result.key, trick_id: tricks[shown].id }));
+      const links = element('div', { className: 'translator-trick-links' }, [
+        tricks.length > 1 ? button('Noch ein Trick', 'translator-trick-next', () => {
+          shown = (shown + 1) % tricks.length;
+          const next = tricks[shown];
+          art.setAttribute('src', next.image);
+          art.setAttribute('width', String(next.imageWidth ?? 480));
+          art.setAttribute('height', String(next.imageHeight ?? 400));
+          title.textContent = next.title;
+          body.textContent = next.text;
+          trickLink.setAttribute('href', next.href);
+          track('translator_trick', { result_key: result.key, trick_id: next.id, step: 'next' });
+        }) : null,
+        trickLink
+      ]);
+      trickBlock = [element('div', { className: 'translator-trick', attributes: { 'aria-live': 'polite' } }, [
+        art,
+        element('div', { className: 'translator-trick-text' }, [element('p', { className: 'translator-trick-label', text: 'Dieser Trick hilft' }), title, body, links])
+      ])];
+    }
     if (trick && !doBlock.length) trickBlock.unshift(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
     const doWithTrick = [...doBlock, ...trickBlock];
     const order = goal === 'jetzt' ? [phraseBlock, doWithTrick, meaningBlock]

@@ -40,31 +40,32 @@ const categories = Object.entries(data.categories);
 const title = "Alltagstricks bei Demenz: 54 kleine Hilfen mit Bildern | Demenz Coach";
 const description = "Roter Teller, Bild an der Toilettentür, Tafel für den Tag: 54 einfache Alltagstricks für Angehörige von Menschen mit Demenz, jeder mit Zeichnung.";
 
+// Gleiches Aussehen wie die Ergebnisseite des Übersetzers (Daniel, 8. Nov 17:01: „soll wie eine Seite wirken“):
+// dieselbe Trick-Karte wie unter „Das kannst du tun“, Themen als Überschriften wie „Das kannst du sagen“,
+// Sprungliste wie „Mehr zu dieser Situation“.
 const card = (t) => {
-  const links = [...new Set(t.situations.filter((s) => pages[s]).map((s) => pages[s][0]))].slice(0, 2)
+  const links = [...new Set(t.situations.filter((s) => pages[s]).map((s) => pages[s][0]))].slice(0, 1)
     .map((slug) => {
       const label = Object.values(pages).find(([s]) => s === slug)[1];
-      return `<a href="../demenz-uebersetzer/${slug}.html" data-related-link="trick-${t.id}-${slug}">${esc(label)}</a>`;
+      return `
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/${slug}.html" data-related-link="trick-${t.id}-${slug}">${esc(label)}</a>`;
     });
   return `
-          <article class="trick" id="${t.id}">
-            <img src="img/${t.drawing}.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>${esc(t.title)}</h3>
-              <p>${esc(t.text)}</p>${links.length ? `
-              <p class="trick-links">Passt zu: ${links.join(" · ")}</p>` : ""}
-            </div>
-          </article>`;
+            <article class="translator-trick" id="${t.id}">
+              <img class="translator-trick-art" src="img/${t.drawing}.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">${esc(t.title)}</h3>
+                <p>${esc(t.text)}</p>${links.join("")}
+              </div>
+            </article>`;
 };
 
 const sections = categories.map(([key, name]) => {
   const tricks = data.tricks.filter((t) => t.category === key);
   return `
-        <section class="trick-group" id="${key}" aria-labelledby="${key}-title">
-          <h2 id="${key}-title">${esc(name)}</h2>
-          <div class="trick-grid">${tricks.map(card).join("")}
-          </div>
-        </section>`;
+          <section class="tricks-group" id="${key}" aria-labelledby="${key}-title">
+            <h2 class="translator-step" id="${key}-title">${esc(name)}</h2>${tricks.map(card).join("")}
+          </section>`;
 }).join("");
 
 const schema = {
@@ -108,27 +109,20 @@ const html = `<!doctype html>
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicon-192.png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
   <link rel="manifest" href="../site.webmanifest">
+  <link rel="stylesheet" href="../translator.css">
   <link rel="stylesheet" href="../einfach.css">
   <style>
-    .tricks-main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 24px; }
-    .trick-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px !important; padding: 0 !important; list-style: none; }
-    body.einfach .trick-jump a { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--e-lav); color: var(--e-lav-text); text-decoration: none; font-size: var(--e-small) !important; font-weight: 600; }
-    .trick-group { margin: 0 0 32px; scroll-margin-top: 16px; }
-    .trick-grid { display: grid; gap: 16px; }
-    .trick { display: grid; gap: 12px; padding: 16px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); scroll-margin-top: 16px; }
-    .trick img { display: block; width: 100%; max-height: 220px; object-fit: contain; }
-    .trick h3 { margin: 0 0 6px; }
-    .trick p:last-child { margin-bottom: 0; }
-    body.einfach .trick-links, body.einfach .trick-links a { font-size: var(--e-small) !important; color: var(--e-muted); }
-    .trick-links a { color: var(--e-purple); }
-    .trick:target { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
-    .trick-cta { margin: 8px 0 24px; padding: 20px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); text-align: center; }
-    .trick-cta .button { display: inline-block; margin-top: 4px; padding: 12px 20px; border-radius: 12px; background: var(--e-purple); color: #fff; text-decoration: none; font-weight: 700; }
-    @media (min-width: 640px) { .trick { grid-template-columns: 220px 1fr; align-items: center; } }
+    body.einfach .tricks-group { scroll-margin-top: 16px; }
+    body.einfach .tricks-group + .tricks-group { margin-top: 32px; }
+    body.einfach .translator-trick { scroll-margin-top: 16px; }
+    body.einfach h3.translator-trick-title { margin: 0 0 6px; font-size: var(--e-size, 1.0625rem) !important; line-height: 1.35; }
+    body.einfach .translator-trick-link { display: block; }
+    body.einfach .translator-trick:target { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
+    body.einfach .tricks-jump { margin: 24px 0 8px; }
   </style>
   <script type="application/ld+json">${JSON.stringify(schema, null, 2)}</script>
 </head>
-<body class="einfach" data-page-type="tricks" data-page-language="de">
+<body class="einfach" data-page-type="translator-tool" data-page-language="de" data-page-slug="alltagstricks">
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
   <header class="e-header">
     <div class="e-wrap">
@@ -136,17 +130,39 @@ const html = `<!doctype html>
       <nav aria-label="Hauptnavigation"><a href="${store("seo_de_tricks_nav")}" data-store-link="seo-de-tricks-nav">Zur App</a></nav>
     </div>
   </header>
-  <main id="main" class="tricks-main">
-    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Start</a><span aria-hidden="true"> › </span><span aria-current="page">Alltagstricks</span></nav>
-    <h1>Alltagstricks bei Demenz</h1>
-    <p>Kleine Dinge im Alltag machen oft einen großen Unterschied. Hier findest du ${data.tricks.length} einfache Tricks, die viele Familien nutzen, jeder mit einer Zeichnung. Probiere aus, was zu euch passt.</p>
-    <ul class="trick-jump" aria-label="Themen">${categories.map(([k, n]) => `<li><a href="#${k}">${esc(n)}</a></li>`).join("")}</ul>${sections}
-    <aside class="trick-cta">
-      <h2>Den passenden Trick im richtigen Moment</h2>
-      <p>Die App Demenz Coach zeigt dir zu deiner Situation, was du sagen und tun kannst, und den passenden Trick dazu.</p>
-      <a class="button" href="${store("seo_de_tricks")}" data-store-link="seo_de_tricks">Kostenlos im App Store</a>
-    </aside>
-    <p class="article-meta">Aktualisiert: <time datetime="2026-11-08">8. November 2026</time> · <a href="/ratgeber/redaktion.html">Demenz Coach Redaktion</a> · Quellen: <a href="https://www.deutsche-alzheimer.de/mit-demenz-leben/umgang-und-kommunikation" rel="noopener">Deutsche Alzheimer Gesellschaft</a>, <a href="https://www.wegweiser-demenz.de/" rel="noopener">Wegweiser Demenz</a></p>
+  <main id="main" class="content-main">
+    <section class="content-hero translator-hero">
+      <div class="container content-narrow">
+        <h1>Alltagstricks<span class="translator-h1-sub"><span class="translator-h1-dash">: </span>Kleine Hilfen für jeden Tag</span></h1>
+        <p>${data.tricks.length} einfache Tricks, die viele Familien nutzen. Probiere aus, was zu euch passt.</p>
+        <div class="translator-next tricks-jump">
+          <p class="translator-next-title">Themen</p>
+          <nav class="translator-next-rows" aria-label="Themen">${categories.map(([k, n]) => `
+            <a class="translator-copy" href="#${k}">${esc(n)}</a>`).join("")}
+          </nav>
+        </div>
+        <div class="translator-result">
+          <div class="translator-answer">${sections}
+          </div>
+          <div class="translator-result-links">
+            <a class="translator-copy" href="/demenz-uebersetzer/" data-related-link="demenz-uebersetzer">Satz übersetzen</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section translator-how" aria-label="App">
+      <div class="container content-narrow">
+        <aside class="article-cta translator-static-cta">
+          <div>
+            <span class="eyebrow">Demenz Coach für iPhone</span>
+            <h2>Der passende Trick im richtigen Moment</h2>
+            <p>Die App zeigt dir zu eurer Situation, was du sagen und tun kannst, und den passenden Trick dazu.</p>
+          </div>
+          <a class="button" href="${store("seo_de_tricks")}" data-store-link="seo_de_tricks">Kostenlos im App Store</a>
+        </aside>
+        <p class="article-meta">Aktualisiert: <time datetime="2026-11-08">8. November 2026</time> · <a href="/ratgeber/redaktion.html">Demenz Coach Redaktion</a> · Quellen: <a href="https://www.deutsche-alzheimer.de/mit-demenz-leben/umgang-und-kommunikation" rel="noopener">Deutsche Alzheimer Gesellschaft</a>, <a href="https://www.wegweiser-demenz.de/" rel="noopener">Wegweiser Demenz</a></p>
+      </div>
+    </section>
   </main>
   <footer class="e-footer">
     <div class="e-wrap">

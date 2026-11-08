@@ -22,23 +22,16 @@
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicon-192.png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
   <link rel="manifest" href="../site.webmanifest">
+  <link rel="stylesheet" href="../translator.css">
   <link rel="stylesheet" href="../einfach.css">
   <style>
-    .tricks-main { width: min(760px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 24px; }
-    .trick-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px !important; padding: 0 !important; list-style: none; }
-    body.einfach .trick-jump a { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--e-lav); color: var(--e-lav-text); text-decoration: none; font-size: var(--e-small) !important; font-weight: 600; }
-    .trick-group { margin: 0 0 32px; scroll-margin-top: 16px; }
-    .trick-grid { display: grid; gap: 16px; }
-    .trick { display: grid; gap: 12px; padding: 16px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); scroll-margin-top: 16px; }
-    .trick img { display: block; width: 100%; max-height: 220px; object-fit: contain; }
-    .trick h3 { margin: 0 0 6px; }
-    .trick p:last-child { margin-bottom: 0; }
-    body.einfach .trick-links, body.einfach .trick-links a { font-size: var(--e-small) !important; color: var(--e-muted); }
-    .trick-links a { color: var(--e-purple); }
-    .trick:target { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
-    .trick-cta { margin: 8px 0 24px; padding: 20px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); text-align: center; }
-    .trick-cta .button { display: inline-block; margin-top: 4px; padding: 12px 20px; border-radius: 12px; background: var(--e-purple); color: #fff; text-decoration: none; font-weight: 700; }
-    @media (min-width: 640px) { .trick { grid-template-columns: 220px 1fr; align-items: center; } }
+    body.einfach .tricks-group { scroll-margin-top: 16px; }
+    body.einfach .tricks-group + .tricks-group { margin-top: 32px; }
+    body.einfach .translator-trick { scroll-margin-top: 16px; }
+    body.einfach h3.translator-trick-title { margin: 0 0 6px; font-size: var(--e-size, 1.0625rem) !important; line-height: 1.35; }
+    body.einfach .translator-trick-link { display: block; }
+    body.einfach .translator-trick:target { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
+    body.einfach .tricks-jump { margin: 24px 0 8px; }
   </style>
   <script type="application/ld+json">{
   "@context": "https://schema.org",
@@ -68,7 +61,7 @@
       "@type": "ItemList",
       "@id": "https://dementiacoachapp.com/alltagstricks/#tricks",
       "name": "Alltagstricks bei Demenz",
-      "numberOfItems": 54,
+      "numberOfItems": 57,
       "itemListElement": [
         {
           "@type": "ListItem",
@@ -79,318 +72,336 @@
         {
           "@type": "ListItem",
           "position": 2,
+          "name": "Erst riechen lassen",
+          "url": "https://dementiacoachapp.com/alltagstricks/#erst-riechen"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Kräftiger würzen",
+          "url": "https://dementiacoachapp.com/alltagstricks/#kraeftig-wuerzen"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Zähne und Prothese nachsehen",
+          "url": "https://dementiacoachapp.com/alltagstricks/#zaehne-pruefen"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
           "name": "Einfarbige Unterlage",
           "url": "https://dementiacoachapp.com/alltagstricks/#unterlage-einfarbig"
         },
         {
           "@type": "ListItem",
-          "position": 3,
+          "position": 6,
           "name": "Immer nur ein Gericht",
           "url": "https://dementiacoachapp.com/alltagstricks/#eins-nach-dem-anderen"
         },
         {
           "@type": "ListItem",
-          "position": 4,
+          "position": 7,
           "name": "Essen zum Anfassen",
           "url": "https://dementiacoachapp.com/alltagstricks/#fingerfood"
         },
         {
           "@type": "ListItem",
-          "position": 5,
+          "position": 8,
           "name": "Gemeinsam essen",
           "url": "https://dementiacoachapp.com/alltagstricks/#gemeinsam-essen"
         },
         {
           "@type": "ListItem",
-          "position": 6,
+          "position": 9,
           "name": "Nur ein Löffel",
           "url": "https://dementiacoachapp.com/alltagstricks/#nur-loeffel"
         },
         {
           "@type": "ListItem",
-          "position": 7,
+          "position": 10,
           "name": "Lieblingsessen von früher",
           "url": "https://dementiacoachapp.com/alltagstricks/#lieblingsessen"
         },
         {
           "@type": "ListItem",
-          "position": 8,
+          "position": 11,
           "name": "Farbiger Becher",
           "url": "https://dementiacoachapp.com/alltagstricks/#becher-farbig"
         },
         {
           "@type": "ListItem",
-          "position": 9,
+          "position": 12,
           "name": "Getränke überall",
           "url": "https://dementiacoachapp.com/alltagstricks/#getraenke-ueberall"
         },
         {
           "@type": "ListItem",
-          "position": 10,
+          "position": 13,
           "name": "Anstoßen",
           "url": "https://dementiacoachapp.com/alltagstricks/#anstossen"
         },
         {
           "@type": "ListItem",
-          "position": 11,
+          "position": 14,
           "name": "Farbiger Toilettensitz",
           "url": "https://dementiacoachapp.com/alltagstricks/#wc-sitz-farbig"
         },
         {
           "@type": "ListItem",
-          "position": 12,
+          "position": 15,
           "name": "Bild an der Toilettentür",
           "url": "https://dementiacoachapp.com/alltagstricks/#tuer-bild"
         },
         {
           "@type": "ListItem",
-          "position": 13,
+          "position": 16,
           "name": "Licht auf dem Weg",
           "url": "https://dementiacoachapp.com/alltagstricks/#nachtlicht-weg"
         },
         {
           "@type": "ListItem",
-          "position": 14,
+          "position": 17,
           "name": "Bad vorwärmen",
           "url": "https://dementiacoachapp.com/alltagstricks/#bad-vorwaermen"
         },
         {
           "@type": "ListItem",
-          "position": 15,
+          "position": 18,
           "name": "Lieblingslied beim Waschen",
           "url": "https://dementiacoachapp.com/alltagstricks/#lied-beim-waschen"
         },
         {
           "@type": "ListItem",
-          "position": 16,
+          "position": 19,
           "name": "Erst nur die Hände",
           "url": "https://dementiacoachapp.com/alltagstricks/#erst-die-haende"
         },
         {
           "@type": "ListItem",
-          "position": 17,
+          "position": 20,
           "name": "Zähne nebeneinander putzen",
           "url": "https://dementiacoachapp.com/alltagstricks/#zaehne-nebeneinander"
         },
         {
           "@type": "ListItem",
-          "position": 18,
+          "position": 21,
           "name": "Handcreme",
           "url": "https://dementiacoachapp.com/alltagstricks/#handcreme"
         },
         {
           "@type": "ListItem",
-          "position": 19,
+          "position": 22,
           "name": "Duschhocker",
           "url": "https://dementiacoachapp.com/alltagstricks/#duschhocker"
         },
         {
           "@type": "ListItem",
-          "position": 20,
+          "position": 23,
           "name": "Uhr mit Wochentag",
           "url": "https://dementiacoachapp.com/alltagstricks/#uhr-mit-datum"
         },
         {
           "@type": "ListItem",
-          "position": 21,
+          "position": 24,
           "name": "Antwort auf den Zettel",
           "url": "https://dementiacoachapp.com/alltagstricks/#antwort-zettel"
         },
         {
           "@type": "ListItem",
-          "position": 22,
+          "position": 25,
           "name": "Tafel für den Tag",
           "url": "https://dementiacoachapp.com/alltagstricks/#tagestafel"
         },
         {
           "@type": "ListItem",
-          "position": 23,
+          "position": 26,
           "name": "Fotoalbum",
           "url": "https://dementiacoachapp.com/alltagstricks/#fotoalbum"
         },
         {
           "@type": "ListItem",
-          "position": 24,
+          "position": 27,
           "name": "Fotos mit Namen",
           "url": "https://dementiacoachapp.com/alltagstricks/#fotos-mit-namen"
         },
         {
           "@type": "ListItem",
-          "position": 25,
+          "position": 28,
           "name": "Bilder am Schrank",
           "url": "https://dementiacoachapp.com/alltagstricks/#schrank-bilder"
         },
         {
           "@type": "ListItem",
-          "position": 26,
+          "position": 29,
           "name": "Vorhänge auf",
           "url": "https://dementiacoachapp.com/alltagstricks/#vorhaenge-auf"
         },
         {
           "@type": "ListItem",
-          "position": 27,
+          "position": 30,
           "name": "Fester Platz für Wichtiges",
           "url": "https://dementiacoachapp.com/alltagstricks/#fester-platz"
         },
         {
           "@type": "ListItem",
-          "position": 28,
+          "position": 31,
           "name": "Raus an die Luft",
           "url": "https://dementiacoachapp.com/alltagstricks/#tageslicht-spaziergang"
         },
         {
           "@type": "ListItem",
-          "position": 29,
+          "position": 32,
           "name": "Immer derselbe Abend",
           "url": "https://dementiacoachapp.com/alltagstricks/#abendritual"
         },
         {
           "@type": "ListItem",
-          "position": 30,
+          "position": 33,
           "name": "Gleichmäßiges Licht",
           "url": "https://dementiacoachapp.com/alltagstricks/#gleichmaessiges-licht"
         },
         {
           "@type": "ListItem",
-          "position": 31,
+          "position": 34,
           "name": "Ruhige Musik",
           "url": "https://dementiacoachapp.com/alltagstricks/#ruhige-musik"
         },
         {
           "@type": "ListItem",
-          "position": 32,
+          "position": 35,
           "name": "Armband mit Telefonnummer",
           "url": "https://dementiacoachapp.com/alltagstricks/#armband"
         },
         {
           "@type": "ListItem",
-          "position": 33,
+          "position": 36,
           "name": "Glocke an der Tür",
           "url": "https://dementiacoachapp.com/alltagstricks/#tuerglocke"
         },
         {
           "@type": "ListItem",
-          "position": 34,
+          "position": 37,
           "name": "Aktuelles Foto bereit",
           "url": "https://dementiacoachapp.com/alltagstricks/#aktuelles-foto"
         },
         {
           "@type": "ListItem",
-          "position": 35,
+          "position": 38,
           "name": "Mantel und Schlüssel außer Sicht",
           "url": "https://dementiacoachapp.com/alltagstricks/#mantel-weg"
         },
         {
           "@type": "ListItem",
-          "position": 36,
+          "position": 39,
           "name": "Spiegel abdecken",
           "url": "https://dementiacoachapp.com/alltagstricks/#spiegel-abdecken"
         },
         {
           "@type": "ListItem",
-          "position": 37,
+          "position": 40,
           "name": "Eigenes Portemonnaie",
           "url": "https://dementiacoachapp.com/alltagstricks/#eigenes-portemonnaie"
         },
         {
           "@type": "ListItem",
-          "position": 38,
+          "position": 41,
           "name": "Haken für die Jacke",
           "url": "https://dementiacoachapp.com/alltagstricks/#garderobenhaken"
         },
         {
           "@type": "ListItem",
-          "position": 39,
+          "position": 42,
           "name": "Kleidung bereitlegen",
           "url": "https://dementiacoachapp.com/alltagstricks/#kleidung-bereitlegen"
         },
         {
           "@type": "ListItem",
-          "position": 40,
+          "position": 43,
           "name": "Klettverschluss und Gummibund",
           "url": "https://dementiacoachapp.com/alltagstricks/#klettverschluss"
         },
         {
           "@type": "ListItem",
-          "position": 41,
+          "position": 44,
           "name": "Schuhe in Laufrichtung",
           "url": "https://dementiacoachapp.com/alltagstricks/#schuhe-laufrichtung"
         },
         {
           "@type": "ListItem",
-          "position": 42,
+          "position": 45,
           "name": "Kiste zum Sortieren",
           "url": "https://dementiacoachapp.com/alltagstricks/#sortierkiste"
         },
         {
           "@type": "ListItem",
-          "position": 43,
+          "position": 46,
           "name": "Wäsche falten",
           "url": "https://dementiacoachapp.com/alltagstricks/#waesche-falten"
         },
         {
           "@type": "ListItem",
-          "position": 44,
+          "position": 47,
           "name": "Hand halten",
           "url": "https://dementiacoachapp.com/alltagstricks/#haende-halten"
         },
         {
           "@type": "ListItem",
-          "position": 45,
+          "position": 48,
           "name": "Lieblingslied",
           "url": "https://dementiacoachapp.com/alltagstricks/#lieblingslied"
         },
         {
           "@type": "ListItem",
-          "position": 46,
+          "position": 49,
           "name": "Fummeldecke",
           "url": "https://dementiacoachapp.com/alltagstricks/#fummeldecke"
         },
         {
           "@type": "ListItem",
-          "position": 47,
+          "position": 50,
           "name": "Ruhige Ecke",
           "url": "https://dementiacoachapp.com/alltagstricks/#ruhige-ecke"
         },
         {
           "@type": "ListItem",
-          "position": 48,
+          "position": 51,
           "name": "Nur zwei Möglichkeiten",
           "url": "https://dementiacoachapp.com/alltagstricks/#zwei-moeglichkeiten"
         },
         {
           "@type": "ListItem",
-          "position": 49,
+          "position": 52,
           "name": "Auf Augenhöhe",
           "url": "https://dementiacoachapp.com/alltagstricks/#augenhoehe"
         },
         {
           "@type": "ListItem",
-          "position": 50,
+          "position": 53,
           "name": "Immer wieder vorstellen",
           "url": "https://dementiacoachapp.com/alltagstricks/#name-nennen"
         },
         {
           "@type": "ListItem",
-          "position": 51,
+          "position": 54,
           "name": "Etwas Vertrautes mitnehmen",
           "url": "https://dementiacoachapp.com/alltagstricks/#vertrautes-mitnehmen"
         },
         {
           "@type": "ListItem",
-          "position": 52,
+          "position": 55,
           "name": "Karten mit Bildern",
           "url": "https://dementiacoachapp.com/alltagstricks/#bildkarten"
         },
         {
           "@type": "ListItem",
-          "position": 53,
+          "position": 56,
           "name": "Kurzer Abschied",
           "url": "https://dementiacoachapp.com/alltagstricks/#kurzer-abschied"
         },
         {
           "@type": "ListItem",
-          "position": 54,
+          "position": 57,
           "name": "Immer dieselbe Person",
           "url": "https://dementiacoachapp.com/alltagstricks/#feste-pflegekraft"
         }
@@ -422,7 +433,7 @@
   ]
 }</script>
 </head>
-<body class="einfach" data-page-type="tricks" data-page-language="de">
+<body class="einfach" data-page-type="translator-tool" data-page-language="de" data-page-slug="alltagstricks">
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
   <header class="e-header">
     <div class="e-wrap">
@@ -430,484 +441,520 @@
       <nav aria-label="Hauptnavigation"><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=seo_de_tricks_nav&amp;mt=8" data-store-link="seo-de-tricks-nav">Zur App</a></nav>
     </div>
   </header>
-  <main id="main" class="tricks-main">
-    <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Start</a><span aria-hidden="true"> › </span><span aria-current="page">Alltagstricks</span></nav>
-    <h1>Alltagstricks bei Demenz</h1>
-    <p>Kleine Dinge im Alltag machen oft einen großen Unterschied. Hier findest du 54 einfache Tricks, die viele Familien nutzen, jeder mit einer Zeichnung. Probiere aus, was zu euch passt.</p>
-    <ul class="trick-jump" aria-label="Themen"><li><a href="#essen">Essen</a></li><li><a href="#trinken">Trinken</a></li><li><a href="#bad">Bad und Toilette</a></li><li><a href="#orientierung">Orientierung</a></li><li><a href="#schlaf">Abend und Nacht</a></li><li><a href="#sicherheit">Sicherheit</a></li><li><a href="#kleidung">Kleidung</a></li><li><a href="#beschaeftigung">Beschäftigung und Ruhe</a></li><li><a href="#gespraech">Gespräch und Begegnung</a></li></ul>
-        <section class="trick-group" id="essen" aria-labelledby="essen-title">
-          <h2 id="essen-title">Essen</h2>
-          <div class="trick-grid">
-          <article class="trick" id="teller-rot">
-            <img src="img/illu-plate-red.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Roter Teller</h3>
-              <p>Serviere das Essen auf einem roten Teller. Darauf hebt sich das Essen deutlich ab.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-teller-rot-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="unterlage-einfarbig">
-            <img src="img/illu-trick-unterlage.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Einfarbige Unterlage</h3>
-              <p>Lege eine einfarbige Unterlage auf den Tisch und räume Muster, Deko und Gläser weg. So bleibt nur das Essen im Blick.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-unterlage-einfarbig-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="eins-nach-dem-anderen">
-            <img src="img/illu-trick-ein-gericht.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Immer nur ein Gericht</h3>
-              <p>Stelle nur Teller und Besteck hin. Das nächste Gericht kommt erst, wenn das erste weg ist.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-eins-nach-dem-anderen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="fingerfood">
-            <img src="img/illu-plates.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Essen zum Anfassen</h3>
-              <p>Schneide Brot, Obst und Gemüse in kleine Stücke zum Greifen. Dann braucht es kein Besteck.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-fingerfood-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="gemeinsam-essen">
-            <img src="img/illu-together.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Gemeinsam essen</h3>
-              <p>Setz dich dazu und iss selbst mit. Viele machen einfach nach, was sie sehen.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-gemeinsam-essen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="nur-loeffel">
-            <img src="img/illu-trick-loeffel.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Nur ein Löffel</h3>
-              <p>Lege statt Messer und Gabel nur einen Löffel hin. Das ist einfacher zu greifen.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-nur-loeffel-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="lieblingsessen">
-            <img src="img/illu-trick-lieblingsessen.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Lieblingsessen von früher</h3>
-              <p>Koche etwas, das die Person von früher kennt. Der Duft aus der Küche macht oft neugierig.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-lieblingsessen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a></p>
-            </div>
-          </article>
+  <main id="main" class="content-main">
+    <section class="content-hero translator-hero">
+      <div class="container content-narrow">
+        <h1>Alltagstricks<span class="translator-h1-sub"><span class="translator-h1-dash">: </span>Kleine Hilfen für jeden Tag</span></h1>
+        <p>57 einfache Tricks, die viele Familien nutzen. Probiere aus, was zu euch passt.</p>
+        <div class="translator-next tricks-jump">
+          <p class="translator-next-title">Themen</p>
+          <nav class="translator-next-rows" aria-label="Themen">
+            <a class="translator-copy" href="#essen">Essen</a>
+            <a class="translator-copy" href="#trinken">Trinken</a>
+            <a class="translator-copy" href="#bad">Bad und Toilette</a>
+            <a class="translator-copy" href="#orientierung">Orientierung</a>
+            <a class="translator-copy" href="#schlaf">Abend und Nacht</a>
+            <a class="translator-copy" href="#sicherheit">Sicherheit</a>
+            <a class="translator-copy" href="#kleidung">Kleidung</a>
+            <a class="translator-copy" href="#beschaeftigung">Beschäftigung und Ruhe</a>
+            <a class="translator-copy" href="#gespraech">Gespräch und Begegnung</a>
+          </nav>
+        </div>
+        <div class="translator-result">
+          <div class="translator-answer">
+          <section class="tricks-group" id="essen" aria-labelledby="essen-title">
+            <h2 class="translator-step" id="essen-title">Essen</h2>
+            <article class="translator-trick" id="teller-rot">
+              <img class="translator-trick-art" src="img/illu-plate-red.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Roter Teller</h3>
+                <p>Serviere das Essen auf einem roten Teller. Darauf hebt sich das Essen deutlich ab.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-teller-rot-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="erst-riechen">
+              <img class="translator-trick-art" src="img/illu-trick-riechen.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Erst riechen lassen</h3>
+                <p>Biete das Essen zuerst zum Riechen an. Der Duft weckt oft die Lust auf Essen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-erst-riechen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="kraeftig-wuerzen">
+              <img class="translator-trick-art" src="img/illu-trick-wuerzen.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Kräftiger würzen</h3>
+                <p>Würze ruhig etwas kräftiger, zum Beispiel mit Kräutern. Im Alter schmeckt man oft weniger.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-kraeftig-wuerzen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="zaehne-pruefen">
+              <img class="translator-trick-art" src="img/illu-trick-zaehne.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Zähne und Prothese nachsehen</h3>
+                <p>Fällt das Kauen schwer, schau nach Zähnen und Prothese. Drückt etwas, lass es in der Zahnarztpraxis nachsehen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-zaehne-pruefen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="unterlage-einfarbig">
+              <img class="translator-trick-art" src="img/illu-trick-unterlage.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Einfarbige Unterlage</h3>
+                <p>Lege eine einfarbige Unterlage auf den Tisch und räume Muster, Deko und Gläser weg. So bleibt nur das Essen im Blick.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-unterlage-einfarbig-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="eins-nach-dem-anderen">
+              <img class="translator-trick-art" src="img/illu-trick-ein-gericht.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Immer nur ein Gericht</h3>
+                <p>Stelle nur Teller und Besteck hin. Das nächste Gericht kommt erst, wenn das erste weg ist.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-eins-nach-dem-anderen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="fingerfood">
+              <img class="translator-trick-art" src="img/illu-trick-fingerfood.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Essen zum Anfassen</h3>
+                <p>Schneide Brot, Obst und Gemüse in kleine Stücke zum Greifen. Dann braucht es kein Besteck.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-fingerfood-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="gemeinsam-essen">
+              <img class="translator-trick-art" src="img/illu-together.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Gemeinsam essen</h3>
+                <p>Setz dich dazu und iss selbst mit. Viele machen einfach nach, was sie sehen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-gemeinsam-essen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="nur-loeffel">
+              <img class="translator-trick-art" src="img/illu-trick-loeffel.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Nur ein Löffel</h3>
+                <p>Lege statt Messer und Gabel nur einen Löffel hin. Das ist einfacher zu greifen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-nur-loeffel-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="lieblingsessen">
+              <img class="translator-trick-art" src="img/illu-trick-lieblingsessen.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Lieblingsessen von früher</h3>
+                <p>Koche etwas, das die Person von früher kennt. Der Duft aus der Küche macht oft neugierig.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-habe-schon-gegessen.html" data-related-link="trick-lieblingsessen-ich-habe-schon-gegessen">„Ich habe schon gegessen.“</a>
+              </div>
+            </article>
+          </section>
+          <section class="tricks-group" id="trinken" aria-labelledby="trinken-title">
+            <h2 class="translator-step" id="trinken-title">Trinken</h2>
+            <article class="translator-trick" id="becher-farbig">
+              <img class="translator-trick-art" src="img/illu-becher-red.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Farbiger Becher</h3>
+                <p>Nimm einen bunten Becher, der sich vom Tisch abhebt, und fülle ihn nur halb voll.</p>
+              </div>
+            </article>
+            <article class="translator-trick" id="getraenke-ueberall">
+              <img class="translator-trick-art" src="img/illu-trick-getraenke.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Getränke überall</h3>
+                <p>Stelle in jedem Raum ein gefülltes Glas oder eine Tasse hin, die man gut sieht.</p>
+              </div>
+            </article>
+            <article class="translator-trick" id="anstossen">
+              <img class="translator-trick-art" src="img/illu-becher-drink.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Anstoßen</h3>
+                <p>Nimm selbst ein Glas und stoße an. Gemeinsam trinken fällt leichter.</p>
+              </div>
+            </article>
+          </section>
+          <section class="tricks-group" id="bad" aria-labelledby="bad-title">
+            <h2 class="translator-step" id="bad-title">Bad und Toilette</h2>
+            <article class="translator-trick" id="wc-sitz-farbig">
+              <img class="translator-trick-art" src="img/illu-wc-red.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Farbiger Toilettensitz</h3>
+                <p>Ein farbiger Toilettensitz hebt sich vom weißen Becken ab. So findet man ihn leichter.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-muss-nicht-aufs-klo.html" data-related-link="trick-wc-sitz-farbig-ich-muss-nicht-aufs-klo">„Ich muss nicht aufs Klo.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="tuer-bild">
+              <img class="translator-trick-art" src="img/illu-trick-wc-tuer.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Bild an der Toilettentür</h3>
+                <p>Hänge ein Bild einer Toilette in Augenhöhe an die Tür und lasse die Tür offen stehen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-muss-nicht-aufs-klo.html" data-related-link="trick-tuer-bild-ich-muss-nicht-aufs-klo">„Ich muss nicht aufs Klo.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="nachtlicht-weg">
+              <img class="translator-trick-art" src="img/illu-nacht-sensor.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Licht auf dem Weg</h3>
+                <p>Ein Nachtlicht mit Bewegungsmelder zeigt nachts den Weg zur Toilette.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-muss-aufstehen-nachts.html" data-related-link="trick-nachtlicht-weg-ich-muss-aufstehen-nachts">Nachts aufstehen</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="bad-vorwaermen">
+              <img class="translator-trick-art" src="img/illu-tuch-towel.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Bad vorwärmen</h3>
+                <p>Wärme das Bad vor und lege ein großes Handtuch um die Schultern. Decke beim Waschen ab, was gerade nicht dran ist.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-bad-vorwaermen-ich-will-nicht-duschen">„Ich will nicht duschen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="lied-beim-waschen">
+              <img class="translator-trick-art" src="img/illu-lied-sing.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Lieblingslied beim Waschen</h3>
+                <p>Summt oder singt zusammen ein Lied, das die Person mag. Das lenkt ab und macht es freundlicher.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-lied-beim-waschen-ich-will-nicht-duschen">„Ich will nicht duschen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="erst-die-haende">
+              <img class="translator-trick-art" src="img/illu-trick-waschlappen.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Erst nur die Hände</h3>
+                <p>Beginne mit einem warmen Waschlappen an Händen und Gesicht. Der Rest folgt später oder ein anderes Mal.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-erst-die-haende-ich-will-nicht-duschen">„Ich will nicht duschen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="zaehne-nebeneinander">
+              <img class="translator-trick-art" src="img/illu-teeth.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Zähne nebeneinander putzen</h3>
+                <p>Putze dir neben der Person die Zähne. Sie macht oft einfach mit.</p>
+              </div>
+            </article>
+            <article class="translator-trick" id="handcreme">
+              <img class="translator-trick-art" src="img/illu-hand-cream.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Handcreme</h3>
+                <p>Creme der Person die Hände ein. Das ist eine ruhige Berührung, für die es keine Worte braucht.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-handcreme-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="duschhocker">
+              <img class="translator-trick-art" src="img/illu-trick-duschhocker.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Duschhocker</h3>
+                <p>Mit einem Duschhocker kann die Person im Sitzen duschen. Das gibt Halt und ist weniger anstrengend.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-duschhocker-ich-will-nicht-duschen">„Ich will nicht duschen.“</a>
+              </div>
+            </article>
+          </section>
+          <section class="tricks-group" id="orientierung" aria-labelledby="orientierung-title">
+            <h2 class="translator-step" id="orientierung-title">Orientierung</h2>
+            <article class="translator-trick" id="uhr-mit-datum">
+              <img class="translator-trick-art" src="img/illu-uhr-clock.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Uhr mit Wochentag</h3>
+                <p>Hänge eine große Uhr auf, die Wochentag und Datum zeigt, dort wo die Person oft sitzt.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/wann-gehen-wir.html" data-related-link="trick-uhr-mit-datum-wann-gehen-wir">„Wann gehen wir?“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="antwort-zettel">
+              <img class="translator-trick-art" src="img/illu-trick-zettel.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Antwort auf den Zettel</h3>
+                <p>Schreibe die Antwort in großer Schrift auf einen Zettel. Bei der nächsten Frage zeigst du darauf.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/wann-gehen-wir.html" data-related-link="trick-antwort-zettel-wann-gehen-wir">„Wann gehen wir?“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="tagestafel">
+              <img class="translator-trick-art" src="img/illu-trick-tagestafel.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Tafel für den Tag</h3>
+                <p>Schreibe auf eine Tafel, was heute ansteht, groß und mit wenigen Wörtern. Streiche Erledigtes gemeinsam durch.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/wann-gehen-wir.html" data-related-link="trick-tagestafel-wann-gehen-wir">„Wann gehen wir?“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="fotoalbum">
+              <img class="translator-trick-art" src="img/illu-trick-fotoalbum.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Fotoalbum</h3>
+                <p>Schaut zusammen ein Album mit alten Fotos an. Bilder von früher geben Gesprächsstoff.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/wo-ist-meine-mutter.html" data-related-link="trick-fotoalbum-wo-ist-meine-mutter">„Wo ist meine Mutter?“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="fotos-mit-namen">
+              <img class="translator-trick-art" src="img/illu-trick-namen-fotos.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Fotos mit Namen</h3>
+                <p>Stelle Fotos der Familie auf und schreibe die Namen in großer Schrift dazu.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/wer-sind-sie.html" data-related-link="trick-fotos-mit-namen-wer-sind-sie">„Wer sind Sie?“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="schrank-bilder">
+              <img class="translator-trick-art" src="img/illu-trick-schrank-bilder.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Bilder am Schrank</h3>
+                <p>Klebe außen auf Schränke und Schubladen ein Bild von dem, was darin liegt.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-ziehe-mich-nicht-um.html" data-related-link="trick-schrank-bilder-ich-ziehe-mich-nicht-um">„Ich ziehe mich nicht um.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="vorhaenge-auf">
+              <img class="translator-trick-art" src="img/illu-licht-window.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Vorhänge auf</h3>
+                <p>Öffne morgens die Vorhänge und lasse Tageslicht herein. Das markiert den Beginn des Tages.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-bleibe-heute-im-bett.html" data-related-link="trick-vorhaenge-auf-ich-bleibe-heute-im-bett">„Ich bleibe heute im Bett.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="fester-platz">
+              <img class="translator-trick-art" src="img/illu-trick-schluesselbrett.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Fester Platz für Wichtiges</h3>
+                <p>Gib Schlüsseln, Brille und Geldbeutel einen festen, sichtbaren Platz, zum Beispiel ein Schlüsselbrett.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/du-hast-mein-geld-gestohlen.html" data-related-link="trick-fester-platz-du-hast-mein-geld-gestohlen">„Du hast mein Geld gestohlen.“</a>
+              </div>
+            </article>
+          </section>
+          <section class="tricks-group" id="schlaf" aria-labelledby="schlaf-title">
+            <h2 class="translator-step" id="schlaf-title">Abend und Nacht</h2>
+            <article class="translator-trick" id="tageslicht-spaziergang">
+              <img class="translator-trick-art" src="img/illu-walk.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Raus an die Luft</h3>
+                <p>Plane vormittags einen kurzen Spaziergang ein. Frische Luft und Tageslicht gehören für viele zum Tagesrhythmus.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-muss-aufstehen-nachts.html" data-related-link="trick-tageslicht-spaziergang-ich-muss-aufstehen-nachts">Nachts aufstehen</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="abendritual">
+              <img class="translator-trick-art" src="img/illu-trick-abendritual.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Immer derselbe Abend</h3>
+                <p>Mache jeden Abend dasselbe in derselben Reihenfolge, zum Beispiel Tee, Waschen, Lieblingslied. Das gibt Halt.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-abendritual-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="gleichmaessiges-licht">
+              <img class="translator-trick-art" src="img/illu-licht-inner.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Gleichmäßiges Licht</h3>
+                <p>Schalte am Abend die Lampen an und ziehe die Vorhänge zu. So gibt es keine dunklen Ecken und keine Spiegelungen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-gleichmaessiges-licht-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="ruhige-musik">
+              <img class="translator-trick-art" src="img/illu-lied-speaker.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Ruhige Musik</h3>
+                <p>Schalte den Fernseher aus und spiele leise Musik, die die Person kennt.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-ruhige-musik-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a>
+              </div>
+            </article>
+          </section>
+          <section class="tricks-group" id="sicherheit" aria-labelledby="sicherheit-title">
+            <h2 class="translator-step" id="sicherheit-title">Sicherheit</h2>
+            <article class="translator-trick" id="armband">
+              <img class="translator-trick-art" src="img/illu-trick-armband.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Armband mit Telefonnummer</h3>
+                <p>Ein Armband oder eine Karte in der Jacke mit Namen und deiner Telefonnummer hilft, wenn die Person allein unterwegs ist.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-armband-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="tuerglocke">
+              <img class="translator-trick-art" src="img/illu-trick-tuerglocke.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Glocke an der Tür</h3>
+                <p>Hänge eine Glocke oder einen Türmelder an die Wohnungstür. So hörst du, wenn jemand hinausgeht.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-tuerglocke-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="aktuelles-foto">
+              <img class="translator-trick-art" src="img/illu-trick-foto-bereit.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Aktuelles Foto bereit</h3>
+                <p>Mache ab und zu ein neues Foto der Person und halte es griffbereit. Sage den Nachbarn Bescheid.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-aktuelles-foto-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="mantel-weg">
+              <img class="translator-trick-art" src="img/illu-trick-mantel-weg.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Mantel und Schlüssel außer Sicht</h3>
+                <p>Hänge Mantel, Schuhe und Schlüssel in einen Schrank. Was man nicht sieht, erinnert nicht ans Gehen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-mantel-weg-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="spiegel-abdecken">
+              <img class="translator-trick-art" src="img/illu-mirror.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Spiegel abdecken</h3>
+                <p>Hänge ein Tuch über den Spiegel oder nimm ihn aus dem Raum.</p>
+              </div>
+            </article>
+            <article class="translator-trick" id="eigenes-portemonnaie">
+              <img class="translator-trick-art" src="img/illu-trick-portemonnaie.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Eigenes Portemonnaie</h3>
+                <p>Gib der Person ein Portemonnaie mit etwas Kleingeld, das sie behalten darf.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/du-hast-mein-geld-gestohlen.html" data-related-link="trick-eigenes-portemonnaie-du-hast-mein-geld-gestohlen">„Du hast mein Geld gestohlen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="garderobenhaken">
+              <img class="translator-trick-art" src="img/illu-trick-garderobe.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Haken für die Jacke</h3>
+                <p>Hänge in Sichtweite einen Haken auf. Die Jacke hängt dort sichtbar, und die Person holt sie selbst, wenn sie hinaus möchte.</p>
+              </div>
+            </article>
+          </section>
+          <section class="tricks-group" id="kleidung" aria-labelledby="kleidung-title">
+            <h2 class="translator-step" id="kleidung-title">Kleidung</h2>
+            <article class="translator-trick" id="kleidung-bereitlegen">
+              <img class="translator-trick-art" src="img/illu-trick-kleidung.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Kleidung bereitlegen</h3>
+                <p>Lege die Kleidung in der Reihenfolge zum Anziehen hin, das Erste oben.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-ziehe-mich-nicht-um.html" data-related-link="trick-kleidung-bereitlegen-ich-ziehe-mich-nicht-um">„Ich ziehe mich nicht um.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="klettverschluss">
+              <img class="translator-trick-art" src="img/illu-trick-klett.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Klettverschluss und Gummibund</h3>
+                <p>Schuhe mit Klettverschluss und Hosen mit Gummibund lassen sich leichter anziehen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-ziehe-mich-nicht-um.html" data-related-link="trick-klettverschluss-ich-ziehe-mich-nicht-um">„Ich ziehe mich nicht um.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="schuhe-laufrichtung">
+              <img class="translator-trick-art" src="img/illu-shoes.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Schuhe in Laufrichtung</h3>
+                <p>Stelle die Schuhe so hin, dass die Spitzen zur Person zeigen und sie hineinschlüpfen kann.</p>
+              </div>
+            </article>
+          </section>
+          <section class="tricks-group" id="beschaeftigung" aria-labelledby="beschaeftigung-title">
+            <h2 class="translator-step" id="beschaeftigung-title">Beschäftigung und Ruhe</h2>
+            <article class="translator-trick" id="sortierkiste">
+              <img class="translator-trick-art" src="img/illu-trick-sortierkiste.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Kiste zum Sortieren</h3>
+                <p>Gib der Person eine Kiste mit ungefährlichen Dingen zum Sortieren, zum Beispiel Socken, Wäscheklammern oder Stoffreste.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-muss-zur-arbeit.html" data-related-link="trick-sortierkiste-ich-muss-zur-arbeit">„Ich muss zur Arbeit.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="waesche-falten">
+              <img class="translator-trick-art" src="img/illu-trick-waesche.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Wäsche falten</h3>
+                <p>Bitte um Hilfe beim Falten von Handtüchern. Eine bekannte Handarbeit gibt das Gefühl, gebraucht zu werden.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-muss-zur-arbeit.html" data-related-link="trick-waesche-falten-ich-muss-zur-arbeit">„Ich muss zur Arbeit.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="haende-halten">
+              <img class="translator-trick-art" src="img/illu-hand-massage.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Hand halten</h3>
+                <p>Setze dich dazu und halte die Hand der Person. Eine ruhige Berührung braucht keine Worte.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-haende-halten-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="lieblingslied">
+              <img class="translator-trick-art" src="img/illu-lied-notes.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Lieblingslied</h3>
+                <p>Spiele oder summe ein Lied aus der Jugend der Person. Alte Lieder kennen viele Menschen noch Wort für Wort.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-lieblingslied-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="fummeldecke">
+              <img class="translator-trick-art" src="img/illu-trick-fummeldecke.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Fummeldecke</h3>
+                <p>Eine Decke mit Knöpfen, Bändern und Stoffen zum Anfassen beschäftigt unruhige Hände.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-fummeldecke-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="ruhige-ecke">
+              <img class="translator-trick-art" src="img/illu-noise.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Ruhige Ecke</h3>
+                <p>Richte einen Platz ein, an den man sich zurückziehen kann, mit Sessel, Decke und wenig Lärm.</p>
+              </div>
+            </article>
+          </section>
+          <section class="tricks-group" id="gespraech" aria-labelledby="gespraech-title">
+            <h2 class="translator-step" id="gespraech-title">Gespräch und Begegnung</h2>
+            <article class="translator-trick" id="zwei-moeglichkeiten">
+              <img class="translator-trick-art" src="img/illu-trick-wahl.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Nur zwei Möglichkeiten</h3>
+                <p>Biete höchstens zwei Möglichkeiten an, zum Beispiel Tee oder Kaffee. Eine offene Frage überfordert schnell.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-zwei-moeglichkeiten-ich-will-nicht-duschen">„Ich will nicht duschen.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="augenhoehe">
+              <img class="translator-trick-art" src="img/illu-wuetend-ruhig.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Auf Augenhöhe</h3>
+                <p>Gehe auf Augenhöhe, sprich langsam und leise und nur einen Satz nach dem anderen.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-augenhoehe-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="name-nennen">
+              <img class="translator-trick-art" src="img/illu-trick-vorstellen.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Immer wieder vorstellen</h3>
+                <p>Sage freundlich deinen Namen und wer du bist, auch zum fünften Mal am Tag.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/wer-sind-sie.html" data-related-link="trick-name-nennen-wer-sind-sie">„Wer sind Sie?“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="vertrautes-mitnehmen">
+              <img class="translator-trick-art" src="img/illu-trick-vertraut.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Etwas Vertrautes mitnehmen</h3>
+                <p>Nimm zu Terminen eine Lieblingsjacke, die Handtasche oder ein Foto mit. Das gibt Sicherheit an fremden Orten.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html" data-related-link="trick-vertrautes-mitnehmen-ich-gehe-nicht-in-die-tagespflege">„Ich gehe nicht in die Tagespflege.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="bildkarten">
+              <img class="translator-trick-art" src="img/illu-trick-bildkarten.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Karten mit Bildern</h3>
+                <p>Lege Karten mit Bildern bereit, zum Beispiel Glas, Toilette, Bett. Die Person kann darauf zeigen, wenn Worte fehlen.</p>
+              </div>
+            </article>
+            <article class="translator-trick" id="kurzer-abschied">
+              <img class="translator-trick-art" src="img/illu-daycare.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Kurzer Abschied</h3>
+                <p>Verabschiede dich kurz und freundlich und schreibe die Abholzeit auf einen Zettel.</p>
+                <a class="text-link translator-trick-link" href="../demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html" data-related-link="trick-kurzer-abschied-ich-gehe-nicht-in-die-tagespflege">„Ich gehe nicht in die Tagespflege.“</a>
+              </div>
+            </article>
+            <article class="translator-trick" id="feste-pflegekraft">
+              <img class="translator-trick-art" src="img/illu-carer.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <div class="translator-trick-text">
+                <h3 class="translator-trick-title">Immer dieselbe Person</h3>
+                <p>Bitte den Pflegedienst um feste Personen und feste Zeiten. Vertraute Gesichter machen es leichter.</p>
+              </div>
+            </article>
+          </section>
           </div>
-        </section>
-        <section class="trick-group" id="trinken" aria-labelledby="trinken-title">
-          <h2 id="trinken-title">Trinken</h2>
-          <div class="trick-grid">
-          <article class="trick" id="becher-farbig">
-            <img src="img/illu-becher-red.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Farbiger Becher</h3>
-              <p>Nimm einen bunten Becher, der sich vom Tisch abhebt, und fülle ihn nur halb voll.</p>
-            </div>
-          </article>
-          <article class="trick" id="getraenke-ueberall">
-            <img src="img/illu-trick-getraenke.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Getränke überall</h3>
-              <p>Stelle in jedem Raum ein gefülltes Glas oder eine Tasse hin, die man gut sieht.</p>
-            </div>
-          </article>
-          <article class="trick" id="anstossen">
-            <img src="img/illu-becher-drink.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Anstoßen</h3>
-              <p>Nimm selbst ein Glas und stoße an. Gemeinsam trinken fällt leichter.</p>
-            </div>
-          </article>
+          <div class="translator-result-links">
+            <a class="translator-copy" href="/demenz-uebersetzer/" data-related-link="demenz-uebersetzer">Satz übersetzen</a>
           </div>
-        </section>
-        <section class="trick-group" id="bad" aria-labelledby="bad-title">
-          <h2 id="bad-title">Bad und Toilette</h2>
-          <div class="trick-grid">
-          <article class="trick" id="wc-sitz-farbig">
-            <img src="img/illu-wc-red.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Farbiger Toilettensitz</h3>
-              <p>Ein farbiger Toilettensitz hebt sich vom weißen Becken ab. So findet man ihn leichter.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-muss-nicht-aufs-klo.html" data-related-link="trick-wc-sitz-farbig-ich-muss-nicht-aufs-klo">„Ich muss nicht aufs Klo.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="tuer-bild">
-            <img src="img/illu-tuer-door.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Bild an der Toilettentür</h3>
-              <p>Hänge ein Bild einer Toilette in Augenhöhe an die Tür und lasse die Tür offen stehen.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-muss-nicht-aufs-klo.html" data-related-link="trick-tuer-bild-ich-muss-nicht-aufs-klo">„Ich muss nicht aufs Klo.“</a> · <a href="../demenz-uebersetzer/ich-muss-aufstehen-nachts.html" data-related-link="trick-tuer-bild-ich-muss-aufstehen-nachts">Nachts aufstehen</a></p>
-            </div>
-          </article>
-          <article class="trick" id="nachtlicht-weg">
-            <img src="img/illu-nacht-sensor.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Licht auf dem Weg</h3>
-              <p>Ein Nachtlicht mit Bewegungsmelder zeigt nachts den Weg zur Toilette.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-muss-aufstehen-nachts.html" data-related-link="trick-nachtlicht-weg-ich-muss-aufstehen-nachts">Nachts aufstehen</a> · <a href="../demenz-uebersetzer/ich-muss-nicht-aufs-klo.html" data-related-link="trick-nachtlicht-weg-ich-muss-nicht-aufs-klo">„Ich muss nicht aufs Klo.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="bad-vorwaermen">
-            <img src="img/illu-tuch-towel.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Bad vorwärmen</h3>
-              <p>Wärme das Bad vor und lege ein großes Handtuch um die Schultern. Decke beim Waschen ab, was gerade nicht dran ist.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-bad-vorwaermen-ich-will-nicht-duschen">„Ich will nicht duschen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="lied-beim-waschen">
-            <img src="img/illu-lied-sing.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Lieblingslied beim Waschen</h3>
-              <p>Summt oder singt zusammen ein Lied, das die Person mag. Das lenkt ab und macht es freundlicher.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-lied-beim-waschen-ich-will-nicht-duschen">„Ich will nicht duschen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="erst-die-haende">
-            <img src="img/illu-trick-waschlappen.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Erst nur die Hände</h3>
-              <p>Beginne mit einem warmen Waschlappen an Händen und Gesicht. Der Rest folgt später oder ein anderes Mal.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-erst-die-haende-ich-will-nicht-duschen">„Ich will nicht duschen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="zaehne-nebeneinander">
-            <img src="img/illu-teeth.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Zähne nebeneinander putzen</h3>
-              <p>Putze dir neben der Person die Zähne. Sie macht oft einfach mit.</p>
-            </div>
-          </article>
-          <article class="trick" id="handcreme">
-            <img src="img/illu-hand-cream.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Handcreme</h3>
-              <p>Creme der Person die Hände ein. Das ist eine ruhige Berührung, für die es keine Worte braucht.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-handcreme-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="duschhocker">
-            <img src="img/illu-trick-duschhocker.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Duschhocker</h3>
-              <p>Mit einem Duschhocker kann die Person im Sitzen duschen. Das gibt Halt und ist weniger anstrengend.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-duschhocker-ich-will-nicht-duschen">„Ich will nicht duschen.“</a></p>
-            </div>
-          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section translator-how" aria-label="App">
+      <div class="container content-narrow">
+        <aside class="article-cta translator-static-cta">
+          <div>
+            <span class="eyebrow">Demenz Coach für iPhone</span>
+            <h2>Der passende Trick im richtigen Moment</h2>
+            <p>Die App zeigt dir zu eurer Situation, was du sagen und tun kannst, und den passenden Trick dazu.</p>
           </div>
-        </section>
-        <section class="trick-group" id="orientierung" aria-labelledby="orientierung-title">
-          <h2 id="orientierung-title">Orientierung</h2>
-          <div class="trick-grid">
-          <article class="trick" id="uhr-mit-datum">
-            <img src="img/illu-uhr-clock.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Uhr mit Wochentag</h3>
-              <p>Hänge eine große Uhr auf, die Wochentag und Datum zeigt, dort wo die Person oft sitzt.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/wann-gehen-wir.html" data-related-link="trick-uhr-mit-datum-wann-gehen-wir">„Wann gehen wir?“</a> · <a href="../demenz-uebersetzer/ich-bleibe-heute-im-bett.html" data-related-link="trick-uhr-mit-datum-ich-bleibe-heute-im-bett">„Ich bleibe heute im Bett.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="antwort-zettel">
-            <img src="img/illu-trick-zettel.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Antwort auf den Zettel</h3>
-              <p>Schreibe die Antwort in großer Schrift auf einen Zettel. Bei der nächsten Frage zeigst du darauf.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/wann-gehen-wir.html" data-related-link="trick-antwort-zettel-wann-gehen-wir">„Wann gehen wir?“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="tagestafel">
-            <img src="img/illu-trick-tagestafel.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Tafel für den Tag</h3>
-              <p>Schreibe auf eine Tafel, was heute ansteht, groß und mit wenigen Wörtern. Streiche Erledigtes gemeinsam durch.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/wann-gehen-wir.html" data-related-link="trick-tagestafel-wann-gehen-wir">„Wann gehen wir?“</a> · <a href="../demenz-uebersetzer/ich-bleibe-heute-im-bett.html" data-related-link="trick-tagestafel-ich-bleibe-heute-im-bett">„Ich bleibe heute im Bett.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="fotoalbum">
-            <img src="img/illu-trick-fotoalbum.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Fotoalbum</h3>
-              <p>Schaut zusammen ein Album mit alten Fotos an. Bilder von früher geben Gesprächsstoff.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/wo-ist-meine-mutter.html" data-related-link="trick-fotoalbum-wo-ist-meine-mutter">„Wo ist meine Mutter?“</a> · <a href="../demenz-uebersetzer/wo-sind-meine-kinder.html" data-related-link="trick-fotoalbum-wo-sind-meine-kinder">„Wo sind meine Kinder?“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="fotos-mit-namen">
-            <img src="img/illu-trick-namen-fotos.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Fotos mit Namen</h3>
-              <p>Stelle Fotos der Familie auf und schreibe die Namen in großer Schrift dazu.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/wer-sind-sie.html" data-related-link="trick-fotos-mit-namen-wer-sind-sie">„Wer sind Sie?“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="schrank-bilder">
-            <img src="img/illu-trick-schrank-bilder.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Bilder am Schrank</h3>
-              <p>Klebe außen auf Schränke und Schubladen ein Bild von dem, was darin liegt.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-ziehe-mich-nicht-um.html" data-related-link="trick-schrank-bilder-ich-ziehe-mich-nicht-um">„Ich ziehe mich nicht um.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="vorhaenge-auf">
-            <img src="img/illu-licht-window.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Vorhänge auf</h3>
-              <p>Öffne morgens die Vorhänge und lasse Tageslicht herein. Das markiert den Beginn des Tages.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-bleibe-heute-im-bett.html" data-related-link="trick-vorhaenge-auf-ich-bleibe-heute-im-bett">„Ich bleibe heute im Bett.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="fester-platz">
-            <img src="img/illu-trick-schluesselbrett.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Fester Platz für Wichtiges</h3>
-              <p>Gib Schlüsseln, Brille und Geldbeutel einen festen, sichtbaren Platz, zum Beispiel ein Schlüsselbrett.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/du-hast-mein-geld-gestohlen.html" data-related-link="trick-fester-platz-du-hast-mein-geld-gestohlen">„Du hast mein Geld gestohlen.“</a></p>
-            </div>
-          </article>
-          </div>
-        </section>
-        <section class="trick-group" id="schlaf" aria-labelledby="schlaf-title">
-          <h2 id="schlaf-title">Abend und Nacht</h2>
-          <div class="trick-grid">
-          <article class="trick" id="tageslicht-spaziergang">
-            <img src="img/illu-walk.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Raus an die Luft</h3>
-              <p>Plane vormittags einen kurzen Spaziergang ein. Frische Luft und Tageslicht gehören für viele zum Tagesrhythmus.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-muss-aufstehen-nachts.html" data-related-link="trick-tageslicht-spaziergang-ich-muss-aufstehen-nachts">Nachts aufstehen</a> · <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-tageslicht-spaziergang-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="abendritual">
-            <img src="img/illu-trick-abendritual.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Immer derselbe Abend</h3>
-              <p>Mache jeden Abend dasselbe in derselben Reihenfolge, zum Beispiel Tee, Waschen, Lieblingslied. Das gibt Halt.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-abendritual-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a> · <a href="../demenz-uebersetzer/ich-muss-aufstehen-nachts.html" data-related-link="trick-abendritual-ich-muss-aufstehen-nachts">Nachts aufstehen</a></p>
-            </div>
-          </article>
-          <article class="trick" id="gleichmaessiges-licht">
-            <img src="img/illu-licht-inner.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Gleichmäßiges Licht</h3>
-              <p>Schalte am Abend die Lampen an und ziehe die Vorhänge zu. So gibt es keine dunklen Ecken und keine Spiegelungen.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-gleichmaessiges-licht-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a> · <a href="../demenz-uebersetzer/da-ist-jemand-im-zimmer.html" data-related-link="trick-gleichmaessiges-licht-da-ist-jemand-im-zimmer">„Da ist jemand im Zimmer.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="ruhige-musik">
-            <img src="img/illu-lied-speaker.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Ruhige Musik</h3>
-              <p>Schalte den Fernseher aus und spiele leise Musik, die die Person kennt.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-ruhige-musik-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a> · <a href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-ruhige-musik-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a></p>
-            </div>
-          </article>
-          </div>
-        </section>
-        <section class="trick-group" id="sicherheit" aria-labelledby="sicherheit-title">
-          <h2 id="sicherheit-title">Sicherheit</h2>
-          <div class="trick-grid">
-          <article class="trick" id="armband">
-            <img src="img/illu-trick-armband.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Armband mit Telefonnummer</h3>
-              <p>Ein Armband oder eine Karte in der Jacke mit Namen und deiner Telefonnummer hilft, wenn die Person allein unterwegs ist.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-armband-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a> · <a href="../demenz-uebersetzer/lass-mich-nicht-allein.html" data-related-link="trick-armband-lass-mich-nicht-allein">„Lass mich nicht allein.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="tuerglocke">
-            <img src="img/illu-trick-tuerglocke.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Glocke an der Tür</h3>
-              <p>Hänge eine Glocke oder einen Türmelder an die Wohnungstür. So hörst du, wenn jemand hinausgeht.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-tuerglocke-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a> · <a href="../demenz-uebersetzer/ich-muss-aufstehen-nachts.html" data-related-link="trick-tuerglocke-ich-muss-aufstehen-nachts">Nachts aufstehen</a></p>
-            </div>
-          </article>
-          <article class="trick" id="aktuelles-foto">
-            <img src="img/illu-trick-foto-bereit.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Aktuelles Foto bereit</h3>
-              <p>Mache ab und zu ein neues Foto der Person und halte es griffbereit. Sage den Nachbarn Bescheid.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-aktuelles-foto-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="mantel-weg">
-            <img src="img/illu-trick-mantel-weg.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Mantel und Schlüssel außer Sicht</h3>
-              <p>Hänge Mantel, Schuhe und Schlüssel in einen Schrank. Was man nicht sieht, erinnert nicht ans Gehen.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-mantel-weg-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a> · <a href="../demenz-uebersetzer/ich-will-auto-fahren.html" data-related-link="trick-mantel-weg-ich-will-auto-fahren">„Ich will Auto fahren.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="spiegel-abdecken">
-            <img src="img/illu-mirror.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Spiegel abdecken</h3>
-              <p>Hänge ein Tuch über den Spiegel oder nimm ihn aus dem Raum.</p>
-            </div>
-          </article>
-          <article class="trick" id="eigenes-portemonnaie">
-            <img src="img/illu-trick-portemonnaie.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Eigenes Portemonnaie</h3>
-              <p>Gib der Person ein Portemonnaie mit etwas Kleingeld, das sie behalten darf.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/du-hast-mein-geld-gestohlen.html" data-related-link="trick-eigenes-portemonnaie-du-hast-mein-geld-gestohlen">„Du hast mein Geld gestohlen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="garderobenhaken">
-            <img src="img/illu-trick-garderobe.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Haken für die Jacke</h3>
-              <p>Hänge in Sichtweite einen Haken auf. Die Jacke hängt dort sichtbar, und die Person holt sie selbst, wenn sie hinaus möchte.</p>
-            </div>
-          </article>
-          </div>
-        </section>
-        <section class="trick-group" id="kleidung" aria-labelledby="kleidung-title">
-          <h2 id="kleidung-title">Kleidung</h2>
-          <div class="trick-grid">
-          <article class="trick" id="kleidung-bereitlegen">
-            <img src="img/illu-trick-kleidung.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Kleidung bereitlegen</h3>
-              <p>Lege die Kleidung in der Reihenfolge zum Anziehen hin, das Erste oben.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-ziehe-mich-nicht-um.html" data-related-link="trick-kleidung-bereitlegen-ich-ziehe-mich-nicht-um">„Ich ziehe mich nicht um.“</a> · <a href="../demenz-uebersetzer/ich-bleibe-heute-im-bett.html" data-related-link="trick-kleidung-bereitlegen-ich-bleibe-heute-im-bett">„Ich bleibe heute im Bett.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="klettverschluss">
-            <img src="img/illu-trick-klett.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Klettverschluss und Gummibund</h3>
-              <p>Schuhe mit Klettverschluss und Hosen mit Gummibund lassen sich leichter anziehen.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-ziehe-mich-nicht-um.html" data-related-link="trick-klettverschluss-ich-ziehe-mich-nicht-um">„Ich ziehe mich nicht um.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="schuhe-laufrichtung">
-            <img src="img/illu-shoes.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Schuhe in Laufrichtung</h3>
-              <p>Stelle die Schuhe so hin, dass die Spitzen zur Person zeigen und sie hineinschlüpfen kann.</p>
-            </div>
-          </article>
-          </div>
-        </section>
-        <section class="trick-group" id="beschaeftigung" aria-labelledby="beschaeftigung-title">
-          <h2 id="beschaeftigung-title">Beschäftigung und Ruhe</h2>
-          <div class="trick-grid">
-          <article class="trick" id="sortierkiste">
-            <img src="img/illu-trick-sortierkiste.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Kiste zum Sortieren</h3>
-              <p>Gib der Person eine Kiste mit ungefährlichen Dingen zum Sortieren, zum Beispiel Socken, Wäscheklammern oder Stoffreste.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-muss-zur-arbeit.html" data-related-link="trick-sortierkiste-ich-muss-zur-arbeit">„Ich muss zur Arbeit.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="waesche-falten">
-            <img src="img/illu-trick-waesche.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Wäsche falten</h3>
-              <p>Bitte um Hilfe beim Falten von Handtüchern. Eine bekannte Handarbeit gibt das Gefühl, gebraucht zu werden.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-muss-zur-arbeit.html" data-related-link="trick-waesche-falten-ich-muss-zur-arbeit">„Ich muss zur Arbeit.“</a> · <a href="../demenz-uebersetzer/lass-mich-nicht-allein.html" data-related-link="trick-waesche-falten-lass-mich-nicht-allein">„Lass mich nicht allein.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="haende-halten">
-            <img src="img/illu-hand-massage.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Hand halten</h3>
-              <p>Setze dich dazu und halte die Hand der Person. Eine ruhige Berührung braucht keine Worte.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-haende-halten-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a> · <a href="../demenz-uebersetzer/du-hast-einen-anderen.html" data-related-link="trick-haende-halten-du-hast-einen-anderen">„Du hast einen anderen.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="lieblingslied">
-            <img src="img/illu-lied-notes.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Lieblingslied</h3>
-              <p>Spiele oder summe ein Lied aus der Jugend der Person. Alte Lieder kennen viele Menschen noch Wort für Wort.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-lieblingslied-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a> · <a href="../demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html" data-related-link="trick-lieblingslied-es-wird-dunkel-ich-muss-los">„Es wird dunkel, ich muss los.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="fummeldecke">
-            <img src="img/illu-trick-fummeldecke.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Fummeldecke</h3>
-              <p>Eine Decke mit Knöpfen, Bändern und Stoffen zum Anfassen beschäftigt unruhige Hände.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-fummeldecke-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="ruhige-ecke">
-            <img src="img/illu-noise.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Ruhige Ecke</h3>
-              <p>Richte einen Platz ein, an den man sich zurückziehen kann, mit Sessel, Decke und wenig Lärm.</p>
-            </div>
-          </article>
-          </div>
-        </section>
-        <section class="trick-group" id="gespraech" aria-labelledby="gespraech-title">
-          <h2 id="gespraech-title">Gespräch und Begegnung</h2>
-          <div class="trick-grid">
-          <article class="trick" id="zwei-moeglichkeiten">
-            <img src="img/illu-trick-wahl.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Nur zwei Möglichkeiten</h3>
-              <p>Biete höchstens zwei Möglichkeiten an, zum Beispiel Tee oder Kaffee. Eine offene Frage überfordert schnell.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-will-nicht-duschen.html" data-related-link="trick-zwei-moeglichkeiten-ich-will-nicht-duschen">„Ich will nicht duschen.“</a> · <a href="../demenz-uebersetzer/ich-ziehe-mich-nicht-um.html" data-related-link="trick-zwei-moeglichkeiten-ich-ziehe-mich-nicht-um">„Ich ziehe mich nicht um.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="augenhoehe">
-            <img src="img/illu-wuetend-ruhig.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Auf Augenhöhe</h3>
-              <p>Gehe auf Augenhöhe, sprich langsam und leise und nur einen Satz nach dem anderen.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/lass-mich-in-ruhe.html" data-related-link="trick-augenhoehe-lass-mich-in-ruhe">„Lass mich in Ruhe!“</a> · <a href="../demenz-uebersetzer/wer-sind-sie.html" data-related-link="trick-augenhoehe-wer-sind-sie">„Wer sind Sie?“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="name-nennen">
-            <img src="img/illu-trick-vorstellen.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Immer wieder vorstellen</h3>
-              <p>Sage freundlich deinen Namen und wer du bist, auch zum fünften Mal am Tag.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/wer-sind-sie.html" data-related-link="trick-name-nennen-wer-sind-sie">„Wer sind Sie?“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="vertrautes-mitnehmen">
-            <img src="img/illu-trick-vertraut.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Etwas Vertrautes mitnehmen</h3>
-              <p>Nimm zu Terminen eine Lieblingsjacke, die Handtasche oder ein Foto mit. Das gibt Sicherheit an fremden Orten.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html" data-related-link="trick-vertrautes-mitnehmen-ich-gehe-nicht-in-die-tagespflege">„Ich gehe nicht in die Tagespflege.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="bildkarten">
-            <img src="img/illu-trick-bildkarten.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Karten mit Bildern</h3>
-              <p>Lege Karten mit Bildern bereit, zum Beispiel Glas, Toilette, Bett. Die Person kann darauf zeigen, wenn Worte fehlen.</p>
-            </div>
-          </article>
-          <article class="trick" id="kurzer-abschied">
-            <img src="img/illu-daycare.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Kurzer Abschied</h3>
-              <p>Verabschiede dich kurz und freundlich und schreibe die Abholzeit auf einen Zettel.</p>
-              <p class="trick-links">Passt zu: <a href="../demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html" data-related-link="trick-kurzer-abschied-ich-gehe-nicht-in-die-tagespflege">„Ich gehe nicht in die Tagespflege.“</a> · <a href="../demenz-uebersetzer/lass-mich-nicht-allein.html" data-related-link="trick-kurzer-abschied-lass-mich-nicht-allein">„Lass mich nicht allein.“</a></p>
-            </div>
-          </article>
-          <article class="trick" id="feste-pflegekraft">
-            <img src="img/illu-carer.webp" width="300" height="220" loading="lazy" alt="">
-            <div>
-              <h3>Immer dieselbe Person</h3>
-              <p>Bitte den Pflegedienst um feste Personen und feste Zeiten. Vertraute Gesichter machen es leichter.</p>
-            </div>
-          </article>
-          </div>
-        </section>
-    <aside class="trick-cta">
-      <h2>Den passenden Trick im richtigen Moment</h2>
-      <p>Die App Demenz Coach zeigt dir zu deiner Situation, was du sagen und tun kannst, und den passenden Trick dazu.</p>
-      <a class="button" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=seo_de_tricks&amp;mt=8" data-store-link="seo_de_tricks">Kostenlos im App Store</a>
-    </aside>
-    <p class="article-meta">Aktualisiert: <time datetime="2026-11-08">8. November 2026</time> · <a href="/ratgeber/redaktion.html">Demenz Coach Redaktion</a> · Quellen: <a href="https://www.deutsche-alzheimer.de/mit-demenz-leben/umgang-und-kommunikation" rel="noopener">Deutsche Alzheimer Gesellschaft</a>, <a href="https://www.wegweiser-demenz.de/" rel="noopener">Wegweiser Demenz</a></p>
+          <a class="button" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=seo_de_tricks&amp;mt=8" data-store-link="seo_de_tricks">Kostenlos im App Store</a>
+        </aside>
+        <p class="article-meta">Aktualisiert: <time datetime="2026-11-08">8. November 2026</time> · <a href="/ratgeber/redaktion.html">Demenz Coach Redaktion</a> · Quellen: <a href="https://www.deutsche-alzheimer.de/mit-demenz-leben/umgang-und-kommunikation" rel="noopener">Deutsche Alzheimer Gesellschaft</a>, <a href="https://www.wegweiser-demenz.de/" rel="noopener">Wegweiser Demenz</a></p>
+      </div>
+    </section>
   </main>
   <footer class="e-footer">
     <div class="e-wrap">

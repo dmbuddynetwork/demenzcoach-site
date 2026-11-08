@@ -365,16 +365,16 @@ body.einfach .translator-call-link { color: inherit !important; font-weight: 700
 body.einfach .translator-said { display: flex; align-items: center; gap: 14px; margin: 0 0 20px; }
 body.einfach .translator-said-text { flex: 1 1 auto; min-width: 0; }
 body.einfach .translator-said-label { margin: 0 0 8px !important; color: var(--e-purple) !important; font-size: var(--e-small) !important; font-weight: 700 !important; }
-body.einfach h2.translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 16px 20px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
-body.einfach h2.translator-said-bubble::before { display: none !important; }
-body.einfach h2.translator-said-bubble::after { content: ""; position: absolute; left: 30px; bottom: -9px; width: 16px; height: 16px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
-body.einfach .translator-said-with-art h2.translator-said-bubble::after { left: auto; right: -9px; bottom: auto; top: calc(50% - 8px); border-bottom: 0; border-top: 1px solid var(--e-line); }
+body.einfach :is(h1, h2).translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 16px 20px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
+body.einfach :is(h1, h2).translator-said-bubble::before { display: none !important; }
+body.einfach :is(h1, h2).translator-said-bubble::after { content: ""; position: absolute; left: 30px; bottom: -9px; width: 16px; height: 16px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
+body.einfach .translator-said-with-art :is(h1, h2).translator-said-bubble::after { left: auto; right: -9px; bottom: auto; top: calc(50% - 8px); border-bottom: 0; border-top: 1px solid var(--e-line); }
 body.einfach .translator-said-art { flex: 0 0 34%; max-width: 210px; width: 34%; height: auto; max-height: 210px; object-fit: contain; }
 @media (max-width: 480px) {
-  body.einfach h2.translator-said-bubble { padding: 14px 16px !important; font-size: 1.25rem !important; }
+  body.einfach :is(h1, h2).translator-said-bubble { padding: 14px 16px !important; font-size: 1.25rem !important; }
 }
 body.einfach .translator-answer .translator-goal-chosen { margin-bottom: 14px; }
-@media (min-width: 720px) { body.einfach h2.translator-said-bubble { font-size: 1.75rem !important; padding: 20px 26px !important; } }
+@media (min-width: 720px) { body.einfach :is(h1, h2).translator-said-bubble { font-size: 1.75rem !important; padding: 20px 26px !important; } }
 
 /* ---------- Alltagstrick in der Antwort und als Kacheln im Archiv (Daniel, 8. Nov) ---------- */
 body.einfach .translator-trick { display: flex; align-items: center; gap: 16px; margin: 14px 0 4px; padding: 16px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 18px; }
@@ -420,3 +420,37 @@ body.einfach .translator-result .translator-answer .translator-step { margin: 0 
 body.einfach .translator-answer .translator-step ~ .translator-step { margin-top: 32px !important; padding-top: 0 !important; border-top: 0 !important; }
 body.einfach .translator-answer :is(.translator-meaning, .translator-goal-list li) { line-height: 1.6 !important; }
 body.einfach .translator-answer .translator-meaning + .translator-meaning { margin-top: 10px !important; }
+/* Herz und Teilen rechts oben in der Sprechblase, untereinander (Daniel, 8. Nov 17:02: Satz an die Familie schicken). */
+body.einfach .translator-phrase-actions { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; margin: -8px -6px -8px auto; }
+body.einfach .translator-phrase-actions:empty { display: none; }
+body.einfach .translator-phrase-actions .translator-save { margin: 0 !important; }
+body.einfach .translator-phrase-share { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: 0; padding: 0; background: transparent; border: 0; border-radius: 50%; color: var(--e-purple); cursor: pointer; }
+body.einfach .translator-phrase-share:hover { background: var(--e-lav); }
+body.einfach .translator-phrase-share::before {
+  content: ""; width: 22px; height: 22px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V3'/%3E%3Cpath d='m7 8 5-5 5 5'/%3E%3Cpath d='M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 15V3'/%3E%3Cpath d='m7 8 5-5 5 5'/%3E%3Cpath d='M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+body.einfach .translator-phrase-share::after { content: none !important; }
+
+/* Schrift größer (A+), Wahl bleibt im Browser (Daniel, 8. Nov 17:04). Alles in rem, darum genügt die Grundgröße. */
+html.e-large { font-size: 118.75%; }
+.e-header nav { display: flex; align-items: center; gap: 14px; }
+.e-font-toggle { display: inline-flex; align-items: center; justify-content: center; min-width: 48px; min-height: 44px; margin: 0; padding: 4px 10px; background: var(--e-card); color: var(--e-purple); border: 1px solid var(--e-line); border-radius: 12px; font: inherit; font-weight: 800 !important; cursor: pointer; }
+.e-font-toggle[aria-pressed="true"] { background: var(--e-purple); color: #fff; border-color: var(--e-purple); }
+/* Satz-Seiten im Look der Antwort (Daniel, 8. Nov 17:03): Kopf als Sprechblase, Sätze als Sprechblasen mit Teilen, Trick-Karte. */
+body.einfach .article-header.translator-said { margin: 8px 0 24px; }
+body.einfach .translator-said-bubble .translator-h1-sub { display: block; margin-top: 6px; color: var(--e-muted); font-size: var(--e-small) !important; font-weight: 600 !important; }
+body.einfach .translator-said-bubble .translator-h1-dash { display: none; }
+body.einfach .phrase-list > p.phrase-bubble { position: relative; display: flex; align-items: flex-start; gap: 8px; margin: 0 0 18px !important; padding: 14px 10px 14px 18px !important; background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: 20px !important; font-weight: 600; line-height: 1.4 !important; }
+body.einfach .phrase-list > p.phrase-bubble > span { flex: 1 1 auto; }
+body.einfach .phrase-list > p.phrase-bubble::after { content: ""; position: absolute; left: 26px; bottom: -8px; width: 14px; height: 14px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
+body.einfach .phrase-list > p.phrase-bubble .translator-phrase-share { flex: 0 0 auto; margin: -8px 0 -8px auto; }
+body[data-page-type="translator-phrase"].einfach .article-body h2 { margin: 32px 0 10px !important; color: var(--e-text) !important; font-size: 1.125rem !important; font-weight: 800 !important; }
+body[data-page-type="translator-phrase"].einfach .article-body h3 { margin: 20px 0 6px !important; font-size: 1.0625rem !important; font-weight: 800 !important; }
+body[data-page-type="translator-phrase"].einfach .article-body p, body[data-page-type="translator-phrase"].einfach .article-body li { line-height: 1.6 !important; }
+body[data-page-type="translator-phrase"].einfach section.translator-trick { margin: 8px 0 8px; }
+/* „Noch ein Trick“ als ruhiger hellila Knopf neben „Alle Tricks“. */
+body.einfach .translator-trick-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 6px; }
+body.einfach .translator-trick-next { display: inline-flex; align-items: center; min-height: 44px; margin: 0; padding: 6px 14px; background: var(--e-lav) !important; color: var(--e-lav-text) !important; border: 0 !important; border-radius: 999px !important; font: inherit; font-size: var(--e-small) !important; font-weight: 700 !important; cursor: pointer; }
+body.einfach .translator-trick-next::after { content: none !important; }
