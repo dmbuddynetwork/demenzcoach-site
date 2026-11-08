@@ -335,7 +335,7 @@
   const callNumbers = [
     { pattern: /\b112\b/, label: 'Notruf 112', tel: '112' },
     { pattern: /\b110\b/, label: 'Polizei 110', tel: '110' },
-    { pattern: /116 117/, label: 'Bereitschaftsdienst 116 117', tel: '116117' },
+    { pattern: /116 117/, label: 'Bereitschafts\u00ADdienst 116 117', tel: '116117' },
     { pattern: /0800 111 0 111/, label: 'TelefonSeelsorge 0800 111 0 111', tel: '08001110111' }
   ];
   // Bei Entlastung für Angehörige steht das Gespräch (TelefonSeelsorge) vor dem Notruf.
@@ -355,13 +355,24 @@
     if (target === urgent) urgent.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
   };
-  const urgentNote = (text, lead = '') => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
+  const urgentNote = (text, lead = '', doctorFirst = false) => element('aside', { className: 'safety-note safety-urgent', attributes: { role: 'note' } }, [
     // Im Notfall zuerst die Knöpfe zum Anrufen, dann die Erklärung.
     element('strong', { text: 'Erst die Sicherheit' }),
     lead ? element('p', { className: 'safety-lead', text: lead }) : null,
-    safetyCalls(text),
+    safetyCalls(text, doctorFirst),
     element('span', { text })
   ]);
+  // Nur Schmerzen oder Fieber, nichts Akutes: kurzer Hinweis, 116 117 zuerst.
+  const mildOnly = (typed) => {
+    const mild = data.safetySignals.mild;
+    if (!mild || !typed) return false;
+    const normalized = core.normalize(typed);
+    const has = (cue) => normalized.includes(` ${cue}`);
+    return mild.cues.some(has) && !mild.not.some(has);
+  };
+  const generalNote = (typed, lead = '') => (mildOnly(typed) && !lead
+    ? urgentNote(data.safetySignals.mild.text, '', true)
+    : urgentNote(data.safetySignals.text, lead));
 
   // KI für Sätze, die die feste Liste nicht kennt. Gesendet wird erst, wenn
   // jemand „KI fragen“ tippt – vorher bleibt alles auf dem Gerät.
@@ -428,7 +439,7 @@
 
   const renderUnknown = ({ safetyHit, typed }) => {
     const nodes = [];
-    if (safetyHit) nodes.push(urgentNote(data.safetySignals.text));
+    if (safetyHit) nodes.push(generalNote(typed));
     // Gleicher Aufbau wie ein Treffer: oben der Satz, dann klar, was jetzt hilft.
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
@@ -498,7 +509,7 @@
     } else if (safetyHit || result.safetyOnly) {
       const typedForLead = core.normalize(typed);
       const lead = result.urgentLead?.cues?.some((cue) => typedForLead.includes(` ${cue}`)) ? result.urgentLead.text : '';
-      nodes.push(urgentNote(result.safetyOnly ? result.safety : data.safetySignals.text, lead));
+      nodes.push(result.safetyOnly ? urgentNote(result.safety, lead) : generalNote(typed, lead));
     }
 
     // Steht der getippte Satz schon als Überschrift da, braucht es keine Wiederholung.
