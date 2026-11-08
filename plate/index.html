@@ -96,6 +96,8 @@
     .secret { filter: blur(5px); user-select: none; }
     .unlocked .secret { filter: none; }
     .inbox-hint { font-size: 16px; color: var(--soft); }
+    .steps { margin: 0; padding-left: 24px; display: grid; gap: 8px; font-size: 18px; }
+    .mock-btn { display: inline-block; margin-top: 6px; padding: 8px 14px; border-radius: 10px; background: var(--red); color: #fff; font-weight: 700; font-size: 16px; }
     .typo { margin-top: 8px; font-size: 17px; }
     .typo button { font: inherit; font-weight: 700; color: var(--red); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 
@@ -197,11 +199,12 @@
           <p class="byline"><img src="../teller/debby-avatar.webp" width="40" height="40" alt="">By <a href="#debby">Debby Frey, geriatric nurse and founder of Dementia Coach</a></p>
         </div>
         <div class="thanks" role="status">
-          <h3>Almost done! 💌</h3>
-          <p><strong>All 5 tricks are now unlocked below.</strong> <a href="#tricks" data-to-tricks>Go to the tricks ↓</a></p>
-            <p>So I can email you the printable list and new tricks, please tap the button in my email.</p>
+          <h3>One more step! 💌</h3>
+          <ol class="steps"><li>Open your email inbox now.</li><li>Find the email from <strong>“Debby from Dementia Coach”</strong>.</li><li>Tap this button in it: <span class="mock-btn">Yes, send the list</span></li></ol>
+            <p class="inbox-hint">Only then am I allowed to send you the printable list and new tricks.</p>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Open your inbox</a>
-            <p class="inbox-hint">The email comes from “Debby from Dementia Coach”. Nothing there? Please check your spam folder too.</p>
+            <p class="inbox-hint">Nothing after 2 minutes? Please check your spam or promotions folder.</p>
+            <p class="inbox-hint">You can already read all 5 tricks below: <a href="#tricks" data-to-tricks>Go to the tricks ↓</a></p>
           <a class="btn btn-ghost" href="https://wa.me/?text=Small%20tricks%20for%20dementia%2C%20like%20the%20red%20plate%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fplate%2F">Share with your family</a>
         </div>
       </div>
@@ -293,11 +296,12 @@
             <a class="btn btn-ghost" href="https://wa.me/?text=Small%20tricks%20for%20dementia%2C%20like%20the%20red%20plate%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fplate%2F">Share on WhatsApp</a>
           </div>
           <div class="thanks" role="status">
-            <h3>Almost done! 💌</h3>
-            <p><strong>All 5 tricks are now unlocked below.</strong> <a href="#tricks" data-to-tricks>Go to the tricks ↓</a></p>
-            <p>So I can email you the printable list and new tricks, please tap the button in my email.</p>
+            <h3>One more step! 💌</h3>
+            <ol class="steps"><li>Open your email inbox now.</li><li>Find the email from <strong>“Debby from Dementia Coach”</strong>.</li><li>Tap this button in it: <span class="mock-btn">Yes, send the list</span></li></ol>
+            <p class="inbox-hint">Only then am I allowed to send you the printable list and new tricks.</p>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Open your inbox</a>
-            <p class="inbox-hint">The email comes from “Debby from Dementia Coach”. Nothing there? Please check your spam folder too.</p>
+            <p class="inbox-hint">Nothing after 2 minutes? Please check your spam or promotions folder.</p>
+            <p class="inbox-hint">You can already read all 5 tricks below: <a href="#tricks" data-to-tricks>Go to the tricks ↓</a></p>
             <a class="btn btn-ghost" href="https://wa.me/?text=Small%20tricks%20for%20dementia%2C%20like%20the%20red%20plate%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fplate%2F">Share with your family</a>
           </div>
         </div>

@@ -99,6 +99,8 @@
     .secret { filter: blur(5px); user-select: none; }
     .unlocked .secret { filter: none; }
     .inbox-hint { font-size: 16px; color: var(--soft); }
+    .steps { margin: 0; padding-left: 24px; display: grid; gap: 8px; font-size: 18px; }
+    .mock-btn { display: inline-block; margin-top: 6px; padding: 8px 14px; border-radius: 10px; background: var(--red); color: #fff; font-weight: 700; font-size: 16px; }
     .typo { margin-top: 8px; font-size: 17px; }
     .typo button { font: inherit; font-weight: 700; color: var(--red); background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 
@@ -200,11 +202,12 @@
           <p class="byline"><img src="debby-avatar.webp" width="40" height="40" alt="">Von <a href="#debby">Debby Frey, Altenpflegerin und Gründerin von Demenz Coach</a></p>
         </div>
         <div class="thanks" role="status">
-          <h3>Fast geschafft! 💌</h3>
-          <p><strong>Alle 5 Tricks sind jetzt unten freigeschaltet.</strong> <a href="#tricks" data-to-tricks>Zu den Tricks ↓</a></p>
-            <p>Damit ich dir die Liste zum Ausdrucken und neue Tricks schicken darf, tipp bitte noch auf den Knopf in meiner Mail.</p>
+          <h3>Noch 1 Schritt! 💌</h3>
+          <ol class="steps"><li>Öffne jetzt dein E-Mail-Postfach.</li><li>Such die Mail von <strong>„Debby vom Demenz Coach“</strong>.</li><li>Tipp dort auf diesen Knopf: <span class="mock-btn">Ja, Liste schicken</span></li></ol>
+            <p class="inbox-hint">Erst dann darf ich dir die Liste zum Ausdrucken und neue Tricks schicken.</p>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Postfach öffnen</a>
-            <p class="inbox-hint">Die Mail kommt von „Debby vom Demenz Coach“. Nichts da? Schau bitte auch im Spam-Ordner.</p>
+            <p class="inbox-hint">Nach 2 Minuten noch nichts da? Schau bitte im Spam- oder Werbung-Ordner.</p>
+            <p class="inbox-hint">Die 5 Tricks kannst du schon jetzt unten lesen: <a href="#tricks" data-to-tricks>Zu den Tricks ↓</a></p>
           <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">An die Familie weiterschicken</a>
         </div>
       </div>
@@ -296,11 +299,12 @@
             <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">Per WhatsApp weiterschicken</a>
           </div>
           <div class="thanks" role="status">
-            <h3>Fast geschafft! 💌</h3>
-            <p><strong>Alle 5 Tricks sind jetzt unten freigeschaltet.</strong> <a href="#tricks" data-to-tricks>Zu den Tricks ↓</a></p>
-            <p>Damit ich dir die Liste zum Ausdrucken und neue Tricks schicken darf, tipp bitte noch auf den Knopf in meiner Mail.</p>
+            <h3>Noch 1 Schritt! 💌</h3>
+            <ol class="steps"><li>Öffne jetzt dein E-Mail-Postfach.</li><li>Such die Mail von <strong>„Debby vom Demenz Coach“</strong>.</li><li>Tipp dort auf diesen Knopf: <span class="mock-btn">Ja, Liste schicken</span></li></ol>
+            <p class="inbox-hint">Erst dann darf ich dir die Liste zum Ausdrucken und neue Tricks schicken.</p>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Postfach öffnen</a>
-            <p class="inbox-hint">Die Mail kommt von „Debby vom Demenz Coach“. Nichts da? Schau bitte auch im Spam-Ordner.</p>
+            <p class="inbox-hint">Nach 2 Minuten noch nichts da? Schau bitte im Spam- oder Werbung-Ordner.</p>
+            <p class="inbox-hint">Die 5 Tricks kannst du schon jetzt unten lesen: <a href="#tricks" data-to-tricks>Zu den Tricks ↓</a></p>
             <a class="btn btn-ghost" href="https://wa.me/?text=Kleine%20Tricks%20bei%20Demenz%2C%20z.%20B.%20der%20rote%20Teller%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fteller%2F">An die Familie weiterschicken</a>
           </div>
         </div>
