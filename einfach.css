@@ -485,3 +485,7 @@ body.einfach .e-shots figcaption { margin-top: 8px; color: var(--e-text) !import
 body.e-loc .consent-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 body.e-loc :is(.consent-button, main, .e-footer) { overflow-wrap: anywhere; }
 body.e-loc .e-brand span, .e-lang > summary { white-space: nowrap; }
+
+/* Ruhige Zeichnungen im Ergebnis (Daniel, 8. Nov 17:16): „Danach“-Bild unter den Sätzen, Gefühle, Zweiter Versuch, Pause */
+body.einfach .translator-scene-art { display: block; width: 100%; max-width: 300px; height: auto; max-height: 240px; object-fit: contain; margin: 1.25rem auto 0.5rem; }
+body.einfach .translator-retry .translator-scene-art { max-width: 200px; max-height: 160px; margin: 0.5rem auto 0.75rem; }

@@ -123,18 +123,23 @@
   };
 
   // „Wenn das nicht hilft“: zweiter Versuch für den Moment, mit persönlichem Satz.
+  // Ruhige Zeichnung im Ergebnis (Daniel, 8. Nov 17:16: „lockert die Textwüste auf“). Kommt fest aus den Seitendaten.
+  const sceneArt = (image) => (image?.src
+    ? element('img', { className: 'translator-scene-art', attributes: { src: image.src, alt: '', width: String(image.width ?? 480), height: String(image.height ?? 400), loading: 'lazy', decoding: 'async' } })
+    : null);
   const retryBlock = (result) => {
     const block = element('div', { className: 'translator-retry', attributes: { id: `translator-retry-${result.key}`, tabindex: '-1' } });
     block.hidden = true;
     const text = () => core.personalize(result.retry.phrase, personal, data.formal);
     const quote = element('q', { text: text() });
-    block.append(
+    block.append(...[
       // Erst der neue Satz, dann der Hinweis dazu, zuletzt deutlich: Aufhören ist erlaubt.
       element('h3', { text: 'Zweiter Versuch' }),
+      sceneArt(data.retryImage),
       element('div', { className: 'translator-phrase' }, [quote]),
       element('p', { text: result.retry.tip }),
       element('p', { className: 'translator-retry-stop' }, [element('strong', { text: 'Du darfst aufhören. ' }), data.retryStop])
-    );
+    ].filter(Boolean));
     const toggle = button('Hat nicht geholfen? Zweiter Versuch', 'translator-copy translator-retry-toggle', () => open('button'), {
       'aria-expanded': 'false',
       'aria-controls': block.id
@@ -439,6 +444,7 @@
     linkLabel: '',
     related: feeling.related,
     retry: feeling.retry,
+    afterImage: feeling.image ?? null,
     urgentLead: feeling.urgentLead ?? null,
     url: `${toolURL}#${feelingHash}${feeling.id}`
   }]));
@@ -759,6 +765,7 @@
         element('span', { text: result.safety }),
         safetyCalls(result.safety, !safetyHit)
       ]));
+      if (!safetyHit) nodes.push(sceneArt(data.selfCareImage));
     } else if (safetyHit || result.safetyOnly) {
       const typedForLead = core.normalize(typed);
       const lead = result.urgentLead?.cues?.some((cue) => typedForLead.includes(` ${cue}`)) ? result.urgentLead.text : '';
@@ -944,6 +951,8 @@
         : [meaningBlock, phraseBlock, doWithTrick];
     // Anrede-Zeile direkt unter den Sprechblasen (Daniel, 8. Nov 16:51), nicht am Ende der Karte.
     if (quickRow) phraseBlock.push(quickRow);
+    // Unter den Sätzen dieselbe Situation, wenn es wieder ruhig ist („Danach“-Zeichnung).
+    if (phraseBlock.length && !result.safetyOnly && !result.selfCare && !safetyHit) phraseBlock.push(sceneArt(result.afterImage));
     answerCard.append(...order.flat().filter(Boolean));
     // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
     // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
