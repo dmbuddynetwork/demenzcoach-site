@@ -373,7 +373,9 @@
     const set = (on) => {
       node.setAttribute('aria-pressed', String(on));
       node.setAttribute('aria-label', on ? 'Gemerkt – nicht mehr merken' : 'Satz merken');
-      node.replaceChildren(element('span', { text: on ? '♥' : '♡', attributes: { 'aria-hidden': 'true' } }), ` ${on ? 'Gemerkt' : 'Merken'}`);
+      node.setAttribute('title', on ? 'Gemerkt' : 'Merken');
+      // Nur das Herz (Daniel, 8. Nov: „Merken“ als Knopf nahm zu viel Platz weg).
+      node.replaceChildren(element('span', { text: on ? '♥' : '♡', attributes: { 'aria-hidden': 'true' } }));
     };
     set(savedStore.has(item));
     saveButtons.push({ node, item, set });
@@ -899,7 +901,9 @@
     const order = goal === 'jetzt' ? [phraseBlock, doWithTrick, meaningBlock]
       : goal === 'tipps' ? [doWithTrick, phraseBlock, meaningBlock]
         : [meaningBlock, phraseBlock, doWithTrick];
-    answerCard.append(...[...order.flat(), quickRow].filter(Boolean));
+    // Anrede-Zeile direkt unter den Sprechblasen (Daniel, 8. Nov 16:51), nicht am Ende der Karte.
+    if (quickRow) phraseBlock.push(quickRow);
+    answerCard.append(...order.flat().filter(Boolean));
     // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
     // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
     const nextRows = chosenGoal ? goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {

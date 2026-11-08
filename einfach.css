@@ -394,3 +394,29 @@ body.einfach .translator-answer .translator-goal-chosen { display: inline-flex; 
 body.einfach .translator-answer .translator-goal-chosen::before {
   content: ""; flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: #2e7d4a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 16px no-repeat;
 }
+/* Anrede-Zeile direkt unter den Sprechblasen: ohne Trennlinie, nah an den Sätzen. */
+body.einfach .translator-answer .translator-quick { margin: 10px 0 0; padding-top: 0; border-top: 0; }
+/* Merken nur als Herz rechts oben in der Sprechblase (Daniel, 8. Nov 16:52), ohne Rahmen, Tippfläche 44 px. */
+body.einfach .translator-save { justify-content: center; width: 44px; min-width: 44px; height: 44px; min-height: 44px !important; margin: -8px -8px -8px auto !important; padding: 0 !important; background: transparent !important; border: 0 !important; border-radius: 50% !important; color: var(--e-purple) !important; font-size: 1.6rem !important; line-height: 1; }
+body.einfach .translator-save[aria-pressed="true"] { background: transparent !important; }
+body.einfach .translator-save:hover { background: var(--e-lav) !important; }
+body.einfach .translator-phrase .translator-save { align-self: flex-start; }
+body.einfach .translator-phrase:has(> .translator-save) { flex-wrap: nowrap !important; }
+body.einfach .translator-phrase:has(> .translator-save) > q { flex: 1 1 0 !important; }
+/* Die Satz-Karte ist selbst die Sprechblase (Daniel, 8. Nov 16:52): kein lila Symbol, kleiner Zipfel unten links. */
+body.einfach .translator-phrase { position: relative; overflow: visible !important; border-radius: 20px !important; }
+body.einfach .translator-phrase::before { content: none !important; display: none !important; }
+body.einfach .translator-phrase::after { content: ""; position: absolute; left: 26px; bottom: -8px; width: 14px; height: 14px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
+body.einfach .translator-phrases { gap: 18px !important; }
+/* Mehr Platz für den Text (Daniel, 8. Nov 16:52): Trick-Bild auf dem Handy kleiner, Anrede mit Abstand zum Zipfel. */
+@media (max-width: 480px) {
+  body.einfach .translator-trick { gap: 12px; padding: 14px; }
+  body.einfach .translator-trick-art { flex: 0 0 72px; width: 72px; max-height: 80px; }
+  body.einfach .translator-phrase { padding: 14px 10px 14px 16px !important; }
+}
+body.einfach .translator-answer .translator-quick { margin-top: 18px; }
+/* Besser lesbar (Daniel, 8. Nov 16:52): klare dunkle Zwischenüberschriften in normaler Größe, mehr Luft statt Trennlinien, ruhigere Zeilenhöhe. */
+body.einfach .translator-result .translator-answer .translator-step { margin: 0 0 8px !important; color: var(--e-text) !important; font-size: 1.125rem !important; font-weight: 800 !important; }
+body.einfach .translator-answer .translator-step ~ .translator-step { margin-top: 32px !important; padding-top: 0 !important; border-top: 0 !important; }
+body.einfach .translator-answer :is(.translator-meaning, .translator-goal-list li) { line-height: 1.6 !important; }
+body.einfach .translator-answer .translator-meaning + .translator-meaning { margin-top: 10px !important; }
