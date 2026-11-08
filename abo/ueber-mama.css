@@ -1,0 +1,21 @@
+/* „Über Mama“-Blatt: am Bildschirm ein einfaches Formular, beim Drucken nur das fertige Blatt. */
+.ueber-hint { margin: -4px 0 18px; font-size: var(--small); }
+.ueber-field { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin: 0 0 12px; }
+.ueber-field label { display: block; font-weight: 700; }
+.ueber-field-hint { margin: 2px 0 10px; color: var(--ink-2); font-size: var(--small); }
+.ueber-field input, .ueber-field textarea { box-sizing: border-box; width: 100%; min-height: 52px; padding: 12px 14px; border: 1px solid var(--line);
+  border-radius: 12px; background: #fff; color: var(--ink); font: inherit; resize: vertical; }
+.ueber-field input:focus, .ueber-field textarea:focus { outline: 3px solid var(--lav); border-color: var(--purple); }
+.ueber-sheet { display: none; }
+
+@media print {
+  @page { size: A4; margin: 18mm; }
+  body { background: #fff; }
+  .abo-page > *:not(.ueber-sheet) { display: none !important; }
+  .ueber-sheet { display: block; color: #000; font-size: 13pt; line-height: 1.4; }
+  .ueber-sheet h1 { font-size: 24pt; margin: 0 0 14pt; }
+  .ueber-sheet section { break-inside: avoid; border-top: 1px solid #bbb; padding: 8pt 0 2pt; }
+  .ueber-sheet h2 { font-size: 11pt; margin: 0 0 3pt; text-transform: uppercase; letter-spacing: .04em; color: #333; }
+  .ueber-sheet p { margin: 0 0 6pt; white-space: pre-line; }
+  .ueber-sheet-foot { margin-top: 16pt !important; font-size: 9pt; color: #555; }
+}

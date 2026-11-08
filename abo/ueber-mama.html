@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Blatt für Helfer – Demenz Coach</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f6f5f2">
+  <link rel="icon" href="/assets/lovable-logo.jpg">
+  <link rel="stylesheet" href="abo.css">
+  <link rel="stylesheet" href="../start/start.css">
+  <link rel="stylesheet" href="ueber-mama.css">
+  <script src="abo-config.js"></script>
+  <script src="plan-data.js"></script>
+  <script type="module" src="ueber-mama.js"></script>
+</head>
+<body>
+  <!-- „Über Mama“-Blatt für Abonnenten: Gewohnheiten und Vorlieben für Nachbarn, Tagespflege oder Geschwister.
+       Alltag statt Medizin. Alles bleibt nur in diesem Browser (localStorage), nichts wird gesendet. -->
+  <main class="abo-page">
+    <div class="abo-top">
+      <a class="abo-brand" href="/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+    </div>
+    <p class="abo-error" id="error" role="alert" hidden></p>
+    <section id="loading"><p class="abo-muted">Wird geladen …</p></section>
+
+    <section id="signed-out" hidden>
+      <h1>Melde dich an</h1>
+      <p>Mit dem Konto, mit dem du dein Abo abgeschlossen hast.</p>
+      <a class="abo-button" href="./?weiter=1">Anmelden</a>
+    </section>
+
+    <section id="no-subscription" hidden>
+      <h1>Noch kein Abo</h1>
+      <p>Das Blatt gehört zum Abo von Demenz Coach. Hast du in der iPhone-App abgeschlossen? Dann findest du alles dort.</p>
+      <a class="abo-button" href="/start/">Plan erstellen</a>
+    </section>
+
+    <section id="form" hidden>
+      <h1 id="form-title">Blatt für Helfer</h1>
+      <p class="start-lead">Für Nachbarn, Tagespflege oder Geschwister: was im Alltag wichtig ist. Fülle aus, was du weißt, und drucke es aus.</p>
+      <p class="abo-muted ueber-hint">Bleibt nur in diesem Browser. Bitte keine medizinischen Angaben eintragen.</p>
+      <form id="fields" autocomplete="off"></form>
+      <button class="abo-button" type="button" id="print">Blatt drucken</button>
+      <p class="start-small"><a href="mein-plan.html">Zurück zu deinem Plan</a></p>
+    </section>
+
+    <article id="sheet" class="ueber-sheet" aria-hidden="true"></article>
+
+    <footer class="abo-footer">
+      <a class="abo-cancel-link" href="kuendigen.html">Verträge hier kündigen</a>
+      <a href="/impressum.html">Impressum</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+      <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>
+      <p class="abo-muted">Allgemeine Kommunikations- und Alltagshilfe für Angehörige. Hinweise ohne Gewähr, kein Medizinprodukt, kein Ersatz für ärztlichen Rat. Im Notfall 112.</p>
+    </footer>
+  </main>
+  <script src="/lovable-home.js?v=20261108a"></script>
+</body>
+</html>

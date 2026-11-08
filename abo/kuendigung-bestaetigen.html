@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kündigung bestätigen – Demenz Coach</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f6f5f2">
+  <link rel="icon" href="/assets/lovable-logo.jpg">
+  <link rel="stylesheet" href="abo.css">
+  <script src="abo-config.js"></script>
+</head>
+<body>
+  <!-- Link aus der Eingangsbestätigung (backend/web-checkout.mjs, cancellationReceiptMail). Erst der Knopf
+       führt die außerordentliche Kündigung oder den Widerruf aus, damit E-Mail-Programme, die Links vorab
+       öffnen, nichts auslösen. Fristen zählen ab dem Eingang der Erklärung, nicht ab diesem Klick. -->
+  <main class="abo-page">
+    <div class="abo-top">
+      <a class="abo-brand" href="/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+    </div>
+    <p class="abo-error" id="error" role="alert" hidden></p>
+    <section id="ask">
+      <h1>Kündigung bestätigen</h1>
+      <p>Mit dem Knopf beendest du dein Abo. Für alle Fristen zählt der Zeitpunkt, an dem wir deine Erklärung erhalten haben.</p>
+      <button class="abo-button" type="button" id="confirm">Jetzt bestätigen</button>
+      <p class="abo-muted">Du warst das nicht? Dann schließ diese Seite einfach. Dein Abo läuft weiter.</p>
+    </section>
+    <section id="done" hidden>
+      <h1>Bestätigt</h1>
+      <div class="abo-card">
+        <p><strong>Eingang:</strong> <span id="done-time"></span></p>
+        <p><strong>Art:</strong> <span id="done-kind"></span></p>
+      </div>
+      <p>Eine E-Mail mit dem Ergebnis kommt gleich.</p>
+    </section>
+    <footer class="abo-footer">
+      <a class="abo-cancel-link" href="kuendigen.html">Verträge hier kündigen</a>
+      <a href="/impressum.html">Impressum</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+    </footer>
+  </main>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var error = document.getElementById("error");
+      document.getElementById("confirm").addEventListener("click", function () {
+        var button = this;
+        button.disabled = true;
+        error.hidden = true;
+        fetch(window.DEMENZ_ABO_CONFIG.endpoint + "/cancel/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: params.get("id") || "", token: params.get("t") || "" })
+        }).then(function (response) {
+          return response.json().catch(function () { return {}; }).then(function (result) {
+            if (!response.ok) { var failure = new Error(String(response.status)); failure.code = result.code; throw failure; }
+            document.getElementById("done-time").textContent = result.receivedAtText || "";
+            document.getElementById("done-kind").textContent = result.kindText || "";
+            document.getElementById("ask").hidden = true;
+            document.getElementById("done").hidden = false;
+          });
+        }).catch(function (failure) {
+          button.disabled = false;
+          error.textContent = failure.code === "link_expired"
+            ? "Dieser Link ist abgelaufen. Deine Erklärung liegt uns trotzdem vor, wir melden uns. Du kannst auch neu kündigen."
+            : "Das hat nicht geklappt. Bitte öffne den Link aus der E-Mail noch einmal oder schreib an dementica@minini.de.";
+          error.hidden = false;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

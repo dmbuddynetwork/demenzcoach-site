@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Wochen-E-Mail abbestellen – Demenz Coach</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f6f5f2">
+  <link rel="icon" href="/assets/lovable-logo.jpg">
+  <link rel="stylesheet" href="abo.css">
+  <script src="abo-config.js"></script>
+</head>
+<body>
+  <!-- Abmelde-Link aus der Wochen-E-Mail (backend/web-plan-mail.mjs). Erst der Knopf meldet ab, damit
+       E-Mail-Programme, die Links vorab öffnen, niemanden versehentlich abmelden. Das Abo bleibt unverändert. -->
+  <main class="abo-page">
+    <div class="abo-top">
+      <a class="abo-brand" href="/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+    </div>
+    <p class="abo-error" id="error" role="alert" hidden></p>
+    <section id="ask">
+      <h1>Wochen-E-Mail abbestellen</h1>
+      <p>Du bekommst dann keine E-Mails mit dem Moment der Woche mehr. Dein Abo und dein Plan im Web bleiben, wie sie sind.</p>
+      <button class="abo-button" type="button" id="stop">Abbestellen</button>
+    </section>
+    <section id="done" hidden>
+      <h1>Abbestellt</h1>
+      <p>Du bekommst keine Wochen-E-Mails mehr. Deinen Plan findest du weiter im Web.</p>
+      <a class="abo-button abo-button-light" href="mein-plan.html">Zu deinem Plan</a>
+    </section>
+    <footer class="abo-footer">
+      <a class="abo-cancel-link" href="kuendigen.html">Verträge hier kündigen</a>
+      <a href="/impressum.html">Impressum</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+    </footer>
+  </main>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var error = document.getElementById("error");
+      document.getElementById("stop").addEventListener("click", function () {
+        var button = this;
+        button.disabled = true;
+        fetch(window.DEMENZ_ABO_CONFIG.endpoint + "/plan-mails/stop", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customer: params.get("c") || "", token: params.get("t") || "" })
+        }).then(function (response) {
+          if (!response.ok) throw new Error(String(response.status));
+          document.getElementById("ask").hidden = true;
+          document.getElementById("done").hidden = false;
+        }).catch(function () {
+          button.disabled = false;
+          error.textContent = "Das hat nicht geklappt. Bitte öffne den Link aus der E-Mail noch einmal oder schreib uns über das Impressum.";
+          error.hidden = false;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

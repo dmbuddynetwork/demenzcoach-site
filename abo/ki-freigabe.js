@@ -2,7 +2,7 @@
 //
 // Bekannte Sätze beantwortet der Übersetzer im Browser, die bleiben immer kostenlos. Nur eigene Sätze,
 // die an die KI gehen, zählen: Ohne Abo gibt es eine kostenlose KI-Antwort pro Browser, danach zeigt die
-// Seite die Angebotskarte (7 Tage kostenlos testen). Mit Web-Abo (dasselbe Firebase-Konto wie die App,
+// Seite die Angebotskarte; sie führt in den Fragebogen (/start/), danach Angebot mit 7 Tagen kostenlos. Mit Web-Abo (dasselbe Firebase-Konto wie die App,
 // GET /entitlement) gibt es unbegrenzt Antworten.
 //
 // Aus, solange DEMENZ_ABO_CONFIG.translatorGate.enabled nicht true ist: Dann ändert sich am Übersetzer
@@ -25,7 +25,8 @@
   const firebaseVersion = "12.16.0";
   const subscriberCacheMs = 12 * 60 * 60 * 1000;
   const checkTimeoutMs = 6000;
-  const offerURL = "/abo/?src=uebersetzer_ki";
+  // Wie die umsatzstärksten Web-Funnels: jeder Einstieg läuft über den persönlichen Fragebogen, nicht direkt zur Kasse.
+  const offerURL = "/start/?src=uebersetzer_ki";
   const signInURL = "/abo/?src=uebersetzer_ki&weiter=1";
 
   function read() {
@@ -119,15 +120,15 @@
     };
     const card = el(doc, "div", "ki-angebot");
     card.setAttribute("role", "region");
-    card.setAttribute("aria-label", "Weiter mit eigenen Sätzen");
+    card.setAttribute("aria-label", "Dein persönlicher Plan");
     card.append(
-      el(doc, "p", "ki-angebot-titel", "Weiter mit eigenen Sätzen"),
-      el(doc, "p", "", "Deine kostenlose KI-Antwort hast du genutzt. Mit Demenz Coach bekommst du unbegrenzt Antworten, hier im Web und in der iPhone-App.")
+      el(doc, "p", "ki-angebot-titel", "Hol dir deinen persönlichen Plan"),
+      el(doc, "p", "", "Deine kostenlose KI-Antwort hast du genutzt. Beantworte ein paar kurze Fragen. Dann bekommst du Sätze für eure schwierigsten Momente und unbegrenzt Antworten auf eigene Sätze.")
     );
-    const button = el(doc, "a", "ki-angebot-knopf", "7 Tage kostenlos testen");
+    const button = el(doc, "a", "ki-angebot-knopf", "Plan in 2 Minuten erstellen");
     button.href = offerURL;
     button.addEventListener("click", () => { remember(); track("ki_offer_click", { source: "uebersetzer_ki" }); });
-    const price = el(doc, "p", "ki-angebot-klein", "Danach 69,99 € im Jahr oder 12,99 € im Monat. Vorher online kündbar.");
+    const price = el(doc, "p", "ki-angebot-klein", "7 Tage kostenlos, danach 69,99 € im Jahr oder 12,99 € im Monat. Vorher online kündbar.");
     const already = el(doc, "p", "ki-angebot-klein");
     const signIn = el(doc, "a", "", "Schon ein Abo? Anmelden");
     signIn.href = signInURL;

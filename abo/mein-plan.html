@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mein Plan – Demenz Coach</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f6f5f2">
+  <link rel="icon" href="/assets/lovable-logo.jpg">
+  <link rel="stylesheet" href="abo.css">
+  <link rel="stylesheet" href="../start/start.css">
+  <link rel="stylesheet" href="mein-plan.css">
+  <script src="abo-config.js"></script>
+  <script src="plan-data.js"></script>
+  <script type="module" src="mein-plan.js"></script>
+</head>
+<body>
+  <!-- „Mein Plan“ für Abonnenten (Web-Kasse): auf jedem Handy und Computer, mit demselben Konto wie die App.
+       Inhalte aus plan-data.js; Name und gewählter Moment aus dem Fragebogen liegen nur in diesem Browser. -->
+  <main class="abo-page">
+    <div class="abo-top">
+      <a class="abo-brand" href="/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+    </div>
+    <p class="abo-error" id="error" role="alert" hidden></p>
+    <section id="loading"><p class="abo-muted">Dein Plan wird geladen …</p></section>
+
+    <section id="signed-out" hidden>
+      <h1>Melde dich an</h1>
+      <p>Mit dem Konto, mit dem du dein Abo abgeschlossen hast.</p>
+      <a class="abo-button" href="./?weiter=1">Anmelden</a>
+    </section>
+
+    <section id="no-subscription" hidden>
+      <h1>Noch kein Abo</h1>
+      <p>Zu diesem Konto gibt es noch kein Abo im Web. Hast du in der iPhone-App abgeschlossen? Dann findest du alles dort.</p>
+      <a class="abo-button" href="/start/">Plan erstellen</a>
+    </section>
+
+    <section id="plan" hidden></section>
+
+    <footer class="abo-footer">
+      <a class="abo-cancel-link" href="kuendigen.html">Verträge hier kündigen</a>
+      <a href="/impressum.html">Impressum</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+      <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>
+      <p class="abo-muted">Allgemeine Kommunikations- und Alltagshilfe für Angehörige. Hinweise ohne Gewähr, kein Medizinprodukt, kein Ersatz für ärztlichen Rat. Im Notfall 112.</p>
+    </footer>
+  </main>
+  <script src="/lovable-home.js?v=20261108a"></script>
+</body>
+</html>

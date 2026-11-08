@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Verträge hier kündigen – Demenz Coach</title>
+  <meta name="description" content="Demenz Coach Abo online kündigen, ohne Anmeldung.">
+  <link rel="canonical" href="https://dementiacoachapp.com/abo/kuendigen.html">
+  <link rel="icon" href="/assets/lovable-logo.jpg">
+  <link rel="stylesheet" href="abo.css">
+  <script src="abo-config.js"></script>
+  <script src="abo-cancel.js" defer></script>
+</head>
+<body>
+  <main class="abo-page">
+    <div class="abo-top">
+      <a class="abo-brand" href="/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+    </div>
+
+    <!-- § 312k BGB: Bestätigungsseite ohne Anmeldung, Knopf "Jetzt kündigen", danach speicherbare Bestätigung. -->
+    <section id="cancel-form-section" aria-labelledby="cancel-title">
+      <h1 id="cancel-title">Abo kündigen</h1>
+      <p>Hier kündigst du ein Abo, das du auf dieser Website abgeschlossen hast. Eine Anmeldung brauchst du nicht.</p>
+      <p class="abo-muted">Abo aus dem App Store? Das kündigst du in den <a href="https://apps.apple.com/account/subscriptions">Apple-Einstellungen</a>.</p>
+      <p class="abo-error" id="cancel-error" role="alert" hidden></p>
+      <form id="cancel-form" class="abo-card" novalidate>
+        <p><strong>Vertrag:</strong> Demenz Coach Premium (Abo über die Website)</p>
+        <fieldset>
+          <legend>Art der Kündigung</legend>
+          <label class="abo-choice"><input type="radio" name="kind" value="ordentlich" checked> Zum nächstmöglichen Zeitpunkt</label>
+          <label class="abo-choice"><input type="radio" name="kind" value="ausserordentlich"> Außerordentlich, aus wichtigem Grund</label>
+          <label class="abo-choice"><input type="radio" name="kind" value="widerruf"> Widerruf innerhalb von 14 Tagen</label>
+        </fieldset>
+        <div id="reason-block" hidden>
+          <label for="reason">Grund</label>
+          <textarea id="reason" maxlength="500"></textarea>
+        </div>
+        <label for="name">Vor- und Nachname</label>
+        <input id="name" type="text" autocomplete="name" maxlength="120" required>
+        <label for="email">E-Mail-Adresse deines Abos</label>
+        <input id="email" type="email" autocomplete="email" inputmode="email" maxlength="254" required>
+        <label for="date">Gewünschter Termin (freiwillig)</label>
+        <input id="date" type="date">
+        <p class="abo-muted">Die Bestätigung schicken wir an diese E-Mail-Adresse.</p>
+        <button class="abo-button" type="submit" id="cancel-button">Jetzt kündigen</button>
+      </form>
+    </section>
+
+    <section id="cancel-done" aria-labelledby="done-title" hidden>
+      <h1 id="done-title">Kündigung erhalten</h1>
+      <div class="abo-card">
+        <p><strong>Eingang:</strong> <span id="done-time"></span></p>
+        <p><strong>Art:</strong> <span id="done-kind"></span></p>
+        <p><strong>Name:</strong> <span id="done-name"></span></p>
+        <p><strong>E-Mail:</strong> <span id="done-email"></span></p>
+        <p id="done-date-line" hidden><strong>Gewünschter Termin:</strong> <span id="done-date"></span></p>
+        <p><strong>Nummer:</strong> <span id="done-id"></span></p>
+      </div>
+      <p id="done-mail">Eine Bestätigung mit dem Ende deines Abos kommt gleich per E-Mail.</p>
+      <p id="done-confirm" hidden>Wir haben dir eine E-Mail geschickt. Bitte öffne den Link darin und bestätige. Erst dann beenden wir dein Abo, damit niemand anderes es beenden kann. Für alle Fristen zählt der Eingang oben.</p>
+      <button class="abo-button abo-noprint" type="button" id="print-button">Bestätigung speichern oder drucken</button>
+    </section>
+
+    <footer class="abo-footer">
+      <a class="abo-cancel-link" href="kuendigen.html">Verträge hier kündigen</a>
+      <a href="widerruf.html">Widerruf</a>
+      <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+      <a href="/impressum.html">Impressum</a>
+    </footer>
+  </main>
+</body>
+</html>

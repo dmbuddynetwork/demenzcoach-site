@@ -1,0 +1,17 @@
+/* „Mein Plan“: gleiche Bausteine wie Fragebogen und App (Karten, hellila Zeilen, drei Schriftgrößen). */
+.plan-day { margin: 0 0 10px; }
+.plan-day > summary { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 14px 18px; list-style: none; cursor: pointer;
+  background: var(--lav); color: var(--lav-ink); border-radius: 14px; font-weight: 700; }
+.plan-day > summary::-webkit-details-marker { display: none; }
+.plan-day > summary .plan-day-no { flex: none; min-width: 3.6em; font-size: var(--small); font-weight: 600; }
+.plan-day > summary span:last-child { flex: 1 1 auto; }
+.plan-day[open] > summary { border-radius: 14px 14px 0 0; }
+.plan-day[open] > .start-card { border-top: 0; border-radius: 0 0 16px 16px; }
+.plan-label { margin: 16px 0 4px; color: var(--purple); font-weight: 600; }
+.plan-label:first-child { margin-top: 0; }
+.plan-today { margin-top: 8px; }
+.plan-rows { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
+.plan-rows a { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 14px 18px; background: var(--lav); color: var(--lav-ink);
+  border-radius: 14px; font-weight: 700; text-decoration: none; }
+.plan-rows a span { flex: 1 1 auto; }
+.plan-rows svg { flex: none; width: 22px; height: 22px; }
