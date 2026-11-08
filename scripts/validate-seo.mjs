@@ -56,7 +56,8 @@ for (const file of htmlFiles) {
     ?? /<link\s+[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["'][^>]*>/i.exec(html)?.[1];
 
   if (!title) fail(`${file}: missing title`);
-  if (!/href=["'][^"']*lovable-home\.css\?v=/.test(html)) fail(`${file}: missing current shared layout`);
+  // Schlichtes Layout im App-Stil (einfach.css, 8. Nov 2026) für Startseite und Übersetzer-Seiten.
+  if (!/href=["'][^"']*lovable-home\.css\?v=/.test(html) && !/href=["'][^"']*einfach\.css["']/.test(html)) fail(`${file}: missing current shared layout`);
   if (/href=["'][^"']*\/(?:styles)\.css|href=["']styles\.css/.test(html)) fail(`${file}: legacy stylesheet remains`);
   if (/src=["'][^"']*\bscript\.js["']/.test(html)) fail(`${file}: legacy navigation script remains`);
   if (!description && file !== "404.html") fail(`${file}: missing meta description`);
@@ -183,8 +184,15 @@ for (const language of homeLanguages) {
   const robots = meta(html, "robots") ?? "";
   if (robots.toLowerCase().includes("noindex")) fail(`${file}: localized home must be indexable`);
   if (html.includes('data-page-type="localized-product-draft"')) fail(`${file}: draft page type remains`);
-  if (!/href="lovable-home\.css(?:\?v=[^"]+)?"/.test(html)) fail(`${file}: missing shared Lovable design system`);
-  if (!/src="lovable-home\.js(?:\?v=[^"]+)?"/.test(html)) fail(`${file}: missing shared accessible navigation script`);
+  // Die deutsche Startseite ist seit 8. Nov 2026 der Demenz-Übersetzer im App-Stil (einfach.css, ohne Store-Galerie).
+  const simpleHome = /<body[^>]*class="[^"]*\beinfach\b/.test(html);
+  if (simpleHome) {
+    if (!/href="[^"]*einfach\.css"/.test(html)) fail(`${file}: missing simple layout einfach.css`);
+    if (!/src="\/?lovable-home\.js(?:\?v=[^"]+)?"/.test(html)) fail(`${file}: missing shared consent and navigation script`);
+  } else {
+    if (!/href="lovable-home\.css(?:\?v=[^"]+)?"/.test(html)) fail(`${file}: missing shared Lovable design system`);
+    if (!/src="lovable-home\.js(?:\?v=[^"]+)?"/.test(html)) fail(`${file}: missing shared accessible navigation script`);
+  }
 
   const alternates = new Map([...html.matchAll(/<link\s+rel=["']alternate["']\s+hreflang=["']([^"']+)["']\s+href=["']([^"']+)["'][^>]*>/gi)]
     .map((match) => [match[1], match[2]]));
@@ -194,7 +202,7 @@ for (const language of homeLanguages) {
 
   const expectedStoreLocale = storeLocaleByLanguage[language] ?? "en-US";
   const storeImages = [...html.matchAll(/<img\s+[^>]*src=["']assets\/store\/([^/]+)\/([^"']+\.webp)["'][^>]*>/gi)];
-  if (storeImages.length < 6) fail(`${file}: expected at least six final Store screenshot references`);
+  if (storeImages.length < 6 && !simpleHome) fail(`${file}: expected at least six final Store screenshot references`);
   for (const [, storeLocale, asset] of storeImages) {
     if (storeLocale !== expectedStoreLocale) fail(`${file}: unexpected Store locale ${storeLocale}`);
     if (!fs.existsSync(path.join(root, "assets", "store", storeLocale, asset))) {
