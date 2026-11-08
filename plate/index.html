@@ -67,6 +67,10 @@
     .thanks h3 { font-size: 26px; }
     .done .signup, .done .alt-actions { display: none; }
     .done .thanks { display: grid; }
+    .steps { margin: 0; padding-left: 24px; display: grid; gap: 8px; font-size: 18px; }
+    .mock-btn { display: inline-block; margin-top: 6px; padding: 8px 14px; border-radius: 10px; background: var(--red); color: #fff; font-weight: 700; font-size: 16px; }
+    .thanks-soi, .soi .thanks-doi { display: none; }
+    .soi .thanks-soi { display: block; }
     .confirmed { display: grid; gap: 4px; padding: 16px 20px; background: var(--red); color: #fff; font-size: 18px; text-align: center; }
     .confirmed strong { font-size: 22px; font-weight: 900; }
     .confirmed a { margin-top: 8px; color: #fff; font-weight: 700; }
@@ -199,8 +203,11 @@
           <p class="byline"><img src="../teller/debby-avatar.webp" width="40" height="40" alt="">By <a href="#debby">Debby Frey, geriatric nurse and founder of Dementia Coach</a></p>
         </div>
         <div class="thanks" role="status">
-          <h3>Done! 💌</h3>
-          <p><strong>The list is on its way to your inbox.</strong> It comes from <strong>“Debby from Dementia Coach”</strong>.</p>
+          <div class="thanks-doi"><h3>Just 1 more step! 💌</h3>
+          <ol class="steps"><li>Open your email inbox now.</li><li>Find the email from <strong>“Debby from Dementia Coach”</strong>.</li><li>Tap this button in it: <span class="mock-btn">Yes, send the list</span></li></ol>
+          <p>Only then am I allowed to send you the list.</p></div>
+          <div class="thanks-soi"><h3>Done! 💌</h3>
+          <p><strong>The list is on its way to your inbox.</strong> It comes from <strong>“Debby from Dementia Coach”</strong>.</p></div>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Open your inbox</a>
             <p class="inbox-hint">Nothing after 2 minutes? Please check your spam or promotions folder.</p>
             <p class="inbox-hint">You can already read all 5 tricks below: <a href="#tricks" data-to-tricks>Go to the tricks ↓</a></p>
@@ -295,8 +302,11 @@
             <a class="btn btn-ghost" href="https://wa.me/?text=Small%20tricks%20for%20dementia%2C%20like%20the%20red%20plate%3A%20https%3A%2F%2Fdementiacoachapp.com%2Fplate%2F">Share on WhatsApp</a>
           </div>
           <div class="thanks" role="status">
-            <h3>Done! 💌</h3>
-            <p><strong>The list is on its way to your inbox.</strong> It comes from <strong>“Debby from Dementia Coach”</strong>.</p>
+            <div class="thanks-doi"><h3>Just 1 more step! 💌</h3>
+            <ol class="steps"><li>Open your email inbox now.</li><li>Find the email from <strong>“Debby from Dementia Coach”</strong>.</li><li>Tap this button in it: <span class="mock-btn">Yes, send the list</span></li></ol>
+            <p>Only then am I allowed to send you the list.</p></div>
+            <div class="thanks-soi"><h3>Done! 💌</h3>
+            <p><strong>The list is on its way to your inbox.</strong> It comes from <strong>“Debby from Dementia Coach”</strong>.</p></div>
             <a class="btn hidden" data-inbox href="#" target="_blank" rel="noopener">Open your inbox</a>
             <p class="inbox-hint">Nothing after 2 minutes? Please check your spam or promotions folder.</p>
             <p class="inbox-hint">You can already read all 5 tricks below: <a href="#tricks" data-to-tricks>Go to the tricks ↓</a></p>
@@ -375,7 +385,25 @@
   (function () {
     // Brevo-Formular-Adresse (Brevo > Kontakte > Formulare > Teilen > HTML-Code, Wert von action="...").
     // Leer = noch kein Brevo: statt E-Mail-Feld erscheinen Ausdrucken und WhatsApp.
-    var BREVO_FORM_URL = ""; // englisches Brevo-Formular (Liste "Plate page (EN)", OHNE Double-Opt-In, Abschlussmail = Vorlage 11), noch anzulegen
+    // Zwei englische Formulare, beide Liste 4 "Plate page (EN)":
+    // DOI = mit Double-Opt-In (Bestätigungsmail Vorlage 10, danach Vorlage 11) – Standard für alle.
+    // SOI = ohne Double-Opt-In (Abschlussmail Vorlage 11) – nur für Länder in SOI_COUNTRIES.
+    var BREVO_FORM_URL_DOI = ""; // noch anzulegen
+    var BREVO_FORM_URL_SOI = ""; // noch anzulegen
+    var SOI_COUNTRIES = ["US"];
+    var BREVO_FORM_URL = BREVO_FORM_URL_DOI;
+
+    // Land erkennen: Cloudflare (/cdn-cgi/trace, loc=XX), sonst grob über die Zeitzone.
+    var US_TZ = /^(America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Juneau|Sitka|Nome|Adak|Yakutat|Metlakatla|Menominee|Indiana\/.+|Kentucky\/.+|North_Dakota\/.+)|Pacific\/Honolulu)$/;
+    var country = "";
+    try { if (US_TZ.test(Intl.DateTimeFormat().resolvedOptions().timeZone || "")) country = "US"; } catch (e) {}
+    if (window.fetch) {
+      fetch("/cdn-cgi/trace", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.text() : ""; })
+        .then(function (t) { var m = /(?:^|\n)loc=([A-Z]{2})/.exec(t || ""); if (m) country = m[1]; })
+        .catch(function () {});
+    }
+    var useSoi = function () { return !!BREVO_FORM_URL_SOI && SOI_COUNTRIES.indexOf(country) > -1; };
 
     var ua = navigator.userAgent || "";
     var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
@@ -472,7 +500,10 @@
         data.append("EMAIL", input.value.trim());
         data.append("email_address_check", "");
         data.append("locale", "en");
+        var soi = useSoi();
+        var formUrl = soi ? BREVO_FORM_URL_SOI : BREVO_FORM_URL;
         var done = function () {
+          if (soi) box.classList.add("soi");
           box.classList.add("done");
           // Sofort-Nutzen: alle Tricks direkt auf der Seite freischalten
           document.body.classList.add("unlocked");
@@ -492,7 +523,7 @@
           if (!err) { err = document.createElement("p"); err.className = "form-error"; err.setAttribute("role", "alert"); form.appendChild(err); }
           err.textContent = "Sorry, that didn’t work. Please check your email address and try again.";
         };
-        fetch(BREVO_FORM_URL, { method: "POST", body: data, headers: { "Accept": "application/json" } })
+        fetch(formUrl, { method: "POST", body: data, headers: { "Accept": "application/json" } })
           .then(function (r) { return r.json().catch(function () { return { success: r.ok }; }); })
           .then(function (j) { if (j && j.success) done(); else fail(); })
           .catch(fail);
