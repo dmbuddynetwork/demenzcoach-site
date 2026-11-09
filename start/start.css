@@ -173,8 +173,8 @@ body[data-screen="plan"] .start-top, body[data-screen="plan"] .start-count { dis
 .start-ready-bar::after { content: ""; display: block; width: var(--p); height: 100%; border-radius: 999px; background: var(--purple); }
 
 /* Rubbellos vor der Preisseite (BetterMe). */
-.start-scratch-card { position: relative; margin: 0 0 18px; border-radius: 18px; overflow: hidden; border: 2px dashed var(--purple); background: var(--lav); aspect-ratio: 2 / 1; }
-.start-prize { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 4px; padding: 12px; text-align: center; color: var(--lav-ink); }
+.start-scratch-card { position: relative; margin: 0 0 18px; border-radius: 18px; overflow: hidden; border: 2px dashed var(--purple); background: var(--lav); }
+.start-prize { display: grid; place-content: center; justify-items: center; gap: 4px; min-height: 200px; padding: 18px 12px; text-align: center; color: var(--lav-ink); }
 .start-prize strong { font-size: 2.25rem; line-height: 1.1; color: var(--purple); }
 .start-prize-icon svg { width: 36px; height: 36px; color: var(--purple); }
 .start-scratch { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; transition: opacity .4s ease; }
@@ -223,7 +223,7 @@ body[data-screen="plan"] .start-page { padding-top: 0; }
   border-bottom: 2px dashed rgba(71, 64, 140, .35); }
 .start-ticket-title svg { width: 26px; height: 26px; color: var(--purple); }
 .start-ticket-body { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: stretch; padding: 12px; }
-.start-ticket-code { display: flex; align-items: center; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 12px; background: #fff; font-weight: 700; }
+.start-ticket-code { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; padding: 12px; border-radius: 12px; background: #fff; font-weight: 700; overflow-wrap: anywhere; }
 .start-ticket-body .start-clock-soft { background: rgba(255, 255, 255, .6); }
 .start-ticket-check { color: #2f8f4e; font-weight: 800; }
 
@@ -245,3 +245,6 @@ body[data-screen="plan"] .start-page { padding-top: 0; }
 .start-pay { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 12px; padding: 0; list-style: none; }
 .start-pay li { display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: .8125rem; font-weight: 700; color: var(--ink-2); }
 .start-pay svg { width: 14px; height: 14px; color: #2f8f4e; }
+.start-prize-code { margin-top: 6px; padding: 4px 10px; border-radius: 8px; background: #fff; font-size: var(--small); }
+.start-ticket-body .start-clock-soft b, .start-ticket-body .start-clock-soft i { font-size: 1.4rem; }
+.start-ticket-body .start-clock-soft { padding: 8px 10px; }

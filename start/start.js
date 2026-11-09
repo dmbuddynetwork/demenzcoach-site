@@ -40,6 +40,13 @@
   let stopTimer = () => {};
   // Geld-zurück-Garantie (Daniel, 9. Nov 2026): 30 Tage ab der ersten Zahlung, Bedingungen auf /abo/garantie.html.
   const guaranteeDays = 30;
+  // Gutscheincode wie BetterMe („testi_nov26“: Name plus Monat). Nur eine Bezeichnung für den echten Willkommenspreis,
+  // er wird automatisch angewendet; der Preis selbst kommt vom Server.
+  const promoCode = () => {
+    const base = (forWho() || "willkommen").normalize("NFD").replace(/[^A-Za-z]/gu, "").toLowerCase().slice(0, 10) || "willkommen";
+    const month = new Intl.DateTimeFormat("en", { month: "short" }).format(new Date()).toLowerCase();
+    return `${base}_${month}${String(new Date().getFullYear()).slice(2)}`;
+  };
 
   const euro = (cents) => new Intl.NumberFormat("de-DE", { style: "currency", currency: offer.currency.toUpperCase() }).format(cents / 100);
   const who = () => answers.name || (answers.relation?.call ?? "") || "sie oder er";
@@ -363,7 +370,9 @@
     const prize = el("div", { class: "start-prize" }, [
       el("span", { class: "start-prize-icon", html: icons.gift }),
       el("strong", { text: `${percent} % Rabatt` }),
-      el("span", { text: `Dein erstes Jahr ${euro(intro.firstYear)} statt ${euro(offer.yearly)}` })
+      el("span", { text: `Dein erstes Jahr ${euro(intro.firstYear)} statt ${euro(offer.yearly)}` }),
+      el("span", { class: "start-prize-code" }, ["Promo-Code ", el("b", { text: promoCode() })]),
+      el("span", { class: "start-small", text: "Wird automatisch an der Kasse angewendet" })
     ]);
     const canvas = el("canvas", { class: "start-scratch", width: "600", height: "300", "aria-hidden": "true" });
     const button = el("button", { type: "button", class: "abo-button", text: "Aufdecken" });
@@ -456,9 +465,10 @@
     const priceText = (key) => `${key === "yearly" ? yearlyText : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
     // Nur ein belegbarer Vergleich (Jahrespreis gegenüber 12 Monatszahlungen), keine unbelegte Spitzenstellung wie „Beliebt“.
     const saving = Math.floor((1 - offer.yearly / (offer.monthly * 12)) * 20) * 5;
-    const discount = Math.floor((1 - firstYear / offer.yearly) * 100);
     const name = forWho();
-    const ctaText = offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos testen` : "Plan holen";
+    // Labels wie BetterMe („GET MY PLAN“, „MOST POPULAR“). Statt „Beliebtester“ (ohne Verkaufszahlen nicht belegbar, UWG)
+    // steht auf dem Jahresplan „Bester Preis“: belegbar, weil er pro Tag am günstigsten ist.
+    const ctaText = "Meinen Plan holen";
 
     const tables = [];
     const select = (key) => {
@@ -481,8 +491,8 @@
         ? el("span", {}, [el("s", { text: euro(offer.yearly) }), ` → ${euro(firstYear)} im 1. Jahr`])
         : el("span", { text: `${euro(offer.yearly)} pro Jahr` });
       const group = el("div", { role: "radiogroup", "aria-label": "Tarif", class: "start-tiers" }, [
-        tier("yearly", "Jahresplan", yearlyLine, firstYear, 365, deal ? offer.yearly : null, saving >= 10 ? `Spare ${saving} %` : "Jahresplan"),
-        tier("monthly", "Monatsplan", el("span", { text: `${euro(offer.monthly)} pro Monat` }), offer.monthly, 30, null, null)
+        tier("monthly", "1-Monats-Plan", el("span", { text: `${euro(offer.monthly)} pro Monat` }), offer.monthly, 30, null, null),
+        tier("yearly", "12-Monats-Plan", yearlyLine, firstYear, 365, deal ? offer.yearly : null, saving >= 10 ? `Bester Preis · Spare ${deal ? Math.floor((1 - firstYear / (offer.monthly * 12)) * 100) : saving} %` : "Bester Preis")
       ]);
       tables.push(group);
       return group;
@@ -500,7 +510,7 @@
 
     // Kopf wie BetterMe: links die Uhr (oder die Probezeit), rechts ein dunkler Knopf; bleibt beim Scrollen oben.
     const head = el("div", { class: "start-head" }, [
-      timed ? clock() : el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein Plan" }), el("span", { text: "Heute 0,00 €" })]),
+      timed ? clock() : el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein Plan ist reserviert" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
       el("button", { type: "button", class: "start-head-button", text: "Plan holen", onclick: scrollToPlans })
     ]);
 
@@ -522,20 +532,20 @@
       "Blatt für Helfer zum Ausdrucken", "In der iPhone-App und hier im Web"];
     if (answers.burden?.key === "kraft") gets.splice(3, 0, "Kleine Hilfen für dich selbst");
     const faq = [
-      ["Was kostet es nach der Probezeit?", deal
-        ? `Jahresplan: ${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} im Jahr. Monatsplan: ${euro(offer.monthly)} im Monat. In den ${offer.trialDays} Tagen zahlst du nichts.`
-        : `${euro(offer.yearly)} im Jahr oder ${euro(offer.monthly)} im Monat, je nach Wahl. In den ${offer.trialDays} Tagen zahlst du nichts.`],
+      ["Was kostet es?", (deal
+        ? `12-Monats-Plan: ${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} im Jahr. 1-Monats-Plan: ${euro(offer.monthly)} im Monat.`
+        : `${euro(offer.yearly)} im Jahr oder ${euro(offer.monthly)} im Monat, je nach Wahl.`) + (offer.trialDays > 0 ? ` In den ${offer.trialDays} Tagen zahlst du nichts.` : " Alle Preise inkl. MwSt.")],
       ["Was ist, wenn es uns nicht hilft?", `Dann bekommst du dein Geld zurück. Es gilt eine ${guaranteeDays} Tage Geld-zurück-Garantie ab der ersten Zahlung: Unter „Verträge hier kündigen“ die Garantie wählen, fertig. Die Bedingungen stehen auf der Seite Geld-zurück-Garantie.`],
-      ["Wie kündige ich?", "Online über „Verträge hier kündigen“ unten auf jeder Seite, ohne Anmeldung. Kündigst du in der Probezeit, zahlst du nichts."],
+      ["Wie kündige ich?", `Online über „Verträge hier kündigen“ unten auf jeder Seite, ohne Anmeldung.${offer.trialDays > 0 ? " Kündigst du in der Probezeit, zahlst du nichts." : ""}`],
       ["Gilt das auch in der App?", "Ja. Du meldest dich in der iPhone-App mit demselben Konto an, dann ist alles freigeschaltet."],
       ["Ist das eine medizinische Beratung?", "Nein. Demenz Coach hilft bei Worten und Alltag. Es ersetzt keinen ärztlichen Rat. Im Notfall 112."],
       ["Was passiert mit meinen Antworten?", "Sie bleiben auf deinem Gerät. Wir senden sie nicht und speichern sie nicht."]
     ];
     // Gutschein-Ticket wie BetterMe („Promo-Code angewendet!“ mit Uhr).
     const ticket = () => (deal ? el("div", { class: "start-ticket" }, [
-      el("p", { class: "start-ticket-title" }, [el("span", { html: icons.gift }), "Willkommenspreis aktiviert!"]),
+      el("p", { class: "start-ticket-title" }, [el("span", { html: icons.gift }), "Promo-Code angewendet!"]),
       el("div", { class: "start-ticket-body" }, [
-        el("p", { class: "start-ticket-code" }, [el("span", { class: "start-ticket-check", text: "✓" }), `−${discount} % im 1. Jahr`]),
+        el("p", { class: "start-ticket-code" }, [el("span", { class: "start-ticket-check", text: "✓" }), promoCode()]),
         timed ? clock("start-clock-soft") : el("p", { class: "start-ticket-code", text: euro(firstYear) })
       ])
     ]) : null);
@@ -581,7 +591,7 @@
         el("a", { href: "/abo/garantie.html", text: "Bedingungen der Garantie" })
       ]),
       el("p", { class: "start-small start-legal" }, [
-        `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende.${deal ? " Der Sonderpreis gilt für das erste Jahr des Jahresplans." : ""} Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
+        `${offer.trialDays > 0 ? `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft` : "Das Abo beginnt sofort und läuft"} zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende.${deal ? " Der Sonderpreis gilt für das erste Jahr des Jahresplans." : ""} Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
         el("a", { href: "/nutzungsbedingungen.html", text: "Nutzungsbedingungen" }), " und die ",
         el("a", { href: "/abo/widerruf.html", text: "Widerrufsbelehrung" }),
         ". Allgemeine Kommunikations- und Alltagshilfe, kein Medizinprodukt."

@@ -386,7 +386,7 @@ async function offerYearlySwitch() {
     title.firstChild.textContent = saving >= 10 ? `Jahresabo statt Monat: spare ${saving} %` : "Lieber das Jahresabo?";
     const text = document.createElement("p");
     text.className = "abo-muted";
-    text.textContent = yearly ? `${euro(yearly.amount, yearly.currency)} im Jahr statt ${euro(monthly.amount * 12, monthly.currency)} bei monatlicher Zahlung, jeweils inkl. MwSt. Deine Probezeit bleibt, heute zahlst du nichts.` : "Deine Probezeit bleibt, heute zahlst du nichts.";
+    text.textContent = yearly ? `${euro(yearly.amount, yearly.currency)} im Jahr statt ${euro(monthly.amount * 12, monthly.currency)} bei monatlicher Zahlung, jeweils inkl. MwSt. Den Preis für den Wechsel siehst du vor der Bestätigung.` : "Den Preis für den Wechsel siehst du vor der Bestätigung.";
     const button = document.createElement("button");
     button.type = "button";
     button.className = "abo-button";
