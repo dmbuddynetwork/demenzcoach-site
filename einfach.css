@@ -509,3 +509,17 @@ body.einfach .e-offers > #plan { order: -2; }
   body.einfach .e-plan > img { width: 180px; max-width: none; margin: 0; }
   body.einfach .e-plan .button { width: auto; padding-inline: 32px; }
 }
+
+/* KI-Warte-Ansicht (Daniel, 9. Nov): Zeichnung, drei Schritte werden nacheinander abgehakt, leiser Plan-Link. */
+body.einfach .translator-ai-wait { display: grid; gap: 14px; margin: 18px 0 8px; padding: 20px 18px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 18px; }
+body.einfach .translator-ai-wait .translator-scene-art { margin: 0 auto; max-width: 200px; max-height: 170px; }
+body.einfach .translator-ai-steps { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+body.einfach .translator-ai-steps li { display: flex; align-items: center; gap: 12px; font-weight: 700; opacity: .45; animation: e-step-on .4s ease forwards; }
+body.einfach .translator-ai-steps li::before { content: ""; flex: 0 0 26px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--e-line); background: #fff center / 16px no-repeat; animation: e-step-done .4s ease forwards; }
+body.einfach .translator-ai-steps li:nth-child(1), body.einfach .translator-ai-steps li:nth-child(1)::before { animation-delay: .6s; }
+body.einfach .translator-ai-steps li:nth-child(2), body.einfach .translator-ai-steps li:nth-child(2)::before { animation-delay: 2.2s; }
+body.einfach .translator-ai-steps li:nth-child(3), body.einfach .translator-ai-steps li:nth-child(3)::before { animation-delay: 4.2s; }
+@keyframes e-step-on { to { opacity: 1; } }
+@keyframes e-step-done { to { border-color: var(--e-purple); background-color: var(--e-purple); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); } }
+@media (prefers-reduced-motion: reduce) { body.einfach .translator-ai-steps li, body.einfach .translator-ai-steps li::before { animation-duration: .01s; } }
+body.einfach .translator-ai-wait-plan { justify-self: center; text-align: center; color: var(--e-purple); font-size: var(--e-small); font-weight: 700; }

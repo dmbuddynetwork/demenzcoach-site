@@ -618,13 +618,22 @@
       status
     ]);
   };
-  // Warte-Ansicht in Form der Antwort: so wirkt die Wartezeit kürzer und nichts springt.
-  const aiWaiting = () => element('div', { className: 'translator-ai-wait', attributes: { 'aria-hidden': 'true' } }, [
-    element('span', { className: 'translator-skeleton translator-skeleton-title' }),
-    element('span', { className: 'translator-skeleton' }),
-    element('span', { className: 'translator-skeleton translator-skeleton-quote' }),
-    element('span', { className: 'translator-skeleton translator-skeleton-short' })
-  ]);
+  // Warte-Ansicht (Daniel, 9. Nov: Ladeanimation auf Conversion optimiert): ruhige Zeichnung und drei Schritte,
+  // die nacheinander abgehakt werden, wie „Dein Plan wird erstellt“ bei Noom. Darunter leise der Web-Plan (nur Deutsch).
+  // Rein gestalterisch: die Schritte laufen per CSS, die Antwort erscheint, sobald sie da ist.
+  const aiWaiting = () => {
+    const plan = ui ? null : element('a', { className: 'translator-ai-wait-plan', text: 'Solche Antworten für euren Alltag: Plan in ein paar Fragen', attributes: { href: '/start/?src=warten', 'data-related-link': 'plan_warten' } });
+    plan?.addEventListener('click', () => track('plan_start_click', { place: 'warten' }));
+    return element('div', { className: 'translator-ai-wait' }, [
+      sceneArt(data.waitImage),
+      element('ol', { className: 'translator-ai-steps', attributes: { 'aria-hidden': 'true' } }, [
+        element('li', { text: 'Satz verstehen' }),
+        element('li', { text: 'Gefühl dahinter erkennen' }),
+        element('li', { text: 'Passende Sätze finden' })
+      ]),
+      plan
+    ]);
+  };
   // Runde 198 (Daniels Wahl „Automatisch“): Unbekannte Sätze gehen ohne Knopf an die KI.
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
