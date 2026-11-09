@@ -125,7 +125,7 @@
   // „Wenn das nicht hilft“: zweiter Versuch für den Moment, mit persönlichem Satz.
   // Ruhige Zeichnung im Ergebnis (Daniel, 8. Nov 17:16: „lockert die Textwüste auf“). Kommt fest aus den Seitendaten.
   const sceneArt = (image) => (image?.src
-    ? element('img', { className: 'translator-scene-art', attributes: { src: image.src, alt: '', width: String(image.width ?? 480), height: String(image.height ?? 400), loading: 'lazy', decoding: 'async' } })
+    ? element('img', { className: 'translator-scene-art', attributes: { src: image.src, alt: '', width: String(image.width ?? 480), height: String(image.height ?? 400), decoding: 'async' } })
     : null);
   const retryBlock = (result) => {
     const block = element('div', { className: 'translator-retry', attributes: { id: `translator-retry-${result.key}`, tabindex: '-1' } });
@@ -204,7 +204,28 @@
   // Am Computer lässt sich die iPhone-App nicht direkt laden, und einen QR-Code nutzt die Zielgruppe nicht
   // (Daniel, 8. Nov). Dort kommt deshalb zuerst die E-Mail-Liste, dann der App-Hinweis.
   const onComputer = () => window.matchMedia?.('(min-width: 900px) and (hover: hover) and (pointer: fine)').matches === true;
-  const offers = (result) => (onComputer() ? [signupBox(), appCTA(result)] : [appCTA(result), signupBox()]);
+  // Web-Plan (Daniel, 9. Nov: „Webfunnel in die neue Webseite integrieren, damit Nutzer zu Zahlenden werden“).
+  // Nur Deutsch, nie bei Notfall oder Entlastung. Der Link trägt nur den Ort und den festen Situations-Schlüssel, nie Text.
+  const planMoments = new Set(['nachhause', 'mutter', 'wer', 'geld', 'arbeit', 'waschen']);
+  const planCTA = (result) => {
+    if (ui || result?.safetyOnly || result?.selfCare) return null;
+    const moment = result?.key && planMoments.has(result.key) ? `&m=${result.key}` : '';
+    const link = element('a', { className: 'button', text: 'Plan erstellen', attributes: { href: `/start/?src=ergebnis${moment}`, 'data-related-link': 'plan_ergebnis' } });
+    link.addEventListener('click', () => track('plan_start_click', { place: 'ergebnis', result_key: result?.key ?? '' }));
+    return element('aside', { className: 'translator-plan-cta' }, [
+      data.planImage ? element('img', { className: 'translator-plan-art', attributes: { src: data.planImage.src, width: String(data.planImage.width), height: String(data.planImage.height), alt: '', decoding: 'async' } }) : null,
+      element('div', {}, [
+        element('h2', { text: 'Dein Plan für solche Momente' }),
+        element('ul', { className: 'e-checks' }, [
+          element('li', { text: 'Ein paar kurze Fragen zu eurer Lage' }),
+          element('li', { text: 'Dann ein Plan mit Sätzen für euren Alltag' }),
+          element('li', { text: '7 Tage kostenlos testen' })
+        ]),
+        link
+      ])
+    ]);
+  };
+  const offers = (result, safetyHit = false) => [safetyHit ? null : planCTA(result), ...(onComputer() ? [signupBox(), appCTA(result)] : [appCTA(result), signupBox()])];
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
       element('h2', { text: 'Für eure eigene Situation' }),
@@ -727,7 +748,7 @@
     nodes.push(fallbackBox);
     nodes.push(disclaimer());
     nodes.push(suggestLink(typed));
-    nodes.push(...offers());
+    nodes.push(...offers(null, safetyHit));
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
@@ -920,7 +941,7 @@
     let trickBlock = [];
     if (trick) {
       let shown = 0;
-      const art = element('img', { className: 'translator-trick-art', attributes: { src: trick.image, alt: '', width: String(trick.imageWidth ?? 480), height: String(trick.imageHeight ?? 400), loading: 'lazy', decoding: 'async' } });
+      const art = element('img', { className: 'translator-trick-art', attributes: { src: trick.image, alt: '', width: String(trick.imageWidth ?? 480), height: String(trick.imageHeight ?? 400), decoding: 'async' } });
       const title = element('p', { className: 'translator-trick-title', text: trick.title });
       const body = element('p', { text: trick.text });
       const trickLink = element('a', { className: 'text-link translator-trick-link', text: 'Alle Tricks', attributes: { href: trick.href } });
@@ -1020,7 +1041,7 @@
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
       nodes.push(feedbackBlock(result, retry));
-      nodes.push(...offers(result));
+      nodes.push(...offers(result, safetyHit));
     }
 
     output.replaceChildren(...nodes.filter(Boolean));

@@ -489,3 +489,23 @@ body.e-loc .e-brand span, .e-lang > summary { white-space: nowrap; }
 /* Ruhige Zeichnungen im Ergebnis (Daniel, 8. Nov 17:16): „Danach“-Bild unter den Sätzen, Gefühle, Zweiter Versuch, Pause */
 body.einfach .translator-scene-art { display: block; width: 100%; max-width: 300px; height: auto; max-height: 240px; object-fit: contain; margin: 1.25rem auto 0.5rem; }
 body.einfach .translator-retry .translator-scene-art { max-width: 200px; max-height: 160px; margin: 0.5rem auto 0.75rem; }
+/* Trick-Zeichnung auf dem Handy oben und groß statt als kleines Symbol am Rand (Daniel, 9. Nov: „sieht komisch aus“).
+   Der Text behält die volle Breite. Im Ergebnis ohne loading="lazy", weil die Karte erst nach dem Tippen entsteht. */
+@media (max-width: 480px) {
+  body.einfach .translator-trick { flex-direction: column; align-items: stretch; gap: 8px; }
+  body.einfach .translator-trick-art { flex: 0 0 auto; width: 100%; max-width: 170px; max-height: 150px; margin: 0 auto; }
+}
+
+/* Web-Plan (Daniel, 9. Nov: Funnel in die Website integrieren): erste Karte bei den Angeboten, auf allen Geräten sichtbar. */
+body.einfach .e-plan, body.einfach .translator-plan-cta { text-align: center; }
+body.einfach .e-plan > img, body.einfach .translator-plan-art { display: block; width: 170px; max-width: 60%; height: auto; margin: 0 auto 12px; }
+body.einfach .e-plan h2, body.einfach .translator-plan-cta h2 { margin: 0 0 12px; }
+body.einfach .e-plan .e-checks, body.einfach .translator-plan-cta .e-checks { margin-bottom: 20px; }
+body.einfach .e-plan .button, body.einfach .translator-plan-cta .button { width: 100%; }
+body.einfach .translator-plan-cta { margin: 28px 0 8px; padding: 22px 18px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 18px; }
+body.einfach .e-offers > #plan { order: -2; }
+@media (min-width: 720px) {
+  body.einfach .e-plan { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 24px; align-items: center; text-align: left; }
+  body.einfach .e-plan > img { width: 180px; max-width: none; margin: 0; }
+  body.einfach .e-plan .button { width: auto; padding-inline: 32px; }
+}
