@@ -14,11 +14,40 @@ const state = {
   auth: null,
   firebase: null,
   user: null,
-  checkout: null
+  checkout: null,
+  checkoutAttempt: null,
+  checkoutGeneration: 0,
+  checkoutReady: false,
+  checkoutElements: [],
+  confirming: false,
+  step: "plan"
 };
 
 const steps = ["plan", "account", "pay", "done", "already"];
+function invalidateCheckout() {
+  state.checkoutGeneration += 1;
+  state.checkoutAttempt = null;
+  state.checkout = null;
+  state.checkoutReady = false;
+  state.confirming = false;
+  $("pay-button").disabled = true;
+  for (const element of state.checkoutElements) {
+    try { element.unmount?.(); } catch { /* Already detached. */ }
+  }
+  state.checkoutElements = [];
+  for (const id of ["payment-element", "express-checkout", "pay-summary", "pay-terms", "pay-summary-short"]) $(id).replaceChildren();
+  $("express-divider").hidden = true;
+}
+function currentAttempt(attempt) {
+  return state.checkoutAttempt === attempt && attempt?.generation === state.checkoutGeneration
+    && attempt.plan === state.plan && attempt.user === state.user && state.step === "pay" && !$("step-pay").hidden;
+}
+function currentCheckout(attempt, checkout) {
+  return Boolean(checkout && currentAttempt(attempt) && state.checkout === checkout);
+}
 function show(step) {
+  invalidateCheckout();
+  state.step = step;
   for (const name of steps) $(`step-${name}`).hidden = name !== step;
   $("error").hidden = true;
   window.scrollTo({ top: 0 });
@@ -62,7 +91,7 @@ function renderPlans() {
   $("trial-note").textContent = `${trialDays} Tage kostenlos. Jetzt wird nichts berechnet.`;
 }
 for (const button of document.querySelectorAll("[data-plan]")) {
-  button.addEventListener("click", () => { state.plan = button.dataset.plan; renderPlans(); });
+  button.addEventListener("click", () => { invalidateCheckout(); state.plan = button.dataset.plan; renderPlans(); });
 }
 // Willkommenspreis aus dem Fragebogen (angebot.js): gilt nur, solange das signierte Angebot läuft.
 const currentDeal = () => (state.offer?.offers ? window.DemenzAngebot?.current() ?? null : null);
@@ -208,23 +237,31 @@ $("email-next").addEventListener("click", () => {
 });
 
 async function startCheckout(email) {
+  invalidateCheckout();
+  const attempt = { generation: state.checkoutGeneration, plan: state.plan, user: state.user };
+  state.checkoutAttempt = attempt;
   $("email-block").hidden = true;
   $("pay-block").hidden = false;
   $("pay-button").disabled = true;
   try {
-    const token = await state.user.getIdToken();
-    const deal = state.plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
+    const token = await attempt.user.getIdToken();
+    if (!currentAttempt(attempt)) return;
+    const deal = attempt.plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
     await window.DemenzTeller?.ready;
+    if (!currentAttempt(attempt)) return;
     const session = await api("/session", {
       method: "POST",
       token,
-      body: { plan: state.plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+      body: { plan: attempt.plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
+    if (!currentAttempt(attempt)) return;
     renderSummary(session.trialDays, session.firstYear);
-    await mountStripe(session.clientSecret);
+    await mountStripe(session.clientSecret, attempt);
   } catch (error) {
+    if (!currentAttempt(attempt)) return;
+    invalidateCheckout();
     if (error.code === "already_subscribed") return show("already");
     if (error.code === "offer_expired" || error.code === "invalid_offer") {
       const deal = window.DemenzAngebot?.current();
@@ -279,46 +316,67 @@ function loadStripe() {
   });
 }
 
-async function mountStripe(clientSecret) {
+async function mountStripe(clientSecret, attempt) {
   await loadStripe();
+  if (!currentAttempt(attempt)) return;
   const stripe = window.Stripe(state.offer.publishableKey, { locale: "de" });
   const appearance = {
     theme: "stripe",
     variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" }
   };
   const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
-  state.checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
-  const express = state.checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
+  const checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
+  if (!currentAttempt(attempt)) return;
+  state.checkout = checkout;
+  const express = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
   express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
+    if (!currentCheckout(attempt, checkout)) return;
     $("express-divider").hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean);
   });
-  express.on("confirm", () => confirmPayment());
+  express.on("confirm", () => confirmPayment(attempt, checkout));
+  const payment = checkout.createPaymentElement({ layout: "tabs" });
+  state.checkoutElements = [express, payment];
   express.mount("#express-checkout");
-  const payment = state.checkout.createPaymentElement({ layout: "tabs" });
-  payment.on("ready", () => { $("pay-button").disabled = false; });
+  payment.on("ready", () => {
+    if (!currentCheckout(attempt, checkout)) return;
+    state.checkoutReady = true;
+    $("pay-button").disabled = state.confirming;
+  });
   payment.on("loaderror", () => {
+    if (!currentCheckout(attempt, checkout)) return;
+    state.checkoutReady = false;
     $("pay-button").disabled = true;
     fail("Die Zahlungsarten konnten nicht geladen werden. Wähle dein Angebot bitte erneut.");
   });
   payment.mount("#payment-element");
 }
 
-async function confirmPayment() {
+async function confirmPayment(attempt = state.checkoutAttempt, checkout = state.checkout) {
+  if (!currentCheckout(attempt, checkout) || !state.checkoutReady || state.confirming) return;
+  state.confirming = true;
   $("pay-button").disabled = true;
   try {
-    const loaded = await state.checkout.loadActions?.();
-    const actions = loaded?.actions ?? state.checkout;
-    const result = await actions.confirm();
-    if (result?.type === "error" || result?.error) {
-      fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
-      $("pay-button").disabled = false;
+    const loaded = await checkout.loadActions?.();
+    // A plan change/retry while actions load invalidates this exact session.
+    if (!currentCheckout(attempt, checkout) || !state.checkoutReady) return;
+    if (loaded?.type === "error") {
+      fail(loaded.error?.message || "Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
+      return;
     }
+    const actions = loaded?.actions ?? checkout;
+    const result = await actions.confirm();
+    if (!currentCheckout(attempt, checkout)) return;
+    if (result?.type === "error" || result?.error) fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
   } catch {
-    fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
-    $("pay-button").disabled = false;
+    if (currentCheckout(attempt, checkout)) fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
+  } finally {
+    if (currentCheckout(attempt, checkout)) {
+      state.confirming = false;
+      $("pay-button").disabled = !state.checkoutReady;
+    }
   }
 }
-$("pay-button").addEventListener("click", confirmPayment);
+$("pay-button").addEventListener("click", () => confirmPayment());
 
 // --- Konto nach dem Kauf: Gast-Konto bekommt die Telefonnummer (UID und damit Stripe/Adapty-Zuordnung bleiben gleich) ----
 let linkConfirmation;

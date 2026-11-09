@@ -17,7 +17,7 @@ const server = http.createServer((req,res)=>{try{let p=new URL(req.url,'http://l
   let browser; let cases=0;
   try {
     browser=await chromium.launch({headless:true,...(process.env.CHROME_PATH?{executablePath:process.env.CHROME_PATH}:{})});
-    for(const width of [390,1280]) for(const mode of ['page','modal']) for(const plan of ['yearly','monthly']) for(const scenario of (plan==='yearly'?['ready','delayed','loaderror','already_subscribed',...(mode==='modal'?['timeout']:[])]:['ready'])) {
+    for(const width of [390,1280]) for(const mode of ['page','modal']) for(const plan of ['yearly','monthly']) for(const scenario of (plan==='yearly'?['ready','delayed','loaderror','already_subscribed',...(mode==='modal'?['timeout']:['race'])]:['ready'])) {
       const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce'}); const errors=[], sessions=[];
       try {
         await context.route('**/*',route=>{
@@ -29,7 +29,7 @@ const server = http.createServer((req,res)=>{try{let p=new URL(req.url,'http://l
           if(url.hostname.endsWith('cloudfunctions.net')) {
             if(url.pathname.endsWith('/config'))return route.fulfill({headers,json:config});
             if(url.pathname.endsWith('/session')&&scenario==='already_subscribed')return route.fulfill({status:409,headers,json:{code:'already_subscribed'}});
-            if(url.pathname.endsWith('/session')) {sessions.push({body:req.postDataJSON(),token:req.headers().authorization});return route.fulfill({headers,json:{clientSecret:'fixture',trialDays:plan==='yearly'?7:0,firstYear:plan==='yearly'?4999:null}});}
+            if(url.pathname.endsWith('/session')) {sessions.push({body:req.postDataJSON(),token:req.headers().authorization});return route.fulfill({headers,json:{clientSecret:'fixture-'+sessions.length,trialDays:req.postDataJSON().plan==='yearly'?7:0,firstYear:req.postDataJSON().plan==='yearly'?4999:null}});}
             if(url.pathname.endsWith('/entitlement'))return route.fulfill({headers,json:{active:false}});
             return route.fulfill({headers,json:{}});
           }
@@ -38,11 +38,23 @@ const server = http.createServer((req,res)=>{try{let p=new URL(req.url,'http://l
         await context.addInitScript(scenario=>{
           const originalTimeout=window.setTimeout.bind(window);if(scenario==='timeout')window.setTimeout=(cb,ms,...args)=>originalTimeout(cb,ms===15000?30:ms,...args);
           const NativeDate=Date;window.Date=class extends NativeDate{constructor(...a){super(...(a.length?a:['2026-11-09T12:00:00+08:00']));}static now(){return new NativeDate('2026-11-09T12:00:00+08:00').getTime();}};
-          window.Stripe=()=>({initCheckoutElementsSdk:async options=>{window.__fixtureAppearance=options.elementsOptions.appearance;return ({
-            createExpressCheckoutElement:()=>({on(name,cb){if(name==='availablepaymentmethodschange')cb({paymentMethods:{paypal:true}});},mount(target){const e=typeof target==='string'?document.querySelector(target):target;e.innerHTML='<div class="fixture-wallets"><button type="button">Link</button><button type="button">PayPal</button></div>';}}),
-            createPaymentElement:()=>({handlers:{},on(name,cb){this.handlers[name]=cb;},mount(target){const e=typeof target==='string'?document.querySelector(target):target;e.innerHTML='<div class="fixture-tabs"><span>Karte</span><span>SEPA-Lastschrift</span><span>Klarna</span></div><label>Kartennummer<input type="text" placeholder="1234 1234 1234 1234"></label><label>Gültig bis<input type="text" placeholder="MM / JJ"></label><label>Prüfziffer<input type="text" placeholder="CVC"></label>';window.__fixturePayment=this;if(scenario==='ready')queueMicrotask(()=>this.handlers.ready?.());if(scenario==='loaderror')queueMicrotask(()=>this.handlers.loaderror?.());}}),
-            loadActions:async()=>({confirm:async()=>{throw Error('No payment in layout fixture');}})
-          });}});
+          window.__fixtureCheckouts=[];
+          window.Stripe=()=>({initCheckoutElementsSdk:async options=>{
+            window.__fixtureAppearance=options.elementsOptions.appearance;
+            const instance={confirmed:0,actionLoads:0};
+            window.__fixtureCheckouts.push(instance);
+            const confirm=async()=>{instance.confirmed++;return {type:'error',error:{message:'Fixture confirmation error'}};};
+            instance.createExpressCheckoutElement=()=>({handlers:{},on(name,cb){this.handlers[name]=cb;if(name==='availablepaymentmethodschange')cb({paymentMethods:{paypal:true}});},unmount(){},mount(target){instance.express=this;const e=typeof target==='string'?document.querySelector(target):target;e.innerHTML='<div class="fixture-wallets"><button type="button">Link</button><button type="button">PayPal</button></div>';}});
+            instance.createPaymentElement=()=>({handlers:{},on(name,cb){this.handlers[name]=cb;},unmount(){},mount(target){instance.payment=this;const e=typeof target==='string'?document.querySelector(target):target;e.innerHTML='<div class="fixture-tabs"><span>Karte</span><span>SEPA-Lastschrift</span><span>Klarna</span></div><label>Kartennummer<input type="text" placeholder="1234 1234 1234 1234"></label><label>Gültig bis<input type="text" placeholder="MM / JJ"></label><label>Prüfziffer<input type="text" placeholder="CVC"></label>';window.__fixturePayment=this;if(scenario==='ready')queueMicrotask(()=>this.handlers.ready?.());if(scenario==='loaderror')queueMicrotask(()=>this.handlers.loaderror?.());}});
+            instance.loadActions=async()=>{
+              instance.actionLoads++;
+              if(window.__failNextActions){window.__failNextActions=false;return {type:'error',error:{message:'Fixture actions error'}};}
+              if(window.__holdNextActions){window.__holdNextActions=false;return await new Promise(resolve=>{instance.resolveActions=()=>resolve({actions:{confirm}});});}
+              return {actions:{confirm}};
+            };
+            if(window.__holdNextInit){window.__holdNextInit=false;await new Promise(resolve=>{instance.resolveInit=resolve;});instance.initResolved=true;}
+            return instance;
+          }});
         },scenario);
         const page=await context.newPage(); page.setDefaultTimeout(8000); page.on('pageerror',e=>errors.push(e.message));
         await page.goto(origin+(mode==='page'?'/abo/?plan='+plan:'/start/'),{waitUntil:'domcontentloaded'});
@@ -53,6 +65,47 @@ const server = http.createServer((req,res)=>{try{let p=new URL(req.url,'http://l
         if(scenario==='already_subscribed') {
           await page.locator(mode==='page'?'#step-already':'.kasse-card .abo-summary').waitFor({state:'visible'});
           assert.deepEqual(errors,[]);cases++;continue;
+        }
+        if(scenario==='race') {
+          await page.waitForFunction(()=>Boolean(window.__fixtureCheckouts[0]?.payment));
+          const pay=page.locator('#pay-button');
+          await page.evaluate(()=>window.__fixtureCheckouts[0].payment.handlers.ready());
+          assert.equal(await pay.isDisabled(),false);
+          const switchPlan=async value=>{
+            await page.locator('#step-pay [data-back="plan"]').click();
+            await page.locator('[data-plan="'+value+'"]').click();
+            await page.locator('#plan-next').click();
+          };
+          await page.evaluate(()=>{window.__holdNextInit=true;});
+          await switchPlan('monthly');
+          await page.waitForFunction(()=>Boolean(window.__fixtureCheckouts[1]?.resolveInit));
+          await page.evaluate(()=>{const old=window.__fixtureCheckouts[0];old.payment.handlers.ready();old.payment.handlers.loaderror();old.express.handlers.confirm();document.querySelector('#pay-button').dispatchEvent(new MouseEvent('click'));});
+          assert.equal(await pay.isDisabled(),true);assert.match(await page.locator('#pay-summary').textContent(),/12,99/);
+          await switchPlan('yearly');
+          await page.waitForFunction(()=>Boolean(window.__fixtureCheckouts[2]?.payment));
+          await page.evaluate(()=>window.__fixtureCheckouts[1].resolveInit());
+          await page.waitForFunction(()=>window.__fixtureCheckouts[1].initResolved);
+          assert.equal(await page.evaluate(()=>Boolean(window.__fixtureCheckouts[1].payment)),false);
+          await page.evaluate(()=>{window.__fixtureCheckouts[2].payment.handlers.ready();window.__holdNextActions=true;});
+          await pay.click();await page.waitForFunction(()=>Boolean(window.__fixtureCheckouts[2].resolveActions));
+          await switchPlan('monthly');
+          await page.waitForFunction(()=>Boolean(window.__fixtureCheckouts[3]?.payment));
+          await page.evaluate(()=>{window.__fixtureCheckouts[3].payment.handlers.ready();window.__fixtureCheckouts[2].resolveActions();});
+          assert.equal(await pay.isDisabled(),false);assert.match(await page.locator('#pay-summary').textContent(),/12,99/);
+          await page.evaluate(()=>{window.__holdNextActions=true;});
+          await pay.click();await page.waitForFunction(()=>Boolean(window.__fixtureCheckouts[3].resolveActions));
+          await page.evaluate(()=>document.querySelector('#pay-button').dispatchEvent(new MouseEvent('click')));
+          assert.equal(await page.evaluate(()=>window.__fixtureCheckouts[3].actionLoads),1);
+          await page.evaluate(()=>window.__fixtureCheckouts[3].resolveActions());
+          await page.getByText('Fixture confirmation error',{exact:true}).waitFor({state:'visible'});
+          assert.equal(await pay.isDisabled(),false);
+          await page.evaluate(()=>{window.__failNextActions=true;});await pay.click();
+          await page.getByText('Fixture actions error',{exact:true}).waitFor({state:'visible'});
+          assert.equal(await page.evaluate(()=>window.__fixtureCheckouts[3].confirmed),1);
+          await pay.click();await page.getByText('Fixture confirmation error',{exact:true}).waitFor({state:'visible'});
+          assert.deepEqual(await page.evaluate(()=>window.__fixtureCheckouts.map(c=>c.confirmed)),[0,0,0,2]);
+          assert.equal(sessions.length,4);assert.deepEqual(errors,[]);cases++;
+          console.log(JSON.stringify({mode,width,scenario,oldSessionsConfirmed:0,currentSessionRetriesVerified:true}));continue;
         }
         await page.waitForFunction(()=>Boolean(window.__fixturePayment));
         const payControl=page.locator(mode==='page'?'#pay-button':'.kasse-card .abo-button');
