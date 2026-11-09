@@ -533,6 +533,7 @@ body.einfach .translator-ai-wait-bar::after { content: ""; position: absolute; i
 /* ---------- Ergebnis-Feinschliff (Daniel, 9. Nov 03:14–03:18) ----------
    Hinweise als EINE ruhige Karte, Eingabefeld unter dem Ergebnis zum Weiterschreiben, kurze Warte-Ansicht vor bekannten Antworten. */
 body.einfach .translator-notes { display: grid; gap: 10px; margin: 24px 0 12px; padding: 16px 18px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+body.einfach .translator-notes > * { min-width: 0; overflow-wrap: anywhere; }
 body.einfach .translator-notes .safety-note.safety-quiet { margin: 0 !important; padding: 0 !important; border: 0 !important; }
 body.einfach .translator-notes .safety-quiet strong { display: block; margin-bottom: 4px; }
 body.einfach .translator-notes .translator-disclaimer { margin: 0; }

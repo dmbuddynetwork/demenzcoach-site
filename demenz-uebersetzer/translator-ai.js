@@ -27,7 +27,23 @@
       if (response.status === 429) return { kind: 'error', reason: 'busy' };
       if (!response.ok) return { kind: 'error', reason: 'unavailable' };
       const result = await response.json();
-      return result && typeof result.kind === 'string' ? result : { kind: 'error', reason: 'unavailable' };
+      const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
+      const invalid = () => ({ kind: 'error', reason: 'unavailable', safetyLevel: result?.safetyLevel,
+        safetyMessage: hasText(result?.safetyMessage) ? result.safetyMessage : '' });
+      if (!result || typeof result.kind !== 'string') return invalid();
+      if (result.kind === 'answer') {
+        const usable = hasText(result.meaning) && hasText(result.avoid)
+          && Array.isArray(result.phrases) && result.phrases.length > 0 && result.phrases.every(hasText)
+          && (result.nextStep == null || typeof result.nextStep === 'string')
+          && (result.safetyMessage == null || typeof result.safetyMessage === 'string')
+          && (result.safetyLevel == null || ['standard', 'concern', 'urgent'].includes(result.safetyLevel));
+        // Eine beschädigte Antwort ist kein Erfolg. Bereits empfangene Sicherheitssignale
+        // bleiben für die Fehleransicht erhalten; fehlende Beratung wird nicht ergänzt.
+        if (!usable) return invalid();
+      }
+      // Alle Antworttypen benutzen denselben Textvertrag, auch error/off_topic
+      // oder unbekannte Typen mit einem bereits empfangenen Sicherheitssignal.
+      return { ...result, safetyMessage: hasText(result.safetyMessage) ? result.safetyMessage : '' };
     } catch {
       return { kind: 'error', reason: 'unavailable' };
     } finally {
