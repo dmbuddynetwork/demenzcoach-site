@@ -529,3 +529,64 @@ body.einfach .translator-ai-wait-bar { position: relative; display: block; heigh
 body.einfach .translator-ai-wait-bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 0; background: var(--e-purple); border-radius: inherit; animation: e-wait-bar 9s cubic-bezier(.2,.7,.3,1) forwards; }
 @keyframes e-wait-bar { to { width: 92%; } }
 @media (prefers-reduced-motion: reduce) { body.einfach .translator-spinner { animation-duration: 2.5s; } }
+
+/* ---------- Ergebnis-Feinschliff (Daniel, 9. Nov 03:14–03:18) ----------
+   Hinweise als EINE ruhige Karte, Eingabefeld unter dem Ergebnis zum Weiterschreiben, kurze Warte-Ansicht vor bekannten Antworten. */
+body.einfach .translator-notes { display: grid; gap: 10px; margin: 24px 0 12px; padding: 16px 18px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+body.einfach .translator-notes .safety-note.safety-quiet { margin: 0 !important; padding: 0 !important; border: 0 !important; }
+body.einfach .translator-notes .safety-quiet strong { display: block; margin-bottom: 4px; }
+body.einfach .translator-notes .translator-disclaimer { margin: 0; }
+body.einfach .translator-notes .safety-quiet + .translator-disclaimer { padding-top: 10px; border-top: 1px solid var(--e-line); }
+body.einfach .translator-form-below { margin-top: 28px; }
+body.einfach .translator-form-below .translator-form-title { display: none; }
+body.einfach .translator-form-below-title { margin: 0 0 10px !important; font-weight: 800; }
+body.einfach .translator-form-below textarea { min-height: 0; }
+body.einfach .translator-ai-wait-quick .translator-ai-steps li:nth-child(1), body.einfach .translator-ai-wait-quick .translator-ai-steps li:nth-child(1)::before { animation-delay: .2s; }
+body.einfach .translator-ai-wait-quick .translator-ai-steps li:nth-child(2), body.einfach .translator-ai-wait-quick .translator-ai-steps li:nth-child(2)::before { animation-delay: .7s; }
+body.einfach .translator-ai-wait-quick .translator-ai-steps li:nth-child(3), body.einfach .translator-ai-wait-quick .translator-ai-steps li:nth-child(3)::before { animation-delay: 1.2s; }
+body.einfach .translator-ai-wait-quick .translator-ai-wait-bar::after { animation-duration: 1.7s; }
+body.einfach .translator-ai:has(> .translator-ai-wait) { padding: 0 !important; background: none !important; border: 0 !important; box-shadow: none !important; }
+body.einfach .translator-ai:has(> .translator-ai-wait) > .translator-ai-status:empty { display: none; }
+
+/* ---------- Ziele, Meine Sätze, Schreib-Knopf (Daniel, 9. Nov 03:24–03:27) ---------- */
+/* Ziel-Knöpfe: weißes Symbol links, Text linksbündig, Pfeil rechts – klar als Knopf erkennbar. */
+body.einfach .translator-goal { justify-content: flex-start !important; gap: 14px; text-align: left !important; box-shadow: 0 3px 0 rgba(40, 32, 90, .28); transition: transform .1s ease, box-shadow .1s ease; }
+body.einfach .translator-goal:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(40, 32, 90, .28); }
+body.einfach .translator-goal-icon { display: inline-flex; flex: 0 0 40px; width: 40px; height: 40px; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255, 255, 255, .18); }
+body.einfach .translator-goal-icon svg { width: 24px; height: 24px; }
+body.einfach .translator-goal-label { flex: 1 1 auto; line-height: 1.35; }
+body.einfach .translator-goal-arrow { display: inline-flex; flex: 0 0 24px; width: 24px; }
+body.einfach .translator-goal-arrow svg { width: 24px; height: 24px; }
+@media (max-width: 480px) { body.einfach .translator-goal { padding: 14px 16px !important; gap: 12px; } body.einfach .translator-goal-icon { flex-basis: 36px; width: 36px; height: 36px; } }
+/* Volle Menüleiste auf dem Handy: Logo ohne Schriftzug, sobald „Meine Sätze“ da ist. */
+@media (max-width: 480px) { .e-header:has(.e-saved-toggle:not([hidden])) .e-brand span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+body.einfach .translator-goal-line { margin: -12px 0 24px; font-size: var(--e-small); }
+/* „Meine Sätze“ in der Menüleiste mit Zähler; die Liste öffnet als Fenster unter der Leiste. */
+.e-saved-toggle { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; padding: 6px 12px; background: var(--e-lav, #ece9f7); color: var(--e-purple, #47408C); border: 0; border-radius: 999px; font: inherit; font-weight: 700; cursor: pointer; }
+.e-saved-toggle[hidden] { display: none; }
+.e-saved-count { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 7px; border-radius: 999px; background: var(--e-purple, #47408C); color: #fff; font-size: .9rem; }
+.e-saved-bump .e-saved-count { animation: e-saved-bump .5s ease; }
+@keyframes e-saved-bump { 40% { transform: scale(1.35); } }
+@media (max-width: 420px) { .e-saved-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } .e-saved-toggle::before { content: "♥"; font-size: 1.2rem; line-height: 1; } }
+@media (prefers-reduced-motion: reduce) { .e-saved-bump .e-saved-count { animation: none; } }
+body.einfach .translator-saved.translator-saved-panel { position: fixed; z-index: 60; top: 72px; right: max(16px, calc((100vw - 760px) / 2)); left: auto; width: min(460px, calc(100vw - 32px)); max-height: calc(100vh - 96px); overflow: auto; margin: 0; box-shadow: 0 16px 48px rgba(30, 24, 70, .22); }
+body.einfach .translator-saved-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+body.einfach .translator-saved-head h2 { margin: 0 !important; }
+body.einfach .translator-saved-close { min-height: 44px; padding: 6px 14px; background: transparent !important; color: var(--e-purple) !important; border: 1px solid var(--e-line) !important; border-radius: 999px !important; font: inherit; font-weight: 700; cursor: pointer; box-shadow: none !important; }
+body.einfach .translator-saved-close::after { content: none !important; }
+/* „Entfernen“ unter dem Satz statt rechts daneben: läuft nicht mehr aus der Sprechblase. */
+body.einfach .translator-saved-phrase { flex-direction: column !important; align-items: flex-start !important; gap: 8px; }
+body.einfach .translator-saved-phrase > q { flex: 0 0 auto !important; width: 100%; }
+body.einfach .translator-saved-remove { min-height: 40px; padding: 4px 14px; background: var(--e-card) !important; color: var(--e-purple) !important; border: 1px solid var(--e-line) !important; border-radius: 999px !important; font: inherit; font-size: var(--e-small) !important; font-weight: 700; cursor: pointer; box-shadow: none !important; }
+body.einfach .translator-saved-remove::after { content: none !important; }
+/* Runder Schreib-Knopf unten rechts, sobald das Eingabefeld aus dem Bild ist. */
+.translator-write-fab { position: fixed; z-index: 55; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: inline-flex; align-items: center; gap: 10px; min-height: 60px; margin: 0; padding: 4px 18px 4px 4px; background: var(--e-purple, #47408C); color: #fff; border: 0; border-radius: 999px; font: inherit; font-weight: 800; box-shadow: 0 8px 24px rgba(30, 24, 70, .3); cursor: pointer; }
+.translator-write-fab[hidden] { display: none; }
+.translator-write-fab img { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; background: #fff; }
+.translator-write-fab::after { content: none !important; }
+.translator-write-fab span { overflow: hidden; white-space: nowrap; max-width: 12em; transition: max-width .3s ease, opacity .2s ease; }
+.translator-write-fab-short { gap: 0; padding: 4px; }
+.translator-write-fab-short span { max-width: 0; opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .translator-write-fab span { transition: none; } }
+body.einfach:has(> .translator-write-fab:not([hidden])) .e-footer { padding-bottom: 96px; }
+body:has(> .consent-banner:not([hidden])) .translator-write-fab { display: none; }

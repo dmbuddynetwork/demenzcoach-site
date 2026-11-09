@@ -28,6 +28,10 @@
   const toolURL = data.toolURL;
   const appURL = ui?.appURL ?? 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=seo_de_translator&mt=8';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Ab dieser Punktzahl (translator-core rank) gilt ein Treffer als sicher: mehrere Wörter oder ein langes Stichwort.
+  const strongScore = ui?.strongScore ?? 4;
+  // Kurze Warte-Ansicht vor bekannten Antworten (die Haken laufen in einfach.css schneller).
+  const quickWaitMs = 1800;
 
   const track = (name, parameters) => {
     if (typeof websiteAnalytics === 'undefined') return;
@@ -332,28 +336,11 @@
   // Drei Ziele je Situation, das erste nach der Situation benannt, eines immer praktische Tipps.
   // Die Antwort selbst bleibt die geprüfte feste Antwort; das Ziel bestimmt, was zuerst und ausführlich kommt.
   // Keine Ziel-Frage bei Sicherheitshinweisen, Entlastung, Gefühlen, geteilten Links und auf anderen Sprachen.
-  const goalNow = {
-    nachhause: 'Jetzt beruhigen', waschen: 'Jetzt fürs Waschen gewinnen', schongegessen: 'Jetzt zum Essen bewegen',
-    hunger: 'Jetzt beim Essen beruhigen', abend: 'Jetzt am Abend beruhigen', auto: 'Jetzt ohne Streit reagieren',
-    mutter: 'Jetzt liebevoll antworten', wer: 'Jetzt ruhig reagieren', geld: 'Jetzt den Vorwurf entschärfen',
-    arbeit: 'Jetzt beruhigen', bett: 'Jetzt ins Bett begleiten', wobin: 'Jetzt Sicherheit geben', uhrzeit: 'Jetzt beruhigen',
-    luegen: 'Jetzt den Vorwurf entschärfen', jemand: 'Jetzt Sicherheit geben', ruhe: 'Jetzt Ruhe und Abstand geben',
-    tabletten: 'Jetzt ohne Druck reagieren', heim: 'Jetzt Sicherheit geben', eingesperrt: 'Jetzt Sicherheit geben',
-    kinder: 'Jetzt liebevoll antworten', partner: 'Jetzt liebevoll antworten', besuch: 'Jetzt das Warten leichter machen',
-    vergiftet: 'Jetzt Vertrauen ins Essen geben', krank: 'Jetzt ohne Streit reagieren', dumm: 'Jetzt trösten und Mut machen',
-    langweilig: 'Jetzt etwas Schönes zusammen tun', allein: 'Jetzt Nähe geben', aufstehen: 'Jetzt beruhigen',
-    liegen: 'Jetzt zum Aufstehen gewinnen', umziehen: 'Jetzt fürs Umziehen gewinnen', ausziehen: 'Jetzt ruhig reagieren',
-    toilette: 'Jetzt zur Toilette begleiten', einkaufen: 'Jetzt beruhigen', anrufen: 'Jetzt beruhigen',
-    nachbarn: 'Jetzt Sicherheit geben', haustier: 'Jetzt liebevoll antworten', kalt: 'Jetzt für Wärme sorgen',
-    untreue: 'Jetzt den Vorwurf entschärfen', kind: 'Jetzt helfen, ohne zu bevormunden', tagespflege: 'Jetzt für die Tagespflege gewinnen'
-  };
   const goalsFor = (entry) => {
     if (ui || !entry || entry.safetyOnly || entry.selfCare || entry.feeling || !entry.phrases?.length) return null;
-    return [
-      { id: 'jetzt', label: goalNow[entry.key] ?? 'Jetzt die richtigen Worte finden' },
-      { id: 'verstehen', label: 'Verstehen, was dahintersteckt' },
-      { id: 'tipps', label: 'Tipps, damit es leichter wird' }
-    ];
+    // Texte je Situation aus ziele.json (Daniel, 9. Nov: „die Ziele sollen flexibel sein“), sonst allgemein.
+    const labels = Array.isArray(entry.goals) && entry.goals.length === 3 ? entry.goals : ['Jetzt die richtigen Worte finden', 'Verstehen, was dahintersteckt', 'Tipps, damit es leichter wird'];
+    return ['jetzt', 'verstehen', 'tipps'].map((id, index) => ({ id, label: labels[index] }));
   };
   // Der gehörte Satz als weiße Sprechblase mit Zeichnung daneben, wie auf den App-Store-Bildern
   // (Daniel, 8. Nov: „stell das in eine Sprechblase, als würde das gesagt werden“).
@@ -367,21 +354,79 @@
       art
     ].filter(Boolean));
   };
+  // Echte Seiten-Adressen statt #satz-… (Daniel, 9. Nov): Ein Satz zeigt die Adresse seiner Satz-Seite
+  // (…/ich-will-nicht-duschen.html), ein Ziel die eigene Ziel-Seite (…-was-sagen.html, -was-dahintersteckt.html,
+  // -tipps.html; build-preview.mjs baut sie). Neu laden öffnet genau diese Seite; Zurück lädt die vorige.
+  const startPath = location.pathname;
+  const goalSlugs = { jetzt: 'was-sagen', verstehen: 'was-dahintersteckt', tipps: 'tipps' };
+  const pathFor = (entry, goal = '') => {
+    if (!entry?.href || /^[a-z]+:/i.test(entry.href) && !entry.href.startsWith(location.origin)) return null;
+    const path = new URL(entry.href, location.href).pathname;
+    return goal && goalSlugs[goal] ? path.replace(/\.html$/, `-${goalSlugs[goal]}.html`) : path;
+  };
+  let pushed = false;
+  const setPage = (entry, goal = '', push = true) => {
+    const path = pathFor(entry, goal);
+    if (!path) { setHash(entry?.key ?? ''); return; }
+    if (path === location.pathname && !location.hash) return;
+    history[push ? 'pushState' : 'replaceState']({ translator: true }, '', path);
+    pushed = pushed || push;
+  };
+  window.addEventListener('popstate', () => { if (pushed) location.reload(); });
+  // Nach dem Ergebnis rückt das Eingabefeld unter die Antwort (Daniel, 9. Nov: oben lenkt es von den Ziel-Knöpfen ab;
+  // statt „Neuen Satz übersetzen“ einfach weiterschreiben). Dasselbe Formular, nur verschoben und leer.
+  let formMoved = false;
+  // Es steht direkt nach Hinweis und „War das hilfreich?“, vor App- und Listen-Angeboten.
+  const formBelow = () => {
+    const anchors = [...output.children].filter((node) => node.matches('.translator-notes, .translator-feedback, .translator-suggest'));
+    const anchor = anchors[anchors.length - 1];
+    if (anchor) { if (anchor.nextElementSibling !== form) anchor.after(form); } else if (form.parentElement !== output) output.append(form);
+    input.value = '';
+    grow();
+    if (formMoved) return;
+    formMoved = true;
+    form.classList.add('translator-form-below');
+    form.prepend(element('p', { className: 'translator-form-below-title', text: 'Noch etwas schreiben?' }));
+    input.setAttribute('placeholder', tr('Was ist noch passiert? Schreib es hier.'));
+  };
+  // In der Sprechblase steht, was die Person eingetippt hat (Daniel, 9. Nov: „sie schreit mich an“ ist nicht
+  // „Lass mich in Ruhe!“). Nur ohne eigene Eingabe (Kachel, Link) steht der bekannte Satz dort.
+  const bubbleText = (entry, typed = '') => {
+    if (!typed || core.normalize(typed) === core.normalize(entry.says ?? '')) return entry.says;
+    return typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
+  };
+  // Ziel-Knöpfe mit weißem Symbol links und Pfeil rechts, klar als Knopf erkennbar (Daniel, 9. Nov).
+  const goalIcons = {
+    jetzt: '<path d="M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H4a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 4 5.5Z"/><path d="M7.5 10h9M7.5 13h6"/>',
+    verstehen: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/>',
+    tipps: '<path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="m3.5 6.5 1.5 1.5 2.5-3M3.5 12l1.5 1.5 2.5-3M3.5 17.5 5 19l2.5-3"/>'
+  };
+  const goalSvg = (paths, className = 'translator-goal-icon') => {
+    const span = element('span', { className, attributes: { 'aria-hidden': 'true' } });
+    span.innerHTML = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+    return span;
+  };
+  const goalButton = (goal, onClick) => {
+    const node = button('', 'translator-goal', onClick);
+    node.append(goalSvg(goalIcons[goal.id] ?? goalIcons.jetzt), element('span', { className: 'translator-goal-label', text: goal.label }), goalSvg('<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>', 'translator-goal-arrow'));
+    return node;
+  };
   const askGoal = (entry, options = {}) => {
     const goals = goalsFor(entry);
     if (!goals) { render(entry, options); return; }
-    const heading = element('h2', { text: `„${entry.says}“`, attributes: { tabindex: '-1' } });
+    const heading = element('h2', { text: `„${bubbleText(entry, options.typed)}“`, attributes: { tabindex: '-1' } });
     output.replaceChildren(...[
-      options.typed && core.normalize(options.typed) !== core.normalize(entry.says ?? '') ? element('p', { className: 'translator-echo', text: `Deine Eingabe: „${options.typed}“` }) : null,
       saidBlock(entry.says, entry, heading),
       element('p', { className: 'translator-goal-question', text: 'Was möchtest du jetzt erreichen?' }),
-      element('div', { className: 'translator-goals', attributes: { role: 'group', 'aria-label': 'Dein Ziel' } }, goals.map((goal) => button(goal.label, 'translator-goal', () => {
+      element('div', { className: 'translator-goals', attributes: { role: 'group', 'aria-label': 'Dein Ziel' } }, goals.map((goal) => goalButton(goal, () => {
         track('translator_goal', { goal: goal.id, result_key: entry.key });
+        setPage(entry, goal.id);
         render(entry, { ...options, goal: goal.id });
       })))
     ].filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
+    formBelow();
     heading.focus({ preventScroll: true });
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
@@ -428,19 +473,56 @@
     link.addEventListener('click', () => track('translator_share', { result_key: result.key, method: 'whatsapp', step: 'phrase' }));
     return link;
   };
-  const savedBox = document.getElementById('translator-saved');
+  // „Meine Sätze“ oben in der Menüleiste mit Zähler (Daniel, 9. Nov 03:26: nicht wahllos auf der Seite).
+  // Der Knopf öffnet die Liste als Fenster unter der Leiste; ohne gemerkte Sätze bleibt er unsichtbar.
+  const savedNav = document.querySelector('.e-header nav');
+  let savedBox = document.getElementById('translator-saved');
+  let savedToggle = null;
+  let savedCount = null;
+  if (savedStore && savedNav && !ui) {
+    if (!savedBox) {
+      savedBox = element('section', { className: 'translator-saved', attributes: { id: 'translator-saved', 'aria-label': 'Meine Sätze', hidden: '' } });
+      document.body.append(savedBox);
+    } else if (savedBox.parentElement !== document.body) document.body.append(savedBox);
+    savedBox.classList.add('translator-saved-panel');
+    savedCount = element('span', { className: 'e-saved-count' });
+    savedToggle = element('button', { className: 'e-saved-toggle', attributes: { type: 'button', 'aria-controls': 'translator-saved', 'aria-expanded': 'false', hidden: '' } }, [
+      element('span', { className: 'e-saved-label', text: 'Meine Sätze' }),
+      savedCount
+    ]);
+    savedNav.prepend(savedToggle);
+  }
+  const openSaved = (open) => {
+    if (!savedToggle) return;
+    savedBox.hidden = !open;
+    savedToggle.setAttribute('aria-expanded', String(open));
+    if (open) { savedBox.querySelector('button')?.focus(); track('translator_save', { step: 'list_opened' }); }
+  };
+  savedToggle?.addEventListener('click', () => openSaved(savedBox.hidden));
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && savedToggle && !savedBox.hidden) { openSaved(false); savedToggle.focus(); } });
+  document.addEventListener('click', (event) => { if (savedToggle && !savedBox.hidden && !savedBox.contains(event.target) && !savedToggle.contains(event.target)) openSaved(false); });
   const renderSaved = () => {
     saveButtons = saveButtons.filter(({ node }) => node.isConnected);
     saveButtons.forEach(({ item, set }) => set(savedStore.has(item)));
     if (!savedBox || !savedStore) return;
     const items = savedStore.list();
-    savedBox.hidden = !items.length;
+    if (savedToggle) {
+      const before = savedCount.textContent;
+      savedToggle.hidden = !items.length;
+      savedCount.textContent = String(items.length);
+      savedToggle.setAttribute('aria-label', `${tr('Meine Sätze')}: ${items.length}`);
+      if (before && before !== savedCount.textContent) { savedToggle.classList.remove('e-saved-bump'); void savedToggle.offsetWidth; savedToggle.classList.add('e-saved-bump'); }
+      if (!items.length) openSaved(false);
+    } else savedBox.hidden = !items.length;
     if (!items.length) { savedBox.replaceChildren(); return; }
     savedBox.replaceChildren(
-      element('h2', { text: 'Meine Sätze' }),
+      element('div', { className: 'translator-saved-head' }, [
+        element('h2', { text: 'Meine Sätze' }),
+        savedToggle ? button('Schließen', 'translator-saved-close', () => { openSaved(false); savedToggle.focus(); }) : null
+      ]),
       element('div', { className: 'translator-phrases' }, items.map((item) => element('div', { className: 'translator-phrase translator-saved-phrase' }, [
         element('q', { text: core.personalize(item.text, personal, data.formal) }),
-        button('Entfernen', 'translator-save', () => {
+        button('Entfernen', 'translator-saved-remove', () => {
           savedStore.remove(item);
           track('translator_save', { step: 'removed_list', result_key: item.key });
         })
@@ -565,11 +647,13 @@
       nodes.push(element('p', { className: 'translator-meaning translator-ai-next', text: result.nextStep }));
     }
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
-    nodes.push(disclaimer(true));
+    nodes.push(notesCard(disclaimer(true)));
     // Anonymes Teilen gibt es vorerst nur auf Deutsch (der Server bietet es sonst auch nicht an).
     if (ui?.anonShare !== false && result.share?.sentence && result.share?.token) nodes.push(shareBox(result.share));
     return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
   };
+  // Hinweise in einer Karte: oben „Wann ein Gespräch nicht ausreicht“ (falls vorhanden), darunter die Haftungszeile.
+  const notesCard = (...children) => element('div', { className: 'translator-notes', attributes: { role: 'note' } }, children.filter(Boolean));
   // Haftungs- und Gesundheitshinweis unter jeder Antwort (Daniel, 8. Nov), kurz und gut lesbar.
   const disclaimer = (fromAI = false) => element('p', { className: 'translator-disclaimer' }, [
     ...(fromAI ? ['KI-Antworten können Fehler enthalten. '] : []),
@@ -621,8 +705,9 @@
   // Warte-Ansicht (Daniel, 9. Nov: Ladeanimation auf Conversion optimiert): ruhige Zeichnung und drei Schritte,
   // die nacheinander abgehakt werden, wie „Dein Plan wird erstellt“ bei Noom. Oben deutlich: Es lädt (Daniel, 9. Nov 02:41).
   // Rein gestalterisch: die Schritte laufen per CSS, die Antwort erscheint, sobald sie da ist.
-  const aiWaiting = () => element('div', { className: 'translator-ai-wait' }, [
-    element('p', { className: 'translator-ai-wait-title' }, [element('span', { className: 'translator-spinner', attributes: { 'aria-hidden': 'true' } }), 'Deine Antwort wird geschrieben …']),
+  // quick: dieselbe Ansicht kurz auch vor bekannten Antworten (Daniel, 9. Nov: „das Ergebnis kommt sofort, das verwirrt“).
+  const aiWaiting = (quick = false) => element('div', { className: quick ? 'translator-ai-wait translator-ai-wait-quick' : 'translator-ai-wait', attributes: { role: 'status' } }, [
+    element('p', { className: 'translator-ai-wait-title' }, [element('span', { className: 'translator-spinner', attributes: { 'aria-hidden': 'true' } }), tr(quick ? 'Deine Antwort wird zusammengestellt …' : 'Deine Antwort wird geschrieben …')]),
     element('span', { className: 'translator-ai-wait-bar', attributes: { 'aria-hidden': 'true' } }),
     sceneArt(data.waitImage),
     element('ol', { className: 'translator-ai-steps', attributes: { 'aria-hidden': 'true' } }, [
@@ -656,7 +741,8 @@
     const run = async () => {
       ask.disabled = true;
       ask.hidden = auto;
-      status.textContent = tr('Einen Moment, die KI schreibt eine Antwort …');
+      // Automatisch: Die Warte-Ansicht sagt schon, dass die Antwort geschrieben wird (kein doppelter Text).
+      status.textContent = auto ? '' : tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
       if (await aiLocked(box, text, source, waiting)) { onFail(); return; }
@@ -671,7 +757,7 @@
         output.querySelector('.translator-fallback')?.remove();
         output.querySelector('.translator-near-group')?.remove();
         // Die KI-Antwort bringt ihren eigenen Hinweis mit („KI-Antworten können Fehler enthalten“).
-        output.querySelector('.translator-disclaimer')?.remove();
+        output.querySelector('.translator-notes')?.remove();
         if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
         document.body.classList.remove('translator-answers-seen');
@@ -717,13 +803,15 @@
     return box;
   };
 
-  const renderUnknown = ({ safetyHit, typed }) => {
+  // hint: ein schwacher Treffer der festen Liste. Die KI antwortet passend zur Eingabe; der Treffer
+  // steht als erster Vorschlag unter „Meinst du vielleicht“ und gibt der Sprechblase seine Zeichnung.
+  const renderUnknown = ({ safetyHit, typed, hint = null }) => {
     const nodes = [];
     if (safetyHit) nodes.push(generalNote());
     // Gleicher Aufbau wie ein Treffer: oben der Satz, dann klar, was jetzt hilft.
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
     const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
-    nodes.push(shown ? saidBlock(shown, null, heading) : heading);
+    nodes.push(shown ? saidBlock(shown, hint, heading) : heading);
     if (shown && !(ai && typed.length >= 2)) nodes.push(element('p', { className: 'translator-meaning translator-unknown-note', text: 'Diesen Satz kenne ich noch nicht.' }));
     // Mit KI-Knopf ist die Gefühle-Auswahl ein Weg zu viel. Sie erscheint erst,
     // wenn die KI nicht antworten kann (oder es keinen KI-Knopf gibt).
@@ -735,7 +823,7 @@
     if (box) feelings.hidden = true;
     nodes.push(box);
     // Ähnliche Situationen zuerst: Sie führen am schnellsten zu genauen Sätzen.
-    const similar = typed ? core.near(typed, data) : [];
+    const similar = typed ? [...new Set([hint, ...core.near(typed, data)].filter(Boolean))].slice(0, 2) : [];
     if (similar.length) {
       nodes.push(element('div', { className: 'translator-near-group' }, [
         element('h3', { className: 'translator-step', text: 'Meinst du vielleicht:' }),
@@ -752,13 +840,14 @@
     ]);
     if (box) fallbackBox.hidden = true;
     nodes.push(fallbackBox);
-    nodes.push(disclaimer());
+    nodes.push(notesCard(disclaimer()));
     nodes.push(suggestLink(typed));
     nodes.push(...offers(null, safetyHit));
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
     document.body.classList.remove('translator-answers-seen');
+    formBelow();
     requestAnimationFrame(() => syncSticky());
     focusResult(heading);
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
@@ -799,11 +888,9 @@
       nodes.push(result.safetyOnly ? urgentNote(result.safety, lead) : generalNote(lead));
     }
 
-    // Steht der getippte Satz schon als Überschrift da, braucht es keine Wiederholung.
-    if (typed && (result.selfCare || core.normalize(typed) !== core.normalize(result.says ?? ''))) nodes.push(element('p', { className: 'translator-echo', text: `Deine Eingabe: „${typed}“` }));
     // Entlastung spricht dich direkt an, statt dir einen Satz wie „Ich kann nicht mehr.“ in den Mund zu legen.
     if (result.feeling) nodes.push(element('span', { className: 'eyebrow', text: 'Nach Gefühl' }));
-    const heading = element('h2', { text: result.selfCare ? 'Das ist gerade viel für dich.' : result.feeling ? `Bei ${result.feeling}` : `„${result.says}“`, attributes: { tabindex: '-1' } });
+    const heading = element('h2', { text: result.selfCare ? 'Das ist gerade viel für dich.' : result.feeling ? `Bei ${result.feeling}` : `„${bubbleText(result, typed)}“`, attributes: { tabindex: '-1' } });
     nodes.push(result.selfCare || result.feeling ? heading : saidBlock(result.says, result, heading));
     // Bei manchen Eingaben gehört der Hinweis „Wann ein Gespräch nicht ausreicht“ nach oben,
     // zum Beispiel wenn jemand seit Tagen kaum trinkt.
@@ -985,6 +1072,7 @@
     // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
     const nextRows = chosenGoal ? goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {
       track('translator_goal', { goal: candidate.id, result_key: result.key, step: 'switch' });
+      setPage(result, candidate.id, false);
       render(result, { safetyHit, alternatives, also, typed, mood, goal: candidate.id });
     })) : [];
     // Runde 199 (schlankes Layout): Ratgeber- und Übungs-Link stehen im Aufklappbereich „Mehr dazu“,
@@ -1030,19 +1118,10 @@
       ]));
     }
 
-    if (result.safety && !result.safetyOnly && !safetyHit && !safetyFirst) nodes.push(safetyAside());
-
-    const actions = element('div', { className: 'translator-result-links' });
-    if (!moreContent.length && !deeperInList) actions.append(...deeper);
-    actions.append(button('Neuen Satz übersetzen', 'translator-copy', () => {
-      input.value = '';
-      grow();
-      history.replaceState(null, '', location.pathname);
-      input.focus();
-      input.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-    }));
-    nodes.push(actions);
-    nodes.push(disclaimer());
+    // „Neuen Satz übersetzen“ entfällt (Daniel, 9. Nov): Unter dem Ergebnis steht das Feld zum Weiterschreiben (formBelow).
+    if (!moreContent.length && !deeperInList && deeper.length) nodes.push(element('div', { className: 'translator-result-links' }, deeper));
+    // Sicherheits- und Haftungshinweis als EINE ruhige Karte (Daniel, 9. Nov: „gestalte disclaimer besser“).
+    nodes.push(notesCard(result.safety && !result.safetyOnly && !safetyHit && !safetyFirst ? safetyAside() : null, disclaimer()));
 
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
@@ -1054,6 +1133,7 @@
     output.hidden = false;
     document.body.classList.add('translator-has-result');
     document.body.classList.remove('translator-answers-seen');
+    formBelow();
     requestAnimationFrame(() => syncSticky());
     focusResult(heading);
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
@@ -1061,7 +1141,7 @@
 
   const setHash = (key) => {
     const hash = key && key !== 'none' ? `#${phraseHash}${key}` : '';
-    history.replaceState(null, '', `${location.pathname}${hash}`);
+    history.replaceState(null, '', `${startPath}${hash}`);
   };
 
   function showFeeling(id, source) {
@@ -1076,7 +1156,7 @@
     input.value = entry.says;
     grow();
     askGoal(entry);
-    setHash(entry.key);
+    setPage(entry);
     track('translator_result', { result_key: entry.key, input_source: source, safety_hint: 'no' });
   }
 
@@ -1108,8 +1188,31 @@
       return;
     }
     const knownPhrase = entry && entry.says === text;
-    (safetyHit ? render : askGoal)(entry, { safetyHit, alternatives, also, mood, typed: knownPhrase ? '' : text });
-    setHash(entry?.key);
+    // Feste Antwort nur bei einem echten Treffer (Daniel, 9. Nov): eigener Satz, eine Variante davon oder
+    // ein klarer Treffer (Punktzahl ab strongScore). Ein einzelnes Stichwort („sie schreit mich an“ → „schreit“)
+    // geht an die KI; der Treffer bleibt als Vorschlag und Ersatz, falls die KI nicht antworten kann.
+    const own = (value) => core.normalize(value ?? '') === core.normalize(text);
+    const score = entry ? core.rank(text, [entry])[0]?.score ?? 0 : 0;
+    const strong = !entry || knownPhrase || own(entry.says) || (entry.variants ?? []).some(own) || score >= strongScore || entry.safetyOnly || entry.selfCare;
+    if (!strong && ai && !safetyHit) {
+      renderUnknown({ safetyHit, typed: text, hint: entry });
+      setHash('');
+      track('translator_result', { result_key: 'none', input_source: 'typed', safety_hint: 'no', multiple: also.length ? 'yes' : 'no', mood: mood?.id ?? 'none', weak_key: entry.key });
+      return;
+    }
+    const answer = () => (safetyHit ? render : askGoal)(entry, { safetyHit, alternatives, also, mood, typed: knownPhrase ? '' : text });
+    // Auch bekannte Antworten kommen nach einer kurzen Warte-Ansicht, nicht schlagartig. Sicherheit nie verzögern.
+    if (entry && !safetyHit && !entry.safetyOnly) {
+      const waiting = aiWaiting(true);
+      output.replaceChildren(waiting);
+      output.hidden = false;
+      document.body.classList.add('translator-has-result');
+      output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      setTimeout(() => { if (waiting.isConnected) answer(); }, reduceMotion ? 300 : quickWaitMs);
+    } else {
+      answer();
+    }
+    if (entry && !entry.safetyOnly) setPage(entry); else setHash(entry?.key);
     track('translator_result', { result_key: entry?.key ?? 'none', input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no', multiple: also.length ? 'yes' : 'no', mood: mood?.id ?? 'none' });
   });
 
@@ -1174,4 +1277,28 @@
   };
   addEventListener('scroll', syncSticky, { passive: true });
   addEventListener('resize', syncSticky, { passive: true });
+
+  // Eingabe immer in Reichweite (Daniel, 9. Nov 03:27): Ist das Feld aus dem Bild gescrollt, lädt unten rechts
+  // ein runder Knopf mit Gesicht zum Schreiben ein und bringt das Feld zurück ins Bild.
+  if (document.body.classList.contains('einfach') && 'IntersectionObserver' in window) {
+    const fab = element('button', { className: 'translator-write-fab', attributes: { type: 'button', hidden: '' } }, [
+      element('img', { attributes: { src: '/assets/lovable-logo.jpg', width: '52', height: '52', alt: '' } }),
+      element('span', { text: 'Schreib mir' })
+    ]);
+    fab.addEventListener('click', () => {
+      form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      input.focus({ preventScroll: true });
+      track('translator_write_fab', { step: 'tap' });
+    });
+    document.body.append(fab);
+    // Erst mit Text „Schreib mir“, nach ein paar Sekunden nur noch das runde Gesicht (verdeckt weniger).
+    let shortTimer = 0;
+    new IntersectionObserver(([seen]) => {
+      fab.hidden = seen.isIntersecting;
+      clearTimeout(shortTimer);
+      fab.classList.remove('translator-write-fab-short');
+      if (!fab.hidden) shortTimer = setTimeout(() => fab.classList.add('translator-write-fab-short'), 4000);
+    }).observe(input);
+    fab.setAttribute('aria-label', tr('Schreib mir'));
+  }
 })();
