@@ -49,7 +49,10 @@ const descriptions = new Map();
 // Alte Startseiten-Adressen (/, /index.html, /index-xx.html) sind dauerhaft auf /de/ bzw. /xx/
 // umgezogen. Auf Cloudflare leitet der Worker per 301 um; die Dateien selbst sind nur noch
 // HTML-Weiterleitungs-Stubs als Fallback für Hosting ohne Server-Weiterleitungen (GitHub Pages).
+const germanRoutes = JSON.parse(read('german-situation-routes.json'));
+const germanStubTargets = new Map(germanRoutes.pages.map(page => [page.source, page.to]));
 const legacyHomeStubTarget = (file) => {
+  if (germanStubTargets.has(file)) return germanStubTargets.get(file);
   if (file === "index.html") return "/de/";
   const match = /^index-([a-z]{2})\.html$/.exec(file);
   return match ? `/${match[1]}/` : null;

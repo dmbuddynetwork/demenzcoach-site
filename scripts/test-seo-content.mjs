@@ -50,14 +50,14 @@ test('curated food topic has distinct metadata, visible citations, real anchors 
 
 test('publisher attribution uses the real provider and preserves distinct mother-page intent', () => {
   assert.ok(read('impressum.html').includes('Deborah Frey'));
-  assert.ok(read('ratgeber/redaktion.html').includes('Anbieterin von Demenz Coach'));
-  assert.ok(read('ratgeber/redaktion.html').includes('keine Berufs- oder Fachqualifikation'));
-  const quick = read('demenz-uebersetzer/wo-ist-meine-mutter.html');
-  const guide = read('ratgeber/demenz-fragt-nach-verstorbener-mutter.html');
+  assert.ok(read('de/ratgeber/redaktion.html').includes('Anbieterin von Demenz Coach'));
+  assert.ok(read('de/ratgeber/redaktion.html').includes('keine Berufs- oder Fachqualifikation'));
+  const quick = read('de/demenz-uebersetzer/wo-ist-meine-mutter.html');
+  const guide = read('de/ratgeber/demenz-fragt-nach-verstorbener-mutter.html');
   assert.match(quick, /<title>[^<]*kurze Antworten/);
   assert.match(guide, /<title>[^<]*Über verstorbene Angehörige sprechen/);
-  assert.ok(guide.includes('href="/demenz-uebersetzer/wo-ist-meine-mutter.html"'));
-  assert.ok(quick.includes('ratgeber/demenz-fragt-nach-verstorbener-mutter.html'));
+  assert.ok(guide.includes('href="/de/demenz-uebersetzer/wo-ist-meine-mutter.html"'));
+  assert.ok(quick.includes('de/ratgeber/demenz-fragt-nach-verstorbener-mutter.html'));
 });
 
 test('marketing entry pages do not hard-code an unverified free-week offer', () => {
