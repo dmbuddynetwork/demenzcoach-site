@@ -49,7 +49,10 @@
 
   const button = (text, className, onClick, attributes = {}) => {
     const node = element('button', { className, text, attributes: { type: 'button', ...attributes } });
-    node.addEventListener('click', onClick);
+    node.addEventListener('click', (event) => {
+      if (node.classList.contains('translator-chip') && event.detail > 1) return;
+      onClick(event);
+    });
     return node;
   };
 
@@ -626,14 +629,22 @@
   // KI für Sätze, die die feste Liste nicht kennt. Bekannte Sätze bleiben auf dem Gerät;
   // unbekannte gehen automatisch an die KI (Hinweis unter dem Eingabefeld).
   const ai = window.DemenzTranslatorAI;
+  const aiSafetyNote = (result, ungraded = false) => {
+    const message = typeof result.safetyMessage === 'string' && result.safetyMessage.trim() ? result.safetyMessage : '';
+    if (result.safetyLevel === 'urgent' || ungraded || (result.safetyLevel === 'concern' && !message)) {
+      return urgentNote(data.safetySignals.text);
+    }
+    if (result.safetyLevel === 'concern') {
+      return element('aside', { className: 'safety-note', attributes: { role: 'note' } }, [element('span', { text: message })]);
+    }
+    return null;
+  };
   const aiAnswer = (result) => {
     const nodes = [];
     // Ohne Stufen (englische Seiten): bei jedem Sicherheitshinweis der KI derselbe feste Hinweis.
     const ungraded = ui?.gradedSafety === false && result.safetyLevel !== 'standard';
-    if (result.safetyLevel === 'urgent' || ungraded) nodes.push(urgentNote(data.safetySignals.text));
-    if (!ungraded && result.safetyLevel === 'concern' && result.safetyMessage) {
-      nodes.push(element('aside', { className: 'safety-note', attributes: { role: 'note' } }, [element('span', { text: result.safetyMessage })]));
-    }
+    const safetyNote = aiSafetyNote(result, ungraded);
+    if (safetyNote) nodes.push(safetyNote);
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
     nodes.push(element('p', { className: 'translator-ai-label', text: 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
     const first = element('h3', { className: 'translator-step', text: 'Was dahintersteckt', attributes: { tabindex: '-1' } });
@@ -737,7 +748,7 @@
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
     const waiting = aiWaiting();
-    const run = async () => {
+    const run = async (manual = false) => {
       ask.disabled = true;
       ask.hidden = auto;
       // Automatisch: Die Warte-Ansicht sagt schon, dass die Antwort geschrieben wird (kein doppelter Text).
@@ -766,7 +777,7 @@
           if (invitation) node.after(invitation);
         }
         document.body.classList.remove('translator-answers-seen');
-        if (!auto) {
+        if (!auto || manual) {
           focus.setAttribute('tabindex', '-1');
           focus.focus({ preventScroll: true });
           top.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
@@ -794,6 +805,13 @@
         note.focus({ preventScroll: true });
         return;
       }
+      // Sicherheit geht auch bei widersprüchlichen Antworttypen vor: Die
+      // Off-topic-Hilfe oder ein Fehler darf den Hinweis nicht verdrängen.
+      const safetyNote = aiSafetyNote(result, ui?.gradedSafety === false && result.safetyLevel === 'concern');
+      if (safetyNote) {
+        box.querySelector('.safety-note')?.remove();
+        box.prepend(safetyNote);
+      }
       if (result.kind === 'off_topic') {
         status.textContent = tr('Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.');
         output.querySelector('.translator-fallback')?.remove();
@@ -810,7 +828,7 @@
       ask.disabled = false;
       onFail();
     };
-    const ask = button('KI fragen', 'button translator-ai-button', run);
+    const ask = button('KI fragen', 'button translator-ai-button', () => run(true));
     // Bei einem Fehler steht erst die Erklärung, dann der Knopf zum erneuten Versuch.
     box.append(...(auto ? [status, ask] : [ask, status]));
     if (!auto) box.append(element('p', { className: 'translator-ai-note', text: 'Dein Satz geht dafür an OpenAI. Wir speichern ihn nicht. Bitte ohne Namen.' }));
@@ -1247,6 +1265,9 @@
     chip.addEventListener('click', (event) => {
       // Links funktionieren auch ohne JavaScript und mit „in neuem Tab öffnen“.
       if (chip.tagName === 'A' && (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return;
+      // Nach dem ersten Klick kann das Formular verrutschen. Ein zweiter Klick
+      // derselben Mehrfachaktivierung darf dann keine fremde Kachel öffnen.
+      if (event.detail > 1) { event.preventDefault(); return; }
       const entry = entryByKey.get(chip.dataset.translatorKey);
       if (entry) { event.preventDefault(); show(entry, 'chip'); }
     });

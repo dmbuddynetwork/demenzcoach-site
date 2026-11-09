@@ -78,10 +78,13 @@
   const ready = (percent) => el("p", { class: "start-ready" }, [el("span", { class: "start-ready-bar", style: `--p:${percent}%` }), el("span", { text: `Dein Plan ist zu ${percent} % bereit` })]);
 
   function optionList(items, chosen, onPick) {
+    let choosing = false;
     return el("ul", { class: "start-options", role: "list" }, items.map((item) => {
       const button = el("button", { type: "button", class: "start-option", "aria-pressed": String(chosen === item), onclick: () => {
+        if (choosing) return;
+        choosing = true;
         button.setAttribute("aria-pressed", "true");
-        setTimeout(() => onPick(item), 160);
+        setTimeout(() => { if (button.isConnected) onPick(item); }, 160);
       } });
       if (item.key && icons[item.key] && items === situations) button.insertAdjacentHTML("beforeend", icons[item.key]);
       button.append(el("span", { text: item.label }), el("i", { class: "start-dot", "aria-hidden": "true" }));
