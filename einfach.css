@@ -590,3 +590,4 @@ body.einfach .translator-saved-remove::after { content: none !important; }
 @media (prefers-reduced-motion: reduce) { .translator-write-fab span { transition: none; } }
 body.einfach:has(> .translator-write-fab:not([hidden])) .e-footer { padding-bottom: 96px; }
 body:has(> .consent-banner:not([hidden])) .translator-write-fab { display: none; }
+body.einfach .translator-plan-cta.translator-plan-up { margin-top: 24px; }

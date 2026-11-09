@@ -211,15 +211,19 @@
   // Web-Plan (Daniel, 9. Nov: „Webfunnel in die neue Webseite integrieren, damit Nutzer zu Zahlenden werden“).
   // Nur Deutsch, nie bei Notfall oder Entlastung. Der Link trägt nur den Ort und den festen Situations-Schlüssel, nie Text.
   const planMoments = new Set(['nachhause', 'mutter', 'wer', 'geld', 'arbeit', 'waschen']);
-  const planCTA = (result) => {
+  // Direkt unter der Antwort statt unten (Daniel, 9. Nov 03:44): ab der zweiten eigenen Eingabe
+  // („Das passiert öfter?“) und beim Ziel „Tipps“ („Mehr Tipps für euren Alltag im Plan“).
+  let typedCount = 0;
+  const planTitles = { ergebnis: 'Dein Plan für solche Momente', wieder: 'Das passiert öfter? Dein Plan für solche Momente', tipps: 'Mehr Tipps für euren Alltag im Plan' };
+  const planCTA = (result, place = 'ergebnis') => {
     if (ui || result?.safetyOnly || result?.selfCare) return null;
     const moment = result?.key && planMoments.has(result.key) ? `&m=${result.key}` : '';
-    const link = element('a', { className: 'button', text: 'Plan erstellen', attributes: { href: `/start/?src=ergebnis${moment}`, 'data-related-link': 'plan_ergebnis' } });
-    link.addEventListener('click', () => track('plan_start_click', { place: 'ergebnis', result_key: result?.key ?? '' }));
-    return element('aside', { className: 'translator-plan-cta' }, [
+    const link = element('a', { className: 'button', text: 'Plan erstellen', attributes: { href: `/start/?src=${place}${moment}`, 'data-related-link': `plan_${place}` } });
+    link.addEventListener('click', () => track('plan_start_click', { place, result_key: result?.key ?? '' }));
+    return element('aside', { className: `translator-plan-cta${place === 'ergebnis' ? '' : ' translator-plan-up'}` }, [
       data.planImage ? element('img', { className: 'translator-plan-art', attributes: { src: data.planImage.src, width: String(data.planImage.width), height: String(data.planImage.height), alt: '', decoding: 'async' } }) : null,
       element('div', {}, [
-        element('h2', { text: 'Dein Plan für solche Momente' }),
+        element('h2', { text: planTitles[place] ?? planTitles.ergebnis }),
         element('ul', { className: 'e-checks' }, [
           element('li', { text: 'Ein paar kurze Fragen zu eurer Lage' }),
           element('li', { text: 'Dann ein Plan mit Sätzen für euren Alltag' }),
@@ -229,7 +233,7 @@
       ])
     ]);
   };
-  const offers = (result, safetyHit = false) => [safetyHit ? null : planCTA(result), ...(onComputer() ? [signupBox(), appCTA(result)] : [appCTA(result), signupBox()])];
+  const offers = (result, safetyHit = false, planShown = false) => [safetyHit || planShown ? null : planCTA(result), ...(onComputer() ? [signupBox(), appCTA(result)] : [appCTA(result), signupBox()])];
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
       element('h2', { text: 'Für eure eigene Situation' }),
@@ -840,9 +844,11 @@
     ]);
     if (box) fallbackBox.hidden = true;
     nodes.push(fallbackBox);
+    const planUp = !safetyHit && typedCount >= 2 ? planCTA(null, 'wieder') : null;
+    nodes.push(planUp);
     nodes.push(notesCard(disclaimer()));
     nodes.push(suggestLink(typed));
-    nodes.push(...offers(null, safetyHit));
+    nodes.push(...offers(null, safetyHit, Boolean(planUp)));
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
@@ -1068,6 +1074,9 @@
     // Unter den Sätzen dieselbe Situation, wenn es wieder ruhig ist („Danach“-Zeichnung).
     if (phraseBlock.length && !result.safetyOnly && !result.selfCare && !safetyHit) phraseBlock.push(sceneArt(result.afterImage));
     answerCard.append(...order.flat().filter(Boolean));
+    const planPlace = safetyHit || result.feeling ? '' : typedCount >= 2 ? 'wieder' : goal === 'tipps' ? 'tipps' : '';
+    const planUp = planPlace ? planCTA(result, planPlace) : null;
+    if (planUp) nodes.push(planUp);
     // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
     // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
     const nextRows = chosenGoal ? goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {
@@ -1126,7 +1135,7 @@
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
       nodes.push(feedbackBlock(result, retry));
-      nodes.push(...offers(result, safetyHit));
+      nodes.push(...offers(result, safetyHit, Boolean(planUp)));
     }
 
     output.replaceChildren(...nodes.filter(Boolean));
@@ -1179,6 +1188,7 @@
       return;
     }
     emptyHint.textContent = '';
+    typedCount += 1;
     const { entry, alternatives, safetyHit, feeling, also, mood } = core.match(text, data);
     const feelingEntry = !entry && feeling ? feelingEntries.get(feeling.id) : null;
     if (feelingEntry) {
