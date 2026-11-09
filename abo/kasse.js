@@ -58,7 +58,7 @@ function loadStripe() {
   if (window.Stripe) return Promise.resolve();
   return new Promise((resolve, reject) => {
     const script = document.createElement("script");
-    script.src = "https://js.stripe.com/v3/";
+    script.src = "https://js.stripe.com/dahlia/stripe.js"; // gleiche Version wie die Checkout-Session (ui_mode elements), v3 kennt initCheckout nicht
     script.onload = resolve;
     script.onerror = () => reject(new Error("stripe.js failed"));
     document.head.append(script);
