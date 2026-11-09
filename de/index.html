@@ -66,6 +66,7 @@
   <link rel="stylesheet" href="/translator.css">
   <link rel="stylesheet" href="/einfach.css">
   <link rel="stylesheet" href="/abo/ki-freigabe.css">
+  <link rel="stylesheet" href="/de/homepage.css">
   <script>(function(){var d=document.documentElement,u=navigator.userAgent||'';d.classList.add('app-check');try{if(localStorage.getItem('demenzcoach.textSize.v1')==='large')d.classList.add('e-large');}catch(e){}document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('[data-font-toggle]');if(!b)return;var on=d.classList.toggle('e-large');b.setAttribute('aria-pressed',String(on));try{if(on)localStorage.setItem('demenzcoach.textSize.v1','large');else localStorage.removeItem('demenzcoach.textSize.v1');}catch(e){}});document.addEventListener('DOMContentLoaded',function(){var b=document.querySelector('[data-font-toggle]');if(b)b.setAttribute('aria-pressed',String(d.classList.contains('e-large')));});if(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))d.classList.add('is-ios');document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href*="apps.apple.com"]');if(a){a.target='_blank';a.rel='noopener';}},true);})();</script>
   <script type="application/ld+json">
     {
@@ -110,32 +111,26 @@
     }
   </script>
 </head>
-<body class="einfach" data-page-type="translator-home" data-page-language="de" data-page-slug="home-de">
+<body class="einfach homepage-v2" data-page-type="translator-home" data-page-language="de" data-page-slug="home-de">
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
   <header class="e-header">
     <div class="e-wrap">
       <a class="e-brand" href="/de/" aria-label="Demenz Coach Startseite"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
-      <nav aria-label="Hauptnavigation"><button type="button" class="e-font-toggle" data-font-toggle aria-pressed="false" aria-label="Schrift größer" title="Schrift größer">A+</button><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_nav&amp;mt=8" data-store-link="home-nav">Zur App</a></nav>
+      <nav aria-label="Hauptnavigation"><button type="button" class="e-font-toggle" data-font-toggle aria-pressed="false" aria-label="Schrift größer" title="Schrift größer">Schrift größer</button><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_nav&amp;mt=8" data-store-link="home-nav">Zur App</a></nav>
     </div>
   </header>
   <main id="main">
     <section id="top" class="e-hero e-home" aria-labelledby="home-title">
       <div class="e-wrap">
-        <img class="e-hero-art" src="/assets/zeichnungen/nach-hause-ruhig.webp" width="720" height="702" alt="" decoding="async" fetchpriority="low">
-        <h1 id="home-title">Demenz: Was soll ich sagen?</h1>
-        <form class="translator-card" id="translator-form" autocomplete="off">
-          <label class="sr-only" for="translator-input">Satz, den die Person mit Demenz gesagt hat</label>
-          <div class="translator-input-row">
-            <textarea id="translator-input" rows="3" maxlength="200" placeholder="Zum Beispiel: Mama will nach Hause." enterkeyhint="go" aria-describedby="translator-empty-hint translator-privacy-note"></textarea>
-            <button class="button" type="submit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M21.6 2.4a.9.9 0 0 0-.95-.2L2.9 9.1a.9.9 0 0 0-.05 1.67l7.2 3.17 3.17 7.2a.9.9 0 0 0 1.67-.05l6.9-17.75a.9.9 0 0 0-.2-.95ZM10.6 12.2 5.6 10l12.2-4.75-7.2 6.95Zm1.2 1.2 6.95-7.2L14 18.4l-2.2-5Z"/></svg><span>Antwort finden</span></button>
+        <div class="home-intro">
+          <img class="e-hero-art" src="/assets/zeichnungen/nach-hause-ruhig.webp" width="720" height="702" alt="" decoding="async" fetchpriority="low">
+          <div>
+            <h1 id="home-title">Demenz: Was soll ich sagen?</h1>
+            <p>Finde passende Worte und Ideen für schwierige Alltagssituationen mit Demenz.</p>
           </div>
-          <p class="translator-empty-hint" id="translator-empty-hint" role="status"></p>
-          <p class="translator-privacy e-privacy" id="translator-privacy-note">Es gelten <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a> und <a href="/datenschutz.html#ki-uebersetzer">Datenschutz</a> (inkl. KI).</p>
-        </form>
-        <div id="translator-result" class="translator-result" hidden></div>
-        <section id="translator-saved" class="translator-saved" aria-label="Meine Sätze" hidden></section>
-        <div class="e-moments-block e-tiles-block">
-          <p class="e-moments-title">Oder tippe auf eine Situation:</p>
+        </div>
+        <section class="home-situations" aria-labelledby="home-situations-title">
+          <h2 class="home-section-title" id="home-situations-title">Wähle eine Situation:</h2>
           <ul class="e-tiles" role="list">
             <li><a class="e-tile" data-translator-key="nachhause" href="/ratgeber/demenz-nach-hause-was-sagen.html"><img src="/assets/zeichnungen/nach-hause.webp" width="480" height="664" alt="" decoding="async"><span>Will nach Hause</span></a></li>
             <li><a class="e-tile" data-translator-key="waschen" href="/demenz-uebersetzer/ich-will-nicht-duschen.html"><img src="/assets/zeichnungen/tuch-mama.webp" width="480" height="505" alt="" decoding="async"><span>Will nicht duschen</span></a></li>
@@ -144,7 +139,20 @@
             <li><a class="e-tile" data-translator-key="auto" href="/demenz-uebersetzer/ich-will-auto-fahren.html"><img src="/assets/zeichnungen/car.webp" width="480" height="384" alt="" loading="lazy" decoding="async"><span>Will Auto fahren</span></a></li>
             <li><a class="e-tile" data-translator-key="mutter" href="/demenz-uebersetzer/wo-ist-meine-mutter.html"><img src="/assets/zeichnungen/s-dead.webp" width="480" height="411" alt="" loading="lazy" decoding="async"><span>Fragt nach der Mutter</span></a></li>
           </ul>
-        </div>
+        </section>
+        <form class="translator-card" id="translator-form" autocomplete="off" data-empty-hint="Bitte zuerst einen Satz eintippen – oder eine Situation auswählen." data-chat-after-input>
+          <h2 class="home-section-title home-form-title">Oder beschreibe deine Situation:</h2>
+          <label class="home-input-label" for="translator-input">Was wurde gesagt oder was ist passiert?</label>
+          <p class="home-input-hint" id="home-input-hint">Ein kurzer Satz reicht.</p>
+          <div class="translator-input-row">
+            <textarea id="translator-input" rows="3" maxlength="200" placeholder="Zum Beispiel: Meine Mutter will nach Hause." enterkeyhint="go" aria-describedby="home-input-hint translator-empty-hint translator-privacy-note"></textarea>
+            <button class="button" type="submit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M21.6 2.4a.9.9 0 0 0-.95-.2L2.9 9.1a.9.9 0 0 0-.05 1.67l7.2 3.17 3.17 7.2a.9.9 0 0 0 1.67-.05l6.9-17.75a.9.9 0 0 0-.2-.95ZM10.6 12.2 5.6 10l12.2-4.75-7.2 6.95Zm1.2 1.2 6.95-7.2L14 18.4l-2.2-5Z"/></svg><span>Antwort finden</span></button>
+          </div>
+          <p class="translator-empty-hint" id="translator-empty-hint" role="status"></p>
+          <p class="translator-privacy e-privacy" id="translator-privacy-note">Es gelten <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a> und <a href="/datenschutz.html#ki-uebersetzer">Datenschutz</a> (inkl. KI).</p>
+        </form>
+        <div id="translator-result" class="translator-result" hidden></div>
+        <section id="translator-saved" class="translator-saved" aria-label="Meine Sätze" hidden></section>
         <noscript><p>Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der <a href="/demenz-uebersetzer/">Übersicht</a>.</p></noscript>
         <div class="e-offers">
           <section id="plan" class="e-card e-plan" aria-labelledby="plan-title">

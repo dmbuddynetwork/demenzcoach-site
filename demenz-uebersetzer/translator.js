@@ -1187,7 +1187,7 @@
     const text = input.value.trim();
     if (!text) {
       // Leeres Feld: sagen, was fehlt – sichtbar und für Vorlesen.
-      emptyHint.textContent = tr('Bitte zuerst einen Satz eintippen – oder unten einen antippen.');
+      emptyHint.textContent = form.dataset.emptyHint || tr('Bitte zuerst einen Satz eintippen – oder unten einen antippen.');
       input.focus();
       return;
     }
@@ -1341,7 +1341,9 @@
     document.body.append(chat);
     new IntersectionObserver(([seen]) => {
       const wasHidden = chat.hidden;
-      chat.hidden = seen.isIntersecting;
+      // Auf der Startseite stehen die Beispiele zuerst: ihr noch nicht erreichtes
+      // Eingabefeld soll keinen Chat über den auswählbaren Situationen öffnen.
+      chat.hidden = seen.isIntersecting || (form.hasAttribute('data-chat-after-input') && seen.boundingClientRect.top >= 0);
       if (wasHidden && !chat.hidden) { chat.classList.remove('translator-chat-in'); void chat.offsetWidth; chat.classList.add('translator-chat-in'); }
     }).observe(input);
   }

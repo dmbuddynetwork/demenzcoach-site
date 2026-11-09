@@ -14,6 +14,11 @@ const production = 'https://dementiacoachapp.com';
     page.on('pageerror', error => errors.push(error.message));
     for (const home of ['/de/', '/en/', '/demenz-uebersetzer/']) {
       await page.goto(new URL(`${home}?src=seo_test`, base).href);
+      await page.locator('#translator-form button[type="submit"]').click();
+      assert.ok(await page.locator('#translator-input').evaluate(element => element === document.activeElement), `${home}: empty submit focuses the input`);
+      const emptyHint = await page.locator('#translator-empty-hint').innerText();
+      assert.ok(emptyHint.trim(), `${home}: empty submit explains the next step`);
+      if (home === '/de/') assert.equal(emptyHint, 'Bitte zuerst einen Satz eintippen – oder eine Situation auswählen.');
       const situation = home === '/en/' ? 'home' : 'nachhause';
       const title = await page.title();
       const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
@@ -56,7 +61,36 @@ const production = 'https://dementiacoachapp.com';
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), `${production}/demenz-uebersetzer/`);
     await page.goto(new URL('/de/?situation=unknown&ziel=invalid', base).href);
     assert.ok(await page.locator('#translator-input').isVisible());
-    assert.deepEqual(errors, []);
+
+    // Examples-first home: a not-yet-reached input must not put the chat over the choices.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(new URL('/de/', base).href);
+    if (await page.locator('.consent-decline').isVisible()) await page.locator('.consent-decline').click();
+    await page.waitForFunction(() => document.querySelector('.translator-chat'));
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    assert.ok(await page.locator('.translator-chat').isHidden(), 'initial choices remain unobstructed');
+    await page.locator('#translator-input').scrollIntoViewIfNeeded();
+    await page.locator('.e-footer').scrollIntoViewIfNeeded();
+    await page.locator('.translator-chat').waitFor({ state: 'visible' });
+    await page.locator('.translator-chat-close').click();
+    assert.ok(await page.locator('.translator-chat-open').isVisible(), 'chat can still be minimized after passing the input');
+
+    for (const width of [320, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(new URL('/de/', base).href);
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `home fits at ${width}px`);
+      for (const control of await page.locator('.home-situations .e-tile, .e-font-toggle, #translator-form button[type="submit"]').all()) {
+        assert.ok((await control.boundingBox()).height >= 44, `home controls remain large enough at ${width}px`);
+      }
+      if (width === 320) {
+        await page.evaluate(() => { document.documentElement.style.fontSize = '225%'; });
+        const layout = await page.evaluate(() => ({
+          fits: document.documentElement.scrollWidth <= innerWidth,
+          overflow: [...document.querySelectorAll('body *')].filter(element => element.getBoundingClientRect().right > innerWidth + 1).slice(0,6).map(element => `${element.tagName}.${element.className}`)
+        }));
+        assert.ok(layout.fits, `home fits at 320px with 225% text: ${layout.overflow.join(', ')}`);
+      }
+    }
 
     // Crawlers, no-JS readers, and new tabs get an actual, self-canonical article.
     const plain = await browser.newContext({ javaScriptEnabled: false });
@@ -67,6 +101,7 @@ const production = 'https://dementiacoachapp.com';
     assert.equal(await noJS.locator('link[rel="canonical"]').getAttribute('href'), `${production}/ratgeber/demenz-nach-hause-was-sagen.html`);
     assert.match(await noJS.locator('h1').innerText(), /nach Hause/);
     await plain.close();
+    assert.deepEqual(errors, [], 'no browser script errors across routing and homepage checks');
   } finally { await browser.close(); }
-  console.log('Translator routing passed: three entry points, stable document metadata, share/reload/back, safety-state clearing, invalid state and real no-JS links.');
+  console.log('Translator/home passed: three entry points, empty input, stable metadata, share/reload/back, safety-state clearing, real no-JS links, examples-first chat visibility, 320/390/768/1440px and 225% text.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
