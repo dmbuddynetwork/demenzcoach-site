@@ -125,7 +125,7 @@
     // Ein „=“ vorne heißt: nur als ganzes Wort („=klo“ trifft „Klo“, aber nicht „kloppen“).
     // Richtig geschriebene häufige Wörter sind keine Tippfehler: „Schuhe“ ist nicht „Schule“,
     // „sauer“ nicht „sauber“, „schreiben“ nicht „schreien“, „schlucken“ nicht „Schmuck“.
-    const noFuzzy = P.noFuzzy ?? new Set(['nichts', 'betruege', 'schlaeft', 'schreiben', 'schreibt', 'schreibe', 'schreib', 'stimmung', 'schlucken', 'schluckt', 'schluck', 'schluckstoerung', 'schluckbeschwerden', 'schmeckt',
+    const noFuzzy = P.noFuzzy ?? new Set(['abend', 'nichts', 'betruege', 'schlaeft', 'schreiben', 'schreibt', 'schreibe', 'schreib', 'stimmung', 'schlucken', 'schluckt', 'schluck', 'schluckstoerung', 'schluckbeschwerden', 'schmeckt',
       'kauen', 'kaut', 'schuld', 'schuhe', 'schuhen', 'melden', 'merken', 'sauer', 'allen', 'kennen', 'legen', 'stellen', 'stiller',
       'muster', 'stammen', 'einladen', 'abbauen', 'baden', 'malen', 'spielen', 'singen', 'lesen', 'anrufer']);
 
