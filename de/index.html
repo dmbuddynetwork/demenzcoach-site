@@ -124,17 +124,12 @@
       <div class="e-wrap">
         <div class="home-intro">
           <img class="e-hero-art" src="/assets/zeichnungen/nach-hause-ruhig.webp" width="720" height="702" alt="" decoding="async" fetchpriority="low">
-          <div>
-            <h1 id="home-title">Demenz: Was soll ich sagen?</h1>
-            <p>Finde passende Worte und Ideen für schwierige Alltagssituationen mit Demenz.</p>
-          </div>
+          <h1 id="home-title">Demenz: Was soll ich sagen?</h1>
         </div>
         <form class="translator-card" id="translator-form" autocomplete="off" data-empty-hint="Bitte zuerst einen Satz eintippen – oder eine Situation auswählen." data-chat-after-input>
-          <h2 class="home-section-title home-form-title">Beschreibe deine Situation:</h2>
-          <label class="home-input-label" for="translator-input">Was wurde gesagt oder was ist passiert?</label>
-          <p class="home-input-hint" id="home-input-hint">Ein kurzer Satz reicht.</p>
+          <label class="sr-only" for="translator-input">Was wurde gesagt oder was ist passiert?</label>
           <div class="translator-input-row">
-            <textarea id="translator-input" rows="3" maxlength="200" placeholder="Zum Beispiel: Meine Mutter will nach Hause." enterkeyhint="go" aria-describedby="home-input-hint translator-empty-hint translator-privacy-note"></textarea>
+            <textarea id="translator-input" rows="3" maxlength="200" placeholder="Zum Beispiel: Meine Mutter will nach Hause." enterkeyhint="go" aria-describedby="translator-empty-hint translator-privacy-note"></textarea>
             <button class="button" type="submit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M21.6 2.4a.9.9 0 0 0-.95-.2L2.9 9.1a.9.9 0 0 0-.05 1.67l7.2 3.17 3.17 7.2a.9.9 0 0 0 1.67-.05l6.9-17.75a.9.9 0 0 0-.2-.95ZM10.6 12.2 5.6 10l12.2-4.75-7.2 6.95Zm1.2 1.2 6.95-7.2L14 18.4l-2.2-5Z"/></svg><span>Antwort finden</span></button>
           </div>
           <p class="translator-empty-hint" id="translator-empty-hint" role="status"></p>

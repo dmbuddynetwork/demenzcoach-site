@@ -14,6 +14,11 @@ const production = 'https://dementiacoachapp.com';
     page.on('pageerror', error => errors.push(error.message));
     for (const home of ['/de/', '/en/', '/demenz-uebersetzer/']) {
       await page.goto(new URL(`${home}?src=seo_test`, base).href);
+      if (home === '/de/') {
+        assert.equal(await page.getByRole('textbox', { name: 'Was wurde gesagt oder was ist passiert?', exact: true }).count(), 1, 'reduced home retains an accessible input label');
+        assert.equal(await page.locator('#translator-form h2').count(), 0, 'reduced home has no competing form heading');
+        assert.ok(await page.locator('#translator-input').evaluate(element => element.getAttribute('aria-describedby').split(/\s+/).every(id => document.getElementById(id))), 'all input descriptions still resolve');
+      }
       await page.locator('#translator-form button[type="submit"]').click();
       assert.ok(await page.locator('#translator-input').evaluate(element => element === document.activeElement), `${home}: empty submit focuses the input`);
       const emptyHint = await page.locator('#translator-empty-hint').innerText();

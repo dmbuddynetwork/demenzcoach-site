@@ -14,6 +14,7 @@
     // GitHub Pages). Damit Cloudflare sie nicht direkt ausliefert, läuft für genau diese Adressen
     // der Worker zuerst und antwortet mit 301 auf /de/ bzw. /xx/ (Liste wie HOME_LANGUAGES im Worker).
     "run_worker_first": [
+      "/teller", "/teller/", "/teller/index.html",
       "/",
       "/index.html",
       "/index-en.html", "/index-pl.html", "/index-ro.html", "/index-bg.html",

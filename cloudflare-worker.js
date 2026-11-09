@@ -18,9 +18,36 @@ export const legacyHomeTarget = (pathname) => {
   return null;
 };
 
+// No identifier or cookie is created at the edge. A consented browser can retain
+// its fixed arm; without that consent each new entry is randomized again.
+export const tellerTarget = (request, random = () => crypto.getRandomValues(new Uint32Array(1))[0] / 2 ** 32) => {
+  const input = new URL(request.url);
+  const cookie = /(?:^|;\s*)dc_teller_v1=(website|funnel)(?:;|$)/.exec(request.headers.get('Cookie') || '');
+  const arm = cookie?.[1] || (random() < 0.5 ? 'website' : 'funnel');
+  const language = input.searchParams.get('lang');
+  const home = language === 'de' || LEGACY_HOME_LANGUAGES.has(language) ? language : 'de';
+  const target = new URL(arm === 'website' ? `/${home}/` : '/start/', input.origin);
+  // Deliberately do not forward arbitrary queries, ad click IDs or input text.
+  target.searchParams.set('teller', arm);
+  return target.toString();
+};
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (['/teller', '/teller/', '/teller/index.html'].includes(url.pathname)) {
+      const headers = {
+        'Cache-Control': 'private, no-store, max-age=0',
+        'CDN-Cache-Control': 'no-store',
+        'Cloudflare-CDN-Cache-Control': 'no-store',
+        'X-Robots-Tag': 'noindex',
+        'Referrer-Policy': 'no-referrer'
+      };
+      if (!['GET', 'HEAD'].includes(request.method)) {
+        return new Response(null, { status: 405, headers: { ...headers, Allow: 'GET, HEAD' } });
+      }
+      return new Response(null, { status: 302, headers: { ...headers, Location: tellerTarget(request) } });
+    }
     const asset = async (pathname) => {
       // Pfad direkt setzen statt neu auflösen: "//host/…" darf nie als fremde Adresse enden.
       const assetURL = new URL(url);
