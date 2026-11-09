@@ -1,5 +1,6 @@
 // Web-Kasse: Angebot wählen, mit demselben Firebase-Konto wie die App anmelden, über Stripe bezahlen.
 // Netzwerk nur zu unserem Backend (DEMENZ_ABO_CONFIG.endpoint), zu Firebase Auth und zu Stripe.
+import { createPaymentStatusController, paymentStatusText } from "./payment-status.js";
 const config = window.DEMENZ_ABO_CONFIG;
 const firebaseVersion = "12.16.0";
 const $ = (id) => document.getElementById(id);
@@ -213,10 +214,12 @@ async function startCheckout(email) {
   try {
     const token = await state.user.getIdToken();
     const deal = state.plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
+    await window.DemenzTeller?.ready;
     const session = await api("/session", {
       method: "POST",
       token,
       body: { plan: state.plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+        ...window.DemenzTeller?.attribution(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
     renderSummary(session.trialDays, session.firstYear);
@@ -430,20 +433,35 @@ $("app-store-link").href = config.appStoreURL;
 translatorReturn();
 if (params.get("status") === "fertig") {
   show("done");
-  // Probezeit gestartet: heute 0 €. Echter Umsatz steht in Stripe/Adapty.
-  track("purchase", { plan: state.plan, source: state.source, value: 0, currency: "EUR" }, { event: "Purchase", values: { value: 0, currency: "EUR" } });
-  offerYearlySwitch();
-  offerAccountLink();
-  const sessionID = params.get("session_id");
-  if (sessionID) {
-    api(`/session-status?session_id=${encodeURIComponent(sessionID)}`).then((status) => {
-      if (status.status !== "complete") {
-        show("plan");
-        fail("Die Zahlung wurde nicht abgeschlossen. Du kannst es noch einmal versuchen.");
-        loadOffer();
-      }
-    }).catch(() => {});
-  }
+  let portalAvailable = false;
+  const checkStatus = createPaymentStatusController({
+    sessionID: params.get("session_id"),
+    loadStatus: async (sessionID) => {
+      await ensureFirebase();
+      if (!state.user) throw new Error("sign_in_required");
+      const token = await state.user.getIdToken();
+      portalAvailable = true;
+      // Das eigene Firebase-Gastkonto sichern, unabhängig vom Zahlungsstatus.
+      // Es wird keine Kundenzuordnung aus einer öffentlichen Session übernommen.
+      if (state.user.isAnonymous && $("link-card").hidden) await offerAccountLink();
+      return api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
+    },
+    render: (outcome) => {
+      const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
+      const [title, text] = paymentStatusText[outcome];
+      $("done-title").textContent = title;
+      $("done-status").textContent = text;
+      $("done-plan").hidden = !active;
+      $("done-plan-link").hidden = !active;
+      $("app-store-link").hidden = !active;
+      $("payment-status-manage").hidden = !portalAvailable || active || outcome === "checking";
+      $("payment-status-retry").hidden = active;
+      $("payment-status-retry").disabled = outcome === "checking";
+    },
+    activate: () => { offerYearlySwitch(); }
+  });
+  $("payment-status-retry").addEventListener("click", checkStatus);
+  checkStatus();
 } else if (params.get("weiter") === "1") {
   // Vom Fragebogen (/start/): Angebot ist dort schon gewählt, direkt zum Konto.
   show("account");

@@ -2,8 +2,9 @@
 // Aufbau nach Noom/BetterMe (Daniel, 8. Nov 12:04: „adaptiere es 1:1“): 11 Fragen zum Alltag (keine Diagnose,
 // kein Stadium; mit ?m=<moment> aus der Anzeige 10), Zwischenbildschirme, „Plan wird erstellt“, E-Mail vor dem Ergebnis,
 // Ergebnis mit Zeitstrahl, lange Angebotsseite, dann die Web-Kasse (/abo/?weiter=1). Sätze aus den geprüften Satz-Seiten.
-// Datenschutz: Antworten und Name bleiben in dieser Seite (kein Speichern, kein Senden). Werbe- und Analyse-
-// Ereignisse laufen über die gemeinsame Einwilligung (DemenzConsent) und tragen nur den Schritt, nie eine Antwort.
+// Datenschutz: freie Angaben bleiben in dieser Seite; nur feste Auswahl-Schlüssel werden im selben Tab
+// kurz für Neuladen gemerkt. Werbe- und Analyse-Ereignisse laufen über die gemeinsame
+// Einwilligung (DemenzConsent) und tragen nur den Schritt, nie eine Antwort.
 (() => {
   const $ = (id) => document.getElementById(id);
   const params = new URLSearchParams(location.search);
@@ -94,6 +95,7 @@
         const index = picked.indexOf(item);
         if (index >= 0) picked.splice(index, 1); else picked.push(item);
         button.setAttribute("aria-pressed", String(index < 0));
+        saveProgress(current);
       } }, [el("span", { text: item.label }), el("span", { class: "start-box", "aria-hidden": "true" })]);
       return el("li", {}, button);
     }));
@@ -118,6 +120,46 @@
   const stepNumber = (name) => flow.slice(0, flow.indexOf(name) + 1).filter(isQuestion).length;
   const after = (name) => flow[flow.indexOf(name) + 1];
   const bare = (quote) => quote.replace(/[.!?]+$/u, "");
+
+  // Kurzlebige Wiederaufnahme im selben Tab. Keine Namen, E-Mail-Adressen oder freien Sätze.
+  const progressKey = "demenzCoachQuizProgress.v1";
+  const progressMaxAge = 30 * 60 * 1000;
+  let progressExpiryTimer;
+  const progressContext = JSON.stringify([source, preset?.key || ""]);
+  const choiceSets = { relation: relations, situation: situations, frequency: frequencies,
+    dayTime: data.dayTimes, duration: data.durations, living: data.livings,
+    goal: data.goals, burden: burdens, minutes: data.minutes };
+  const forgetProgress = () => { clearTimeout(progressExpiryTimer); try { sessionStorage.removeItem(progressKey); } catch { /* privates Fenster */ } };
+  function saveProgress(screen) {
+    if (screen === "relation") { forgetProgress(); return; }
+    const choices = {};
+    for (const [key, items] of Object.entries(choiceSets)) {
+      if (items.includes(answers[key])) choices[key] = answers[key].key;
+    }
+    const tries = answers.tries.filter(item => data.tries.includes(item)).map(item => item.key);
+    try {
+      sessionStorage.setItem(progressKey, JSON.stringify({ version: 1, at: Date.now(), context: progressContext, screen, choices, tries }));
+      clearTimeout(progressExpiryTimer);
+      progressExpiryTimer = setTimeout(forgetProgress, progressMaxAge);
+    } catch { /* ohne Speicher normal weiter */ }
+  }
+  function restoreProgress() {
+    let saved;
+    try { saved = JSON.parse(sessionStorage.getItem(progressKey) || "null"); } catch { forgetProgress(); return "relation"; }
+    if (!saved) return "relation";
+    if (saved.version !== 1 || saved.context !== progressContext || !Number.isFinite(saved.at)
+      || saved.at > Date.now() || Date.now() - saved.at >= progressMaxAge || !flow.includes(saved.screen)
+      || !saved.choices || typeof saved.choices !== "object" || !Array.isArray(saved.tries)) {
+      forgetProgress(); return "relation";
+    }
+    for (const [key, items] of Object.entries(choiceSets)) answers[key] = items.find(item => item.key === saved.choices[key]) || null;
+    if (preset) answers.situation = preset;
+    answers.tries = data.tries.filter(item => saved.tries.includes(item.key));
+    answers.name = answers.relation?.call || "";
+    // Ergebnis und Angebot brauchen eine E-Mail; diese wird im Checkpoint nicht gespeichert.
+    const screen = flow.indexOf(saved.screen) >= flow.indexOf("building") ? "email" : saved.screen;
+    return flow.slice(0, flow.indexOf(screen)).find(step => answerFor[step] && !answers[answerFor[step]]) || screen;
+  }
   const chosen = () => (answers.situation?.say ? answers.situation : situations[0]);
   const pick = (name, key) => (item) => { answers[key] = item; go(after(name)); };
 
@@ -327,7 +369,7 @@
 
   // ---- Ergebnis mit Zeitstrahl (wie Noom: Prognose mit Datum, hier ehrlich: Momente, für die du Sätze hast) --
   function resultScreen() {
-    if (!completed) { completed = true; track("quiz_complete", "Lead"); }
+    if (!completed) { completed = true; track("quiz_complete", "Lead"); window.DemenzTeller?.stage("complete"); }
     const short = (date) => new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" }).format(date).replace(".", "");
     const points = [[1, "Heute"], [7, short(inDays(7))], [10, short(inDays(28))], [18, short(inDays(84))]];
     const width = 320;
@@ -626,6 +668,21 @@
   // ---- Navigation (Zurück-Taste des Handys funktioniert über die Browser-Historie) ----------------
   let current = null;
   let completed = false;
+  const restart = el("button", { type: "button", class: "abo-link-button", text: "Neu anfangen", onclick: () => {
+    forgetProgress();
+    for (const key of Object.keys(choiceSets)) answers[key] = null;
+    if (preset) answers.situation = preset;
+    answers.name = ""; answers.email = ""; answers.tries = []; typed = "";
+    try { sessionStorage.removeItem("demenzCoachEmail"); sessionStorage.removeItem("demenzCoachKiOffen"); } catch { /* */ }
+    completed = false;
+    plan = "yearly";
+    history.replaceState({ screen: "relation" }, "", location.href);
+    render("relation");
+    const heading = $("screen").querySelector("h1");
+    heading?.setAttribute("tabindex", "-1");
+    heading?.focus();
+  } });
+  $("footer").prepend(restart);
   const sections = [
     { title: "Über euch", steps: ["relation", "name", "situation", "frequency", "dayTime", "thanks"] },
     { title: "Euer Alltag", steps: ["duration", "living", "tries", "insight"] },
@@ -652,10 +709,13 @@
     $("count").hidden = done;
     // Rechtliche Links (AGB, Datenschutz, Impressum, Widerruf, Kündigen) stehen auf jedem Schritt unten, klein.
     $("footer").hidden = false;
+    restart.hidden = name === "relation";
     window.scrollTo({ top: 0 });
+    saveProgress(name);
     if (name !== "plan") track(`quiz_${name}`);
   }
   function go(name, { replace = false } = {}) {
+    if (isQuestion(current)) window.DemenzTeller?.stage("first_answer");
     history[replace ? "replaceState" : "pushState"]({ screen: name }, "", location.href);
     render(name);
   }
@@ -714,7 +774,8 @@
     }).catch(() => {});
   }
 
-  history.replaceState({ screen: "relation" }, "", location.href);
-  render("relation");
+  const resumed = restoreProgress();
+  history.replaceState({ screen: resumed }, "", location.href);
+  render(resumed);
   track("quiz_start");
 })();

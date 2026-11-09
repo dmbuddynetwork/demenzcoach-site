@@ -1,3 +1,91 @@
+// Teller experiment: fixed arms only; all durable state and statistics require consent.
+const createTellerExperiment = ({ host, statistics, track, entry, now = () => Date.now() }) => {
+  const key = 'demenzcoach.teller.v1';
+  const cookie = 'dc_teller_v1';
+  const lifetime = 30 * 86400000;
+  const arms = new Set(['website', 'funnel']);
+  const url = new URL(host.location.href);
+  let incoming = entry ?? url.searchParams.get('teller');
+  if (!arms.has(incoming)) incoming = null;
+  if (url.searchParams.has('teller')) {
+    url.searchParams.delete('teller');
+    host.history.replaceState(host.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  }
+  let record = null;
+  let redirecting = false;
+  let measurable = typeof host.navigator?.locks?.request === 'function';
+  const valid = (value) => arms.has(value?.arm) && Number.isFinite(value?.expiresAt)
+    && value.expiresAt > now() && value.expiresAt <= now() + lifetime
+    && value.events && typeof value.events === 'object';
+  const clearSaved = () => {
+    try { host.localStorage.removeItem(key); } catch { /* storage blocked */ }
+    host.document.cookie = `${cookie}=; Max-Age=0; Path=/; SameSite=Lax; Secure`;
+  };
+  const forget = () => { record = null; incoming = null; clearSaved(); };
+  const refresh = () => {
+    if (!statistics()) { forget(); return; }
+    if (redirecting) return;
+    let saved = null;
+    try {
+      saved = host.localStorage.getItem(key);
+      const latest = JSON.parse(saved);
+      // Always load the current shared record, even if this tab's old one is valid.
+      if (valid(latest)) record = latest;
+      else if (saved !== null) { record = null; clearSaved(); }
+    } catch { /* keep the current page's record when storage is unavailable */ }
+    if (!valid(record)) record = incoming ? { arm: incoming, expiresAt: now() + lifetime, events: {} } : null;
+    if (incoming && record && incoming !== record.arm) {
+      redirecting = true;
+      const target = new URL(record.arm === 'website' ? '/de/' : '/start/', host.location.origin);
+      target.searchParams.set('teller', record.arm);
+      host.location.replace(target.toString());
+    }
+  };
+  const save = () => {
+    if (!statistics() || !valid(record) || redirecting) return;
+    try { host.localStorage.setItem(key, JSON.stringify(record)); } catch { return; /* current page only, no durable cookie */ }
+    host.document.cookie = `${cookie}=${record.arm}; Max-Age=${Math.max(0, Math.floor((record.expiresAt - now()) / 1000))}; Path=/; SameSite=Lax; Secure`;
+  };
+  const parameters = () => measurable && statistics() && !redirecting && valid(record)
+    ? { experiment: 'teller_v1', experiment_arm: record.arm } : {};
+  const emit = (name) => {
+    if (!measurable || !statistics() || redirecting || !valid(record) || record.events[name]) return;
+    record.events[name] = true;
+    save();
+    track(`teller_${record.arm}_${name}`, parameters());
+  };
+  const serialize = (action) => {
+    if (!measurable) { action(); return Promise.resolve(); }
+    return host.navigator.locks.request(key, action).catch(() => { measurable = false; });
+  };
+  let ready = Promise.resolve();
+  const consentChanged = () => {
+    if (!statistics()) { forget(); return Promise.resolve(); }
+    ready = serialize(() => { refresh(); save(); emit('assigned'); });
+    return ready;
+  };
+  const stage = (name) => {
+    if (!['assigned', 'first_answer', 'complete'].includes(name) || !measurable || !statistics()) return Promise.resolve();
+    // A single origin-wide transaction also covers truly concurrent tabs.
+    return serialize(() => { refresh(); emit('assigned'); emit(name); });
+  };
+  // Synchronous routing recovery happens before GA's page_view. All persisted
+  // measurement mutations then run under the same lock and re-read shared state.
+  if (statistics()) refresh();
+  if (statistics()) consentChanged();
+  const attribution = () => measurable && statistics() && !redirecting && valid(record)
+    ? { source: `teller_${record.arm}`, campaign: 'teller_v1', variant: record.arm === 'website' ? 'a' : 'b' } : {};
+  return { consentChanged, parameters, stage, attribution, forget, get ready() { return ready; }, redirecting: () => redirecting };
+};
+// End Teller experiment factory.
+
+const tellerURL = new URL(location.href);
+const tellerEntry = tellerURL.searchParams.get('teller');
+if (tellerURL.searchParams.has('teller')) {
+  tellerURL.searchParams.delete('teller');
+  history.replaceState(history.state, '', `${tellerURL.pathname}${tellerURL.search}${tellerURL.hash}`);
+}
+
 const menuButton = document.querySelector('.menu-button');
 const navigation = document.querySelector('.site-nav');
 const usesEnglish = document.documentElement.lang.startsWith('en');
@@ -88,7 +176,7 @@ const websiteAnalytics = (() => {
   };
 
   const loadTag = () => {
-    if (tagLoaded) return;
+    if (tagLoaded || window.DemenzTeller?.redirecting()) return;
     tagLoaded = true;
 
     gtag('consent', 'default', {
@@ -166,13 +254,17 @@ const websiteAnalytics = (() => {
     });
   };
 
-  const grant = () => {
-    remember(consentKey, 'granted');
+  const startStatistics = () => {
+    window[`ga-disable-${measurementID}`] = false;
+    if (tagLoaded) gtag('consent', 'update', { analytics_storage: 'granted' });
     loadTag();
   };
 
-  const deny = () => {
-    remember(consentKey, 'denied');
+  const grant = () => { remember(consentKey, 'granted'); startStatistics(); };
+
+  // Also used for another tab's withdrawal/clear without recreating its removed choice.
+  const stopStatistics = () => {
+    window[`ga-disable-${measurementID}`] = true;
     if (tagLoaded) {
       gtag('consent', 'update', {
         analytics_storage: 'denied',
@@ -183,6 +275,8 @@ const websiteAnalytics = (() => {
     }
     clearCookies(['_ga']);
   };
+
+  const deny = () => { remember(consentKey, 'denied'); stopStatistics(); };
 
   const grantMarketing = () => {
     remember(marketingKey, 'granted');
@@ -199,9 +293,9 @@ const websiteAnalytics = (() => {
   };
 
   const track = (name, parameters = {}) => {
-    if (readConsent() !== 'granted') return;
+    if (readConsent() !== 'granted' || window.DemenzTeller?.redirecting()) return;
     loadTag();
-    gtag('event', name, { ...pageContext, ...parameters });
+    gtag('event', name, { ...pageContext, ...parameters, ...window.DemenzTeller?.parameters() });
   };
 
   // Werbe-Ereignisse (z. B. Lead, InitiateCheckout, Purchase): nur feste Namen und Zahlen, nie Texte.
@@ -213,7 +307,8 @@ const websiteAnalytics = (() => {
     window.ttq?.track?.(name === 'Purchase' ? 'CompletePayment' : name, parameters);
   };
 
-  return { deny, denyMarketing, grant, grantMarketing, loadPixels, loadTag, marketingOnPage, readConsent, readMarketing, track, trackMarketing };
+  const clearSessionChoices = () => { sessionChoice = {}; };
+  return { clearSessionChoices, startStatistics, stopStatistics, deny, denyMarketing, grant, grantMarketing, loadPixels, loadTag, marketingOnPage, readConsent, readMarketing, track, trackMarketing };
 })();
 
 const fallbackAnalyticsCopy = usesEnglish
@@ -252,9 +347,54 @@ const analyticsCopy = {
   ...(localizedSiteCopy.analytics ?? {})
 };
 // Andere Sprachen haben einen eigenen Text ohne Anbieternamen: den Anbieter dann anhängen.
-const consentText = websiteAnalytics.marketingOnPage
+const baseConsentText = websiteAnalytics.marketingOnPage
   ? analyticsCopy.marketingText
   : /Google/.test(analyticsCopy.text) ? analyticsCopy.text : `${analyticsCopy.text} (Google Analytics)`;
+const tellerConsentTexts = {
+  de: 'Mit deiner Statistik-Einwilligung merken wir den Einstieg Website/Fragebogen 30 Tage lang und ordnen bezahlte Abos zu. Ohne Erlaubnis wird diese Zuordnung nicht gespeichert oder an die Kasse gesendet.',
+  en: 'With your statistics consent we remember the website/questionnaire entry for 30 days and attribute paid subscriptions. Without permission, this assignment is not stored or sent to checkout.',
+  fr: 'Avec votre accord pour les statistiques, nous mémorisons votre entrée par le site ou le questionnaire pendant 30 jours et y attribuons les abonnements payés. Sans accord, cette attribution n’est ni conservée ni transmise au paiement.',
+  pl: 'Za zgodą na statystyki zapamiętujemy wejście przez stronę lub ankietę przez 30 dni i przypisujemy opłacone subskrypcje. Bez zgody przypisanie nie jest zapisywane ani przekazywane do płatności.',
+  ro: 'Cu acordul pentru statistici, reținem intrarea prin site sau chestionar timp de 30 de zile și atribuim abonamentele plătite. Fără acord, atribuirea nu este salvată sau trimisă la plată.',
+  bg: 'Със съгласието ви за статистика запомняме входа през сайта или въпросника за 30 дни и свързваме платените абонаменти. Без съгласие това разпределение не се съхранява и не се изпраща към плащането.',
+  hr: 'Uz pristanak na statistiku pamtimo ulazak preko stranice ili upitnika 30 dana i pripisujemo plaćene pretplate. Bez pristanka dodjela se ne pohranjuje niti šalje na naplatu.',
+  sk: 'So súhlasom so štatistikou si pamätáme vstup cez web alebo dotazník 30 dní a priraďujeme zaplatené predplatné. Bez súhlasu sa priradenie neukladá ani neposiela k platbe.',
+  hu: 'Statisztikai hozzájárulással 30 napig megjegyezzük, hogy a weboldalon vagy kérdőíven érkeztél, és hozzárendeljük a kifizetett előfizetéseket. Engedély nélkül ezt nem tároljuk és nem küldjük a pénztárnak.',
+  cs: 'Se souhlasem se statistikou si pamatujeme vstup přes web nebo dotazník 30 dní a přiřazujeme zaplacená předplatná. Bez souhlasu se přiřazení neukládá ani neposílá k platbě.',
+  uk: 'За вашою згодою на статистику ми запам’ятовуємо вхід через сайт або анкету на 30 днів і пов’язуємо з ним оплачені підписки. Без згоди цей розподіл не зберігається та не передається для оплати.',
+  bs: 'Uz pristanak na statistiku pamtimo ulazak putem stranice ili upitnika 30 dana i pripisujemo plaćene pretplate. Bez pristanka dodjela se ne čuva niti šalje na naplatu.',
+  sr: 'Уз пристанак на статистику памтимо улазак преко сајта или упитника 30 дана и приписујемо плаћене претплате. Без пристанка додела се не чува нити шаље на наплату.',
+  lt: 'Gavę sutikimą statistikai, 30 dienų įsimename įėjimą per svetainę ar klausimyną ir priskiriame apmokėtas prenumeratas. Be sutikimo šis priskyrimas nesaugomas ir nesiunčiamas į mokėjimą.',
+  sl: 'S soglasjem za statistiko si 30 dni zapomnimo vstop prek strani ali vprašalnika in mu pripišemo plačane naročnine. Brez soglasja se dodelitev ne shrani ali pošlje v plačilo.',
+  lv: 'Ar piekrišanu statistikai 30 dienas atceramies ieeju caur vietni vai anketu un piesaistām apmaksātos abonementus. Bez piekrišanas šī piesaiste netiek glabāta vai nosūtīta maksājumam.',
+  et: 'Statistika nõusolekul jätame veebilehe või küsimustiku kaudu sisenemise 30 päevaks meelde ja seostame tasutud tellimused. Ilma loata seda jaotust ei salvestata ega saadeta maksmisele.',
+  ru: 'С вашего согласия на статистику мы запоминаем вход через сайт или анкету на 30 дней и связываем с ним оплаченные подписки. Без согласия это распределение не сохраняется и не передаётся для оплаты.',
+  tr: 'İstatistik izninizle site veya anket girişini 30 gün hatırlar ve ödenmiş aboneliklerle ilişkilendiririz. İzin olmadan bu atama saklanmaz veya ödeme sayfasına gönderilmez.',
+  ar: 'بموافقتك على الإحصاءات، نتذكر الدخول عبر الموقع أو الاستبيان لمدة 30 يومًا ونربطه بالاشتراكات المدفوعة. دون موافقتك، لا يُحفظ هذا التخصيص ولا يُرسل إلى صفحة الدفع.',
+  it: 'Con il consenso alle statistiche ricordiamo per 30 giorni l’ingresso dal sito o dal questionario e attribuiamo gli abbonamenti pagati. Senza consenso, l’assegnazione non viene salvata né inviata al pagamento.',
+  es: 'Con tu consentimiento para estadísticas recordamos la entrada por la web o el cuestionario durante 30 días y atribuimos las suscripciones pagadas. Sin permiso, esta asignación no se guarda ni se envía al pago.',
+  pt: 'Com seu consentimento para estatísticas, lembramos a entrada pelo site ou questionário por 30 dias e atribuímos as assinaturas pagas. Sem permissão, essa atribuição não é salva nem enviada ao pagamento.',
+  nl: 'Met je toestemming voor statistieken onthouden we de ingang via website of vragenlijst 30 dagen en koppelen we betaalde abonnementen. Zonder toestemming wordt deze indeling niet opgeslagen of naar de kassa verzonden.',
+  el: 'Με τη συγκατάθεσή σας για στατιστικά θυμόμαστε την είσοδο μέσω ιστοσελίδας ή ερωτηματολογίου για 30 ημέρες και αντιστοιχίζουμε πληρωμένες συνδρομές. Χωρίς άδεια, η αντιστοίχιση δεν αποθηκεύεται ούτε αποστέλλεται στην πληρωμή.',
+  sq: 'Me pëlqimin për statistika, ruajmë hyrjen nga faqja ose pyetësori për 30 ditë dhe lidhim abonimet e paguara. Pa leje, kjo ndarje nuk ruhet dhe nuk dërgohet te pagesa.',
+  fa: 'با رضایت شما برای آمار، ورود از وب‌سایت یا پرسش‌نامه را ۳۰ روز به خاطر می‌سپاریم و اشتراک‌های پرداخت‌شده را به آن نسبت می‌دهیم. بدون اجازه، این تخصیص ذخیره یا به صفحه پرداخت ارسال نمی‌شود.',
+  th: 'เมื่อคุณยินยอมให้เก็บสถิติ เราจะจดจำการเข้าผ่านเว็บไซต์หรือแบบสอบถามเป็นเวลา 30 วัน และเชื่อมโยงกับการสมัครสมาชิกที่ชำระแล้ว หากไม่อนุญาต เราจะไม่บันทึกหรือส่งข้อมูลการแบ่งกลุ่มนี้ไปยังหน้าชำระเงิน',
+  da: 'Med dit samtykke til statistik husker vi indgangen via hjemmesiden eller spørgeskemaet i 30 dage og tilskriver betalte abonnementer. Uden tilladelse gemmes fordelingen ikke og sendes ikke til betaling.',
+  fi: 'Tilastosuostumuksellasi muistamme sivuston tai kyselyn kautta saapumisen 30 päivää ja yhdistämme maksetut tilaukset. Ilman lupaa tätä jakoa ei tallenneta eikä lähetetä maksamiseen.',
+  ga: 'Le do thoiliú le staitisticí, cuimhnímid ar an mbealach isteach tríd an suíomh nó an ceistneoir ar feadh 30 lá agus ceanglaímid síntiúis íoctha leis. Gan cead, ní stóráiltear an sannadh seo ná ní sheoltar chuig an íocaíocht é.',
+  mt: 'Bil-kunsens tiegħek għall-istatistika, niftakru d-dħul mis-sit jew mill-kwestjonarju għal 30 jum u nattribwixxu abbonamenti mħallsa. Mingħajr permess, din l-assenjazzjoni ma tinħażinx u ma tintbagħatx għall-ħlas.',
+  sv: 'Med ditt samtycke till statistik minns vi ingången via webbplatsen eller frågeformuläret i 30 dagar och kopplar betalda prenumerationer. Utan tillstånd sparas inte fördelningen eller skickas till betalningen.'
+};
+let tellerContext = ['website', 'funnel'].includes(tellerEntry);
+if (!tellerContext && websiteAnalytics.readConsent() === 'granted') {
+  try {
+    const saved = JSON.parse(localStorage.getItem('demenzcoach.teller.v1'));
+    tellerContext = ['website', 'funnel'].includes(saved?.arm) && saved.expiresAt > Date.now();
+  } catch { /* no experiment context */ }
+}
+const tellerLanguage = document.documentElement.lang.split('-')[0];
+const tellerConsentCopy = localizedSiteCopy.analytics?.tellerText ?? tellerConsentTexts[tellerLanguage];
+const consentText = baseConsentText + (tellerContext && tellerConsentCopy ? ` ${tellerConsentCopy}` : '');
 // Absolute Adresse, damit der Link auch in Unterordnern wie /start/ oder /ratgeber/ stimmt.
 const privacyURL = new URL(localizedSiteCopy.privacyURL ?? (usesEnglish ? 'privacy-en.html' : 'datenschutz.html'), `${location.origin}/`).pathname;
 
@@ -312,6 +452,7 @@ const applyConsent = (statistics, marketing) => {
     if (marketing) websiteAnalytics.grantMarketing();
     else websiteAnalytics.denyMarketing();
   }
+  window.DemenzTeller?.consentChanged();
   hideConsentBanner();
 };
 
@@ -340,6 +481,27 @@ window.DemenzConsent = {
   track: websiteAnalytics.track,
   trackMarketing: websiteAnalytics.trackMarketing
 };
+
+window.DemenzTeller = createTellerExperiment({
+  host: window,
+  entry: tellerEntry,
+  statistics: () => websiteAnalytics.readConsent() === 'granted',
+  track: websiteAnalytics.track
+});
+if (websiteAnalytics.readConsent() === 'denied') window.DemenzTeller.forget();
+window.addEventListener('storage', (event) => {
+  if (event.key === 'demenzcoach.analyticsConsent.v1' || event.key === null) {
+    websiteAnalytics.clearSessionChoices();
+    if (websiteAnalytics.readConsent() !== 'granted') {
+      websiteAnalytics.stopStatistics();
+      window.DemenzTeller.forget();
+    }
+    else {
+      websiteAnalytics.startStatistics();
+      window.DemenzTeller.consentChanged();
+    }
+  }
+});
 
 if (websiteAnalytics.readConsent() === 'granted') websiteAnalytics.loadTag();
 if (websiteAnalytics.marketingOnPage && websiteAnalytics.readMarketing() === 'granted') websiteAnalytics.loadPixels();

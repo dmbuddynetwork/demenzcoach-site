@@ -16,7 +16,7 @@
 <body data-marketing-pixels>
   <main class="abo-page">
     <div class="abo-top">
-      <a class="abo-brand" href="/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+      <a class="abo-brand" href="/de/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
       <button class="abo-link-button" type="button" id="manage-button" hidden>Abo verwalten</button>
     </div>
 
@@ -105,9 +105,11 @@
 
     <!-- Fertig -->
     <section id="step-done" aria-labelledby="done-title" hidden>
-      <h1 id="done-title">Geschafft</h1>
-      <p>Dein Abo ist aktiv. Eine Bestätigung kommt per E-Mail.</p>
-      <div class="abo-card">
+      <h1 id="done-title">Zahlungsstatus prüfen</h1>
+      <p id="done-status" role="status" aria-live="polite">Wir prüfen deine Zahlung. Bitte schließe kein zweites Abo ab.</p>
+      <button class="abo-button" id="payment-status-manage" type="button" data-manage hidden>Zahlungsstatus in Abo-Verwaltung prüfen</button>
+      <button class="abo-button" id="payment-status-retry" type="button" hidden>Status erneut prüfen</button>
+      <div class="abo-card" id="done-plan" hidden>
         <p><strong>Dein Plan ist fertig.</strong> Du findest ihn hier im Web, auf jedem Handy und Computer.</p>
         <p class="abo-muted">Auf dem iPhone geht es auch in der App: Demenz Coach laden, Einstellungen öffnen, mit demselben Konto anmelden.</p>
       </div>
@@ -127,13 +129,13 @@
           <div id="link-recaptcha"></div>
         </form>
       </div>
-      <a class="abo-button" href="mein-plan.html">Zu deinem Plan</a>
+      <a class="abo-button" id="done-plan-link" href="mein-plan.html" hidden>Zu deinem Plan</a>
       <a class="abo-button abo-button-light" id="app-store-link" href="#">Für iPhone: Demenz Coach laden</a>
     </section>
 
     <section id="step-already" aria-labelledby="already-title" hidden>
       <h1 id="already-title">Du hast schon ein Abo</h1>
-      <p>Dein Plan ist hier im Web freigeschaltet. Auf dem iPhone meldest du dich in der App mit demselben Konto an.</p>
+      <p>Dein Abo besteht bereits. Den Zahlungsstatus und die Zahlungsart kannst du unter „Abo verwalten“ prüfen.</p>
       <a class="abo-button" href="mein-plan.html">Zu deinem Plan</a>
       <button class="abo-button abo-button-light" type="button" data-manage>Abo verwalten</button>
     </section>

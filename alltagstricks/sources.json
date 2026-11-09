@@ -1,0 +1,145 @@
+{
+  "checkedAt": "2026-11-09",
+  "note": "Thematische Weiterlesequellen, kein Nachweis einer medizinischen Fachprüfung. Overrides betreffen nur die Website; App-Quelldaten bleiben unberührt. Quellenorganisationen sind nicht beteiligt.",
+  "sources": {
+    "eating": {
+      "label": "Alzheimer’s Society: Essen im Alltag begleiten (Englisch)",
+      "url": "https://www.alzheimers.org.uk/get-support/living-with-dementia/improving-eating-experience-dementia"
+    },
+    "drinking": {
+      "label": "Alzheimer’s Society: Trinken und Flüssigkeit (Englisch)",
+      "url": "https://www.alzheimers.org.uk/get-support/living-with-dementia/drinking-hydration"
+    },
+    "bathing": {
+      "label": "Alzheimer’s Society: Waschen und Duschen begleiten (Englisch)",
+      "url": "https://www.alzheimers.org.uk/get-support/living-with-dementia/washing-bathing-showering-tips"
+    },
+    "home": {
+      "label": "NHS: Die Wohnung demenzfreundlich gestalten (Englisch)",
+      "url": "https://www.nhs.uk/conditions/dementia/living-with-dementia/home-environment/"
+    },
+    "everyday": {
+      "label": "Deutsche Alzheimer Gesellschaft: Tipps für den Alltag",
+      "url": "https://www.deutsche-alzheimer.de/mit-demenz-leben/tipps-fuer-den-alltag"
+    },
+    "walking": {
+      "label": "Alzheimer’s Society: Sicher unterwegs sein (Englisch)",
+      "url": "https://www.alzheimers.org.uk/about-dementia/stages-and-symptoms/dementia-symptoms/supporting-person-dementia-who-walks-about"
+    },
+    "aids": {
+      "label": "Deutsche Alzheimer Gesellschaft: Technische Hilfen",
+      "url": "https://www.deutsche-alzheimer.de/mit-demenz-leben/technische-hilfen"
+    },
+    "sleep": {
+      "label": "Alzheimer’s Association: Veränderungen des Schlafs (Englisch)",
+      "url": "https://www.alz.org/alzheimers-dementia/treatments/for-sleep-changes"
+    },
+    "dressing": {
+      "label": "Alzheimer’s Association: Anziehen und Körperpflege (Englisch)",
+      "url": "https://www.alz.org/help-support/caregiving/daily-care/dressing-grooming"
+    },
+    "activities": {
+      "label": "NHS: Gemeinsame Aktivitäten bei Demenz (Englisch)",
+      "url": "https://www.nhs.uk/conditions/dementia/living-with-dementia/activities/"
+    },
+    "communication": {
+      "label": "Alzheimer’s Society: Kommunikation bei Demenz (Englisch)",
+      "url": "https://www.alzheimers.org.uk/about-dementia/stages-and-symptoms/dementia-symptoms/how-to-communicate-dementia"
+    }
+  },
+  "categories": {
+    "essen": [
+      "eating"
+    ],
+    "trinken": [
+      "drinking"
+    ],
+    "bad": [
+      "bathing",
+      "home"
+    ],
+    "orientierung": [
+      "everyday",
+      "home"
+    ],
+    "schlaf": [
+      "sleep"
+    ],
+    "sicherheit": [
+      "walking",
+      "aids",
+      "home"
+    ],
+    "kleidung": [
+      "dressing"
+    ],
+    "beschaeftigung": [
+      "activities"
+    ],
+    "gespraech": [
+      "communication"
+    ]
+  },
+  "notes": {
+    "essen": "Bei bekannten Kau- oder Schluckproblemen oder individuellen Ernährungsvorgaben frage vor neuen Angeboten das Behandlungsteam. Niemanden zum Essen drängen.",
+    "trinken": "Beachte individuelle Vorgaben zu Getränken und Trinkmenge. Bei Schluckproblemen gehört die Auswahl geeigneter Getränke und Hilfsmittel zum Behandlungsteam.",
+    "bad": "Achte auf Einverständnis, Privatsphäre und eine sichere Umgebung. Prüfe die Wassertemperatur vor dem Kontakt und hole Unterstützung, wenn die Person unsicher steht.",
+    "sicherheit": "Selbstbestimmung und Sicherheit gehören zusammen. Schließe die Person nicht ein und halte Ausgänge und Fluchtwege frei. Bei vermissten Personen oder unmittelbarer Gefahr hole örtliche Notfallhilfe."
+  },
+  "overrides": {
+    "armband": {
+      "text": "Wenn die Person einverstanden ist, kann eine Kontaktkarte oder ein Armband mit deiner Telefonnummer eine Möglichkeit sein, dich unterwegs zu erreichen.",
+      "source": "walking"
+    },
+    "tuerglocke": {
+      "text": "Ein gemeinsam besprochener Türmelder kann anzeigen, wenn jemand hinausgeht. Er ersetzt keine Begleitung und darf die Tür nicht versperren.",
+      "source": "aids"
+    },
+    "aktuelles-foto": {
+      "text": "Halte mit Einverständnis der Person ein aktuelles Foto bereit. Falls sie vermisst wird, kann es bei der Suche nützlich sein.",
+      "source": "walking"
+    },
+    "mantel-weg": {
+      "title": "Gemeinsam einen Spaziergang planen",
+      "text": "Wenn die Person hinausmöchte, frage nach ihrem Ziel und biete einen gemeinsamen, vertrauten Weg an. Sorge für passende Kleidung und Schuhe.",
+      "source": "walking"
+    },
+    "mitgehen-fragen": {
+      "text": "Höre zu, wohin die Person möchte. Biete Begleitung auf einem sicheren Weg an, wenn das willkommen ist.",
+      "source": "walking"
+    },
+    "tuer-tarnen": {
+      "title": "Ausgänge frei halten",
+      "text": "Halte Türen und Fluchtwege frei. Schließe die Person niemals allein ein. Besprich sichere Begleitung mit einer Demenzberatungsstelle.",
+      "source": "walking"
+    },
+    "nummer-in-jacke": {
+      "text": "Wenn die Person einverstanden ist, legt gemeinsam eine Kontaktkarte mit deiner Telefonnummer in Jacke oder Tasche.",
+      "source": "walking"
+    },
+    "nachbarn-einweihen": {
+      "text": "Besprecht mit vertrauten Nachbarn, ob sie bei Bedarf helfen möchten. Gib persönliche Angaben nur mit Einverständnis der Person weiter.",
+      "source": "walking"
+    },
+    "rundweg-im-garten": {
+      "text": "Ein vertrauter Rundweg kann eine Möglichkeit zum Gehen sein. Halte ihn frei von Stolperstellen und passe Begleitung und Pausen an die Person an.",
+      "source": "walking"
+    },
+    "hand-ueber-hand": {
+      "text": "Biete Unterstützung beim Halten des Bestecks nur an, wenn die Person das möchte. Höre auf, wenn Berührung unangenehm ist; führe ihre Hand nicht gegen ihren Willen.",
+      "source": "eating"
+    },
+    "kleine-becher-halb-voll": {
+      "text": "Biete ein gut greifbares Gefäß und kleine Mengen an. Bei Schluckproblemen frage das Behandlungsteam, welche Gefäße und Hilfsmittel geeignet sind.",
+      "source": "drinking"
+    },
+    "wasser-fuehlen": {
+      "text": "Prüfe vor dem Waschen eine angenehme Wassertemperatur. Danach kann die Person das Wasser mit der Hand kennenlernen, wenn sie das möchte.",
+      "source": "bathing"
+    },
+    "teller-rot": {
+      "text": "Wähle einen Teller, der sich vom Tisch und vom Essen abhebt. Rot ist eine Möglichkeit, wenn der Kontrast passt.",
+      "source": "home"
+    }
+  }
+}

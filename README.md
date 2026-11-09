@@ -16,11 +16,39 @@ Public product, support and legal pages for the Demenz Coach iOS app.
 
 The GitHub Pages deployment rejects any release that still contains an incomplete legal-address placeholder.
 
-The product homepage is available in 33 languages. Run
-`node scripts/refresh-localized-pages.mjs .` to regenerate their shared Lovable
-design, reciprocal language links, final Store screenshot galleries and sitemap.
-The German conversion landing in `de/` (own `landing.css`/`landing.js`, explicit
-DE storefront links) is hand-maintained and not touched by that generator.
-Then run `node scripts/validate-seo.mjs .`. The screenshot provenance, locale
-fallbacks and performance measurements are documented in
-`docs/multilingual-site-refresh.md`.
+The homepage has 33 stable language URLs: `/de/`, `/en/`, `/fr/`, etc.
+`/` and `/index.html` permanently redirect to `/de/`; the former
+`/index-xx.html` addresses redirect to `/xx/`. Cloudflare's Worker preserves
+query parameters and does not select a language from IP or browser settings.
+Language links, self-canonicals, reciprocal hreflang and the sitemap use these
+language URLs; `x-default` is `/de/`. The previous, distinct German app landing
+is preserved at `/de/app/`, with its own assets and canonical. Other existing
+editorial, tool and legal addresses remain valid.
+
+Cloudflare runs the Worker before assets for the legacy homepage addresses
+listed in `wrangler.jsonc`. The root HTML files are redirect fallbacks for
+GitHub Pages, which cannot issue the same server redirects. Do not run the
+historical `scripts/refresh-localized-pages.mjs`: it targets the former paths
+and would overwrite newer layouts. Edit the existing language pages directly.
+
+Checks (Node.js; browser checks also need Playwright and a local HTTP server):
+
+```sh
+node --test scripts/test-worker-routing.mjs
+node scripts/validate-seo.mjs .
+git diff --check
+# Start the actual Cloudflare routing locally:
+npx wrangler dev --local --port 8897
+# In another terminal:
+SITE_URL=http://127.0.0.1:8897/ node scripts/validate-language-routing.cjs
+SITE_URL=http://127.0.0.1:8897/ node scripts/validate-mobile.cjs de/index.html en/index.html fr/index.html ar/index.html de/app/index.html
+SITE_URL=http://127.0.0.1:8897/ node scripts/validate-site-layout.cjs de/index.html en/index.html fr/index.html ar/index.html de/app/index.html index.html index-en.html
+```
+
+`PLAYWRIGHT_MODULE` and `CHROME_PATH` can point to an existing Playwright
+installation and browser. Mobile/layout validators accept optional file
+arguments for focused checks; without them they inspect their full page sets.
+The URL approach follows [Google's multilingual-site guidance](https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites)
+and [hreflang guidance](https://developers.google.com/search/docs/specialty/international/localized-versions).
+Screenshot provenance and locale fallbacks in `docs/multilingual-site-refresh.md`
+are historical background, not current build instructions.

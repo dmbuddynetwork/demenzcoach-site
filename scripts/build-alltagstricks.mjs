@@ -5,6 +5,12 @@ import path from "node:path";
 
 const root = path.resolve(process.argv[2] ?? ".");
 const data = JSON.parse(fs.readFileSync(path.join(root, "alltagstricks/tricks.json"), "utf8"));
+const references = JSON.parse(fs.readFileSync(path.join(root, "alltagstricks/sources.json"), "utf8"));
+// Website clarifications do not rewrite the shared App source list.
+for (const [id, override] of Object.entries(references.overrides)) {
+  if (!data.tricks.some(trick => trick.id === id) || !references.sources[override.source]) throw new Error(`Unknown source override: ${id}`);
+}
+data.tricks = data.tricks.map(trick => ({ ...trick, ...references.overrides[trick.id] }));
 const url = "https://dementiacoachapp.com/alltagstricks/";
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -39,6 +45,12 @@ const store = (ct) => `https://apps.apple.com/app/apple-store/id6790763941?pt=12
 const categories = Object.entries(data.categories);
 const title = `Alltagstricks bei Demenz: ${data.tricks.length} kleine Hilfen mit Bildern | Demenz Coach`;
 const description = `Roter Teller, Bild an der Toilettentür, Tafel für den Tag: ${data.tricks.length} einfache Alltagstricks für Angehörige von Menschen mit Demenz, jeder mit Zeichnung.`;
+const sourceLink = id => {
+  const source = references.sources[id];
+  if (!source) throw new Error(`Unknown source ${id}`);
+  return `<a href="${esc(source.url)}" rel="noopener">${esc(source.label)}</a>`;
+};
+const groupSources = (key, name) => `<details class="tricks-sources"><summary>Quellen zum Thema ${esc(name)}</summary><ul>${references.categories[key].map(id => `<li>${sourceLink(id)}</li>`).join("")}</ul><p>Weiterführende Informationen zur Einordnung. Die Organisationen sind nicht mit Demenz Coach verbunden.</p></details>`;
 
 // Gleiches Aussehen wie die Ergebnisseite des Übersetzers (Daniel, 8. Nov 17:01: „soll wie eine Seite wirken“):
 // dieselbe Trick-Karte wie unter „Das kannst du tun“, Themen als Überschriften wie „Das kannst du sagen“,
@@ -55,7 +67,7 @@ const card = (t) => {
               <img class="translator-trick-art" src="img/${t.drawing}.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
               <div class="translator-trick-text">
                 <h3 class="translator-trick-title">${esc(t.title)}</h3>
-                <p>${esc(t.text)}</p>${links.join("")}
+                <p>${esc(t.text)}</p>${t.source ? `<p class="article-meta">Zum Weiterlesen: ${sourceLink(t.source)}</p>` : ""}${links.join("")}
               </div>
             </article>`;
 };
@@ -64,7 +76,9 @@ const sections = categories.map(([key, name]) => {
   const tricks = data.tricks.filter((t) => t.category === key);
   return `
           <section class="tricks-group" id="${key}" aria-labelledby="${key}-title">
-            <h2 class="translator-step" id="${key}-title">${esc(name)}</h2>${tricks.map(card).join("")}
+            <h2 class="translator-step" id="${key}-title">${esc(name)}</h2>
+            ${references.notes[key] ? `<p class="tricks-safety">${esc(references.notes[key])}</p>` : ""}
+            ${groupSources(key, name)}${tricks.map(card).join("")}
           </section>`;
 }).join("");
 
@@ -72,40 +86,45 @@ const schema = {
   "@context": "https://schema.org",
   "@graph": [
     { "@type": "Article", "@id": `${url}#content`, headline: "Alltagstricks bei Demenz", description, inLanguage: "de",
-      isAccessibleForFree: true, datePublished: "2026-11-08", dateModified: "2026-11-08",
+      isAccessibleForFree: true, datePublished: "2026-11-08", dateModified: references.checkedAt,
       author: { "@id": "https://dementiacoachapp.com/#organization" }, publisher: { "@id": "https://dementiacoachapp.com/#organization" },
       image: `https://dementiacoachapp.com/alltagstricks/img/illu-plate-red.webp`,
-      citation: ["https://www.deutsche-alzheimer.de/mit-demenz-leben/umgang-und-kommunikation", "https://www.wegweiser-demenz.de/"] },
+      citation: Object.values(references.sources).map(source => source.url) },
     { "@type": "ItemList", "@id": `${url}#tricks`, name: "Alltagstricks bei Demenz", numberOfItems: data.tricks.length,
       itemListElement: data.tricks.map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.title, url: `${url}#${t.id}` })) },
     { "@type": "BreadcrumbList", itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Start", item: "https://dementiacoachapp.com/" },
+      { "@type": "ListItem", position: 1, name: "Start", item: "https://dementiacoachapp.com/de/" },
       { "@type": "ListItem", position: 2, name: "Alltagstricks", item: url }] },
     { "@type": "Organization", "@id": "https://dementiacoachapp.com/#organization", name: "Demenz Coach", url: "https://dementiacoachapp.com/" },
   ],
 };
 
-const html = `<!doctype html>
+const overviewHeading = 'Alltagstricks<span class="translator-h1-sub"><span class="translator-h1-dash">: </span>Kleine Hilfen für jeden Tag</span>';
+const overviewIntro = `<p>${data.tricks.length} Möglichkeiten für euren Alltag. Wähle aus, was die Person möchte und was zu eurer Situation passt.</p><p><a href="/alltagstricks/essen-trinken.html">Essen und Trinken: sechs Hilfen gezielt auswählen →</a></p>`;
+const navigation = categories.map(([key, name]) => `<a class="translator-copy" href="#${key}">${esc(name)}</a>`).join("");
+const renderPage = ({ pageURL = url, pageTitle = title, pageDescription = description,
+  headline = overviewHeading, intro = overviewIntro, jumpLinks = navigation, content = sections,
+  pageSchema = schema, slug = "alltagstricks", breadcrumb = '<a href="/de/">Startseite</a> › Alltagstricks' } = {}) => `<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="${esc(description)}">
+  <meta name="description" content="${esc(pageDescription)}">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#f6f5f2">
   <meta name="apple-itunes-app" content="app-id=6790763941">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Demenz Coach">
   <meta property="og:locale" content="de_DE">
-  <meta property="og:title" content="Alltagstricks bei Demenz">
-  <meta property="og:description" content="${esc(description)}">
-  <meta property="og:url" content="${url}">
+  <meta property="og:title" content="${esc(pageTitle)}">
+  <meta property="og:description" content="${esc(pageDescription)}">
+  <meta property="og:url" content="${pageURL}">
   <meta property="og:image" content="https://dementiacoachapp.com/assets/og-teller.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <title>${esc(title)}</title>
-  <link rel="canonical" href="${url}">
-  <link rel="alternate" hreflang="de" href="${url}">
-  <link rel="alternate" hreflang="x-default" href="${url}">
+  <title>${esc(pageTitle)}</title>
+  <link rel="canonical" href="${pageURL}">
+  <link rel="alternate" hreflang="de" href="${pageURL}">
+  <link rel="alternate" hreflang="x-default" href="${pageURL}">
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicon-192.png">
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
   <link rel="manifest" href="../site.webmanifest">
@@ -120,29 +139,29 @@ const html = `<!doctype html>
     body.einfach .translator-trick:target { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
     body.einfach .tricks-jump { margin: 24px 0 8px; }
   </style>
-  <script type="application/ld+json">${JSON.stringify(schema, null, 2)}</script>
+  <script type="application/ld+json">${JSON.stringify(pageSchema, null, 2)}</script>
 </head>
-<body class="einfach" data-page-type="translator-tool" data-page-language="de" data-page-slug="alltagstricks">
+<body class="einfach" data-page-type="translator-tool" data-page-language="de" data-page-slug="${slug}">
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
   <header class="e-header">
     <div class="e-wrap">
-      <a class="e-brand" href="/" aria-label="Demenz Coach Startseite"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+      <a class="e-brand" href="/de/" aria-label="Demenz Coach Startseite"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
       <nav aria-label="Hauptnavigation"><a href="${store("seo_de_tricks_nav")}" data-store-link="seo-de-tricks-nav">Zur App</a></nav>
     </div>
   </header>
   <main id="main" class="content-main">
     <section class="content-hero translator-hero">
       <div class="container content-narrow">
-        <h1>Alltagstricks<span class="translator-h1-sub"><span class="translator-h1-dash">: </span>Kleine Hilfen für jeden Tag</span></h1>
-        <p>${data.tricks.length} einfache Tricks, die viele Familien nutzen. Probiere aus, was zu euch passt.</p>
+        <nav aria-label="Brotkrumen">${breadcrumb}</nav>
+        <h1>${headline}</h1>
+        <div class="tricks-intro">${intro}</div>
         <div class="translator-next tricks-jump">
           <p class="translator-next-title">Themen</p>
-          <nav class="translator-next-rows" aria-label="Themen">${categories.map(([k, n]) => `
-            <a class="translator-copy" href="#${k}">${esc(n)}</a>`).join("")}
+          <nav class="translator-next-rows" aria-label="Themen">${jumpLinks}
           </nav>
         </div>
         <div class="translator-result">
-          <div class="translator-answer">${sections}
+          <div class="translator-answer">${content}
           </div>
           <div class="translator-result-links">
             <a class="translator-copy" href="/demenz-uebersetzer/" data-related-link="demenz-uebersetzer">Satz übersetzen</a>
@@ -160,7 +179,7 @@ const html = `<!doctype html>
           </div>
           <a class="button" href="${store("seo_de_tricks")}" data-store-link="seo_de_tricks">Kostenlos im App Store</a>
         </aside>
-        <p class="article-meta">Aktualisiert: <time datetime="2026-11-08">8. November 2026</time> · <a href="/ratgeber/redaktion.html">Demenz Coach Redaktion</a> · Quellen: <a href="https://www.deutsche-alzheimer.de/mit-demenz-leben/umgang-und-kommunikation" rel="noopener">Deutsche Alzheimer Gesellschaft</a>, <a href="https://www.wegweiser-demenz.de/" rel="noopener">Wegweiser Demenz</a></p>
+        <p class="article-meta">Quellenstand: <time datetime="${references.checkedAt}">9. November 2026</time> · <a href="/ratgeber/redaktion.html">Redaktionelle Leitlinien</a> · Anbieterin: <a href="/impressum.html">Deborah Frey</a></p>
       </div>
     </section>
   </main>
@@ -182,18 +201,43 @@ const html = `<!doctype html>
   <script src="/lovable-home.js?v=20261108a"></script>
 </body>
 </html>
-`;
-fs.writeFileSync(path.join(root, "alltagstricks/index.html"), html);
+`.replace(/[ \t]+$/gm, '');
+fs.writeFileSync(path.join(root, "alltagstricks/index.html"), renderPage());
+
+// Ein kuratierter Einstieg statt einer zweiten vollständigen Kopie der Sammlung.
+const topicURL = 'https://dementiacoachapp.com/alltagstricks/essen-trinken.html';
+const selectedIDs = new Set(['unterlage-einfarbig', 'gemeinsam-essen', 'essen-beschreiben', 'kleine-portionen', 'becher-farbig', 'anstossen']);
+const selected = data.tricks.filter(trick => selectedIDs.has(trick.id));
+if (selected.length !== selectedIDs.size) throw new Error('Missing food topic selection');
+const topicTitle = 'Essen und Trinken bei Demenz: 6 Alltagshilfen | Demenz Coach';
+const topicDescription = 'Sechs Möglichkeiten für Mahlzeiten und Getränke bei Demenz: einen übersichtlichen Tisch gestalten, gemeinsam essen und passende Trinkangebote auswählen.';
+const topicSchema = structuredClone(schema);
+const article = topicSchema['@graph'][0];
+Object.assign(article, { '@id': `${topicURL}#content`, headline: 'Essen und Trinken bei Demenz', description: topicDescription,
+  datePublished: '2026-11-09', citation: ['eating', 'drinking'].map(id => references.sources[id].url) });
+Object.assign(topicSchema['@graph'][1], { '@id': `${topicURL}#tricks`, name: 'Sechs Alltagshilfen für Essen und Trinken',
+  numberOfItems: selected.length, itemListElement: selected.map((trick, index) => ({ '@type': 'ListItem', position: index + 1, name: trick.title, url: `${topicURL}#${trick.id}` })) });
+topicSchema['@graph'][2].itemListElement.push({ '@type': 'ListItem', position: 3, name: 'Essen und Trinken', item: topicURL });
+const topicContent = ['essen', 'trinken'].map(key => `<section class="tricks-group" id="${key}" aria-labelledby="${key}-title"><h2 class="translator-step" id="${key}-title">${esc(data.categories[key])}</h2><p class="tricks-safety">${esc(references.notes[key])}</p>${groupSources(key, data.categories[key])}${selected.filter(trick => trick.category === key).map(card).join('')}</section>`).join('');
+fs.writeFileSync(path.join(root, 'alltagstricks/essen-trinken.html'), renderPage({
+  pageURL: topicURL, pageTitle: topicTitle, pageDescription: topicDescription, headline: 'Essen und Trinken bei Demenz',
+  intro: '<p>Am Tisch ist gerade vieles gleichzeitig los? Beginne mit einer kleinen Veränderung, die die Person möchte. Diese Auswahl führt dich zu sechs Möglichkeiten aus unserer Alltagssammlung.</p><section aria-labelledby="auswahl-title"><h2 id="auswahl-title">Womit möchtest du anfangen?</h2><ul><li>Der Tisch ist unübersichtlich: <a href="#unterlage-einfarbig">weniger Dinge und Muster</a>.</li><li>Ihr möchtet die Mahlzeit gemeinsam gestalten: <a href="#gemeinsam-essen">zusammen am Tisch sitzen</a>.</li><li>Ein Getränk wird leicht übersehen: <a href="#becher-farbig">ein gut erkennbares Gefäß anbieten</a>.</li></ul><p>Beobachte, ob das Angebot angenehm ist. Wenn es nicht passt, höre auf und probiere später etwas anderes. Vorlieben, vertraute Abläufe und die Selbstständigkeit der Person stehen im Mittelpunkt.</p><p>Bei bekannten Kau- oder Schluckproblemen oder individuellen Ernährungsvorgaben frage vor Änderungen das Behandlungsteam. Diese Seite gibt allgemeine Alltagshinweise und ersetzt keine individuelle Beratung.</p></section>',
+  jumpLinks: '<a class="translator-copy" href="#essen">Beim Essen</a><a class="translator-copy" href="#trinken">Beim Trinken</a>',
+  content: `${topicContent}<p><a href="/alltagstricks/">Alle Alltagstricks ansehen →</a></p>`, pageSchema: topicSchema, slug: 'essen-trinken',
+  breadcrumb: '<a href="/de/">Startseite</a> › <a href="/alltagstricks/">Alltagstricks</a> › Essen und Trinken'
+}));
 
 const sitemapPath = path.join(root, "sitemap.xml");
 let sitemap = fs.readFileSync(sitemapPath, "utf8");
-if (!sitemap.includes(`<loc>${url}</loc>`)) {
+for (const pageURL of [url, topicURL]) {
+if (!sitemap.includes(`<loc>${pageURL}</loc>`)) {
   sitemap = sitemap.replace("</urlset>", `  <url>
-    <loc>${url}</loc>
-    <xhtml:link rel="alternate" hreflang="de" href="${url}"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="${url}"/>
+    <loc>${pageURL}</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="${pageURL}"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${pageURL}"/>
   </url>
 </urlset>`);
   fs.writeFileSync(sitemapPath, sitemap);
 }
-console.log(`alltagstricks/index.html: ${data.tricks.length} tricks`);
+}
+console.log(`Alltagstricks: ${data.tricks.length} entries with topic sources; Essen/Trinken: ${selected.length} curated entries.`);

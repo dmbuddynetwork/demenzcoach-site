@@ -146,10 +146,12 @@ export async function open(options) {
   try {
     publicConfig ??= await api("/config");
     const user = await signedInUser();
+    await window.DemenzTeller?.ready;
     const session = await api("/session", {
       method: "POST",
       token: await user.getIdToken(),
       body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
+        ...window.DemenzTeller?.attribution(),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
     const price = publicConfig.plans[options.plan];
