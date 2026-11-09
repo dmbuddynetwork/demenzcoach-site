@@ -81,6 +81,17 @@ test("directory URLs without slash still get the canonical slash redirect", asyn
   await assertRedirect("/en", "/en/");
 });
 
+test("conditional directory requests retain the asset's 304 instead of becoming 404", async () => {
+  const cachedEnv = { ASSETS: { fetch: async () => new Response(null, {
+    status: 304, headers: { etag: '"cached-page"' }
+  }) } };
+  const response = await worker.fetch(new Request('https://dementiacoachapp.com/fr/', {
+    headers: { 'if-none-match': '"cached-page"' }
+  }), cachedEnv);
+  assert.equal(response.status, 304);
+  assert.equal(response.headers.get('etag'), '"cached-page"');
+});
+
 test("worker 404 keeps real status and does not invent redirects", async () => {
   for (const path of ["/zz/", "/nicht-da", "//evil.com/", "/index-de.html"]) {
     const response = await request(path);

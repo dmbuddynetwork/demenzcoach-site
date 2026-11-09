@@ -1,4 +1,4 @@
-// Progressive enhancement for /de/: the page works fully without this script.
+// Progressive enhancement for /de/app/: the page works fully without this script.
 (function () {
   // 1. Carry a legitimate incoming utm_source into the outgoing App Store campaign token
   //    (e.g. web_de_landing_hero_tiktok). No user data, nothing stored, nothing sent elsewhere.

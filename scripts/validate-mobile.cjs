@@ -1,8 +1,7 @@
-// Run with Playwright installed; optionally set PLAYWRIGHT_MODULE and CHROME_PATH.
+// Run against a local HTTP server; optionally set SITE_URL, PLAYWRIGHT_MODULE and CHROME_PATH.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { pathToFileURL } = require('node:url');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '..');
 
@@ -16,7 +15,9 @@ const root = path.resolve(__dirname, '..');
     page.setDefaultTimeout(5000);
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
-    const pages = fs.readdirSync(root).filter(file => /^index(?:-[a-z]+)?\.html$/.test(file));
+    const pages = fs.readdirSync(root).filter(file => /^[a-z]{2}$/.test(file)
+      && fs.existsSync(path.join(root, file, 'index.html'))).map(language => `${language}/index.html`);
+    const selected = process.argv.slice(2);
     const guidePages = fs.readdirSync(path.join(root, 'ratgeber'))
       .filter(file => file.endsWith('.html') && file !== 'redaktion.html')
       .map(file => `ratgeber/${file}`);
@@ -34,23 +35,26 @@ const root = path.resolve(__dirname, '..');
     };
     for (const width of [320, 390, 430]) {
       await page.setViewportSize({ width, height: 844 });
-      for (const file of [...(width === 320 ? pages : ['index.html', 'index-en.html', 'index-ar.html']), ...guidePages]) {
-        await page.goto(pathToFileURL(path.join(root, file)).href);
+      for (const file of selected.length ? selected : [...(width === 320 ? pages : ['de/index.html', 'en/index.html', 'ar/index.html']), ...guidePages]) {
+        await page.goto(new URL(file, process.env.SITE_URL || 'http://127.0.0.1:8892/').href);
         if (await page.locator('.consent-decline').isVisible()) await page.locator('.consent-decline').click();
         await fits(`${file} ${width}`);
         const menu = page.locator('.menu-button');
-        assert.ok((await menu.boundingBox()).height >= 44);
-        await menu.click();
-        assert.equal(await menu.getAttribute('aria-expanded'), 'true');
-        await fits(`${file} ${width} menu open`);
-        await page.keyboard.press('Escape');
-        assert.equal(await menu.getAttribute('aria-expanded'), 'false');
+        // Current einfach.css pages have direct navigation; older shared pages still have a menu.
+        if (await menu.isVisible()) {
+          assert.ok((await menu.boundingBox()).height >= 44);
+          await menu.click();
+          assert.equal(await menu.getAttribute('aria-expanded'), 'true');
+          await fits(`${file} ${width} menu open`);
+          await page.keyboard.press('Escape');
+          assert.equal(await menu.getAttribute('aria-expanded'), 'false');
+        }
         await page.evaluate(() => { document.documentElement.style.fontSize = '225%'; });
         await fits(`${file} ${width} doubled text`);
       }
     }
     assert.deepEqual(errors, [], 'Browser script errors');
-    console.log(`Mobile checks passed: ${pages.length} languages at 320px; DE/EN/AR and ${guidePages.length} German guide/hub pages at 320/390/430px; menu and doubled text.`);
+    console.log(`Mobile checks passed: ${selected.length ? `${selected.length} selected pages at all widths` : `${pages.length} languages at 320px; DE/EN/AR and ${guidePages.length} German guide/hub pages at all widths`}; 320/390/430px, menu and doubled text.`);
   } finally {
     await browser.close();
   }

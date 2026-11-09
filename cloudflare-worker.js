@@ -26,7 +26,9 @@ export default {
       const assetURL = new URL(url);
       assetURL.pathname = pathname;
       const response = await env.ASSETS.fetch(assetURL, request);
-      return response.status === 200 ? response : null;
+      // Auch ein bedingter Browser-Abruf (304) hat die Datei gefunden. Sonst würde ein
+      // erneuter Besuch derselben Ordner-Seite fälschlich auf 404 fallen.
+      return response.ok || response.status === 304 ? response : null;
     };
     if (request.method === 'GET' || request.method === 'HEAD') {
       const path = url.pathname;
