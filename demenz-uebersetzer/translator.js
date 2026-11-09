@@ -1288,27 +1288,46 @@
   addEventListener('scroll', syncSticky, { passive: true });
   addEventListener('resize', syncSticky, { passive: true });
 
-  // Eingabe immer in Reichweite (Daniel, 9. Nov 03:27): Ist das Feld aus dem Bild gescrollt, lädt unten rechts
-  // ein runder Knopf mit Gesicht zum Schreiben ein und bringt das Feld zurück ins Bild.
+  // Eingabe immer in Reichweite (Daniel, 9. Nov 03:27 und 04:09): Ist das Feld aus dem Bild gescrollt, erscheint
+  // unten rechts ein kleines Chat-Fenster wie bei Support-Chats: die junge Frau aus den Zeichnungen, eine
+  // Sprechblase und ein echtes Eingabefeld. Abschicken trägt den Text ins große Feld und schickt es dort ab.
+  // Mit × wird es zum runden Bild; ein Tipp darauf öffnet es wieder.
   if (document.body.classList.contains('einfach') && 'IntersectionObserver' in window) {
-    const fab = element('button', { className: 'translator-write-fab', attributes: { type: 'button', hidden: '' } }, [
-      element('img', { attributes: { src: '/assets/lovable-logo.jpg', width: '52', height: '52', alt: '' } }),
-      element('span', { text: 'Schreib mir' })
+    const chatImage = data.chatImage ?? null;
+    const avatar = () => chatImage
+      ? element('img', { className: 'translator-chat-avatar', attributes: { src: chatImage.src, width: '56', height: '56', alt: '', decoding: 'async' } })
+      : element('span', { className: 'translator-chat-avatar' });
+    const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: 'Hier schreiben …', 'aria-label': 'Was ist passiert?' } });
+    const send = element('button', { className: 'translator-chat-send', attributes: { type: 'submit', 'aria-label': 'Senden' } });
+    send.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>';
+    const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
+    const close = element('button', { className: 'translator-chat-close', text: '×', attributes: { type: 'button', 'aria-label': 'Chat verkleinern' } });
+    const panel = element('div', { className: 'translator-chat-panel' }, [
+      element('div', { className: 'translator-chat-head' }, [avatar(), element('p', { className: 'translator-chat-bubble', text: 'Was ist passiert? Schreib es mir.' }), close]),
+      chatForm
     ]);
-    fab.addEventListener('click', () => {
-      form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-      input.focus({ preventScroll: true });
-      track('translator_write_fab', { step: 'tap' });
+    const bubbleOnly = element('button', { className: 'translator-chat-open', attributes: { type: 'button', 'aria-label': 'Chat öffnen' } }, [avatar()]);
+    const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': 'Noch etwas schreiben', hidden: '' } }, [panel, bubbleOnly]);
+    let small = false;
+    const setSmall = (value) => { small = value; chat.classList.toggle('translator-chat-small', value); };
+    close.addEventListener('click', () => { setSmall(true); bubbleOnly.focus(); track('translator_write_chat', { step: 'closed' }); });
+    bubbleOnly.addEventListener('click', () => { setSmall(false); field.focus(); track('translator_write_chat', { step: 'opened' }); });
+    chatForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const value = field.value.trim();
+      if (!value) { field.focus(); return; }
+      input.value = value;
+      field.value = '';
+      field.blur();
+      grow();
+      track('translator_write_chat', { step: 'sent' });
+      form.requestSubmit();
     });
-    document.body.append(fab);
-    // Erst mit Text „Schreib mir“, nach ein paar Sekunden nur noch das runde Gesicht (verdeckt weniger).
-    let shortTimer = 0;
+    document.body.append(chat);
     new IntersectionObserver(([seen]) => {
-      fab.hidden = seen.isIntersecting;
-      clearTimeout(shortTimer);
-      fab.classList.remove('translator-write-fab-short');
-      if (!fab.hidden) shortTimer = setTimeout(() => fab.classList.add('translator-write-fab-short'), 4000);
+      const wasHidden = chat.hidden;
+      chat.hidden = seen.isIntersecting;
+      if (wasHidden && !chat.hidden) { chat.classList.remove('translator-chat-in'); void chat.offsetWidth; chat.classList.add('translator-chat-in'); }
     }).observe(input);
-    fab.setAttribute('aria-label', tr('Schreib mir'));
   }
 })();
