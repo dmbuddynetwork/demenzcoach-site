@@ -15,6 +15,9 @@ const production = 'https://dementiacoachapp.com';
     for (const home of ['/de/', '/en/', '/demenz-uebersetzer/']) {
       await page.goto(new URL(`${home}?src=seo_test`, base).href);
       if (home === '/de/') {
+        assert.equal(await page.locator('#home-title').innerText(), 'Was soll ich sagen?');
+        assert.equal(await page.locator('.e-brand span').innerText(), 'Demenz Coach App');
+        assert.equal(await page.getByRole('link', { name: 'Demenz Coach App Startseite', exact: true }).count(), 1, 'home brand has a matching accessible name');
         assert.equal(await page.getByRole('textbox', { name: 'Was wurde gesagt oder was ist passiert?', exact: true }).count(), 1, 'reduced home retains an accessible input label');
         assert.equal(await page.locator('#translator-form h2').count(), 0, 'reduced home has no competing form heading');
         assert.ok(await page.locator('#translator-input').evaluate(element => element.getAttribute('aria-describedby').split(/\s+/).every(id => document.getElementById(id))), 'all input descriptions still resolve');

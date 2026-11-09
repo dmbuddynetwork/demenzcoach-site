@@ -1,6 +1,6 @@
 # Gemeinsamer Website-Stand: Sprachpfade, Startseite und SEO
 
-Auftrag: Daniels zehn SEO-Maßnahmen vollständig umsetzen; zusätzlich die jeweils zuletzt im bestehenden Startseiten-Task gewählte Fassung. Daniels spätere Auswahl der reduzierten Variante 1 ersetzt den früheren Entwurf 2. Keine Veröffentlichung ohne `Site <sha> ok`.
+Auftrag: Daniels zehn SEO-Maßnahmen vollständig umsetzen; zusätzlich die jeweils zuletzt im bestehenden Startseiten-Task gewählte Fassung. Daniels zuletzt gewählter Clean-Entwurf 3 ersetzt die frühere Auswahl 1. Sichtbare H1: „Was soll ich sagen?“, Startseiten-Schriftzug: „Demenz Coach App“. Keine Veröffentlichung ohne `Site <sha> ok`.
 
 | Punkt | Ergebnis |
 | --- | --- |
@@ -8,7 +8,7 @@ Auftrag: Daniels zehn SEO-Maßnahmen vollständig umsetzen; zusätzlich die jewe
 | 2 | Deutsche und englische Situationskarten sind echte Inhaltslinks; normales Antippen bedient weiterhin das Werkzeug, neue Tabs und JavaScript-freie Aufrufe öffnen den jeweiligen Inhalt. |
 | 3 | 33 Sprachpfade, deterministische Weiterleitungen und zugehörige SEO-Verweise aus dem bestehenden Sprachpfad-Task integriert. |
 | 4 | Vorhandene neue URL-Präfix-Property im Unternehmenskonto ist angelegt. Der öffentliche Google-Nachweis ist auf der deutschen Ziel-Startseite eingebaut. Die tatsächliche Bestätigung, Sitemap-Einreichung und Datensicht werden nach der genehmigten Veröffentlichung im Anbieter geprüft. Noch kein Sucherfolg oder Ausgangswert behauptet. |
-| 5 | Zuletzt gewählte reduzierte Startseite: eine Hauptfrage, direkt Eingabe/Beispiel/Antwortknopf, danach sechs kompakte Situationen. Doppelte Einleitung, Formularüberschrift und Hilfszeile entfernt; echte zugeordnete Beschriftung bleibt für Vorlesefunktionen vorhanden. Rechtsnote unverändert. |
+| 5 | Zuletzt gewählter Clean-Entwurf 3: „Was soll ich sagen?“, Startseiten-Schriftzug „Demenz Coach App“, eine gemeinsame dezente weiße Fläche für Eingabe/Beispiel/Antwortknopf/Rechtsnote, danach sechs kompakte Situationen. Doppelte Einleitung, Formularüberschrift und Hilfszeile entfernt; echte zugeordnete Beschriftung bleibt für Vorlesefunktionen vorhanden. Rechtsnote unverändert. |
 | 6 | Mutter-Situationsseite bietet kurze Antworten; der eigenständige Ratgeber ordnet Gespräche über verstorbene Angehörige ein. Beide bleiben selbstkanonisch und gegenseitig verlinkt. Keine unbewiesene Ranking-Konkurrenz behauptet. |
 | 7 | Alle acht deutschen Ratgeber bieten nach ihren Sicherheitshinweisen einen passenden Werkzeug-/Situationslink vor dem App-Angebot. |
 | 8 | Bestätigte Anbieterin Deborah Frey mit Impressumsverweis und nachvollziehbare Quellen. Daniels direkte Auswahl: „Nur Anbieterin und Quellen nennen“. Keine erfundene Qualifikation, Erfahrung oder medizinische Fachprüfung. |
@@ -64,7 +64,7 @@ Nach Integration von92f5541 und72c33e4 bestanden auf0d29cea erneut25 kombinierte
 
 Die Erfolgsadresse allein bestätigt weder Zahlung noch Zugang. Die Seite fragt den geschützten Status mit dem bestehenden Kontotoken ab und unterscheidet bezahltes Abo, Probezeit, Rechnung ohne fällige Zahlung, ausstehenden Einzug, notwendige zusätzliche Bestätigung und fehlgeschlagene/unbestätigte Prüfung. Plan-/App-Links erscheinen nur bei bestätigtem Zugang. Aus der Rückkehr-URL wird kein Kaufereignis erzeugt. Die Teller-Attribution bleibt erhalten.
 
-Der ergänzende Checkout-Backendstand wird getrennt geprüft und benötigt die gemeinsame Functions-Freigabe; der Site-Commit alleine stellt diesen Endpunkt nicht bereit. Ein unabhängiger synthetischer Browsercheck auf f0f1fec bestand19 DOM-Fälle auf1280/320px einschließlich pending→paid, Owner-Token, altem Schema, Fehlern und Sichtbarkeit der Links. Keine echte Zahlung oder Freischaltung wurde durchgeführt.
+Das ergänzende reiche Statusschema gehört zum separat freizugebenden Checkout-Backendstand. Die Website unterstützt daneben den unveränderten Live-Vertrag sicher: alte Statusantworten zeigen neutralen Prüfhinweis und den bestehenden geschützten Portalweg. Ein Functions-Deploy ist dadurch keine Voraussetzung für diese Website-Veröffentlichung. Ein unabhängiger synthetischer Browsercheck auf f0f1fec bestand19 DOM-Fälle auf1280/320px einschließlich pending→paid, Owner-Token, altem Schema, Fehlern und Sichtbarkeit der Links. Keine echte Zahlung oder Freischaltung wurde durchgeführt.
 
 Offener Anbieterbefund: Im bestehenden Live-SEPA-Mandat und der Kartenzustimmung zum Demenz-Coach-Produkt steht „Propstage AI“. Die Vertragspartnerentscheidung wird mit Daniel im Hauptchat geklärt; keine globale Kontoumbenennung oder Produktionsbereitschaft für SEPA daraus ableiten.
 
@@ -77,3 +77,13 @@ Die vier Dateien aus fdb1ae8 wurden nach unabhängig akzeptiertem Funktions-/Pri
 Backendfreigabe separat: Der Payment-Owner allein bereitet den gemeinsamen Functions-Release vor. Sein Taskstand1f5684a auf88155fc bestand die finale Pflichtprüfung mit250 Tests und7 Firestore-Emulator-Skips sowie49 gezielten Paymenttests. Das ist noch keine globale Deploy-SHA oder Produktionsfreigabe. Der bestehende Live-Webhook hört bislang nur auf `checkout.session.completed`; zusätzliche asynchrone Zahlungs-/Invoice-/Subscription-Ereignisse und echter Stripe→Firebase→Adapty-Nachweis bleiben vor vollständiger Produktionsbereitschaft abzustimmen.
 
 Abschließender gemeinsamer Stand51f7486:29 kombinierte Node-Verträge und SEO299/147/147 bestanden; unabhängiger kurzer Integrations-Smoke auf genau diesem Stand mit vollständigem mobilem Quizweg bis Angebot sowie pending/paid-DOM und pending→paid bestanden. Dieser nachfolgende Dokumentationsabgleich verändert keinen Produktcode.
+
+## Aktuelle Website-only-Veröffentlichung
+
+Daniels Auftrag „Website: veröffentlichen“ wird mit Clean-Entwurf3 und der eng geprüften Legacy-Kompatibilität vorbereitet; die genaue `Site <sha> ok`-Freigabe bleibt nötig. Der Homepage-Delta fd48354 wurde unabhängig geprüft: Texte/zugänglicher Markenname exakt, head und Rechtsnote unverändert, weiße gemeinsame Formularfläche, Tastatur/Fokus/Antwort/Reload sowie320px225% ohne Überlauf. Keine Änderung an Store-/iOS-Namen, Rechtsperson oder Merchant.
+
+Der aktuelle öffentliche `/session-status`-Endpunkt gab bei ungültiger synthetischer ID ohne Authentifizierung400 `invalid_session` zurück; das entspricht dem alten Vertrag, während der vorbereitete neue Backendstand zuerst authentifiziert. Frische Quellmetadaten konnten wegen erneut nötiger Cloud-Anmeldung nicht gelesen werden; keine Credentials geändert oder neuen Live-Quellstand behauptet.
+
+Der Legacy-Delta2f9c8c4 behandelt alte Antworten `{status,paymentStatus}` neutral. Es entstehen daraus weder bezahlt/Probezeit/Plan-Zugang/Upgrade noch Kaufereignis. Der prominente vorhandene `POST /portal` verwendet nur das aktuelle Firebase-Konto/Bearertoken, keine fremde Session oder customerID aus URL/öffentlichem Status. Es wird kein Legacy-Paid-Fallback mit `/entitlement` konstruiert. Das eigene anonyme Browserkonto kann unabhängig vom Zahlungsstatus gesichert werden. Neue reiche Antworten bleiben streng geprüft. Website-only-Release benötigt damit keinen Backend-/Webhook-/Kontodeploy. Die alten serverseitigen SEPA-Entitlement-Grenzen, Adapty-E2E und Vertragspartnerklärung bleiben getrennt offen; keine allgemeine SEPA-Produktionsfreigabe.
+
+Gemeinsame abschließende Delta-Prüfung nach Übernahme beider Folgeaufträge:30 Tests bestanden, darunter12 isolierte tatsächliche Zahlungsseitenfälle auf dem zusammengeführten Code. SEO299/147/147 und diff-check bestanden. Unveränderte Backend-Gesamttests und allgemeine Webapp-Audits wurden nicht wiederholt.

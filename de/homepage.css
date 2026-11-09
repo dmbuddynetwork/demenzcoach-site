@@ -1,4 +1,4 @@
-/* Ruhiger Einstieg: eine Hauptfrage, direkt die Eingabe, darunter Situationen.
+/* Entwurf 3: eine Hauptfrage, gemeinsame weiße Eingabefläche, darunter Situationen.
    Nur die deutsche Startseite lädt diese Datei; Antwortablauf und andere Seiten bleiben eigenständig. */
 body.homepage-v2 {
   overflow-wrap: anywhere;
@@ -16,6 +16,7 @@ body.homepage-v2 .e-header .e-wrap {
 }
 
 body.homepage-v2 .e-brand {
+  flex: 1 1 12rem;
   min-height: 44px;
   min-width: 0;
   max-width: 100%;
@@ -23,6 +24,10 @@ body.homepage-v2 .e-brand {
 
 body.homepage-v2 .e-brand span {
   min-width: 0;
+}
+
+body.homepage-v2 .e-brand img {
+  flex: 0 0 32px;
 }
 
 body.homepage-v2 .e-footer nav a {
@@ -100,6 +105,9 @@ body.homepage-v2 .home-situations .e-tile span {
 
 body.homepage-v2 #translator-form {
   margin-top: 0;
+  padding: 24px !important;
+  background: var(--e-card) !important;
+  border-radius: 24px;
 }
 
 body.homepage-v2 #translator-form > .e-privacy {
@@ -119,6 +127,12 @@ body.homepage-v2 #translator-input:focus-visible {
   outline-offset: 3px;
 }
 
+@media (max-width: 699px) {
+  body.homepage-v2 #translator-form {
+    padding: 16px !important;
+  }
+}
+
 @media (min-width: 700px) {
   body.homepage-v2 .home-situations .e-tiles {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -127,12 +141,6 @@ body.homepage-v2 #translator-input:focus-visible {
 }
 
 @media (min-width: 900px) {
-  body.homepage-v2 .e-home .e-hero-art {
-    width: auto;
-    height: 72px;
-    margin: 0 auto 16px;
-  }
-
   body.homepage-v2 .home-situations .e-tile {
     grid-template-columns: 56px minmax(0, 1fr);
     min-height: 96px;

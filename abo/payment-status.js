@@ -11,8 +11,13 @@ export function createPaymentStatusController({ sessionID, loadStatus, render, a
     try {
       if (!sessionID) throw new Error("missing session");
       const status = await loadStatus(sessionID);
+      // Das alte Live-Schema liefert keine geschützte Zahlungs-/Zugangsprüfung.
+      // Seine Statuswerte begründen weder Erfolg noch Freischaltung.
+      const legacy = status && !Object.hasOwn(status, "outcome") && !Object.hasOwn(status, "active")
+        && ["open", "complete", "expired"].includes(status.status)
+        && ["paid", "unpaid", "no_payment_required"].includes(status.paymentStatus);
       const active = status.status === "complete" && status.active === true && ["paid", "trialing", "no_payment_due"].includes(status.outcome);
-      const outcome = active ? status.outcome
+      const outcome = legacy ? "legacy" : active ? status.outcome
         : ["failed", "action_required", "pending"].includes(status.outcome) ? status.outcome : "unverified";
       render(outcome);
       if (!verifiedOnce && status.status === "complete" && typeof status.active === "boolean"
@@ -34,6 +39,7 @@ export function createPaymentStatusController({ sessionID, loadStatus, render, a
 
 export const paymentStatusText = Object.freeze({
   checking: ["Zahlungsstatus prüfen", "Wir prüfen deine Zahlung. Bitte schließe kein zweites Abo ab."],
+  legacy: ["Prüfe deinen Zahlungsstatus", "Hier können wir deinen Zahlungsstatus noch nicht sicher bestätigen. Prüfe ihn in der Abo-Verwaltung. Bitte schließe kein zweites Abo ab."],
   pending: ["Deine Zahlung wird noch geprüft", "Bei einer Lastschrift kann die Bestätigung mehrere Werktage dauern. Dein Zugang wird nach der Bestätigung freigeschaltet. Bitte schließe kein zweites Abo ab."],
   failed: ["Dein Zugang ist noch nicht freigeschaltet", "Die Zahlung wurde nicht bestätigt oder das Abo wurde beendet. Prüfe den Stand unter „Abo verwalten“. Dort kannst du auch die Zahlungsart ändern."],
   action_required: ["Bitte prüfe deine Zahlung", "Deine Zahlung braucht noch eine Bestätigung. Öffne „Abo verwalten“, um den nächsten Schritt zu sehen."],

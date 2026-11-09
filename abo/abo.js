@@ -433,12 +433,18 @@ $("app-store-link").href = config.appStoreURL;
 translatorReturn();
 if (params.get("status") === "fertig") {
   show("done");
+  let portalAvailable = false;
   const checkStatus = createPaymentStatusController({
     sessionID: params.get("session_id"),
     loadStatus: async (sessionID) => {
       await ensureFirebase();
       if (!state.user) throw new Error("sign_in_required");
-      return api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token: await state.user.getIdToken() });
+      const token = await state.user.getIdToken();
+      portalAvailable = true;
+      // Das eigene Firebase-Gastkonto sichern, unabhängig vom Zahlungsstatus.
+      // Es wird keine Kundenzuordnung aus einer öffentlichen Session übernommen.
+      if (state.user.isAnonymous && $("link-card").hidden) await offerAccountLink();
+      return api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
     },
     render: (outcome) => {
       const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
@@ -448,10 +454,10 @@ if (params.get("status") === "fertig") {
       $("done-plan").hidden = !active;
       $("done-plan-link").hidden = !active;
       $("app-store-link").hidden = !active;
+      $("payment-status-manage").hidden = !portalAvailable || active || outcome === "checking";
       $("payment-status-retry").hidden = active;
       $("payment-status-retry").disabled = outcome === "checking";
     },
-    verified: () => { offerAccountLink(); },
     activate: () => { offerYearlySwitch(); }
   });
   $("payment-status-retry").addEventListener("click", checkStatus);
