@@ -231,7 +231,7 @@ if (process.env.QA_REQUIRE_CLEAN === '1') assert.ok(startRevision.clean, 'a clea
       response = { kind: 'safety' }; await open(); await submit('sie ist mein eis weg');
       await page.locator('.translator-clarify').waitFor();
       await page.locator('#translator-input').fill('NEUER FIKTIVER ENTWURF');
-      await page.getByRole('button', { name: 'Genauer beschreiben', exact: true }).click();
+      assert.ok(await page.locator('.translator-followup-question').evaluate(node => node.open), 'clarification directly opens the same form');
       assert.equal(await page.locator('#translator-input').inputValue(), 'NEUER FIKTIVER ENTWURF');
       assert.ok(await page.locator('#translator-result a[href="tel:112"]').count());
       assert.equal(await page.locator('.translator-plan-cta').count(), 0);

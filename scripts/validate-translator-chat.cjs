@@ -79,8 +79,9 @@ const screenshotDir = process.env.SCREENSHOT_DIR;
           if (screenshotDir && width === 1280 && entry === 'chat' && text === 'sie ist mein eis weg') {
             await page.locator('#translator-result').screenshot({ path: path.join(screenshotDir, 'eis-chat-hinweis-und-rueckfrage.png') });
           }
-          await page.getByRole('button', { name: 'Genauer beschreiben', exact: true }).click();
-          assert.ok(await page.locator('#translator-input').evaluate(node => node === document.activeElement));
+          assert.ok(await page.locator('.translator-followup-question').evaluate(node => node.open), 'clarification directly opens the existing form');
+          assert.ok(await page.locator('#translator-result .safety-urgent').first().evaluate(node => node === document.activeElement), 'the full urgent warning keeps focus before the editable field');
+          assert.equal(await page.getByRole('button', { name: 'Genauer beschreiben', exact: true }).count(), 0);
           assert.equal(await page.locator('#translator-input').inputValue(), text, 'the text remains editable');
           if (screenshotDir && entry === 'chat' && text === 'sie ist mein eis weg') {
             await page.locator('.translator-clarify').scrollIntoViewIfNeeded();

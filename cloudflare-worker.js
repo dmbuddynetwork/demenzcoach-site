@@ -1,4 +1,37 @@
-// Statische Website wie bisher auf GitHub Pages: Adressen mit .html bleiben unverändert.
+import germanRoutes from './german-situation-routes.json' with { type: 'json' };
+
+const germanAliases = new Map(germanRoutes.pages.flatMap(page => page.aliases.map(alias => [alias, page.to])));
+const germanHubQueries = new Set(['/', '/index.html', '/de/', '/de/index.html',
+  '/demenz-uebersetzer', '/demenz-uebersetzer/', '/demenz-uebersetzer/index.html',
+  '/de/demenz-uebersetzer/', '/de/demenz-uebersetzer/index.html']);
+// Only existing goal/entry/campaign tokens survive these redirects; never free-text fields.
+const safeGermanQuery = (input, target) => {
+  const choices = germanRoutes.query.enums;
+  const tokens = new Set(germanRoutes.query.tokenKeys);
+  const tokenPattern = new RegExp(germanRoutes.query.tokenPattern, 'i');
+  for (const [key, value] of input.searchParams) {
+    const allowed = Object.hasOwn(choices, key) ? choices[key] : null;
+    if (allowed?.includes(value) || (tokens.has(key) && tokenPattern.test(value))) {
+      if (!target.searchParams.has(key)) target.searchParams.set(key, value);
+    }
+  }
+};
+export const germanSituationTarget = request => {
+  if (!['GET', 'HEAD'].includes(request.method)) return null;
+  const input = new URL(request.url);
+  const key = input.searchParams.get('situation');
+  const selected = germanHubQueries.has(input.pathname) && Object.hasOwn(germanRoutes.situations, key)
+    ? germanRoutes.situations[key] : null;
+  const canonicalIndex = germanRoutes.pages.find(page => page.to.endsWith('/') && '/' + page.target === input.pathname)?.to;
+  const destination = selected || germanAliases.get(input.pathname) || canonicalIndex;
+  if (!destination) return null;
+  const target = new URL(destination, input.origin);
+  safeGermanQuery(input, target);
+  return target.toString();
+};
+
+// Statische Website: die 52 deutschen Inhaltsseiten erhalten /de/ laut explizitem Manifest.
+// Alte Adressen leiten direkt zum kanonischen Ziel; andere .html-Adressen bleiben erhalten.
 // Dateien liefert Cloudflare direkt aus (ohne diesen Code). Nur wenn keine Datei passt, läuft er:
 // /ordner/ → /ordner/index.html, /ordner → 301 auf /ordner/, /seite → /seite.html, sonst 404.html.
 // Ausnahme (run_worker_first in wrangler.jsonc): die alten Startseiten-Adressen / , /index.html
@@ -59,11 +92,16 @@ export default {
     };
     if (request.method === 'GET' || request.method === 'HEAD') {
       const path = url.pathname;
+      const germanTarget = germanSituationTarget(request);
+      if (germanTarget) return new Response(null, { status: 301, headers: { Location: germanTarget, 'Referrer-Policy': 'no-referrer' } });
       const homeTarget = legacyHomeTarget(path);
       if (homeTarget) {
         url.pathname = homeTarget;
         return Response.redirect(url.toString(), 301);
       }
+      // Worker-first legacy folders also contain unchanged scripts/images and noindex pages.
+      const direct = await asset(path);
+      if (direct) return direct;
       if (path.endsWith('/')) {
         const index = await asset(`${path}index.html`);
         if (index) return index;

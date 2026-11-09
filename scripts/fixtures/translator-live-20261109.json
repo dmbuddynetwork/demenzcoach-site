@@ -1,0 +1,47 @@
+{
+  "mode": "Recorded responses to fictitious QA inputs from published site, Nov 9. Replays are not new live calls. Tokens and identity fields excluded.",
+  "cases": [
+    {
+      "caseId": 46,
+      "input": "Meine Mutter ist seit heute plötzlich viel verwirrter als sonst.",
+      "observedAt": "2026-11-09T16:25:18.866Z",
+      "response": {
+        "kind": "answer",
+        "meaning": "Die Verwirrung kann deiner Mutter Angst machen. Deine ruhige Nähe kann ihr Halt geben.",
+        "phrases": [
+          "Ich bin bei dir. Wir setzen uns zusammen hin."
+        ],
+        "avoid": "Nun reiß dich doch zusammen!",
+        "nextStep": "Bleib bei deiner Mutter und ruf jetzt in der Hausarztpraxis an.",
+        "safetyLevel": "concern",
+        "safetyMessage": "Lass die plötzliche Veränderung zeitnah ärztlich abklären. Bei weiterer plötzlicher Verschlechterung oder im Zweifel ruf sofort die örtliche medizinische Notfallhilfe."
+      }
+    },
+    {
+      "caseId": 47,
+      "input": "Sie bekommt gerade kaum Luft.",
+      "observedAt": "2026-11-09T16:34:45.851Z",
+      "response": {
+        "kind": "answer",
+        "meaning": "Atemnot kann Angst machen. Bleib bei ihr und sprich ruhig.",
+        "phrases": [
+          "Ich bin bei dir. Ich rufe sofort Hilfe."
+        ],
+        "avoid": "Beruhige dich, das geht gleich vorbei.",
+        "nextStep": "Ruf sofort die örtliche medizinische Notfallhilfe.",
+        "safetyLevel": "urgent",
+        "safetyMessage": "Ruf sofort die örtliche medizinische Notfallhilfe und folge den Anweisungen der Leitstelle."
+      }
+    },
+    {
+      "caseId": 48,
+      "input": "Er ist gestürzt und reagiert nicht.",
+      "observedAt": "2026-11-09T16:34:53.951Z",
+      "response": {
+        "kind": "safety",
+        "safetyLevel": "urgent",
+        "message": "Bitte handle jetzt. Kontaktiere die örtliche medizinische Notfallhilfe."
+      }
+    }
+  ]
+}

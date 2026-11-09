@@ -21,6 +21,22 @@
   // übersetzt von translator-locale.js. Auf deutschen Seiten fehlt data.ui, alles bleibt wie bisher.
   const ui = data.ui ?? null;
   const tr = window.DemenzTranslatorLocale?.create(ui) ?? ((text) => text);
+  const homeHeading = document.getElementById('home-title');
+  const initialTitle = document.title;
+  const formStartParent = form.parentNode;
+  const formStartNext = form.nextSibling;
+  const initialPlaceholder = input.getAttribute('placeholder') ?? '';
+  let syncChat = () => {};
+  const setViewState = (state) => {
+    document.body.dataset.translatorState = state;
+    requestAnimationFrame(() => syncChat());
+    if (!homeHeading) return;
+    homeHeading.hidden = state !== 'input';
+    // Nur feste Zustandsnamen: eingegebener Freitext gehört nicht in Seitentitel/Analytics.
+    document.title = state === 'input' ? initialTitle : ui?.lang === 'en'
+      ? (state === 'goal' ? 'Choose your goal | Dementia Coach' : 'Your answer | Dementia Coach')
+      : ui ? initialTitle : state === 'goal' ? 'Dein Ziel wählen | Demenz Coach' : 'Deine Antwort | Demenz Coach';
+  };
   const translatedAttributes = new Set(['alt', 'aria-label', 'placeholder', 'title']);
   const phraseHash = ui?.phraseHash ?? 'satz-';
   const feelingHash = ui?.feelingHash ?? 'gefuehl-';
@@ -30,8 +46,6 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Ab dieser Punktzahl (translator-core rank) gilt ein Treffer als sicher: mehrere Wörter oder ein langes Stichwort.
   const strongScore = ui?.strongScore ?? 4;
-  // Kurze Warte-Ansicht vor bekannten Antworten (die Haken laufen in einfach.css schneller).
-  const quickWaitMs = 1800;
 
   const track = (name, parameters) => {
     if (typeof websiteAnalytics === 'undefined') return;
@@ -352,7 +366,7 @@
       : null;
     heading.classList.add('translator-said-bubble');
     return element('div', { className: art ? 'translator-said translator-said-with-art' : 'translator-said' }, [
-      element('div', { className: 'translator-said-text' }, [element('p', { className: 'translator-said-label', text: 'Du hörst:' }), heading]),
+      element('div', { className: 'translator-said-text' }, [element('p', { className: 'translator-said-label', text: ui?.lang === 'en' ? 'Your input:' : ui ? tr('Du hörst:') : 'Deine Eingabe:' }), heading]),
       art
     ].filter(Boolean));
   };
@@ -379,17 +393,51 @@
   // statt „Neuen Satz übersetzen“ einfach weiterschreiben). Dasselbe Formular, nur verschoben und leer.
   let formMoved = false;
   // Es steht direkt nach Hinweis und „War das hilfreich?“, vor App- und Listen-Angeboten.
-  const formBelow = () => {
-    const anchors = [...output.children].filter((node) => node.matches('.translator-notes, .translator-feedback, .translator-suggest'));
-    const anchor = anchors[anchors.length - 1];
-    if (anchor) { if (anchor.nextElementSibling !== form) anchor.after(form); } else if (form.parentElement !== output) output.append(form);
+  const setFollowupOpen = (open) => {
+    const details = output.querySelector('.translator-followup-question');
+    if (details) details.open = open || Boolean(input.value.trim()) || form.contains(document.activeElement);
+  };
+  const formBelow = ({ open = false } = {}) => {
+    form.hidden = false;
+    let followup = output.querySelector(':scope > .translator-followup');
+    if (!followup) {
+      followup = element('section', { className: 'translator-followup' });
+      const feedback = output.querySelector(':scope > .translator-feedback');
+      if (feedback) followup.append(feedback);
+      const details = element('details', { className: 'translator-followup-question' }, [element('summary', { text: 'Noch etwas schreiben?' }), form]);
+      followup.append(details);
+      const offer = output.querySelector(':scope > .translator-plan-cta, :scope > .translator-suggest, :scope > .translator-signup, :scope > .translator-app-cta');
+      output.insertBefore(followup, offer);
+    }
     input.value = '';
     grow();
+    setFollowupOpen(open);
+    const signup = output.querySelector(':scope > .translator-signup');
+    if (signup) {
+      const extra = element('details', { className: 'translator-extra-offers' }, [element('summary', { text: 'Alle Sätze zum Ausdrucken' })]);
+      signup.before(extra);
+      extra.append(signup);
+    }
     if (formMoved) return;
     formMoved = true;
     form.classList.add('translator-form-below');
-    form.prepend(element('p', { className: 'translator-form-below-title', text: 'Noch etwas schreiben?' }));
     input.setAttribute('placeholder', tr('Was ist noch passiert? Schreib es hier.'));
+  };
+  const returnToInput = () => {
+    formStartParent.insertBefore(form, formStartNext?.parentNode === formStartParent ? formStartNext : null);
+    form.hidden = false;
+    form.classList.remove('translator-form-below');
+    form.querySelector('.translator-form-below-title')?.remove();
+    formMoved = false;
+    input.setAttribute('placeholder', initialPlaceholder);
+    output.replaceChildren();
+    output.hidden = true;
+    document.body.classList.remove('translator-has-result', 'translator-answers-seen');
+    setViewState('input');
+    setHash('');
+    grow();
+    input.focus({ preventScroll: true });
+    form.scrollIntoView({ behavior: 'instant', block: 'start' });
   };
   // In der Sprechblase steht, was die Person eingetippt hat (Daniel, 9. Nov: „sie schreit mich an“ ist nicht
   // „Lass mich in Ruhe!“). Nur ohne eigene Eingabe (Kachel, Link) steht der bekannte Satz dort.
@@ -416,21 +464,32 @@
   const askGoal = (entry, options = {}) => {
     const goals = goalsFor(entry);
     if (!goals) { render(entry, options); return; }
-    const heading = element('h2', { text: `„${bubbleText(entry, options.typed)}“`, attributes: { tabindex: '-1' } });
+    setViewState('goal');
+    const situation = element('p', { text: `„${bubbleText(entry, options.typed)}“`, attributes: { id: 'translator-selected-situation' } });
+    const heading = element(homeHeading ? 'h1' : 'h2', { className: 'translator-goal-question', text: 'Was möchtest du jetzt erreichen?', attributes: { tabindex: '-1', id: 'translator-goal-heading' } });
+    const changeSituation = element('a', { className: 'text-link', text: ui ? tr('Neuen Satz übersetzen') : 'Andere Situation beschreiben', attributes: { href: startPath } });
+    changeSituation.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      returnToInput();
+    });
     output.replaceChildren(...[
-      saidBlock(entry.says, entry, heading),
-      element('p', { className: 'translator-goal-question', text: 'Was möchtest du jetzt erreichen?' }),
-      element('div', { className: 'translator-goals', attributes: { role: 'group', 'aria-label': 'Dein Ziel' } }, goals.map((goal) => goalButton(goal, () => {
+      saidBlock(entry.says, entry, situation),
+      heading,
+      element('div', { className: 'translator-goals', attributes: { role: 'group', 'aria-labelledby': 'translator-goal-heading', 'aria-describedby': 'translator-selected-situation' } }, goals.map((goal) => goalButton(goal, () => {
         track('translator_goal', { goal: goal.id, result_key: entry.key });
         setPage(entry, goal.id);
         render(entry, { ...options, goal: goal.id });
-      })))
+      }))),
+      element('p', { className: 'translator-change-situation' }, [changeSituation])
     ].filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
-    formBelow();
+    // Vor einer Antwort gibt es noch keine Rückfrage: denselben Entwurf behalten,
+    // das große Formular erst beim Zurückgehen oder nach dem Ergebnis zeigen.
+    form.hidden = true;
     heading.focus({ preventScroll: true });
-    output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    output.scrollIntoView({ behavior: 'instant', block: 'start' });
   };
 
   // Sätze merken (Daniel, 8. Nov): nur in diesem Browser (translator-saved.js), nur Sätze aus den festen Antworten.
@@ -743,7 +802,7 @@
     track('translator_ai', { step: 'limit', source });
     return true;
   };
-  const aiBox = (text, source, onFail = () => {}, { auto = false } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
@@ -770,12 +829,16 @@
         output.querySelector('.translator-notes')?.remove();
         if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
+        if (result.safetyLevel !== 'standard') {
+          output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
+        }
         // Unbekannte Sätze: erst die fertige KI-Antwort; nie während des Ladens,
         // bei Sicherheitshinweisen oder mit eingegebenem Text im Planlink.
         if (source === 'unknown' && result.safetyLevel === 'standard' && !output.querySelector('.safety-note, .translator-plan-cta')) {
           const invitation = planCTA(null);
-          if (invitation) node.after(invitation);
+          if (invitation) (output.querySelector('.translator-followup') ?? node).after(invitation);
         }
+        setFollowupOpen(false);
         document.body.classList.remove('translator-answers-seen');
         if (!auto || manual) {
           focus.setAttribute('tabindex', '-1');
@@ -785,21 +848,23 @@
         return;
       }
       if (result.kind === 'safety') {
-        const note = urgentNote(data.safetySignals.text);
-        box.replaceWith(note);
+        const freshNote = urgentNote(data.safetySignals.text);
+        const existing = [...output.querySelectorAll('.safety-urgent')].find((note) => !box.contains(note) && note.textContent === freshNote.textContent);
+        const note = existing ?? freshNote;
+        if (existing) box.remove(); else box.replaceWith(note);
+        output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
         // Der Dienst liefert hier keine Formulierung. Die Sicherheitsinformation bleibt
         // zuerst stehen; bei einer unbekannten Eingabe braucht es auch einen nächsten Schritt.
-        if (source === 'unknown' && !ui) {
-          output.querySelector('.translator-suggest')?.remove();
+        if (source === 'unknown' && !ui && !localSafetyHit) {
+          const iceQuestion = /^\s*sie\s+(?:ist|isst)\s+mein\s+eis\s+(?:weg|auf)\s*[.!?]*\s*$/i.test(text);
           note.after(element('section', { className: 'translator-clarify' }, [
             element('h3', { className: 'translator-step', text: 'Was genau ist passiert?' }),
-            element('p', { text: 'Hat die Person diesen Satz gesagt, oder beschreibst du, was sie gerade tut? Schreib bitte noch einen Satz dazu.' }),
-            button('Genauer beschreiben', 'translator-copy', () => {
-              if (!input.value.trim()) { input.value = text; grow(); }
-              input.focus({ preventScroll: true });
-              form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-            })
+            element('p', { text: iceQuestion ? 'Meinst du „Sie isst mein Eis auf“? Oder meinst du etwas anderes? Schreib bitte kurz dazu, was passiert ist.' : 'Was ist gerade passiert? Beschreibe bitte kurz die Situation.' })
           ]));
+          if (!input.value.trim()) { input.value = text; grow(); }
+          setFollowupOpen(true);
+        } else {
+          setFollowupOpen(false);
         }
         note.setAttribute('tabindex', '-1');
         note.focus({ preventScroll: true });
@@ -813,7 +878,8 @@
         box.prepend(safetyNote);
       }
       if (result.kind === 'off_topic') {
-        status.textContent = tr('Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.');
+        status.textContent = ui ? tr('Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.')
+          : 'Dazu kann der Übersetzer nicht helfen. Beschreibe eine Situation im Alltag mit Demenz oder eine Frage als pflegende Person.';
         output.querySelector('.translator-fallback')?.remove();
         output.querySelector('.translator-suggest')?.remove();
         return;
@@ -842,12 +908,13 @@
 
   // hint: ein schwacher Treffer der festen Liste. Die KI antwortet passend zur Eingabe; der Treffer
   // steht als erster Vorschlag unter „Meinst du vielleicht“ und gibt der Sprechblase seine Zeichnung.
-  const renderUnknown = ({ safetyHit, typed, hint = null }) => {
+  const renderUnknown = ({ safetyHit, typed, hint = null, contextual = false }) => {
+    setViewState('answer');
     const nodes = [];
     if (safetyHit) nodes.push(generalNote());
     // Gleicher Aufbau wie ein Treffer: oben der Satz, dann klar, was jetzt hilft.
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
-    const heading = element('h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
+    const heading = element(homeHeading ? 'h1' : 'h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
     nodes.push(shown ? saidBlock(shown, hint, heading) : heading);
     if (shown && !(ai && typed.length >= 2)) nodes.push(element('p', { className: 'translator-meaning translator-unknown-note', text: 'Diesen Satz kenne ich noch nicht.' }));
     // Mit KI-Knopf ist die Gefühle-Auswahl ein Weg zu viel. Sie erscheint erst,
@@ -856,11 +923,14 @@
       element('h3', { className: 'translator-step', text: 'Was spürst du bei der Person?' }),
       feelingPicker('')
     ]);
-    const box = aiBox(typed, 'unknown', () => { feelings.hidden = false; if (fallbackBox) fallbackBox.hidden = false; }, { auto: true });
+    const box = aiBox(typed, contextual ? 'context' : 'unknown', () => {
+      if (!contextual) { feelings.hidden = false; if (fallbackBox) fallbackBox.hidden = false; }
+      setFollowupOpen(true);
+    }, { auto: true, localSafetyHit: safetyHit });
     if (box) feelings.hidden = true;
     nodes.push(box);
     // Ähnliche Situationen zuerst: Sie führen am schnellsten zu genauen Sätzen.
-    const similar = typed ? [...new Set([hint, ...core.near(typed, data)].filter(Boolean))].slice(0, 2) : [];
+    const similar = typed && !contextual ? [...new Set([hint, ...core.near(typed, data)].filter(Boolean))].slice(0, 2) : [];
     if (similar.length) {
       nodes.push(element('div', { className: 'translator-near-group' }, [
         element('h3', { className: 'translator-step', text: 'Meinst du vielleicht:' }),
@@ -876,18 +946,46 @@
       feelings
     ]);
     if (box) fallbackBox.hidden = true;
-    nodes.push(fallbackBox);
+    if (!contextual) nodes.push(fallbackBox);
     nodes.push(notesCard(disclaimer()));
-    nodes.push(suggestLink(typed));
-    nodes.push(...offers(null, safetyHit));
+    if (!contextual) {
+      nodes.push(suggestLink(typed));
+      nodes.push(...offers(null, safetyHit));
+    }
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
     document.body.classList.remove('translator-answers-seen');
-    formBelow();
+    formBelow({ open: true });
     requestAnimationFrame(() => syncSticky());
     focusResult(heading);
-    output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    output.scrollIntoView({ behavior: 'instant', block: 'start' });
+  };
+
+  const renderContextQuestion = (typed, context, safetyHit = false) => {
+    setViewState('answer');
+    const prompts = {
+      presence: 'Ist gerade eine Person im Zimmer, oder erzählt die Person mit Demenz davon?',
+      repetition: 'Was wiederholt sich – eine Frage, ein Satz oder etwas anderes?',
+      speaker: 'Wer fühlt sich wie ein Kind behandelt – du oder die Person, die du begleitest?',
+      protection: 'Wer hat Angst, und wer ist gerade betroffen? Beschreibe bitte kurz, was passiert ist.'
+    };
+    const heading = element(homeHeading ? 'h1' : 'h2', { text: 'Was genau ist passiert?', attributes: { tabindex: '-1' } });
+    output.replaceChildren(...[
+      safetyHit ? generalNote() : null,
+      saidBlock(typed, null, element('p', { text: `„${typed}“` })),
+      heading,
+      element('p', { className: 'translator-context-question', text: prompts[context] }),
+      notesCard(disclaimer())
+    ].filter(Boolean));
+    output.hidden = false;
+    document.body.classList.add('translator-has-result');
+    document.body.classList.remove('translator-answers-seen');
+    formBelow({ open: true });
+    input.value = typed;
+    grow();
+    focusResult(heading);
+    output.scrollIntoView({ behavior: 'instant', block: 'start' });
   };
 
   const splitLead = (text) => {
@@ -903,13 +1001,16 @@
 
   const moodLead = ui?.moodLead ?? { wut: 'Zuerst beruhigen', trauer: 'Zuerst trösten', angst: 'Zuerst Sicherheit geben' };
 
-  const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null, goal = '' } = {}) => {
+  const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null, goal = '', protection = '' } = {}) => {
     if (!entry) {
       renderUnknown({ safetyHit, typed });
       return;
     }
+    setViewState('answer');
     const result = entry;
     const nodes = [];
+
+    if (protection === 'self') nodes.push(generalNote());
 
     if (result.selfCare) {
       // Angehörige schreiben über sich selbst: Hilfe für sie zuerst, ruhig statt alarmierend.
@@ -927,7 +1028,7 @@
 
     // Entlastung spricht dich direkt an, statt dir einen Satz wie „Ich kann nicht mehr.“ in den Mund zu legen.
     if (result.feeling) nodes.push(element('span', { className: 'eyebrow', text: 'Nach Gefühl' }));
-    const heading = element('h2', { text: result.selfCare ? 'Das ist gerade viel für dich.' : result.feeling ? `Bei ${result.feeling}` : `„${bubbleText(result, typed)}“`, attributes: { tabindex: '-1' } });
+    const heading = element(homeHeading ? 'h1' : 'h2', { text: result.selfCare ? 'Das ist gerade viel für dich.' : result.feeling ? `Bei ${result.feeling}` : `„${bubbleText(result, typed)}“`, attributes: { tabindex: '-1' } });
     nodes.push(result.selfCare || result.feeling ? heading : saidBlock(result.says, result, heading));
     // Bei manchen Eingaben gehört der Hinweis „Wann ein Gespräch nicht ausreicht“ nach oben,
     // zum Beispiel wenn jemand seit Tagen kaum trinkt.
@@ -1041,7 +1142,6 @@
       paint();
       phraseBlock.push(phraseList);
       // Auf dem Handy muss der erste Satz ohne Scrollen sichtbar sein: Sätze zuerst, Anpassen und Erklärung danach.
-      const usesExampleName = result.phrases.some((original) => /\bAnna\b/.test(original));
       // Runde 198: Wie bei der KI-Antwort (und in der App) ein konkreter Schritt direkt unter den Sätzen.
       const doNow = !result.selfCare && !result.safetyOnly && result.next?.length ? result.next[0] : '';
       if (goal === 'tipps' && result.next?.length) {
@@ -1056,7 +1156,7 @@
         doBlock.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
         doBlock.push(element('p', { className: 'translator-meaning translator-do', text: doNow }));
       }
-      panel = result.selfCare ? null : personalPanel(repaint, { open: usesExampleName });
+      panel = result.selfCare ? null : personalPanel(repaint);
       // Mit der Anrede-Zeile in der Karte braucht es keine zweite Zeile „Sätze persönlich machen“: Die Felder öffnen über „Namen einsetzen“.
       if (panel && quickRow) panel.classList.add('translator-personal-quiet');
       nodes.push(alsoWrapper, panel);
@@ -1107,7 +1207,6 @@
     answerCard.append(...order.flat().filter(Boolean));
     const planPlace = safetyHit || result.feeling || result.selfCare || result.safetyOnly ? '' : typedCount >= 2 ? 'wieder' : goal === 'tipps' ? 'tipps' : 'ergebnis';
     const planUp = planPlace ? planCTA(result, planPlace) : null;
-    if (planUp) nodes.push(planUp);
     // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
     // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
     const nextRows = chosenGoal ? goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {
@@ -1166,6 +1265,7 @@
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
       nodes.push(feedbackBlock(result, retry));
+      if (planUp) nodes.push(planUp);
       nodes.push(...offers(result, safetyHit, Boolean(planUp)));
     }
 
@@ -1176,7 +1276,7 @@
     formBelow();
     requestAnimationFrame(() => syncSticky());
     focusResult(heading);
-    output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    output.scrollIntoView({ behavior: 'instant', block: 'start' });
   };
 
   const setHash = (key, prefix = phraseHash) => {
@@ -1197,7 +1297,7 @@
   }
 
   function show(entry, source) {
-    input.value = entry.says;
+    if (!input.value.trim()) input.value = entry.says;
     grow();
     askGoal(entry);
     setPage(entry);
@@ -1224,7 +1324,25 @@
     }
     emptyHint.textContent = '';
     typedCount += 1;
-    const { entry, alternatives, safetyHit, feeling, also, mood } = core.match(text, data);
+    const { entry, alternatives, safetyHit, feeling, also, mood, context, protection } = core.match(text, data);
+    if (protection === 'self') {
+      render(entry, { safetyHit, typed: text, protection });
+      setHash(entry.key);
+      track('translator_result', { result_key: entry.key, input_source: 'typed', safety_hint: 'yes' });
+      return;
+    }
+    if (protection === 'clarify' || ['presence', 'repetition', 'speaker'].includes(context)) {
+      renderContextQuestion(text, protection ? 'protection' : context, safetyHit);
+      setHash('');
+      track('translator_result', { result_key: 'none', input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no' });
+      return;
+    }
+    if (context) {
+      renderUnknown({ safetyHit, typed: text, contextual: true });
+      setHash('');
+      track('translator_result', { result_key: 'none', input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no' });
+      return;
+    }
     const feelingEntry = !entry && feeling ? feelingEntries.get(feeling.id) : null;
     if (feelingEntry) {
       render(feelingEntry, { safetyHit, typed: text });
@@ -1246,28 +1364,22 @@
       return;
     }
     const answer = () => (safetyHit ? render : askGoal)(entry, { safetyHit, alternatives, also, mood, typed: knownPhrase ? '' : text });
-    // Auch bekannte Antworten kommen nach einer kurzen Warte-Ansicht, nicht schlagartig. Sicherheit nie verzögern.
-    if (entry && !safetyHit && !entry.safetyOnly) {
-      const waiting = aiWaiting(true);
-      output.replaceChildren(waiting);
-      output.hidden = false;
-      document.body.classList.add('translator-has-result');
-      output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-      setTimeout(() => { if (waiting.isConnected) answer(); }, reduceMotion ? 300 : quickWaitMs);
-    } else {
-      answer();
-    }
+    // Die feste Antwort ist bereits vorhanden; nur echte KI-Anfragen brauchen eine Warte-Ansicht.
+    answer();
     if (entry && !entry.safetyOnly) setPage(entry); else setHash(entry?.key);
     track('translator_result', { result_key: entry?.key ?? 'none', input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no', multiple: also.length ? 'yes' : 'no', mood: mood?.id ?? 'none' });
   });
 
   document.querySelectorAll('[data-translator-key]').forEach((chip) => {
     chip.addEventListener('click', (event) => {
-      // Links funktionieren auch ohne JavaScript und mit „in neuem Tab öffnen“.
+      // Die vorhandene Fachseitenadresse ist das Ziel, auch mit JavaScript.
+      // Native Navigation bewahrt Metadaten, Tastatur, neue Tabs und Browser-Back.
+      // Das zentrale Routenmanifest und statische hrefs verwaltet der Website-Owner.
       if (chip.tagName === 'A' && (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return;
       // Nach dem ersten Klick kann das Formular verrutschen. Ein zweiter Klick
       // derselben Mehrfachaktivierung darf dann keine fremde Kachel öffnen.
       if (event.detail > 1) { event.preventDefault(); return; }
+      if (chip.tagName === 'A') return;
       const entry = entryByKey.get(chip.dataset.translatorKey);
       if (entry) { event.preventDefault(); show(entry, 'chip'); }
     });
@@ -1360,7 +1472,8 @@
     const bubbleOnly = element('button', { className: 'translator-chat-open', attributes: { type: 'button', 'aria-label': 'Chat öffnen' } }, [avatar()]);
     const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': 'Noch etwas schreiben', hidden: '' } }, [panel, bubbleOnly]);
     let small = false;
-    const setSmall = (value) => { small = value; chat.classList.toggle('translator-chat-small', value); };
+    let positionFrame = 0;
+    const setSmall = (value) => { small = value; chat.classList.toggle('translator-chat-small', value); syncChat(); };
     close.addEventListener('click', () => { setSmall(true); bubbleOnly.focus(); track('translator_write_chat', { step: 'closed' }); });
     bubbleOnly.addEventListener('click', () => { setSmall(false); field.focus(); track('translator_write_chat', { step: 'opened' }); });
     chatForm.addEventListener('submit', (event) => {
@@ -1375,12 +1488,44 @@
       form.requestSubmit();
     });
     document.body.append(chat);
-    new IntersectionObserver(([seen]) => {
+    const updateChatPosition = () => {
+      positionFrame = 0;
+      const inputRect = input.getBoundingClientRect();
+      const entryPoint = inputRect.height > 0 ? input : form.closest('.translator-followup-question')?.querySelector('summary');
+      const entryRect = entryPoint?.getBoundingClientRect() ?? inputRect;
+      const inputVisible = entryRect.height > 0 && entryRect.bottom > 0 && entryRect.top < innerHeight;
       const wasHidden = chat.hidden;
       // Auf der Startseite stehen die Beispiele zuerst: ihr noch nicht erreichtes
       // Eingabefeld soll keinen Chat über den auswählbaren Situationen öffnen.
-      chat.hidden = seen.isIntersecting || (form.hasAttribute('data-chat-after-input') && seen.boundingClientRect.top >= 0);
+      chat.hidden = inputVisible || document.body.dataset.translatorState === 'goal'
+        || (form.hasAttribute('data-chat-after-input') && entryRect.top >= 0);
+      chat.style.bottom = '';
+      chat.classList.toggle('translator-chat-small', small);
+      panel.style.maxHeight = '';
+      panel.style.overflowY = '';
+      if (!chat.hidden) {
+        const settings = document.querySelector('.consent-settings');
+        const control = settings?.getBoundingClientRect();
+        const box = chat.getBoundingClientRect();
+        if (control?.height && control.top < innerHeight && control.bottom > 0
+          && box.left < control.right && box.right > control.left && box.top < control.bottom && box.bottom > control.top) {
+          const available = Math.max(56, control.top - 20);
+          if (box.height > available && !chat.contains(document.activeElement)) chat.classList.add('translator-chat-small');
+          else if (box.height > available) {
+            panel.style.maxHeight = `${available}px`;
+            panel.style.overflowY = 'auto';
+          }
+          // Nur die optionale Hilfe rückt über den sichtbaren Datenschutzcontrol;
+          // Text, Fokus, bewusster Minimiertzustand und Einwilligung bleiben erhalten.
+          chat.style.bottom = `${Math.max(parseFloat(getComputedStyle(chat).bottom) || 16, innerHeight - control.top + 12)}px`;
+        }
+      }
       if (wasHidden && !chat.hidden) { chat.classList.remove('translator-chat-in'); void chat.offsetWidth; chat.classList.add('translator-chat-in'); }
-    }).observe(input);
+    };
+    syncChat = () => { if (!positionFrame) positionFrame = requestAnimationFrame(updateChatPosition); };
+    new IntersectionObserver(syncChat).observe(input);
+    addEventListener('scroll', syncChat, { passive: true });
+    addEventListener('resize', syncChat, { passive: true });
+    syncChat();
   }
 })();

@@ -34,11 +34,11 @@
     tries: [], goal: null, burden: null, minutes: null, email: "" };
   let plan = "yearly";
   let offer = { yearly: 6999, monthly: 1299, currency: "eur", trialDays: 7, offers: null };
-  // Willkommenspreis (angebot.js): echtes Angebot vom Server mit Ablaufzeit; ohne es gilt der normale Preis.
+  // Willkommenspreis (angebot.js): Preis vom Server; die Gültigkeit prüft die Kasse erneut.
+  // Keine sichtbare Frist: eine dauerhaft bindende Begrenzung ist für den veröffentlichten Flow nicht belegt.
   const deals = window.DemenzAngebot;
   let dealAsked = false;
   let reservationEnded = false;
-  let stopTimer = () => {};
   // Geld-zurück-Garantie (Daniel, 9. Nov 2026): 30 Tage ab der ersten Zahlung, Bedingungen auf /abo/garantie.html.
   const guaranteeDays = 30;
   // Gutscheincode wie BetterMe („testi_nov26“: Name plus Monat). Nur eine Bezeichnung für den echten Willkommenspreis,
@@ -73,9 +73,8 @@
     for (const child of [].concat(children)) if (child) node.append(child);
     return node;
   };
-  // Fester Weiter-Knopf unten wie bei Yazio, Zwischenseiten melden den Stand des Plans wie bei Headway ("Dein Plan ist zu 94 % bereit").
+  // Der Fortschritt steht einmal in der bestehenden Schrittanzeige.
   const next = (name) => el("button", { type: "button", class: "abo-button start-next", text: "Weiter", onclick: () => go(after(name)) });
-  const ready = (percent) => el("p", { class: "start-ready" }, [el("span", { class: "start-ready-bar", style: `--p:${percent}%` }), el("span", { text: `Dein Plan ist zu ${percent} % bereit` })]);
 
   function optionList(items, chosen, onPick) {
     let choosing = false;
@@ -219,7 +218,6 @@
     ],
     thanks: () => [
       el("img", { class: "start-art", src: "../assets/zeichnungen/nach-hause-ruhig.webp", width: "720", height: "702", alt: "" }),
-      ready(35),
       el("h1", { text: "Danke, dass du das teilst" }),
       el("p", { text: `Hilfe zu suchen ist ein wichtiger erster Schritt. Viele Familien erleben genau das${answers.dayTime && answers.dayTime.key !== "immer" ? `, oft ${answers.dayTime.text}` : ""}. Du machst nichts falsch.` }),
       next("thanks")
@@ -241,7 +239,6 @@
     insight: () => {
       const explained = answers.tries.some((item) => item.key === "erklaeren" || item.key === "widersprechen");
       return [
-        ready(65),
         el("p", { class: "start-big-number", text: "1,8 Mio." }),
         el("h1", { text: "Menschen in Deutschland leben mit Demenz" }),
         el("p", { class: "start-small", text: "Quelle: Deutsche Alzheimer Gesellschaft, Stand Ende 2023" }),
@@ -268,7 +265,6 @@
       optionList(data.minutes, answers.minutes, pick("minutes", "minutes"))
     ],
     how: () => [
-      ready(90),
       el("h1", { text: "So funktioniert dein Plan" }),
       el("ol", { class: "start-steps", role: "list" }, [
         ["Jeden Tag ein Moment", `Zuerst „${bare(chosen().quote)}“, dann die nächsten häufigen Momente.`],
@@ -279,32 +275,16 @@
       next("how")
     ],
     building: () => {
-      const lines = [`Sätze für „${bare(chosen().quote)}“`, `Passend für ${answers.dayTime?.key === "immer" || !answers.dayTime ? "euren Alltag" : answers.dayTime.text}`,
-        answers.goal ? `Dein Ziel: ${answers.goal.text}` : "Was du jetzt tun kannst", "Dein Plan für die ersten 7 Tage"];
-      const items = lines.map((text) => el("li", { class: "start-pending", text }));
-      items.forEach((item, index) => setTimeout(() => item.classList.remove("start-pending"), 500 + index * 600));
-      setTimeout(() => { if (current === "building") go(after("building"), { replace: true }); }, 500 + lines.length * 600 + 300);
-      // Kreis mit Prozent wie bei BetterMe und Liven; läuft genau so lange wie die Liste.
-      const total = 500 + lines.length * 600;
-      const number = el("strong", { text: "0 %" });
-      const ring = el("div", { class: "start-ring", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": "0" }, [
-        el("div", { html: '<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="#ece9f7" stroke-width="10"/><circle class="start-ring-bar" cx="60" cy="60" r="52" fill="none" stroke="#47408c" stroke-width="10" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90 60 60)"/></svg>' }),
-        number
-      ]);
-      const began = performance.now();
-      const tick = () => {
-        if (current !== "building") return;
-        const percent = Math.min(100, Math.round(((performance.now() - began) / total) * 100));
-        number.textContent = `${percent} %`;
-        ring.setAttribute("aria-valuenow", String(percent));
-        ring.querySelector(".start-ring-bar")?.setAttribute("stroke-dashoffset", String(100 - percent));
-        if (percent < 100) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
+      // Diese Angaben sind schon vorhanden. Hier läuft keine Planberechnung.
+      const selected = [
+        ["Situation", bare(chosen().quote)],
+        ["Tageszeit", answers.dayTime?.text],
+        ["Dein Ziel", answers.goal?.text]
+      ].filter(([, value]) => value);
       return [
-        ring,
-        el("h1", { class: "start-center", text: forWho() ? `Dein Plan für ${forWho()} wird erstellt` : "Dein Plan wird erstellt" }),
-        el("ul", { class: "start-checks", role: "list" }, items)
+        el("h1", { class: "start-center", text: "Deine Angaben im Überblick" }),
+        el("dl", { class: "start-summary" }, selected.flatMap(([label, value]) => [el("dt", { text: label }), el("dd", { text: value })])),
+        el("button", { type: "button", class: "abo-button start-next", text: "Weiter", onclick: () => go(after("building"), { replace: true }) })
       ];
     },
     email: () => emailScreen(),
@@ -316,7 +296,7 @@
 
   // ---- E-Mail vor dem Ergebnis (wie BetterMe und Yazio: Pflicht, direkt nach „Plan wird erstellt“) ----------
   // Die Adresse bleibt in diesem Tab, bis jemand ein Abo startet (dann geht sie an Stripe für Bestätigung und Rechnung).
-  // Für den reservierten Willkommenspreis schickt angebot.js sie an unseren Server, der nur einen Prüfwert speichert.
+  // Für den Willkommenspreis schickt angebot.js sie an unseren Server, der nur einen Prüfwert speichert.
   // Werbe-Mails nur mit dem eigenen Schritt danach (Kopplungsverbot, Art. 7 Abs. 4 DSGVO): kein Haken, keine Vorauswahl.
   const validEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(value);
   function emailScreen() {
@@ -400,7 +380,7 @@
 
   // ---- Enthüllung des Willkommenspreises (wie BetterMe: Rubbellos vor der Preisseite) -----------------------
   // Alle bekommen denselben Preis; das Rubbeln deckt ihn nur auf (kein Gewinnspiel, keine Zufallsbehauptung).
-  // Beim Öffnen startet der Server das 15-Minuten-Fenster für diese E-Mail (angebot.js).
+  // Beim Öffnen wird der Einführungspreis für diese E-Mail angefragt (angebot.js).
   function revealScreen() {
     const intro = offer.offers?.intro;
     const deal = deals?.current();
@@ -426,7 +406,7 @@
       if (revealed) return;
       revealed = true;
       canvas.classList.add("start-scratch-gone");
-      button.textContent = "Preis sichern";
+      button.textContent = "Weiter zum Angebot";
       track("quiz_reveal");
     };
     button.addEventListener("click", () => { if (revealed) go("plan", { replace: true }); else reveal(); });
@@ -468,9 +448,9 @@
   }
 
   // ---- Angebotsseite 1:1 nach BetterMe, Liven und Noom (lange Seite) --------------------------------
-  // Oben eine feste Leiste mit Rabatt-Uhr und Knopf, Vorher/Nachher mit Zeichnungen, deine Angaben als Schilder,
+  // Oben eine feste Leiste mit Probezeit und Knopf, Vorher/Nachher mit Zeichnungen, deine Angaben als Schilder,
   // Rabatt-Box, Tarife mit Preis pro Tag, Knopf, sicher bezahlen, was du bekommst, Probezeit, FAQ, Tarife noch einmal.
-  // Keine erfundenen Bewertungen oder Nutzerzahlen. Uhr und Garantie sind echt: Ablauf vom Server, Garantie über kuendigen.html.
+  // Keine erfundenen Bewertungen, Nutzerzahlen oder unbelegte zeitliche Verknappung.
   function planScreen() {
     const s = chosen();
     if (offer.offers?.intro && deals && !dealAsked && !reservationEnded) {
@@ -478,31 +458,6 @@
       deals.start("intro", { email: answers.email }).then((started) => { if (started && current === "plan") render("plan"); });
     }
     const deal = offer.offers ? deals?.current() : null;
-    // Aufbau 1:1 nach der BetterMe-Preisseite (Daniel, 9. Nov 2026: „sieht nicht professionell aus“):
-    // fester Kopf mit Uhr und Knopf, großes Vorher/Nachher, Überschrift, Gutschein-Ticket mit Uhr, Tarifkarten mit
-    // großem Tagespreis rechts, Knopf, Kleingedrucktes im Rahmen, Zahlungsarten. Uhr echt: Ablauf vom Server.
-    stopTimer();
-    // Uhr nur bei einem kurzen Fenster (Server mit 15 Minuten); ein altes 7-Tage-Fenster zeigt keine Uhr.
-    const timed = Boolean(deal && deal.expiresAt - Date.now() <= 60 * 60_000);
-    const clocks = [];
-    const clock = (extra = "") => {
-      const minutes = el("b", { text: "15" });
-      const seconds = el("b", { text: "00" });
-      clocks.push([minutes, seconds]);
-      return el("span", { class: `start-clock ${extra}`, role: "timer", "aria-label": "Reserviert noch" }, [
-        minutes, el("i", { text: ":" }), seconds, el("small", { text: "Minuten" }), el("span"), el("small", { text: "Sekunden" })]);
-    };
-    if (timed) {
-      stopTimer = deals.countdown(deal, (text) => {
-        const [minutes, seconds] = text.split(":");
-        for (const [m, s] of clocks) { m.textContent = minutes.padStart(2, "0"); s.textContent = seconds; }
-      }, () => {
-        deals.drop(deal.kind);
-        reservationEnded = true;
-        track("quiz_offer_ended");
-        if (current === "plan") render("plan");
-      });
-    }
     const firstYear = deal ? deal.firstYear : offer.yearly;
     const perDay = (cents, days) => euro(Math.round(cents / days));
     const yearlyText = deal ? `${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} pro Jahr` : `${euro(offer.yearly)} pro Jahr`;
@@ -553,9 +508,9 @@
       el("span", {}, [el("strong", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }), " ", el("a", { href: "/abo/garantie.html", text: "Bedingungen" })])]);
     const scrollToPlans = () => document.querySelector(".start-tiers")?.scrollIntoView({ behavior: "smooth", block: "center" });
 
-    // Kopf wie BetterMe: links die Uhr (oder die Probezeit), rechts ein dunkler Knopf; bleibt beim Scrollen oben.
+    // Fester Kopf: sachliche Probezeit oder gewählter Plan, daneben der Knopf zu den Tarifen.
     const head = el("div", { class: "start-head" }, [
-      timed ? clock() : el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein Plan ist reserviert" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
+      el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewählter Plan" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
       el("button", { type: "button", class: "start-head-button", text: "Plan holen", onclick: scrollToPlans })
     ]);
 
@@ -586,19 +541,19 @@
       ["Ist das eine medizinische Beratung?", "Nein. Demenz Coach hilft bei Worten und Alltag. Es ersetzt keinen ärztlichen Rat. Im Notfall 112."],
       ["Was passiert mit meinen Antworten?", "Sie bleiben auf deinem Gerät. Wir senden sie nicht und speichern sie nicht."]
     ];
-    // Gutschein-Ticket wie BetterMe („Promo-Code angewendet!“ mit Uhr).
+    // Gutschein-Ticket mit dem bestätigten Einführungspreis, ohne Zeitdruck.
     const ticket = () => (deal ? el("div", { class: "start-ticket" }, [
       el("p", { class: "start-ticket-title" }, [el("span", { html: icons.gift }), "Promo-Code angewendet!"]),
       el("div", { class: "start-ticket-body" }, [
         el("p", { class: "start-ticket-code" }, [el("span", { class: "start-ticket-check", text: "✓" }), promoCode()]),
-        timed ? clock("start-clock-soft") : el("p", { class: "start-ticket-code", text: euro(firstYear) })
+        el("p", { class: "start-ticket-code", text: euro(firstYear) })
       ])
     ]) : null);
 
     return [
       head,
       compare,
-      reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Die Reservierung deines Willkommenspreises ist abgelaufen. Es gilt der normale Preis." }) : null,
+      reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
       el("h1", { class: "start-center start-plan-title", text: name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!" }),
       ticket(),
       table(),
@@ -686,6 +641,24 @@
     heading?.focus();
   } });
   $("footer").prepend(restart);
+  const footer = $("footer");
+  footer.classList.add("start-footer-clean");
+  const footerLinks = el("nav", { class: "start-footer-clean-links", "aria-label": "Weitere Links" }, [...footer.querySelectorAll("a")]);
+  const footerControls = el("div", { class: "start-footer-clean-controls" }, [restart]);
+  footer.prepend(footerLinks, footerControls);
+  // Dasselbe Bedienelement mit bestehendem Handler, keine Kopie und keine neue Einwilligung.
+  let footerObserver;
+  const placePrivacySettings = () => {
+    const settings = document.querySelector(".consent-settings");
+    if (!settings) return false;
+    footerControls.append(settings);
+    footerObserver?.disconnect();
+    return true;
+  };
+  if (!placePrivacySettings()) {
+    footerObserver = new MutationObserver(placePrivacySettings);
+    footerObserver.observe(document.body, { childList: true });
+  }
   const sections = [
     { title: "Über euch", steps: ["relation", "name", "situation", "frequency", "dayTime", "thanks"] },
     { title: "Euer Alltag", steps: ["duration", "living", "tries", "insight"] },
@@ -706,8 +679,7 @@
       bars[number].firstChild.style.width = `${Math.round(share * 100)}%`;
     });
     $("count").textContent = done ? "" : sections[index]?.title ?? "";
-    $("back").style.visibility = ["relation", "building", "email", "newsletter"].includes(name) ? "hidden" : "visible";
-    if (name !== "plan") stopTimer();
+    $("back").style.visibility = ["relation", "email", "newsletter"].includes(name) ? "hidden" : "visible";
     $("progress").hidden = done;
     $("count").hidden = done;
     // Rechtliche Links (AGB, Datenschutz, Impressum, Widerruf, Kündigen) stehen auf jedem Schritt unten, klein.

@@ -56,6 +56,12 @@ const key = 'demenzCoachQuizProgress.v1';
       await page.locator('.start-option').first().click();
       await at('frequency');
       if (process.env.SCREENSHOT_DIR) await page.screenshot({ path: path.join(process.env.SCREENSHOT_DIR, `quiz-nach-neuladen-${width}.png`) });
+      if (await page.locator('.consent-decline').isVisible()) {
+        await page.locator('.consent-decline').click();
+        assert.equal(await page.evaluate(() => window.DemenzConsent.statistics()), false, 'visible refusal is applied');
+        assert.equal(await page.evaluate(() => localStorage.getItem('demenzcoach.analyticsConsent.v1')), 'denied', 'refusal persists');
+        assert.equal(await page.locator('.consent-banner').isVisible(), false);
+      }
       await page.getByRole('button', { name: 'Neu anfangen', exact: true }).click();
       await at('relation');
       assert.equal(await checkpoint(), null);

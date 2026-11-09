@@ -205,26 +205,42 @@
     const contextWish = P.contextWish ?? / (?:will|willst|moechte|muss|sagt|fragt|sucht|ruft nach|schreit|weint|packt|laeuft|isst|trinkt|schlaeft|erkennt|denkt|glaubt|hat angst) /;
     const plain = (value) => ` ${fold(value).replace(/[^a-z0-9]+/g, ' ').trim()} `;
     const negation = P.negation ?? / (?:nicht|kein|keine|nie) /;
+    const currentPart = (text) => String(text).match(/\b(?:früher|frueher|damals|zuvor)\b[\s\S]*?(?:[,;.!?]\s*|\s+aber\s+)((?:heute|jetzt|inzwischen|mittlerweile)\b[\s\S]*)/i)?.[1] ?? String(text);
     const focusText = (text) => {
-      const sentences = String(text).split(/[.!?;\n]+/).map((part) => part.trim()).filter(Boolean);
-      if (sentences.length < 2) return String(text);
+      const current = currentPart(text);
+      const sentences = current.split(/[.!?;\n]+/).map((part) => part.trim()).filter(Boolean);
+      if (sentences.length < 2) return current;
       const kept = sentences.filter((sentence) => {
         const value = plain(sentence);
         // Verneinung („hat keine Demenz“) oder ein Anliegen im selben Satz („wohnt bei uns und will heim“) bleibt.
         return negation.test(value) || contextWish.test(value) || !contextPatterns.some((pattern) => pattern.test(value));
       });
-      return kept.length ? kept.join('. ') : String(text);
+      return kept.length ? kept.join('. ') : current;
     };
 
     const ownFeelings = P.ownFeelings ?? [/\bich (?:bin|war|fuehle mich|fühle mich|werde)(?: (?:so|sehr|total|ganz|oft|dann|einfach))* (?:traurig|wütend|wuetend|sauer|ängstlich|aengstlich|verzweifelt)\b[^.!?;\n]*/gi, /\b(?:das )?macht mich(?: so| sehr)? traurig\b/gi];
     const partSplit = P.partSplit ?? /[.!?;\n]+|,\s*(?:(?:und|aber|oder)\s+)?|\s+(?:und|aber|oder)\s+/i;
     const ownQuestion = P.ownQuestion ?? /^ (?:was|wie|darf|soll|kann|muss)(?: [a-z]+)? (?:ich|man)\b/;
     const match = (input, data) => {
+      const original = plain(input);
+      // Expliziter Gedanke, einer anderen Person etwas anzutun: nie als bloßes
+      // Gefühl der erkrankten Person behandeln. Es gelten vorhandene Schutztexte.
+      const harm = original.match(/ (ich|sie|er) (?:(?:koennte|kann|will|werde|wird) )?(?:ihr|ihm|mir|dir|sie|ihn|jemandem) (?:(?:etwas|was) (?:antue|antun|antut)|(?:weh ?tue|weh ?tun|weh ?tut)|verletz[a-z]*)\b/);
+      if (harm) {
+        // Die eigene Befürchtung muss unmittelbar zum drohenden Ich gehören.
+        // Hier keine Satz-/Zitatgrenzen wegfalten: fremde direkte Rede ist unklar.
+        const ownThought = fold(input).trim().match(/^ich[ \t]+(?:habe[ \t]+angst|fuerchte|befuerchte)[ \t]*,?[ \t]*(?:dass[ \t]+)?(ich[ \t]+[^\r\n]*)/);
+        const ownRisk = harm[1] === 'ich' && Boolean(ownThought
+          && ownThought[1].replace(/[ \t]+/g, ' ').startsWith(harm[0].trim()));
+        const protection = ownRisk ? data.entries.find((entry) => entry.key === 'erschoepft' && entry.safetyOnly && entry.selfCare) : null;
+        return { entry: protection ?? null, alternatives: [], also: [], feeling: null, mood: null,
+          safetyHit: true, protection: protection ? 'self' : 'clarify' };
+      }
       const text = focusText(input);
       let ranked = rank(text, data.entries);
       // Sicherheits- und Entlastungssätze merken, bevor Gefühlswörter entfernt werden:
       // „Ich bin so wütend auf sie“ ist ein Satz über die Angehörigen selbst.
-      const initialSafety = ranked.find((candidate) => candidate.entry.safetyOnly);
+      const initialSafety = (text === String(input) ? ranked : rank(input, data.entries)).find((candidate) => candidate.entry.safetyOnly);
       // Starkes Gefühl in einer beschriebenen Situation („Er ist wütend und will zur Arbeit“):
       // Das Gefühl soll nicht das Thema überdecken. Ohne Gefühlswörter neu suchen und das
       // Gefühl als kurze erste Antwort mitgeben („Erst trösten …“).
@@ -258,9 +274,23 @@
       if (safetyFirst?.entry.selfCare || safetyFirst?.entry.key === careConcernKey) mood = null;
       if (safetyFirst && ranked[0] !== safetyFirst) ranked = [safetyFirst, ...ranked.filter((candidate) => candidate !== safetyFirst)];
       const best = ranked[0] ?? null;
+      let context = '';
+      if (!best?.entry.safetyOnly) {
+        if (currentPart(input) !== String(input)) context = 'temporal';
+        else if (best?.entry.key === 'wer' && / (?:zimmer|wohnung|haus) /.test(original)
+          && / fremd[a-z]* (?:mann|frau|person|leute) /.test(original)
+          && !/ (?:erkennt|kennt) (?:mich|uns|seine|ihre)| haelt mich fuer | wer (?:bist|sind) /.test(original)) context = 'presence';
+        else if (best?.entry.key === 'uhrzeit' && !/ (?:wann|spaet|uhrzeit|datum|termin|frage|fragen|fragt)| welcher tag | welches datum /.test(original)) {
+          context = / (?:ruft|rufen|anruf[a-z]*|telefon[a-z]*) /.test(original) ? 'calls' : 'repetition';
+        } else if (best?.entry.key === 'kind' && / (?:sie|er) behandelt mich /.test(original)) context = 'speaker';
+        else if (best?.entry.key === 'umziehen' && / muede /.test(original)
+          && !/ (?:will|moechte|mag) (?:sich )?nicht (?:umziehen|anziehen)| will keine /.test(original)) context = 'description';
+      }
+      const exact = best && [best.entry.says, ...(best.entry.variants ?? [])].some((phrase) => normalize(phrase) === normalize(input));
       // Betrug und Sorge um die Pflege sind eine eigene Lage: keine „Passt eher?“-Vorschläge daneben.
-      const alternatives = best && !ownSituations.includes(best.entry.key)
+      const alternatives = best && !context && !exact && !ownSituations.includes(best.entry.key)
         ? ranked.slice(1).filter((candidate) => candidate.score >= best.score * 0.5 && !candidate.entry.safetyOnly).slice(0, 2)
+          .filter((candidate) => ![['allein', 'ruhe'], ['ruhe', 'allein']].some(([first, second]) => best.entry.key === first && candidate.entry.key === second))
         : [];
       // Kein bekannter Satz, aber ein Gefühlswort („Sie hat Angst“)? Dann zum Gefühl.
       const feeling = best ? null : rank(text, (data.feelings ?? []).map((item) => ({ ...item, keywords: item.keywords ?? [] })))[0]?.entry ?? null;
@@ -284,6 +314,7 @@
         });
       }
       return {
+        context,
         feeling,
         mood,
         also: also.slice(0, 3),
@@ -313,6 +344,12 @@
         result = result.replace(/Anna, (deine|Ihre) Tochter\./, `${me}.`);
       }
       if (me) result = result.replace(/\bAnna\b/g, me);
+      else {
+        // Unbestätigte Beispielnamen/-rollen sind keine direkt nutzbaren Tatsachen.
+        // Der bereits vorhandene neutrale zweite Satz bzw. die Frage bleibt erhalten.
+        if (!role) result = result.replace(/^Ich bin Anna, (?:deine|Ihre) Tochter\.\s*/, '');
+        result = result.replace(/^Ich bin Anna\.\s*/, '');
+      }
       const callName = clean(settings.callName);
       if (callName) {
         const [first, ...rest] = result.split(' ');

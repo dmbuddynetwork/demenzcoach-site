@@ -112,3 +112,106 @@ test("redirect targets are fixed internal paths only", () => {
   assert.equal(legacyHomeTarget("/de/"), null);
   assert.equal(legacyHomeTarget("/de/index.html"), null);
 });
+
+// Migration contracts use the explicit original-content digest, not a copy of rewritten output.
+const { default: germanRoutes } = await import('../german-situation-routes.json', { with: { type: 'json' } });
+const { germanSituationTarget } = await import('../cloudflare-worker.js');
+const fs = await import('node:fs');
+const { createHash } = await import('node:crypto');
+const siteRoot = new URL('../', import.meta.url);
+const siteRead = file => fs.readFileSync(new URL(file, siteRoot), 'utf8');
+const visibleText = html => html.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i)[1]
+  .replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+const physical = pathname => pathname.endsWith('/') ? pathname.slice(1) + 'index.html' : pathname.slice(1);
+const diskEnv = { ASSETS: { fetch: async (input, request) => {
+  const url = new URL(typeof input === 'string' ? input : input.url || input);
+  const file = physical(decodeURIComponent(url.pathname));
+  if (file.includes('..') || !fs.existsSync(new URL(file, siteRoot)) || !fs.statSync(new URL(file, siteRoot)).isFile()) return new Response('', { status: 404 });
+  return new Response(request?.method === 'HEAD' ? null : siteRead(file), { headers: { 'Content-Type': file.endsWith('.html') ? 'text/html; charset=utf-8' : 'text/plain' } });
+} } };
+const diskRequest = (pathname, method = 'GET') => worker.fetch(new Request('https://dementiacoachapp.com' + pathname, { method }), diskEnv);
+
+test('52 German pages retain their visible source copy and each have one indexable static canonical', async () => {
+  assert.equal(germanRoutes.pages.length, 52);
+  assert.equal(new Set(germanRoutes.pages.map(p => p.to)).size, 52);
+  const sitemap = siteRead('sitemap.xml');
+  for (const page of germanRoutes.pages) {
+    const html = siteRead(page.target);
+    assert.equal(createHash('sha256').update(visibleText(html)).digest('hex'), page.visibleTextSha256, page.target + ': original visible text');
+    assert.match(html, /<html lang="de"/);
+    assert.equal((html.match(/<h1\b/g) || []).length, 1, page.target);
+    assert.ok(html.includes('<link rel="canonical" href="https://dementiacoachapp.com' + page.to + '">'), page.target);
+    assert.ok(!/<meta name="robots" content="[^"]*noindex/.test(html), page.target);
+    assert.equal((sitemap.match(new RegExp('<loc>https://dementiacoachapp\\.com' + page.to.replaceAll('.', '\\.') + '</loc>', 'g')) || []).length, 1);
+    assert.ok(!sitemap.includes('<loc>https://dementiacoachapp.com' + page.from + '</loc>'));
+    assert.equal((await diskRequest(page.to)).status, 200, page.to);
+  }
+});
+
+test('all legacy German aliases redirect once to a real page for GET and HEAD', async () => {
+  const wrangler = siteRead('wrangler.jsonc');
+  const patterns = [...wrangler.matchAll(/"([^"]+)"/g)].map(m => m[1]);
+  for (const page of germanRoutes.pages) for (const alias of page.aliases) {
+    assert.ok(patterns.some(p => p.endsWith('*') ? alias.startsWith(p.slice(0, -1)) : alias === p), 'Worker-first covers ' + alias);
+    for (const method of ['GET', 'HEAD']) {
+      const response = await diskRequest(alias, method);
+      assert.equal(response.status, 301, alias);
+      assert.equal(response.headers.get('location'), 'https://dementiacoachapp.com' + page.to, alias);
+      assert.equal((await diskRequest(page.to, method)).status, 200, 'no redirect chain: ' + alias);
+    }
+  }
+});
+
+test('all 45 old situation queries use the existing fachlich chosen link and discard text fields', async () => {
+  assert.equal(Object.keys(germanRoutes.situations).length, 45);
+  assert.equal(germanRoutes.situations.nachhause, '/de/ratgeber/demenz-nach-hause-was-sagen.html');
+  assert.equal(germanRoutes.situations.umziehen, '/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html');
+  for (const [key, target] of Object.entries(germanRoutes.situations)) {
+    const response = await diskRequest('/de/?situation=' + key + '&ziel=jetzt&teller=website&utm_source=test&text=PRIVATE&prompt=PRIVATE&__proto__=bad');
+    const location = new URL(response.headers.get('location'));
+    assert.equal(response.status, 301);
+    assert.equal(location.pathname, target.split('#')[0]);
+    assert.equal(location.search, '?ziel=jetzt&teller=website&utm_source=test');
+    assert.ok(!location.href.includes('PRIVATE'));
+    assert.equal((await diskRequest(location.pathname + location.search)).status, 200, key);
+  }
+  assert.equal(germanSituationTarget(new Request('https://dementiacoachapp.com/de/?situation=unknown')), null);
+  assert.equal(germanSituationTarget(new Request('https://dementiacoachapp.com/en/?situation=umziehen')), null);
+  assert.equal(germanSituationTarget(new Request('https://dementiacoachapp.com/de/?situation=umziehen', { method: 'POST' })), null);
+});
+
+test('moved pages resolve their local resources and retain the existing privacy fragment', async () => {
+  let assets = 0;
+  for (const page of germanRoutes.pages) {
+    const html = siteRead(page.target);
+    for (const tag of html.matchAll(/<(?:script|img|link)\b[^>]*>/gi)) {
+      for (const attr of tag[0].matchAll(/\b(?:src|href)=["']([^"']+)["']/g)) {
+        const url = new URL(attr[1].replaceAll('&amp;', '&'), 'https://dementiacoachapp.com' + page.to);
+        if (url.origin !== 'https://dementiacoachapp.com') continue;
+        const file = physical(url.pathname);
+        assert.ok(fs.existsSync(new URL(file, siteRoot)), page.to + ': ' + attr[1]);
+        assets++;
+      }
+    }
+  }
+  assert.ok(assets > 300);
+  assert.ok(siteRead('datenschutz.html').includes('id="ki-uebersetzer"'));
+});
+
+test('reciprocal language metadata goes straight to the German canonical with no other English changes', () => {
+  assert.equal(germanRoutes.hreflangSources.length, 46);
+  for (const item of germanRoutes.hreflangSources) {
+    const html = siteRead(item.file);
+    const normalized = html.replace(/<link\b[^>]*rel="alternate"[^>]*>/g, tag =>
+      /hreflang="(?:de|x-default)"/.test(tag) ? tag.replace(/href="[^"]+"/, 'href="__GERMAN_CANONICAL__"') : tag);
+    assert.equal(createHash('sha256').update(normalized).digest('hex'), item.unchangedExceptAlternateHrefsSha256, item.file + ': no other byte changed');
+    for (const tag of html.matchAll(/<link\b[^>]*rel="alternate"[^>]*>/g)) {
+      if (!/hreflang="(?:de|x-default)"/.test(tag[0])) continue;
+      const target = /href="([^"]+)"/.exec(tag[0])[1];
+      const url = new URL(target);
+      assert.ok(url.pathname.startsWith('/de/'), item.file);
+      const germanHTML = siteRead(physical(url.pathname));
+      assert.ok(germanHTML.includes('<link rel="canonical" href="' + target + '">'), 'direct canonical target');
+    }
+  }
+});

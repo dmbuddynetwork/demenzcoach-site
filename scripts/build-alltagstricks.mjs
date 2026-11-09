@@ -2,6 +2,7 @@
 // Aufruf: node scripts/build-alltagstricks.mjs .   (danach node scripts/validate-seo.mjs .)
 import fs from "node:fs";
 import path from "node:path";
+import { rewriteGermanRouteReferences } from './migrate-german-situation-routes.mjs';
 
 const root = path.resolve(process.argv[2] ?? ".");
 const data = JSON.parse(fs.readFileSync(path.join(root, "alltagstricks/tricks.json"), "utf8"));
@@ -203,7 +204,7 @@ const renderPage = ({ pageURL = url, pageTitle = title, pageDescription = descri
 </body>
 </html>
 `.replace(/[ \t]+$/gm, '');
-fs.writeFileSync(path.join(root, "alltagstricks/index.html"), renderPage());
+fs.writeFileSync(path.join(root, "alltagstricks/index.html"), rewriteGermanRouteReferences(renderPage(), "alltagstricks/index.html"));
 
 // Ein kuratierter Einstieg statt einer zweiten vollständigen Kopie der Sammlung.
 const topicURL = 'https://dementiacoachapp.com/alltagstricks/essen-trinken.html';
@@ -228,14 +229,14 @@ const choices = [
   const trick = selected.find(item => item.id === id);
   return `<li><a class="food-choice" href="#${id}"><img src="img/${trick.drawing}.webp" width="300" height="220" alt="" decoding="async"><span class="food-choice-copy"><strong>${label}</strong><span>${detail}</span></span><span class="food-choice-arrow" aria-hidden="true">→</span></a></li>`;
 }).join('');
-fs.writeFileSync(path.join(root, 'alltagstricks/essen-trinken.html'), renderPage({
+fs.writeFileSync(path.join(root, 'alltagstricks/essen-trinken.html'), rewriteGermanRouteReferences(renderPage({
   pageURL: topicURL, pageTitle: topicTitle, pageDescription: topicDescription, headline: 'Essen und Trinken bei Demenz',
   intro: `<p class="food-lead">Sechs kleine Hilfen. Beginne mit einer Veränderung, die die Person möchte.</p><section class="food-choices" aria-labelledby="auswahl-title"><h2 id="auswahl-title">Womit möchtest du anfangen?</h2><ul>${choices}</ul></section><aside class="food-care-note" aria-labelledby="food-care-title"><h2 id="food-care-title">Bitte beachten</h2><p>Bei bekannten Kau- oder Schluckproblemen oder individuellen Ernährungsvorgaben frage vor Änderungen das Behandlungsteam. Diese Seite gibt allgemeine Alltagshinweise und ersetzt keine individuelle Beratung.</p></aside><details class="food-context"><summary>Eine Idee in Ruhe ausprobieren</summary><p>Beobachte, ob das Angebot angenehm ist. Wenn es nicht passt, höre auf und probiere später etwas anderes. Vorlieben, vertraute Abläufe und die Selbstständigkeit der Person stehen im Mittelpunkt.</p></details>`,
   extraStyles: '\n  <link rel="stylesheet" href="/alltagstricks/essen-trinken.css">', jumpTitle: 'Die sechs Ideen', brandName: 'Demenz Coach App',
   jumpLinks: '<a class="translator-copy" href="#essen">Beim Essen</a><a class="translator-copy" href="#trinken">Beim Trinken</a>',
   content: `${topicContent}<p><a href="/alltagstricks/">Alle Alltagstricks ansehen →</a></p>`, pageSchema: topicSchema, slug: 'essen-trinken',
   breadcrumb: '<a href="/de/">Startseite</a> › <a href="/alltagstricks/">Alltagstricks</a> › Essen und Trinken'
-}));
+}), "alltagstricks/essen-trinken.html"));
 
 const sitemapPath = path.join(root, "sitemap.xml");
 let sitemap = fs.readFileSync(sitemapPath, "utf8");
