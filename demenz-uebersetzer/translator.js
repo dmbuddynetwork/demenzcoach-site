@@ -358,22 +358,22 @@
       art
     ].filter(Boolean));
   };
-  // Echte Seiten-Adressen statt #satz-… (Daniel, 9. Nov): Ein Satz zeigt die Adresse seiner Satz-Seite
-  // (…/ich-will-nicht-duschen.html), ein Ziel die eigene Ziel-Seite (…-was-sagen.html, -was-dahintersteckt.html,
-  // -tipps.html; build-preview.mjs baut sie). Neu laden öffnet genau diese Seite; Zurück lädt die vorige.
+  // Das Werkzeug hat eigene, teilbare Zustände. entry.href ist ein redaktioneller
+  // Weiterlese-Link und darf ohne Dokumentwechsel keine Ratgeberadresse übernehmen.
+  // Nur feste Situations-/Zielschlüssel gelangen in die URL, niemals Eingabetext.
   const startPath = location.pathname;
-  const goalSlugs = { jetzt: 'was-sagen', verstehen: 'was-dahintersteckt', tipps: 'tipps' };
-  const pathFor = (entry, goal = '') => {
-    if (!entry?.href || /^[a-z]+:/i.test(entry.href) && !entry.href.startsWith(location.origin)) return null;
-    const path = new URL(entry.href, location.href).pathname;
-    return goal && goalSlugs[goal] ? path.replace(/\.html$/, `-${goalSlugs[goal]}.html`) : path;
-  };
+  const validGoals = new Set(['jetzt', 'verstehen', 'tipps']);
   let pushed = false;
   const setPage = (entry, goal = '', push = true) => {
-    const path = pathFor(entry, goal);
-    if (!path) { setHash(entry?.key ?? ''); return; }
-    if (path === location.pathname && !location.hash) return;
-    history[push ? 'pushState' : 'replaceState']({ translator: true }, '', path);
+    if (!entryByKey.has(entry?.key) || entry.safetyOnly) { setHash(entry?.key ?? ''); return; }
+    const url = new URL(location.href);
+    url.pathname = startPath;
+    url.searchParams.set('situation', entry.key);
+    if (validGoals.has(goal)) url.searchParams.set('ziel', goal);
+    else url.searchParams.delete('ziel');
+    url.hash = '';
+    if (url.href === location.href) return;
+    history[push ? 'pushState' : 'replaceState']({ translator: true }, '', url);
     pushed = pushed || push;
   };
   window.addEventListener('popstate', () => { if (pushed) location.reload(); });
@@ -1148,16 +1148,20 @@
     output.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   };
 
-  const setHash = (key) => {
-    const hash = key && key !== 'none' ? `#${phraseHash}${key}` : '';
-    history.replaceState(null, '', `${startPath}${hash}`);
+  const setHash = (key, prefix = phraseHash) => {
+    const url = new URL(location.href);
+    url.pathname = startPath;
+    url.searchParams.delete('situation');
+    url.searchParams.delete('ziel');
+    url.hash = key && key !== 'none' ? `${prefix}${key}` : '';
+    history.replaceState(null, '', url);
   };
 
   function showFeeling(id, source) {
     const entry = feelingEntries.get(id);
     if (!entry) return;
     render(entry);
-    history.replaceState(null, '', `${location.pathname}#${feelingHash}${id}`);
+    setHash(id, feelingHash);
     track('translator_result', { result_key: entry.key, input_source: source, safety_hint: 'no' });
   }
 
@@ -1193,7 +1197,7 @@
     const feelingEntry = !entry && feeling ? feelingEntries.get(feeling.id) : null;
     if (feelingEntry) {
       render(feelingEntry, { safetyHit, typed: text });
-      history.replaceState(null, '', `${location.pathname}#${feelingHash}${feeling.id}`);
+      setHash(feeling.id, feelingHash);
       track('translator_result', { result_key: feelingEntry.key, input_source: 'typed', safety_hint: safetyHit ? 'yes' : 'no' });
       return;
     }
@@ -1227,9 +1231,11 @@
   });
 
   document.querySelectorAll('[data-translator-key]').forEach((chip) => {
-    chip.addEventListener('click', () => {
+    chip.addEventListener('click', (event) => {
+      // Links funktionieren auch ohne JavaScript und mit „in neuem Tab öffnen“.
+      if (chip.tagName === 'A' && (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return;
       const entry = entryByKey.get(chip.dataset.translatorKey);
-      if (entry) show(entry, 'chip');
+      if (entry) { event.preventDefault(); show(entry, 'chip'); }
     });
   });
 
@@ -1253,7 +1259,16 @@
     render(entry);
     track('translator_result', { result_key: entry.key, input_source: 'link', safety_hint: 'no' });
   };
-  openFromHash();
+  const params = new URLSearchParams(location.search);
+  const linkedEntry = entryByKey.get(params.get('situation'));
+  if (linkedEntry && !linkedEntry.safetyOnly) {
+    const goal = params.get('ziel');
+    input.value = linkedEntry.says;
+    grow();
+    if (validGoals.has(goal)) render(linkedEntry, { goal });
+    else askGoal(linkedEntry);
+    track('translator_result', { result_key: linkedEntry.key, input_source: 'link', safety_hint: 'no' });
+  } else openFromHash();
   window.addEventListener('hashchange', openFromHash);
   renderSaved();
 
