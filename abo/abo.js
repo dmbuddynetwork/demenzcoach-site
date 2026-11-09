@@ -334,7 +334,7 @@ async function mountStripe(clientSecret, attempt) {
     $("express-divider").hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean);
   });
   express.on("confirm", () => confirmPayment(attempt, checkout));
-  const payment = checkout.createPaymentElement({ layout: "tabs" });
+  const payment = checkout.createPaymentElement({ layout: "tabs", wallets: { link: "never" } });
   state.checkoutElements = [express, payment];
   express.mount("#express-checkout");
   payment.on("ready", () => {

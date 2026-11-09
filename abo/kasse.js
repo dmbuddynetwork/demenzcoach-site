@@ -174,7 +174,7 @@ export async function open(options) {
     expressElement.on("availablepaymentmethodschange", ({ paymentMethods }) => { divider.hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean); });
     expressElement.on("confirm", () => confirm());
     expressElement.mount(express);
-    const paymentElement = checkout.createPaymentElement({ layout: "tabs" });
+    const paymentElement = checkout.createPaymentElement({ layout: "tabs", wallets: { link: "never" } });
     paymentElement.on("ready", () => {
       if (!sheet || sheet.node !== node) return;
       clearTimeout(loadingTimer);
