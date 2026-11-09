@@ -1,4 +1,4 @@
-/* Entwurf 2: erst eine Situation wählen, danach selbst schreiben.
+/* Entwurf 2: erst selbst schreiben, darunter eine Situation wählen.
    Nur die deutsche Startseite lädt diese Datei; Antwortablauf und andere Seiten bleiben eigenständig. */
 body.homepage-v2 {
   overflow-wrap: anywhere;
@@ -64,6 +64,10 @@ body.homepage-v2 .home-intro p {
 body.homepage-v2 .home-section-title {
   font-size: 1.375rem !important;
   line-height: 1.3 !important;
+}
+
+body.homepage-v2 .home-situations {
+  margin-top: 28px;
 }
 
 body.homepage-v2 .home-situations .e-tiles {

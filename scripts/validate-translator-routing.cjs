@@ -68,7 +68,7 @@ const production = 'https://dementiacoachapp.com';
     await page.reload();
     assert.match(await page.locator('#translator-result').innerText(), /Mutter/);
 
-    // Examples-first home: a not-yet-reached input must not put the chat over the choices.
+    // Home helper: keep the chat hidden until the user has passed the input.
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(new URL('/de/', base).href);
     if (await page.locator('.consent-decline').isVisible()) await page.locator('.consent-decline').click();
@@ -85,6 +85,10 @@ const production = 'https://dementiacoachapp.com';
       await page.setViewportSize({ width, height: 844 });
       await page.goto(new URL('/de/', base).href);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `home fits at ${width}px`);
+      const formBox = await page.locator('#translator-form').boundingBox();
+      const situationsBox = await page.locator('.home-situations').boundingBox();
+      assert.ok(formBox.y + formBox.height <= situationsBox.y, `input form precedes the situations at ${width}px`);
+      assert.ok(await page.evaluate(() => Boolean(document.querySelector('#translator-input').compareDocumentPosition(document.querySelector('.home-situations a')) & Node.DOCUMENT_POSITION_FOLLOWING)), 'keyboard and reading order put the input first');
       for (const control of await page.locator('.home-situations .e-tile, .e-font-toggle, #translator-form button[type="submit"]').all()) {
         assert.ok((await control.boundingBox()).height >= 44, `home controls remain large enough at ${width}px`);
       }
@@ -117,5 +121,5 @@ const production = 'https://dementiacoachapp.com';
     assert.ok(await page.locator('details.tricks-sources a').first().isVisible());
     assert.deepEqual(errors, [], 'no browser script errors across routing, homepage and topic checks');
   } finally { await browser.close(); }
-  console.log('Translator/home passed: three entry points, empty input, stable metadata, share/reload/back, safety-state clearing, real no-JS links, examples-first chat visibility, 320/390/768/1440px and 225% text.');
+  console.log('Translator/home passed: three entry points, empty input, stable metadata, share/reload/back, safety-state clearing, real no-JS links, input-first layout and reading order, home chat visibility, 320/390/768/1440px and 225% text.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
