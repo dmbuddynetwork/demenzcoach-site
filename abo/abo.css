@@ -88,3 +88,16 @@ legend { font-weight: 700; margin: 0 0 8px; padding: 0; }
 .consent-settings[hidden] { display: none; }
 @media (min-width: 720px) { .consent-banner:not(:has(.consent-choose)) { flex-direction: row; align-items: center; } .consent-actions { flex: 0 0 auto; } }
 @media print { .consent-banner, .consent-settings { display: none !important; } }
+
+/* Kasse als Fenster über der Angebotsseite (kasse.js). */
+.kasse { position: fixed; inset: 0; z-index: 30; display: flex; align-items: flex-end; justify-content: center; background: rgba(28, 27, 31, .45); }
+.kasse-card { box-sizing: border-box; width: 100%; max-width: 560px; max-height: 94vh; overflow-y: auto; background: var(--bg, #f6f5f2);
+  border-radius: 20px 20px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); }
+.kasse-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
+.kasse-head h2 { margin: 0; }
+.kasse-close { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--lav, #ece9f7); color: var(--purple, #47408c); font-size: 1.75rem; line-height: 1; cursor: pointer; }
+.kasse-card #kasse-payment { margin: 0 0 14px; }
+.kasse-card #kasse-express { margin: 0 0 8px; }
+.kasse-short { font-weight: 600; }
+.kasse-card .abo-button { width: 100%; }
+@media (min-width: 640px) { .kasse { align-items: center; } .kasse-card { border-radius: 20px; } }

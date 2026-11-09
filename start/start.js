@@ -21,7 +21,9 @@
     arbeit: svg('<rect x="3.5" y="7.5" width="17" height="12" rx="1.5"/><path d="M9 7.5V5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M3.5 12.5h17"/>'),
     waschen: svg('<path d="M5 21V6a3 3 0 0 1 6 0"/><path d="M8.5 9h5a2.5 2.5 0 0 0-5 0Z"/><path d="M10 13v1.2M13 13v1.2M16 13v1.2M11.5 16.5v1.2M14.5 16.5v1.2"/>'),
     andere: svg('<circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/>'),
-    lock: svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>')
+    lock: svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
+    shield: svg('<path d="M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6z"/><path d="m9 12 2 2 4-4"/>'),
+    gift: svg('<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18v-.5A1.5 1.5 0 0 0 19.5 7h-15A1.5 1.5 0 0 0 3 8.5z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/>')
   };
 
   const data = window.DEMENZ_PLAN_DATA;
@@ -34,6 +36,10 @@
   // Willkommenspreis (angebot.js): echtes Angebot vom Server mit Ablaufzeit; ohne es gilt der normale Preis.
   const deals = window.DemenzAngebot;
   let dealAsked = false;
+  let reservationEnded = false;
+  let stopTimer = () => {};
+  // Geld-zurück-Garantie (Daniel, 9. Nov 2026): 30 Tage ab der ersten Zahlung, Bedingungen auf /abo/garantie.html.
+  const guaranteeDays = 30;
 
   const euro = (cents) => new Intl.NumberFormat("de-DE", { style: "currency", currency: offer.currency.toUpperCase() }).format(cents / 100);
   const who = () => answers.name || (answers.relation?.call ?? "") || "sie oder er";
@@ -96,10 +102,10 @@
   let typed = "";
   try { typed = String(sessionStorage.getItem("demenzCoachKiOffen") || "").slice(0, 120); } catch { /* */ }
   const flow = ["relation", "name", ...(preset ? [] : ["situation"]), "frequency", "dayTime", "thanks", "duration", "living",
-    "tries", "insight", "goal", "burden", "minutes", "how", "building", "email", "result", "plan"];
+    "tries", "insight", "goal", "burden", "minutes", "how", "building", "email", "newsletter", "result", "reveal", "plan"];
   const answerFor = { relation: "relation", situation: "situation", frequency: "frequency", dayTime: "dayTime", duration: "duration",
     living: "living", goal: "goal", burden: "burden", minutes: "minutes" };
-  const interstitials = ["thanks", "insight", "how", "building", "email", "result", "plan"];
+  const interstitials = ["thanks", "insight", "how", "building", "email", "newsletter", "result", "reveal", "plan"];
   const isQuestion = (name) => !interstitials.includes(name);
   const questions = flow.filter(isQuestion).length;
   const stepNumber = (name) => flow.slice(0, flow.indexOf(name) + 1).filter(isQuestion).length;
@@ -250,48 +256,65 @@
       ];
     },
     email: () => emailScreen(),
+    newsletter: () => newsletterScreen(),
     result: () => resultScreen(),
+    reveal: () => revealScreen(),
     plan: () => planScreen()
   };
 
-  // ---- E-Mail vor dem Ergebnis (wie Noom: „Wohin sollen wir deinen Plan schicken?“) ---------------
-  // Brevo-Liste „Demenz-Übersetzer (DE)“ mit Double-Opt-in (dieselbe wie im Übersetzer). Gesendet wird nur die
-  // E-Mail-Adresse, nie Antworten oder Namen. Überspringen ist möglich.
-  const brevoFormURL = "https://dec91d68.sibforms.com/serve/MUIFALjTPrtulR3_pbWZasFlp2rp0I3qK7mXYVC3KPxVznmdzl5zJcBcHNQiuQXilaqGKzd7Y81EDGqt0Ho9tpwQ03SIAGBPrNlnZmT4-JP71DtgDYfd8GrQ11Bg7dNW8tibwtNvt9az78pC4_-kaczKbgGgb_IXoNCZKWhxM8olcup0XJhMqKiLQmUhpO6tpo4UNTUP3JXYHknJrg==";
+  // ---- E-Mail vor dem Ergebnis (wie BetterMe und Yazio: Pflicht, direkt nach „Plan wird erstellt“) ----------
+  // Die Adresse bleibt in diesem Tab, bis jemand ein Abo startet (dann geht sie an Stripe für Bestätigung und Rechnung).
+  // Für den reservierten Willkommenspreis schickt angebot.js sie an unseren Server, der nur einen Prüfwert speichert.
+  // Werbe-Mails nur mit dem eigenen Schritt danach (Kopplungsverbot, Art. 7 Abs. 4 DSGVO): kein Haken, keine Vorauswahl.
+  const validEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(value);
   function emailScreen() {
     const input = el("input", { id: "email", type: "email", autocomplete: "email", inputmode: "email", placeholder: "Deine E-Mail-Adresse" });
     input.value = answers.email;
     const status = el("p", { class: "start-small", role: "status" });
-    const button = el("button", { type: "button", class: "abo-button", text: "Plan ansehen" });
-    const send = async () => {
+    const send = () => {
       const value = input.value.trim();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(value)) { status.textContent = "Bitte gib deine E-Mail-Adresse ein."; input.focus(); return; }
-      button.disabled = true;
-      status.textContent = "Einen Moment …";
-      const body = new FormData();
-      body.append("EMAIL", value);
-      body.append("email_address_check", "");
-      body.append("locale", "de");
-      try {
-        await fetch(brevoFormURL, { method: "POST", body, credentials: "omit", referrerPolicy: "no-referrer", headers: { Accept: "application/json" } });
-      } catch { /* Liste ist ein Extra: der Plan kommt trotzdem */ }
+      if (!validEmail(value)) { status.textContent = "Bitte gib deine E-Mail-Adresse ein."; input.focus(); return; }
       answers.email = value;
       try { sessionStorage.setItem("demenzCoachEmail", value); } catch { /* */ }
       track("quiz_email");
       go(after("email"), { replace: true });
     };
-    button.addEventListener("click", send);
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") send(); });
-    const privacy = el("a", { href: "/datenschutz.html#e-mail-liste", text: "Datenschutz" });
     return [
-      el("h1", { text: "Dein Plan ist fertig. Wohin sollen wir ihn schicken?" }),
-      el("p", { class: "start-lead", text: "Du bekommst die Liste mit Sätzen zum Ausdrucken und ab und zu einen neuen Satz per E-Mail." }),
+      el("h1", { text: forWho() ? `Dein Plan für ${forWho()} ist fertig` : "Dein Plan ist fertig" }),
+      el("p", { class: "start-lead", text: "Gib deine E-Mail-Adresse ein, um deinen Plan zu sehen." }),
       el("label", { for: "email", class: "sr-only", text: "E-Mail" }),
       input,
-      button,
+      el("button", { type: "button", class: "abo-button", text: "Plan ansehen", onclick: send }),
       status,
-      el("p", { class: "start-small" }, ["Wir schicken dir zuerst eine E-Mail zum Bestätigen. Abmelden jederzeit mit einem Klick. ", privacy, "."]),
-      el("button", { type: "button", class: "abo-link-button", text: "Ohne E-Mail weiter", onclick: () => { track("quiz_email_skip"); go(after("email"), { replace: true }); } })
+      el("p", { class: "start-small" }, ["Damit sichern wir deinen Plan und deinen Preis. Startest du ein Abo, kommen Bestätigung und Zugang an diese Adresse. Keine Werbung ohne dein Ja. ",
+        el("a", { href: "/datenschutz.html", text: "Datenschutz" }), "."])
+    ];
+  }
+
+  // ---- Eigener Schritt für Tipps per E-Mail (wie BetterMe: „Ja, ich bin dabei / Kein Interesse“) ------------
+  // Brevo-Liste „Demenz-Übersetzer (DE)“ mit Double-Opt-in. Gesendet wird nur die E-Mail-Adresse.
+  const brevoFormURL = "https://dec91d68.sibforms.com/serve/MUIFALjTPrtulR3_pbWZasFlp2rp0I3qK7mXYVC3KPxVznmdzl5zJcBcHNQiuQXilaqGKzd7Y81EDGqt0Ho9tpwQ03SIAGBPrNlnZmT4-JP71DtgDYfd8GrQ11Bg7dNW8tibwtNvt9az78pC4_-kaczKbgGgb_IXoNCZKWhxM8olcup0XJhMqKiLQmUhpO6tpo4UNTUP3JXYHknJrg==";
+  function newsletterScreen() {
+    const yes = el("button", { type: "button", class: "abo-button", text: "Ja, gern", onclick: async () => {
+      yes.disabled = true;
+      const body = new FormData();
+      body.append("EMAIL", answers.email);
+      body.append("email_address_check", "");
+      body.append("locale", "de");
+      try {
+        await fetch(brevoFormURL, { method: "POST", body, credentials: "omit", referrerPolicy: "no-referrer", headers: { Accept: "application/json" } });
+      } catch { /* Liste ist ein Extra */ }
+      track("quiz_newsletter_yes");
+      go(after("newsletter"), { replace: true });
+    } });
+    return [
+      el("img", { class: "start-art", src: "../assets/zeichnungen/worte-fehlen.webp", width: "260", height: "240", alt: "" }),
+      el("h1", { class: "start-center", text: "Möchtest du jede Woche einen neuen Satz per E-Mail?" }),
+      el("p", { class: "start-lead start-center", text: "Kostenlos. Ein ruhiger Satz für einen schwierigen Moment, abmelden mit einem Klick." }),
+      yes,
+      el("button", { type: "button", class: "abo-button abo-button-light", text: "Kein Interesse", onclick: () => { track("quiz_newsletter_no"); go(after("newsletter"), { replace: true }); } }),
+      el("p", { class: "start-small start-center" }, ["Bei „Ja“ kommt zuerst eine E-Mail zum Bestätigen. ", el("a", { href: "/datenschutz.html#e-mail-liste", text: "Datenschutz" }), "."])
     ];
   }
 
@@ -323,90 +346,177 @@
     ];
   }
 
+  // ---- Enthüllung des Willkommenspreises (wie BetterMe: Rubbellos vor der Preisseite) -----------------------
+  // Alle bekommen denselben Preis; das Rubbeln deckt ihn nur auf (kein Gewinnspiel, keine Zufallsbehauptung).
+  // Beim Öffnen startet der Server das 15-Minuten-Fenster für diese E-Mail (angebot.js).
+  function revealScreen() {
+    const intro = offer.offers?.intro;
+    const deal = deals?.current();
+    if (!intro || !deals || deals.ended("intro") && !deal) { setTimeout(() => { if (current === "reveal") go("plan", { replace: true }); }); return []; }
+    if (!dealAsked) {
+      dealAsked = true;
+      deals.start("intro", { email: answers.email }).then((started) => {
+        if (!started && current === "reveal") go("plan", { replace: true });
+      });
+    }
+    const percent = Math.floor((1 - intro.firstYear / offer.yearly) * 100);
+    const prize = el("div", { class: "start-prize" }, [
+      el("span", { class: "start-prize-icon", html: icons.gift }),
+      el("strong", { text: `${percent} % Rabatt` }),
+      el("span", { text: `Dein erstes Jahr ${euro(intro.firstYear)} statt ${euro(offer.yearly)}` })
+    ]);
+    const canvas = el("canvas", { class: "start-scratch", width: "600", height: "300", "aria-hidden": "true" });
+    const button = el("button", { type: "button", class: "abo-button", text: "Aufdecken" });
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      canvas.classList.add("start-scratch-gone");
+      button.textContent = "Preis sichern";
+      track("quiz_reveal");
+    };
+    button.addEventListener("click", () => { if (revealed) go("plan", { replace: true }); else reveal(); });
+    // Rubbelfläche: lila Schicht, die mit Finger oder Maus weggerieben wird; ab etwa 45 % ist alles frei.
+    requestAnimationFrame(() => {
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      if (!context) return reveal();
+      context.fillStyle = "#47408c";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#ffffff";
+      context.font = "700 40px system-ui, sans-serif";
+      context.textAlign = "center";
+      context.fillText("Hier rubbeln", canvas.width / 2, canvas.height / 2 + 14);
+      context.globalCompositeOperation = "destination-out";
+      let moves = 0;
+      const rub = (event) => {
+        if (revealed || (event.buttons === 0 && event.pointerType === "mouse")) return;
+        const box = canvas.getBoundingClientRect();
+        context.beginPath();
+        context.arc((event.clientX - box.left) * (canvas.width / box.width), (event.clientY - box.top) * (canvas.height / box.height), 46, 0, Math.PI * 2);
+        context.fill();
+        if (++moves % 12 === 0) {
+          const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+          let clear = 0;
+          for (let index = 3; index < pixels.length; index += 64) if (pixels[index] === 0) clear += 1;
+          if (clear / (pixels.length / 64) > 0.45) reveal();
+        }
+      };
+      canvas.addEventListener("pointerdown", (event) => { canvas.setPointerCapture?.(event.pointerId); rub(event); });
+      canvas.addEventListener("pointermove", rub);
+    });
+    return [
+      el("h1", { class: "start-center", text: "Ein Willkommensgeschenk für dich" }),
+      el("p", { class: "start-lead start-center", text: "Rubbel die Karte frei oder tippe auf Aufdecken." }),
+      el("div", { class: "start-scratch-card" }, [prize, canvas]),
+      button,
+      el("p", { class: "start-small start-center", text: `Willkommenspreis für das erste Jahr des Jahresplans, inkl. MwSt. Danach ${euro(offer.yearly)} im Jahr. ${offer.trialDays > 0 ? `Die ${offer.trialDays} Tage kostenlos bleiben.` : ""}` })
+    ];
+  }
+
   // ---- Angebotsseite 1:1 nach BetterMe, Liven und Noom (lange Seite) --------------------------------
   // Oben eine feste Leiste mit Rabatt-Uhr und Knopf, Vorher/Nachher mit Zeichnungen, deine Angaben als Schilder,
   // Rabatt-Box, Tarife mit Preis pro Tag, Knopf, sicher bezahlen, was du bekommst, Probezeit, FAQ, Tarife noch einmal.
-  // Alles ehrlich: keine erfundenen Bewertungen, Nutzerzahlen oder Garantien, keine Uhr und keine Knappheitsbehauptung.
+  // Keine erfundenen Bewertungen oder Nutzerzahlen. Uhr und Garantie sind echt: Ablauf vom Server, Garantie über kuendigen.html.
   function planScreen() {
     const s = chosen();
-    if (offer.offers?.intro && deals && !dealAsked) {
+    if (offer.offers?.intro && deals && !dealAsked && !reservationEnded) {
       dealAsked = true;
-      deals.start("intro").then((started) => { if (started && current === "plan") render("plan"); });
+      deals.start("intro", { email: answers.email }).then((started) => { if (started && current === "plan") render("plan"); });
     }
     const deal = offer.offers ? deals?.current() : null;
+    // Aufbau 1:1 nach der BetterMe-Preisseite (Daniel, 9. Nov 2026: „sieht nicht professionell aus“):
+    // fester Kopf mit Uhr und Knopf, großes Vorher/Nachher, Überschrift, Gutschein-Ticket mit Uhr, Tarifkarten mit
+    // großem Tagespreis rechts, Knopf, Kleingedrucktes im Rahmen, Zahlungsarten. Uhr echt: Ablauf vom Server.
+    stopTimer();
+    // Uhr nur bei einem kurzen Fenster (Server mit 15 Minuten); ein altes 7-Tage-Fenster zeigt keine Uhr.
+    const timed = Boolean(deal && deal.expiresAt - Date.now() <= 60 * 60_000);
+    const clocks = [];
+    const clock = (extra = "") => {
+      const minutes = el("b", { text: "15" });
+      const seconds = el("b", { text: "00" });
+      clocks.push([minutes, seconds]);
+      return el("span", { class: `start-clock ${extra}`, role: "timer", "aria-label": "Reserviert noch" }, [
+        minutes, el("i", { text: ":" }), seconds, el("small", { text: "Minuten" }), el("span"), el("small", { text: "Sekunden" })]);
+    };
+    if (timed) {
+      stopTimer = deals.countdown(deal, (text) => {
+        const [minutes, seconds] = text.split(":");
+        for (const [m, s] of clocks) { m.textContent = minutes.padStart(2, "0"); s.textContent = seconds; }
+      }, () => {
+        deals.drop(deal.kind);
+        reservationEnded = true;
+        track("quiz_offer_ended");
+        if (current === "plan") render("plan");
+      });
+    }
     const firstYear = deal ? deal.firstYear : offer.yearly;
     const perDay = (cents, days) => euro(Math.round(cents / days));
     const yearlyText = deal ? `${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} pro Jahr` : `${euro(offer.yearly)} pro Jahr`;
     // Preise immer mit Hinweis auf die Umsatzsteuer (PAngV § 6 Abs. 1 Nr. 1).
     const priceText = (key) => `${key === "yearly" ? yearlyText : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
-    // Nur ein belegbarer Vergleich (Jahrespreis gegenüber 12 Monatszahlungen), keine unbelegte Spitzenstellung wie „Beliebteste Wahl“.
+    // Nur ein belegbarer Vergleich (Jahrespreis gegenüber 12 Monatszahlungen), keine unbelegte Spitzenstellung wie „Beliebt“.
     const saving = Math.floor((1 - offer.yearly / (offer.monthly * 12)) * 20) * 5;
+    const discount = Math.floor((1 - firstYear / offer.yearly) * 100);
     const name = forWho();
+    const ctaText = offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos testen` : "Plan holen";
 
-    // Tarife wie BetterMe: Band mit der Ersparnis, Auswahlkreis, alter Preis durchgestrichen, Preis pro Tag als Schild.
     const tables = [];
     const select = (key) => {
       plan = key;
       for (const table of tables) for (const card of table.querySelectorAll("[data-plan]")) card.setAttribute("aria-checked", String(card.dataset.plan === key));
       for (const node of document.querySelectorAll("[data-start-price]")) node.textContent = `Dein Abo beginnt: ${priceText(plan)}. Vorher online kündbar.`;
       for (const node of document.querySelectorAll("[data-start-fine]")) node.textContent = fineText();
-      for (const node of document.querySelectorAll("[data-start-bar]")) node.textContent = barLine();
     };
-    const tag = (cents, days, was) => el("span", { class: "start-tag" }, [
-      was ? el("s", { text: perDay(was, days) }) : null,
-      el("strong", { text: perDay(cents, days) }),
-      el("span", { text: "pro Tag" })
+    // Tarifkarte wie BetterMe: Kreis, Name groß, alter Preis → neuer Preis, rechts groß der Tagespreis.
+    const tier = (key, title, line, cents, days, was, band) => el("button", { type: "button", class: "start-tier", role: "radio", "data-plan": key, "aria-checked": String(plan === key), onclick: () => select(key) }, [
+      band ? el("span", { class: "start-ribbon", text: band }) : null,
+      el("span", { class: "start-tier-body" }, [
+        el("span", { class: "abo-radio", "aria-hidden": "true" }),
+        el("span", { class: "start-tier-text" }, [el("strong", { text: title }), line]),
+        el("span", { class: "start-day" }, [was ? el("s", { text: perDay(was, days) }) : null, el("strong", { text: perDay(cents, days) }), el("span", { text: "pro Tag" })])
+      ])
     ]);
     const table = () => {
-      const yearly = el("button", { type: "button", class: "start-tier", role: "radio", "data-plan": "yearly", "aria-checked": String(plan === "yearly"), onclick: () => select("yearly") }, [
-        saving >= 10 ? el("span", { class: "start-ribbon", text: `Spare ${saving} %` }) : null,
-        el("span", { class: "start-tier-body" }, [
-          el("span", { class: "abo-radio", "aria-hidden": "true" }),
-          el("span", { class: "start-tier-text" }, [
-            el("strong", { text: "Jahresplan" }),
-            deal ? el("span", {}, [el("s", { text: euro(offer.yearly) }), ` ${euro(firstYear)} im 1. Jahr`]) : el("span", { text: `${euro(offer.yearly)} pro Jahr` })
-          ]),
-          tag(firstYear, 365, deal ? offer.yearly : null)
-        ])
+      const yearlyLine = deal
+        ? el("span", {}, [el("s", { text: euro(offer.yearly) }), ` → ${euro(firstYear)} im 1. Jahr`])
+        : el("span", { text: `${euro(offer.yearly)} pro Jahr` });
+      const group = el("div", { role: "radiogroup", "aria-label": "Tarif", class: "start-tiers" }, [
+        tier("yearly", "Jahresplan", yearlyLine, firstYear, 365, deal ? offer.yearly : null, saving >= 10 ? `Spare ${saving} %` : "Jahresplan"),
+        tier("monthly", "Monatsplan", el("span", { text: `${euro(offer.monthly)} pro Monat` }), offer.monthly, 30, null, null)
       ]);
-      const monthly = el("button", { type: "button", class: "start-tier", role: "radio", "data-plan": "monthly", "aria-checked": String(plan === "monthly"), onclick: () => select("monthly") }, [
-        el("span", { class: "start-tier-body" }, [
-          el("span", { class: "abo-radio", "aria-hidden": "true" }),
-          el("span", { class: "start-tier-text" }, [el("strong", { text: "Monatsplan" }), el("span", { text: `${euro(offer.monthly)} pro Monat` })]),
-          tag(offer.monthly, 30)
-        ])
-      ]);
-      const group = el("div", { role: "radiogroup", "aria-label": "Tarif", class: "start-tiers" }, [yearly, monthly]);
       tables.push(group);
-      return el("div", {}, [group, el("p", { class: "start-small start-center", text: "Alle Preise inklusive gesetzlicher Umsatzsteuer (MwSt.)." })]);
+      return group;
     };
-    const cta = () => el("button", { type: "button", class: "abo-button start-cta", text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos testen` : "Meinen Plan holen", onclick: checkout });
-    // Feste Leiste unten (Noom, Headway, Calm): Probezeit und Preis kurz, Knopf geht direkt zur Kasse.
-    const barLine = () => `${offer.trialDays > 0 ? "Dann " : "Nur "}${plan === "yearly" ? (deal ? `${euro(firstYear)} im 1. Jahr` : `${euro(offer.yearly)} pro Jahr`) : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
+    const cta = () => el("button", { type: "button", class: "abo-button start-cta", text: ctaText, onclick: checkout });
     const fineText = () => (offer.trialDays > 0
-      ? `${offer.trialDays} Tage kostenlos, heute zahlst du 0,00 €. Danach ${priceText(plan)}, bis du kündigst. Vorher online kündbar.`
-      : `Du zahlst ${priceText(plan)}, bis du kündigst. Online kündbar.`);
-    const fine = () => el("p", { class: "start-small start-fine", "data-start-fine": "", text: fineText() });
-    const safe = () => el("p", { class: "start-safe" }, [el("span", { html: icons.lock }), el("span", { text: "Sicher bezahlen über Stripe: Apple Pay, Google Pay oder Karte" })]);
+      ? `Heute zahlst du 0,00 €. Kündige ich nicht vor Ablauf der ${offer.trialDays} Tage, kostet das Abo danach ${priceText(plan)} und verlängert sich, bis ich kündige. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`
+      : `Du zahlst ${priceText(plan)}, bis du kündigst. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`);
+    const fine = () => el("p", { class: "start-fine", "data-start-fine": "", text: fineText() });
+    const payments = () => el("ul", { class: "start-pay", role: "list", "aria-label": "Sicher bezahlen" }, [
+      el("li", {}, [el("span", { html: icons.lock }), "SSL-verschlüsselt"]), el("li", { text: "Apple Pay" }), el("li", { text: "Google Pay" }), el("li", { text: "Karte" }), el("li", { text: "Stripe" })]);
+    const guarantee = () => el("p", { class: "start-guarantee" }, [el("span", { html: icons.shield }),
+      el("span", {}, [el("strong", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }), " ", el("a", { href: "/abo/garantie.html", text: "Bedingungen" })])]);
     const scrollToPlans = () => document.querySelector(".start-tiers")?.scrollIntoView({ behavior: "smooth", block: "center" });
 
-    // Vorher/Nachher wie Liven/BetterMe, mit unseren Zeichnungen und ehrlichen Stufen.
+    // Kopf wie BetterMe: links die Uhr (oder die Probezeit), rechts ein dunkler Knopf; bleibt beim Scrollen oben.
+    const head = el("div", { class: "start-head" }, [
+      timed ? clock() : el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein Plan" }), el("span", { text: "Heute 0,00 €" })]),
+      el("button", { type: "button", class: "start-head-button", text: "Plan holen", onclick: scrollToPlans })
+    ]);
+
+    // Vorher/Nachher wie BetterMe: eine Karte mit „Jetzt | Mit deinem Plan“, zwei Zeichnungen, darunter Werte mit Balken.
     const level = (filled) => el("span", { class: "start-level", "aria-hidden": "true" }, [1, 2, 3].map((index) => el("i", { class: index <= filled ? "on" : "" })));
-    const side = (title, image, rows, good) => el("div", { class: `start-side${good ? " start-side-good" : ""}` }, [
-      el("p", { class: "start-side-title", text: title }),
-      el("img", { src: `../assets/zeichnungen/${image}`, alt: "", width: "260", height: "240", loading: "eager" }),
-      ...rows.map(([label, value, filled]) => el("div", { class: "start-side-row" }, [el("span", { text: label }), el("strong", { text: value }), level(filled)]))
+    const rows = [["Passende Worte", "fehlen oft", 1, "sind parat", 3], ["Ruhe im Alltag", "selten", 1, "öfter", 3]];
+    const compare = el("div", { class: "start-hero" }, [
+      el("div", { class: "start-hero-pics" }, [
+        el("p", { class: "start-hero-tabs" }, [el("span", { text: "Jetzt" }), el("span", { text: "Mit deinem Plan" })]),
+        el("img", { src: "../assets/zeichnungen/worte-fehlen.webp", alt: "", width: "260", height: "240", loading: "eager" }),
+        el("img", { src: "../assets/zeichnungen/v-umarmung.webp", alt: "", width: "260", height: "240", loading: "eager" })
+      ]),
+      el("div", { class: "start-hero-rows" }, [0, 1].map((side) => el("div", {}, rows.map((row) => el("div", { class: "start-hero-row" }, [
+        el("span", { text: row[0] }), el("strong", { text: side ? row[3] : row[1] }), level(side ? row[4] : row[2])]))))),
+      el("p", { class: "start-small start-center", text: "Beispielhafte Darstellung, kein Versprechen." })
     ]);
-    const compare = el("div", { class: "start-compare" }, [
-      side("Jetzt", "worte-fehlen.webp", [["Passende Worte", "fehlen oft", 1], ["Sicherheit", "gering", 1]]),
-      side("Mit deinem Plan", "v-umarmung.webp", [["Passende Worte", "parat", 3], ["Sicherheit", "wächst", 3]], true)
-    ]);
-    const tags = [
-      ["Am schwersten", `„${s.quote}“`],
-      answers.goal ? ["Dein Ziel", answers.goal.label] : null,
-      answers.dayTime ? ["Wann", answers.dayTime.label] : null,
-      answers.minutes ? ["Zeit", answers.minutes.label] : null
-    ].filter(Boolean);
 
     const gets = ["Jeden Tag ein Moment mit Sätzen zum Sagen", "Unbegrenzt eigene Sätze übersetzen lassen", "Jede Woche ein neuer Moment, auch per E-Mail",
       "Blatt für Helfer zum Ausdrucken", "In der iPhone-App und hier im Web"];
@@ -415,31 +525,33 @@
       ["Was kostet es nach der Probezeit?", deal
         ? `Jahresplan: ${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} im Jahr. Monatsplan: ${euro(offer.monthly)} im Monat. In den ${offer.trialDays} Tagen zahlst du nichts.`
         : `${euro(offer.yearly)} im Jahr oder ${euro(offer.monthly)} im Monat, je nach Wahl. In den ${offer.trialDays} Tagen zahlst du nichts.`],
+      ["Was ist, wenn es uns nicht hilft?", `Dann bekommst du dein Geld zurück. Es gilt eine ${guaranteeDays} Tage Geld-zurück-Garantie ab der ersten Zahlung: Unter „Verträge hier kündigen“ die Garantie wählen, fertig. Die Bedingungen stehen auf der Seite Geld-zurück-Garantie.`],
       ["Wie kündige ich?", "Online über „Verträge hier kündigen“ unten auf jeder Seite, ohne Anmeldung. Kündigst du in der Probezeit, zahlst du nichts."],
       ["Gilt das auch in der App?", "Ja. Du meldest dich in der iPhone-App mit demselben Konto an, dann ist alles freigeschaltet."],
       ["Ist das eine medizinische Beratung?", "Nein. Demenz Coach hilft bei Worten und Alltag. Es ersetzt keinen ärztlichen Rat. Im Notfall 112."],
       ["Was passiert mit meinen Antworten?", "Sie bleiben auf deinem Gerät. Wir senden sie nicht und speichern sie nicht."]
     ];
+    // Gutschein-Ticket wie BetterMe („Promo-Code angewendet!“ mit Uhr).
+    const ticket = () => (deal ? el("div", { class: "start-ticket" }, [
+      el("p", { class: "start-ticket-title" }, [el("span", { html: icons.gift }), "Willkommenspreis aktiviert!"]),
+      el("div", { class: "start-ticket-body" }, [
+        el("p", { class: "start-ticket-code" }, [el("span", { class: "start-ticket-check", text: "✓" }), `−${discount} % im 1. Jahr`]),
+        timed ? clock("start-clock-soft") : el("p", { class: "start-ticket-code", text: euro(firstYear) })
+      ])
+    ]) : null);
 
     return [
-      el("h1", { class: "start-center", text: name ? `Dein Plan für ${name} ist fertig` : "Dein Plan ist fertig" }),
-      el("ul", { class: "start-tags", role: "list" }, tags.map(([term, value]) => el("li", {}, [el("span", { text: term }), el("strong", { text: value })]))),
-      deal ? el("div", { class: "start-promo" }, [
-        el("p", { class: "start-promo-text" }, [el("strong", { text: "Willkommenspreis" }),
-          el("span", { text: `Erstes Jahr ${euro(firstYear)}, danach ${euro(offer.yearly)} im Jahr` })])
-      ]) : null,
-      offer.trialDays > 0 ? el("p", { class: "start-trial" }, [
-        el("strong", { text: `${offer.trialDays} Tage kostenlos testen` }),
-        el("span", { text: "Heute zahlst du 0,00 €. Vorher online kündbar." })
-      ]) : null,
-      el("h2", { class: "start-section start-center", text: "Wähle deinen Plan" }),
+      head,
+      compare,
+      reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Die Reservierung deines Willkommenspreises ist abgelaufen. Es gilt der normale Preis." }) : null,
+      el("h1", { class: "start-center start-plan-title", text: name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!" }),
+      ticket(),
       table(),
       cta(),
       fine(),
-      safe(),
-      compare,
-      el("p", { class: "start-small start-center", text: "Beispielhafte Darstellung, kein Versprechen." }),
-      el("h2", { class: "start-section start-center", text: "Das bekommst du" }),
+      payments(),
+      guarantee(),
+      el("h2", { class: "start-section start-center", text: "Was ist in deinem Plan?" }),
       el("img", { class: "start-art", src: "../assets/zeichnungen/v-tanzen.webp", width: "600", height: "650", alt: "" }),
       el("ul", { class: "start-checks", role: "list" }, gets.map((text) => el("li", { text }))),
       el("div", { class: "start-card" }, [
@@ -457,22 +569,22 @@
       el("h2", { class: "start-section start-center", text: "Häufige Fragen" }),
       el("div", { class: "start-faq" }, faq.map(([question, answer]) => el("details", {}, [el("summary", { text: question }), el("p", { text: answer })]))),
       el("h2", { class: "start-section start-center", text: name ? `Hol dir den Plan für ${name}` : "Hol dir deinen Plan" }),
+      ticket(),
       table(),
       cta(),
       fine(),
-      safe(),
+      payments(),
+      el("div", { class: "start-guarantee-card" }, [
+        el("span", { html: icons.shield }),
+        el("h2", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }),
+        el("p", { text: `Hilft dir der Plan nicht, bekommst du dein Geld zurück. Wähle innerhalb von ${guaranteeDays} Tagen nach der ersten Zahlung unter „Verträge hier kündigen“ die Geld-zurück-Garantie. Wir erstatten den vollen Betrag, das Abo endet sofort.` }),
+        el("a", { href: "/abo/garantie.html", text: "Bedingungen der Garantie" })
+      ]),
       el("p", { class: "start-small start-legal" }, [
-        `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende.${deal ? " Der Sonderpreis gilt für das erste Jahr des Jahresplans." : ""} Kündigen geht online ohne Anmeldung. Es gelten die `,
+        `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende.${deal ? " Der Sonderpreis gilt für das erste Jahr des Jahresplans." : ""} Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
         el("a", { href: "/nutzungsbedingungen.html", text: "Nutzungsbedingungen" }), " und die ",
         el("a", { href: "/abo/widerruf.html", text: "Widerrufsbelehrung" }),
         ". Allgemeine Kommunikations- und Alltagshilfe, kein Medizinprodukt."
-      ]),
-      el("div", { class: "start-bar" }, [
-        el("p", { class: "start-bar-text" }, [
-          el("b", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein Plan ist bereit" }),
-          el("span", { "data-start-bar": "", text: barLine() })
-        ]),
-        el("button", { type: "button", class: "start-bar-button", text: offer.trialDays > 0 ? "Kostenlos testen" : "Plan holen", onclick: checkout })
       ])
     ];
   }
@@ -487,7 +599,18 @@
       }));
     } catch { /* privater Modus: Plan startet dann mit dem häufigsten Moment */ }
     const campaign = (params.get("utm_campaign") || "").toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
-    location.href = `../abo/?plan=${plan}&src=quiz_${source}${preset ? `_${preset.key}` : ""}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
+    const src = `quiz_${source}${preset ? `_${preset.key}` : ""}`.slice(0, 40);
+    // Kasse als Fenster auf dieser Seite (kasse.js, wie BetterMe/Yazio). Ohne das Modul wie bisher die Seite /abo/.
+    const kasse = window.DemenzKasse;
+    if (!kasse || !config.firebase?.apiKey) {
+      location.href = `../abo/?plan=${plan}&src=${src}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
+      return;
+    }
+    const deal = plan === "yearly" && offer.offers ? deals?.forCheckout() : null;
+    history.pushState({ screen: "plan", sheet: true }, "", location.href);
+    kasse.open({ plan, email: answers.email, offer: deal, source: src, campaign, track: (name) => track(name),
+      onClose: () => { if (history.state?.sheet) history.back(); },
+      onOfferExpired: () => { if (deal) deals.drop(deal.kind); reservationEnded = true; render("plan"); } });
   }
 
   // ---- Navigation (Zurück-Taste des Handys funktioniert über die Browser-Historie) ----------------
@@ -513,7 +636,8 @@
       bars[number].firstChild.style.width = `${Math.round(share * 100)}%`;
     });
     $("count").textContent = done ? "" : sections[index]?.title ?? "";
-    $("back").style.visibility = ["relation", "building", "email"].includes(name) ? "hidden" : "visible";
+    $("back").style.visibility = ["relation", "building", "email", "newsletter"].includes(name) ? "hidden" : "visible";
+    if (name !== "plan") stopTimer();
     $("progress").hidden = done;
     $("count").hidden = done;
     // Rechtliche Links (AGB, Datenschutz, Impressum, Widerruf, Kündigen) stehen auf jedem Schritt unten, klein.
@@ -534,7 +658,7 @@
     const close = () => { dialog.remove(); document.body.classList.remove("start-noscroll"); };
     const accept = el("button", { type: "button", class: "abo-button", text: `Für ${euro(exit.firstYear)} starten`, onclick: async () => {
       accept.disabled = true;
-      const started = await deals.start("exit");
+      const started = await deals.start("exit", { email: answers.email });
       close();
       plan = "yearly";
       track("quiz_exit_offer_click");
@@ -555,6 +679,7 @@
   }
 
   window.addEventListener("popstate", (event) => {
+    if (window.DemenzKasse?.isOpen()) { window.DemenzKasse.close(); return; }
     if (current === "plan" && offer.offers?.exit && deals && !deals.exitShown() && event.state?.screen !== "plan") {
       history.pushState({ screen: "plan" }, "", location.href);
       showExitOffer();
@@ -562,7 +687,8 @@
     }
     let name = event.state?.screen || "relation";
     if (!flow.includes(name)) name = "relation";
-    if (["building", "email"].includes(name)) name = "how";
+    if (["building", "email", "newsletter"].includes(name)) name = "how";
+    if (name === "reveal") name = "result";
     // Ohne Antwort zurück auf die erste offene Frage.
     const open = flow.slice(0, flow.indexOf(name)).find((step) => answerFor[step] && !answers[answerFor[step]]);
     render(open || name);
@@ -574,7 +700,7 @@
     fetch(`${config.endpoint}/config`).then((response) => response.ok ? response.json() : null).then((data) => {
       if (!data?.plans) return;
       offer = { yearly: data.plans.yearly.amount, monthly: data.plans.monthly.amount, currency: data.plans.yearly.currency || "eur", trialDays: data.trialDays ?? 7, offers: data.offers || null };
-      if (current === "plan") render("plan");
+      if (current === "plan" || current === "reveal") render(current);
     }).catch(() => {});
   }
 

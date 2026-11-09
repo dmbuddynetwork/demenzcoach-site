@@ -104,7 +104,6 @@ body[data-screen="plan"] .start-top, body[data-screen="plan"] .start-count { dis
 .start-bar-text b { display: block; font-size: 1.125rem; color: var(--ink); }
 .start-bar-button { flex: none; min-height: 52px; padding: 10px 22px; border: 0; border-radius: 14px; background: var(--purple); color: #fff;
   font: 700 1.0625rem/1 var(--sans); cursor: pointer; }
-body[data-screen="plan"] .start-page { padding-bottom: 110px; }
 .start-compare { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--card); margin: 0 0 6px; }
 .start-side { display: grid; align-content: start; gap: 6px; padding: 14px 12px 16px; }
 .start-side + .start-side { border-left: 1px solid var(--line); }
@@ -172,3 +171,77 @@ body[data-screen="plan"] .start-page { padding-bottom: 110px; }
 .start-ready { display: grid; gap: 6px; margin: 0 0 14px; font-size: var(--small); font-weight: 700; color: var(--purple); text-align: center; }
 .start-ready-bar { display: block; height: 8px; border-radius: 999px; background: var(--lav); overflow: hidden; }
 .start-ready-bar::after { content: ""; display: block; width: var(--p); height: 100%; border-radius: 999px; background: var(--purple); }
+
+/* Rubbellos vor der Preisseite (BetterMe). */
+.start-scratch-card { position: relative; margin: 0 0 18px; border-radius: 18px; overflow: hidden; border: 2px dashed var(--purple); background: var(--lav); aspect-ratio: 2 / 1; }
+.start-prize { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 4px; padding: 12px; text-align: center; color: var(--lav-ink); }
+.start-prize strong { font-size: 2.25rem; line-height: 1.1; color: var(--purple); }
+.start-prize-icon svg { width: 36px; height: 36px; color: var(--purple); }
+.start-scratch { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; transition: opacity .4s ease; }
+.start-scratch-gone { opacity: 0; pointer-events: none; }
+
+/* Geld-zurück-Garantie */
+.start-guarantee { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 6px; font-size: var(--small); }
+.start-guarantee svg { width: 22px; height: 22px; color: var(--purple); flex: none; }
+.start-guarantee-card { margin: 20px 0 0; padding: 20px; text-align: center; background: var(--card); border: 2px solid var(--purple); border-radius: 16px; }
+.start-guarantee-card svg { width: 44px; height: 44px; color: var(--purple); }
+.start-guarantee-card h2 { margin: 6px 0 8px; }
+
+/* Preisseite 1:1 nach BetterMe (9. Nov 2026): Kopf mit Uhr, Vorher/Nachher, Ticket, Tarife mit Tagespreis, Rahmen fürs Kleingedruckte. */
+body[data-screen="plan"] { background: #fbfaf7; }
+body[data-screen="plan"] .start-page { padding-top: 0; }
+.start-head { position: sticky; top: 0; z-index: 7; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 0 -16px 12px; padding: 10px 16px; background: rgba(251, 250, 247, .97); border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
+.start-head-text { margin: 0; display: grid; line-height: 1.2; }
+.start-head-text span { font-size: var(--small); color: var(--ink-2); }
+.start-head-button { flex: none; min-height: 52px; padding: 0 26px; border: 0; border-radius: 999px; background: var(--purple); color: #fff;
+  font: 700 1rem/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.start-clock { display: inline-grid; grid-template-columns: auto auto auto; column-gap: 4px; align-items: end; justify-items: center; line-height: 1; }
+.start-clock b { font-size: 2.1rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ink); }
+.start-clock i { font-style: normal; font-size: 1.6rem; font-weight: 700; color: var(--ink-2); padding-bottom: 3px; }
+.start-clock small { font-size: .75rem; color: var(--ink-2); margin-top: 4px; }
+.start-clock-soft { padding: 10px 14px; border-radius: 12px; background: var(--lav); }
+.start-clock-soft b, .start-clock-soft i { color: var(--purple); font-size: 1.6rem; }
+
+.start-hero { margin: 0 0 8px; }
+.start-hero-pics { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 62px 8px 8px; border-radius: 20px; background: #f1eee8; overflow: hidden; }
+.start-hero-pics img { display: block; width: 100%; height: 170px; object-fit: contain; mix-blend-mode: multiply; }
+.start-hero-tabs { position: absolute; top: 10px; left: 10px; right: 10px; display: grid; grid-template-columns: 1fr 1fr; margin: 0; padding: 10px 0;
+  background: #fff; border-radius: 12px; text-align: center; font-weight: 600; }
+.start-hero-tabs span + span { border-left: 1px solid var(--line); color: var(--purple); }
+.start-hero-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; padding: 16px 8px 4px; }
+.start-hero-row { display: grid; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: var(--small); }
+.start-hero-row:last-child { border-bottom: 0; }
+.start-hero-row span { color: var(--ink-2); }
+.start-hero-row strong { font-size: 1.0625rem; color: var(--ink); }
+.start-hero-rows .start-level i.on { background: var(--ink); }
+.start-hero-rows > div:last-child .start-level i.on { background: var(--purple); }
+.start-plan-title { margin: 22px 0 18px; font-size: 1.9rem; line-height: 1.15; }
+
+.start-ticket { margin: 0 0 16px; border-radius: 18px; background: var(--lav); overflow: hidden; }
+.start-ticket-title { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0; padding: 16px 16px 14px; font-weight: 700; font-size: 1.125rem; color: var(--lav-ink);
+  border-bottom: 2px dashed rgba(71, 64, 140, .35); }
+.start-ticket-title svg { width: 26px; height: 26px; color: var(--purple); }
+.start-ticket-body { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: stretch; padding: 12px; }
+.start-ticket-code { display: flex; align-items: center; gap: 10px; margin: 0; padding: 12px 14px; border-radius: 12px; background: #fff; font-weight: 700; }
+.start-ticket-body .start-clock-soft { background: rgba(255, 255, 255, .6); }
+.start-ticket-check { color: #2f8f4e; font-weight: 800; }
+
+.start-tiers { gap: 14px; }
+.start-tier { background: #f4f2ee; border: 2px solid transparent; border-radius: 18px; }
+.start-tier[aria-checked="true"] { background: #fff; border-color: var(--ink); box-shadow: 0 4px 14px rgba(28, 27, 31, .08); }
+.start-ribbon { background: #d9d6cf; color: var(--ink); letter-spacing: .08em; }
+.start-tier[aria-checked="true"] .start-ribbon { background: var(--ink); color: #fff; }
+.start-tier-body { padding: 16px 16px 16px 14px; }
+.start-tier-text strong { font-size: 1.375rem; font-weight: 700; }
+.start-tier-text span { font-size: 1rem; }
+.start-tier[aria-checked="true"] .abo-radio { border: 0; background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 15px no-repeat; }
+.start-day { flex: none; display: grid; justify-items: end; min-width: 86px; text-align: right; }
+.start-day s { font-size: .875rem; color: var(--ink-2); }
+.start-day strong { font-size: 1.75rem; font-weight: 800; line-height: 1.1; color: var(--ink); }
+.start-day span { font-size: .875rem; color: var(--ink-2); }
+.start-cta { min-height: 62px; border-radius: 999px; font-size: 1.125rem; letter-spacing: .04em; text-transform: uppercase; }
+.start-fine { margin: 14px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: #fff; font-size: var(--small); color: var(--ink-2); text-align: center; }
+.start-pay { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 12px; padding: 0; list-style: none; }
+.start-pay li { display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: .8125rem; font-weight: 700; color: var(--ink-2); }
+.start-pay svg { width: 14px; height: 14px; color: #2f8f4e; }

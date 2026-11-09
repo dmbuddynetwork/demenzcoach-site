@@ -1,0 +1,190 @@
+// Kasse als Fenster auf derselben Seite (Daniel, 9. Nov 2026: wie BetterMe und Yazio, die Zahlung öffnet sich über der
+// Angebotsseite). Wird von /start/ geladen (window.DemenzKasse.open). Die Seite /abo/ bleibt als eigener Einstieg.
+// Ablauf wie abo.js: stilles Gast-Konto (Firebase anonym), POST /session, Stripe Checkout (Elements) mit Express-Knöpfen
+// und Zahlungsfeld. Nach der Zahlung leitet Stripe auf /abo/?status=fertig weiter (dort Danke-Seite und Konto sichern).
+// § 312j Abs. 2 BGB: Preis, Laufzeit und Kündigung stehen vor allen Zahlungsknöpfen und direkt über dem Bestellknopf,
+// der Bestellknopf heißt „Zahlungspflichtig abonnieren“. Texte gleich wie renderSummary in abo.js.
+const config = window.DEMENZ_ABO_CONFIG || {};
+const firebaseVersion = "12.16.0";
+const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
+const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long", year: "numeric" }).format(date);
+
+let firebase = null;
+let auth = null;
+let publicConfig = null;
+let sheet = null;
+
+function el(tag, props = {}, children = []) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(props)) {
+    if (key === "text") node.textContent = value;
+    else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value);
+  }
+  for (const child of [].concat(children)) if (child) node.append(child);
+  return node;
+}
+
+async function api(path, { method = "GET", body, token } = {}) {
+  const headers = {};
+  if (body) headers["Content-Type"] = "application/json";
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const response = await fetch(`${config.endpoint}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data.message || `HTTP ${response.status}`);
+    error.code = data.code;
+    throw error;
+  }
+  return data;
+}
+
+async function signedInUser() {
+  if (!auth) {
+    const [{ initializeApp }, authModule] = await Promise.all([
+      import(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-app.js`),
+      import(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-auth.js`)
+    ]);
+    firebase = authModule;
+    auth = firebase.getAuth(initializeApp(config.firebase));
+    auth.languageCode = "de";
+    await new Promise((resolve) => { const stop = firebase.onAuthStateChanged(auth, () => { stop(); resolve(); }); });
+  }
+  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Das Gast-Konto trägt den Kauf, die Nummer kommt auf der Danke-Seite dazu.
+  return auth.currentUser ?? (await firebase.signInAnonymously(auth)).user;
+}
+
+function loadStripe() {
+  if (window.Stripe) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://js.stripe.com/v3/";
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("stripe.js failed"));
+    document.head.append(script);
+  });
+}
+
+export function summaryText(plan, price, trialDays, firstYear = null) {
+  const priceText = `${euro(price.amount, price.currency)} pro ${plan === "yearly" ? "Jahr" : "Monat"}`;
+  const deal = Number.isInteger(firstYear) ? euro(firstYear, price.currency) : null;
+  if (trialDays > 0) {
+    const start = new Date(Date.now() + trialDays * 86_400_000);
+    return deal
+      ? `Heute 0,00 €. Ab ${dateText(start)} ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt. Kündigst du vorher, zahlst du nichts.`
+      : `Heute 0,00 €. Ab ${dateText(start)} ${priceText} inklusive MwSt. Kündigst du vorher, zahlst du nichts.`;
+  }
+  return deal
+    ? `Heute ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt.`
+    : `Heute ${priceText.replace(" pro ", " für 1 ")} inklusive MwSt. Danach ${priceText}.`;
+}
+export const termsText = (plan) => (plan === "yearly"
+  ? "Laufzeit: 1 Jahr. Danach läuft das Abo unbefristet weiter und ist mit einer Frist von einem Monat kündbar."
+  : "Das Abo verlängert sich jeden Monat automatisch und ist jederzeit zum Monatsende kündbar.");
+
+function close() {
+  if (!sheet) return;
+  sheet.node.remove();
+  document.body.classList.remove("start-noscroll");
+  sheet.onClose?.();
+  sheet = null;
+}
+
+// open({ plan, email, offer, source, campaign, onClose, onOfferExpired, track })
+export async function open(options) {
+  close();
+  const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
+  const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
+  const summary = el("p", { text: "Einen Moment, die Kasse lädt …" });
+  const terms = el("p");
+  const short = el("p", { class: "kasse-short" });
+  const divider = el("p", { class: "abo-divider", text: "oder", hidden: "" });
+  const express = el("div", { id: "kasse-express" });
+  const payment = el("div", { id: "kasse-payment" });
+  const payButton = el("button", { type: "button", class: "abo-button", disabled: "", text: "Zahlungspflichtig abonnieren" });
+  const emailLine = el("p", { class: "abo-muted", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
+  const title = el("h2", { id: "kasse-title", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
+  const card = el("div", { class: "kasse-card" }, [
+    el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": "Schließen", text: "×", onclick: () => close() })]),
+    error,
+    el("div", { class: "abo-card abo-summary" }, [summary, terms,
+      el("p", { class: "abo-muted" }, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
+        el("a", { href: "/abo/garantie.html", target: "_blank", text: "Geld-zurück-Garantie" }), ". Es gelten die ",
+        el("a", { href: "/nutzungsbedingungen.html", target: "_blank", text: "Nutzungsbedingungen" }), ". ",
+        el("a", { href: "/abo/widerruf.html", target: "_blank", text: "Widerrufsbelehrung" }), ". ",
+        el("a", { href: "/datenschutz.html", target: "_blank", text: "Datenschutz" }), "."])
+    ]),
+    express, divider, payment, emailLine, short, payButton
+  ]);
+  const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title",
+    onclick: (event) => { if (event.target === node) close(); } }, card);
+  const onKey = (event) => { if (event.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  sheet = { node, onClose: () => { document.removeEventListener("keydown", onKey); options.onClose?.(); } };
+  document.body.append(node);
+  document.body.classList.add("start-noscroll");
+  payButton.focus();
+
+  let checkout = null;
+  const confirm = async () => {
+    payButton.disabled = true;
+    error.hidden = true;
+    try {
+      const loaded = await checkout.loadActions?.();
+      const result = await (loaded?.actions ?? checkout).confirm();
+      if (result?.type === "error" || result?.error) {
+        fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
+        payButton.disabled = false;
+      }
+    } catch {
+      fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
+      payButton.disabled = false;
+    }
+  };
+  payButton.addEventListener("click", confirm);
+
+  try {
+    publicConfig ??= await api("/config");
+    const user = await signedInUser();
+    const session = await api("/session", {
+      method: "POST",
+      token: await user.getIdToken(),
+      body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
+        ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
+    });
+    const price = publicConfig.plans[options.plan];
+    const text = summaryText(options.plan, price, session.trialDays, session.firstYear);
+    summary.textContent = text;
+    short.textContent = text;
+    terms.textContent = termsText(options.plan);
+    await loadStripe();
+    const stripe = window.Stripe(publicConfig.publishableKey, { locale: "de" });
+    const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "18px", borderRadius: "12px" } };
+    const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
+    checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance } });
+    if (!sheet || sheet.node !== node) return;
+    const expressElement = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
+    expressElement.on("availablepaymentmethodschange", ({ paymentMethods }) => { divider.hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean); });
+    expressElement.on("confirm", () => confirm());
+    expressElement.mount(express);
+    checkout.createPaymentElement({ layout: "tabs" }).mount(payment);
+    payButton.disabled = false;
+    options.track?.("checkout_sheet_ready");
+  } catch (problem) {
+    if (problem.code === "already_subscribed") {
+      summary.textContent = "Du hast schon ein Abo. Dein Plan ist freigeschaltet.";
+      payButton.replaceWith(el("a", { class: "abo-button", href: "/abo/mein-plan.html", text: "Zu deinem Plan" }));
+      return;
+    }
+    if (problem.code === "offer_expired" || problem.code === "invalid_offer") {
+      close();
+      return options.onOfferExpired?.();
+    }
+    if (problem.code === "email_required") return fail("Bitte gib deine E-Mail-Adresse ein. Geh dafür einen Schritt zurück.");
+    if (problem.code === "terms_outdated") return fail("Die Seite ist nicht mehr aktuell. Bitte lade sie neu.");
+    fail("Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
+  }
+}
+
+export const isOpen = () => Boolean(sheet);
+window.DemenzKasse = Object.freeze({ open, close, isOpen });

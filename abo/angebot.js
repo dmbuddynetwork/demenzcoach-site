@@ -2,8 +2,9 @@
 //
 // Die Angebote kommen vom Server (POST {endpoint}/offer) mit fester Ablaufzeit und Signatur. Die Kasse
 // (POST /session) wendet den Stripe-Gutschein nur an, solange das Angebot gilt (7 Tage, nur als technisches Fenster).
-// Die Seiten zeigen bewusst keine Uhr und keine Knappheit mehr: Wer den Browser-Speicher löscht, bekommt das Angebot
-// erneut, also wäre jede Uhr unwahr (UWG Anhang Nr. 7). Läuft das Fenster ab, gilt der normale Preis (localStorage, nur diese Daten).
+// Uhr „reserviert für 14:59“ (Daniel, 9. Nov 2026): nur mit echtem Ende (UWG Anhang Nr. 7). Der Server bindet das
+// Willkommensfenster (15 Minuten) an einen Prüfwert der E-Mail; dieselbe E-Mail bekommt nie ein neues Fenster, auch nicht
+// nach gelöschtem Browser-Speicher oder auf einem anderen Gerät. Danach gilt der normale Preis.
 // Ein Ausstiegsangebot erscheint höchstens einmal pro Browser.
 (function (root) {
   "use strict";
@@ -23,14 +24,16 @@
   const valid = (offer) => Boolean(offer && typeof offer.token === "string" && Number(offer.expiresAt) > Date.now() && Number.isInteger(offer.firstYear));
 
   // Holt (oder setzt fort) ein Angebot beim Server. Ohne Verbindung: kein Angebot, normaler Preis.
-  async function start(kind) {
+  // Mit E-Mail: Fenster gilt für diese Adresse (Server). Antwort 409 = Fenster vorbei, dann kein Angebot mehr.
+  async function start(kind, { email = "" } = {}) {
     if (!config.endpoint) return null;
     const saved = read()[kind];
     const response = await fetch(`${config.endpoint}/offer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ kind, ...(saved ? { expiresAt: saved.expiresAt, token: saved.token } : {}) })
+      body: JSON.stringify({ kind, ...(saved ? { expiresAt: saved.expiresAt, token: saved.token } : {}), ...(email ? { email } : {}) })
     }).catch(() => null);
+    if (response?.status === 409) { drop(kind); write({ [`${kind}Ended`]: true }); return null; }
     if (!response?.ok) return null;
     const offer = await response.json().catch(() => null);
     if (!valid(offer)) return null;
@@ -54,6 +57,7 @@
     delete saved[kind];
     try { root.localStorage.setItem(storageKey, JSON.stringify(saved)); } catch { /* */ }
   }
+  const ended = (kind) => read()[`${kind}Ended`] === true;
   const exitShown = () => read().exitShown === true;
   const markExitShown = () => write({ exitShown: true });
 
@@ -70,5 +74,5 @@
     return () => root.clearInterval(timer);
   }
 
-  root.DemenzAngebot = Object.freeze({ start, current, forCheckout, drop, exitShown, markExitShown, countdown });
+  root.DemenzAngebot = Object.freeze({ start, current, forCheckout, drop, ended, exitShown, markExitShown, countdown });
 })(typeof window !== "undefined" ? window : globalThis);
