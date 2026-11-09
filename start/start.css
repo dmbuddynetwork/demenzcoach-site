@@ -1,8 +1,22 @@
 /* Fragebogen für Meta/TikTok. Bausteine wie die App und einfach.css: hellila Zeilen mit Symbol und Pfeil,
    weiße Karten mit feinem Rand, ein lila Knopf pro Seite, drei Schriftgrößen. */
 .start-page { padding-top: 12px; }
+/* Bestehende Footerlinks und Controls bleiben sichtbar und zusammen bedienbar. */
+.start-footer-clean { display: grid; gap: 12px; margin-top: 24px; padding-top: 16px; font-size: 1rem; line-height: 1.45; }
+.start-footer-clean-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
+.start-footer-clean-links > .abo-cancel-link { grid-column: 1 / -1; }
+.start-footer-clean-links > a, .start-footer-clean-controls > button:not([hidden]) { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; font: inherit; text-decoration: none; overflow-wrap: anywhere; }
+.start-footer-clean-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-top: 8px; border-top: 1px solid var(--line); }
+.start-footer-clean-controls > button:not([hidden]) { position: static; margin: 0; padding: 6px 0; border: 0; background: transparent; color: var(--purple); }
+.start-footer-clean-controls > button[hidden] { display: none; }
+.start-footer-clean a:focus-visible, .start-footer-clean button:focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; border-radius: 2px; }
+.start-footer-clean > p { margin: 0; font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
 .start-top { display: grid; grid-template-columns: 72px 1fr 72px; align-items: center; min-height: 52px; margin-bottom: 8px; }
 .start-top .abo-brand { justify-self: center; white-space: nowrap; }
+/* Nur Start: Nutzerzoom bleibt erhalten, Marke bricht innerhalb der verfügbaren Breite um. */
+.start-page .start-top { grid-template-columns: 44px minmax(0, 1fr) 44px; }
+.start-page .abo-brand { min-width: 0; max-width: 100%; white-space: normal; }
+.start-page .abo-brand > span { min-width: 0; overflow-wrap: anywhere; }
 .start-card > :last-child { margin-bottom: 0; }
 .start-back { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: var(--purple); cursor: pointer; padding: 0; }
 /* Wie BetterMe: Abschnittsname über drei Balken, ein Balken je Abschnitt. */

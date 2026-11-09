@@ -319,7 +319,8 @@
         "/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
         "/demenz-uebersetzer/ich-ziehe-mich-nicht-um"
       ],
-      "visibleTextSha256": "7e87a9a52adb38fe706664538cc84a3f437eb41034a1be9c8eb9b6e3d815d309"
+      "visibleTextSha256": "f3c36824ff55f2fa67a7b3aae6a32b85495e2e852fdec07b5cfa031ae8e43062",
+      "contentSourceRevision": "b7a3076403ad2c29f91ca1ef9c0edd6d607966cf"
     },
     {
       "source": "demenz-uebersetzer/index.html",
@@ -386,7 +387,8 @@
         "/demenz-uebersetzer/wann-gehen-wir.html",
         "/demenz-uebersetzer/wann-gehen-wir"
       ],
-      "visibleTextSha256": "7dfab5c604cc3fa157aad7a0ded0bba881ef17dc85fce4dfd73cab7df8c1c5fb"
+      "visibleTextSha256": "602d915e3d7e7a191691c7fbe7b2f46d36a97a61e6426246192081d86724c71d",
+      "contentSourceRevision": "b7a3076403ad2c29f91ca1ef9c0edd6d607966cf"
     },
     {
       "source": "demenz-uebersetzer/wann-kommt-mein-sohn.html",
@@ -419,7 +421,8 @@
         "/demenz-uebersetzer/wo-bin-ich.html",
         "/demenz-uebersetzer/wo-bin-ich"
       ],
-      "visibleTextSha256": "b30d4cecfdb329fa1e501c390a92452a4d6c3757d4ae9d04521cdd229c84b324"
+      "visibleTextSha256": "93c537b3b42fe99f2abd976646592a71294ed6b13728c1642f97df3f1d81d25b",
+      "contentSourceRevision": "b7a3076403ad2c29f91ca1ef9c0edd6d607966cf"
     },
     {
       "source": "demenz-uebersetzer/wo-ist-mein-hund.html",
@@ -832,6 +835,17 @@
     {
       "file": "guides/dementia-caregiver-overwhelmed.html",
       "unchangedExceptAlternateHrefsSha256": "ab7cdb9d14e77a3c88d24ffc71ccff51529a778912f9dc5f55f3375bc5a23a54"
+    }
+  ],
+  "approvedContentDeltas": [
+    {
+      "revision": "b7a3076403ad2c29f91ca1ef9c0edd6d607966cf",
+      "topics": [
+        "wobin",
+        "uhrzeit",
+        "umziehen"
+      ],
+      "scope": "Only approved phrase/formal/share/FAQ replacements; three visible canonical pages changed intentionally."
     }
   ]
 }

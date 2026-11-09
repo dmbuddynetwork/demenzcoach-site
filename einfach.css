@@ -544,6 +544,29 @@ body.einfach .translator-notes .safety-note.safety-quiet { margin: 0 !important;
 body.einfach .translator-notes .safety-quiet strong { display: block; margin-bottom: 4px; }
 body.einfach .translator-notes .translator-disclaimer { margin: 0; }
 body.einfach .translator-notes .safety-quiet + .translator-disclaimer { padding-top: 10px; border-top: 1px solid var(--e-line); }
+body.einfach .translator-notes .translator-disclaimer a { color: var(--e-purple); font-weight: 600; text-decoration: none; }
+body.einfach .translator-notes .translator-disclaimer a:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; border-radius: 2px; }
+/* Rückmeldung und genau ein vorhandenes Rückfrageformular, nach der vollständigen Hilfe. */
+body.einfach .translator-followup { margin: 24px 0; padding: 18px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+body.einfach .translator-followup .translator-feedback { margin: 0 !important; padding: 0 0 14px; gap: 8px; align-items: center; flex-wrap: wrap; }
+body.einfach .translator-followup .translator-feedback > span { flex: 1 1 auto; min-width: 0; }
+body.einfach .translator-followup .translator-feedback .translator-copy { width: auto !important; min-height: 44px !important; padding: 8px 14px !important; }
+body.einfach .translator-followup .translator-form-below { margin: 0 !important; padding: 0 !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
+body.einfach .translator-followup-question > summary { display: flex; align-items: center; gap: 12px; min-height: 48px; color: var(--e-purple); font-weight: 700; cursor: pointer; list-style: none; }
+body.einfach .translator-followup-question > summary::-webkit-details-marker { display: none; }
+body.einfach .translator-followup-question > summary::after { content: "+"; flex: 0 0 auto; margin-left: auto; font-size: 1.5rem; }
+body.einfach .translator-followup-question[open] > summary::after { content: "−"; }
+body.einfach .translator-followup-question[open] > .translator-card { padding-top: 16px !important; }
+body.einfach .translator-followup-question > summary:focus-visible, body.einfach .translator-extra-offers > summary:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; border-radius: 4px; }
+body.einfach .translator-change-situation { margin: 24px 0 0 !important; }
+body.einfach .translator-change-situation > a { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; }
+body.einfach .translator-extra-offers { margin: 16px 0; padding-top: 12px; border-top: 1px solid var(--e-line); }
+body.einfach .translator-extra-offers > summary { min-height: 44px; padding: 8px 0; color: var(--e-purple); font-weight: 600; cursor: pointer; }
+body.einfach .translator-extra-offers > .translator-signup { margin-top: 12px; }
+body.einfach .translator-ai-answer, body.einfach .translator-ai-answer > * { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  body.einfach .translator-followup .translator-feedback > span { flex-basis: 100%; }
+}
 body.einfach .translator-form-below { margin-top: 28px; }
 body.einfach .translator-form-below .translator-form-title { display: none; }
 body.einfach .translator-form-below-title { margin: 0 0 10px !important; font-weight: 800; }
