@@ -104,7 +104,8 @@ const overviewIntro = `<p>${data.tricks.length} Möglichkeiten für euren Alltag
 const navigation = categories.map(([key, name]) => `<a class="translator-copy" href="#${key}">${esc(name)}</a>`).join("");
 const renderPage = ({ pageURL = url, pageTitle = title, pageDescription = description,
   headline = overviewHeading, intro = overviewIntro, jumpLinks = navigation, content = sections,
-  pageSchema = schema, slug = "alltagstricks", breadcrumb = '<a href="/de/">Startseite</a> › Alltagstricks' } = {}) => `<!doctype html>
+  pageSchema = schema, slug = "alltagstricks", breadcrumb = '<a href="/de/">Startseite</a> › Alltagstricks',
+  extraStyles = "", jumpTitle = "Themen", brandName = "Demenz Coach" } = {}) => `<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
@@ -129,7 +130,7 @@ const renderPage = ({ pageURL = url, pageTitle = title, pageDescription = descri
   <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
   <link rel="manifest" href="../site.webmanifest">
   <link rel="stylesheet" href="../translator.css">
-  <link rel="stylesheet" href="../einfach.css">
+  <link rel="stylesheet" href="../einfach.css">${extraStyles}
   <style>
     body.einfach .tricks-group { scroll-margin-top: 16px; }
     body.einfach .tricks-group + .tricks-group { margin-top: 32px; }
@@ -145,7 +146,7 @@ const renderPage = ({ pageURL = url, pageTitle = title, pageDescription = descri
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
   <header class="e-header">
     <div class="e-wrap">
-      <a class="e-brand" href="/de/" aria-label="Demenz Coach Startseite"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+      <a class="e-brand" href="/de/" aria-label="${brandName} Startseite"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>${brandName}</span></a>
       <nav aria-label="Hauptnavigation"><a href="${store("seo_de_tricks_nav")}" data-store-link="seo-de-tricks-nav">Zur App</a></nav>
     </div>
   </header>
@@ -156,8 +157,8 @@ const renderPage = ({ pageURL = url, pageTitle = title, pageDescription = descri
         <h1>${headline}</h1>
         <div class="tricks-intro">${intro}</div>
         <div class="translator-next tricks-jump">
-          <p class="translator-next-title">Themen</p>
-          <nav class="translator-next-rows" aria-label="Themen">${jumpLinks}
+          <p class="translator-next-title">${jumpTitle}</p>
+          <nav class="translator-next-rows" aria-label="${jumpTitle}">${jumpLinks}
           </nav>
         </div>
         <div class="translator-result">
@@ -218,10 +219,19 @@ Object.assign(article, { '@id': `${topicURL}#content`, headline: 'Essen und Trin
 Object.assign(topicSchema['@graph'][1], { '@id': `${topicURL}#tricks`, name: 'Sechs Alltagshilfen für Essen und Trinken',
   numberOfItems: selected.length, itemListElement: selected.map((trick, index) => ({ '@type': 'ListItem', position: index + 1, name: trick.title, url: `${topicURL}#${trick.id}` })) });
 topicSchema['@graph'][2].itemListElement.push({ '@type': 'ListItem', position: 3, name: 'Essen und Trinken', item: topicURL });
-const topicContent = ['essen', 'trinken'].map(key => `<section class="tricks-group" id="${key}" aria-labelledby="${key}-title"><h2 class="translator-step" id="${key}-title">${esc(data.categories[key])}</h2><p class="tricks-safety">${esc(references.notes[key])}</p>${groupSources(key, data.categories[key])}${selected.filter(trick => trick.category === key).map(card).join('')}</section>`).join('');
+const topicContent = ['essen', 'trinken'].map(key => `<section class="tricks-group" id="${key}" aria-labelledby="${key}-title"><h2 class="translator-step" id="${key}-title">${esc(data.categories[key])}</h2><p class="tricks-safety">${esc(references.notes[key])}</p>${selected.filter(trick => trick.category === key).map(card).join('')}${groupSources(key, data.categories[key])}</section>`).join('');
+const choices = [
+  ['unterlage-einfarbig', 'Tisch übersichtlicher machen', 'Weniger Dinge und Muster'],
+  ['gemeinsam-essen', 'Gemeinsam essen', 'Zusammen am Tisch sitzen'],
+  ['becher-farbig', 'Getränke gut erkennen', 'Ein gut erkennbares Gefäß anbieten'],
+].map(([id, label, detail]) => {
+  const trick = selected.find(item => item.id === id);
+  return `<li><a class="food-choice" href="#${id}"><img src="img/${trick.drawing}.webp" width="300" height="220" alt="" decoding="async"><span class="food-choice-copy"><strong>${label}</strong><span>${detail}</span></span><span class="food-choice-arrow" aria-hidden="true">→</span></a></li>`;
+}).join('');
 fs.writeFileSync(path.join(root, 'alltagstricks/essen-trinken.html'), renderPage({
   pageURL: topicURL, pageTitle: topicTitle, pageDescription: topicDescription, headline: 'Essen und Trinken bei Demenz',
-  intro: '<p>Am Tisch ist gerade vieles gleichzeitig los? Beginne mit einer kleinen Veränderung, die die Person möchte. Diese Auswahl führt dich zu sechs Möglichkeiten aus unserer Alltagssammlung.</p><section aria-labelledby="auswahl-title"><h2 id="auswahl-title">Womit möchtest du anfangen?</h2><ul><li>Der Tisch ist unübersichtlich: <a href="#unterlage-einfarbig">weniger Dinge und Muster</a>.</li><li>Ihr möchtet die Mahlzeit gemeinsam gestalten: <a href="#gemeinsam-essen">zusammen am Tisch sitzen</a>.</li><li>Ein Getränk wird leicht übersehen: <a href="#becher-farbig">ein gut erkennbares Gefäß anbieten</a>.</li></ul><p>Beobachte, ob das Angebot angenehm ist. Wenn es nicht passt, höre auf und probiere später etwas anderes. Vorlieben, vertraute Abläufe und die Selbstständigkeit der Person stehen im Mittelpunkt.</p><p>Bei bekannten Kau- oder Schluckproblemen oder individuellen Ernährungsvorgaben frage vor Änderungen das Behandlungsteam. Diese Seite gibt allgemeine Alltagshinweise und ersetzt keine individuelle Beratung.</p></section>',
+  intro: `<p class="food-lead">Sechs kleine Hilfen. Beginne mit einer Veränderung, die die Person möchte.</p><section class="food-choices" aria-labelledby="auswahl-title"><h2 id="auswahl-title">Womit möchtest du anfangen?</h2><ul>${choices}</ul></section><aside class="food-care-note" aria-labelledby="food-care-title"><h2 id="food-care-title">Bitte beachten</h2><p>Bei bekannten Kau- oder Schluckproblemen oder individuellen Ernährungsvorgaben frage vor Änderungen das Behandlungsteam. Diese Seite gibt allgemeine Alltagshinweise und ersetzt keine individuelle Beratung.</p></aside><details class="food-context"><summary>Eine Idee in Ruhe ausprobieren</summary><p>Beobachte, ob das Angebot angenehm ist. Wenn es nicht passt, höre auf und probiere später etwas anderes. Vorlieben, vertraute Abläufe und die Selbstständigkeit der Person stehen im Mittelpunkt.</p></details>`,
+  extraStyles: '\n  <link rel="stylesheet" href="/alltagstricks/essen-trinken.css">', jumpTitle: 'Die sechs Ideen', brandName: 'Demenz Coach App',
   jumpLinks: '<a class="translator-copy" href="#essen">Beim Essen</a><a class="translator-copy" href="#trinken">Beim Trinken</a>',
   content: `${topicContent}<p><a href="/alltagstricks/">Alle Alltagstricks ansehen →</a></p>`, pageSchema: topicSchema, slug: 'essen-trinken',
   breadcrumb: '<a href="/de/">Startseite</a> › <a href="/alltagstricks/">Alltagstricks</a> › Essen und Trinken'
