@@ -612,3 +612,6 @@ body.einfach .translator-plan-cta.translator-plan-up { margin-top: 24px; }
 body.einfach a.e-tile { color: inherit; text-decoration: none; min-width: 0; overflow-wrap: anywhere; }
 body.einfach a.e-tile:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; }
 body.einfach .tricks-sources, body.einfach .tricks-safety { overflow-wrap: anywhere; }
+
+body.einfach .translator-plan-cta p { margin: 0 0 20px; }
+body.einfach .translator-plan-cta .button { white-space: normal; text-align: center; }
