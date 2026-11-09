@@ -230,15 +230,18 @@ body.einfach ul, body.einfach ol { padding-left: 1.3em; }
 body.einfach :is(.e-moments, .e-checks, .translator-phrases) { padding-left: 0; }
 
 /* ---------- Einwilligungs-Banner (aus site.js / lovable-home.js) ---------- */
-body.einfach .consent-banner { position: fixed; z-index: 50; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 12px; max-width: 720px; margin: 0 auto; padding: 16px; background: var(--e-card); color: var(--e-text); border: 1px solid var(--e-line); border-radius: var(--e-radius); box-shadow: 0 8px 32px rgba(28, 27, 31, .16); }
+body.einfach .consent-banner { position: fixed; z-index: 50; left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; max-width: 960px; max-height: calc(100dvh - 24px - env(safe-area-inset-bottom)); overflow: auto; margin: 0 auto; padding: 12px; background: var(--e-card); color: var(--e-text); border: 1px solid var(--e-line); border-radius: 12px; box-shadow: 0 3px 16px rgba(28, 27, 31, .07); }
 body.einfach .consent-banner[hidden] { display: none; }
-body.einfach .consent-copy p { margin: 4px 0 0; color: var(--e-muted); font-size: var(--e-small) !important; }
+body.einfach .consent-copy { min-width: 0; }
+body.einfach .consent-copy strong { font-size: 1rem !important; }
+body.einfach .consent-copy p { margin: 3px 0 0; color: var(--e-muted); font-size: var(--e-small) !important; }
 body.einfach .consent-copy p a { font-size: var(--e-small) !important; }
-body.einfach .consent-copy a { color: var(--e-purple); }
-body.einfach .consent-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-body.einfach .consent-button { min-height: 52px; padding: 8px 12px; border-radius: 14px; font-weight: 700 !important; cursor: pointer; }
+body.einfach .consent-copy a { color: var(--e-purple); font-weight: 600; text-decoration: none; }
+body.einfach .consent-banner .consent-actions { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5rem), 1fr)); gap: 8px; min-width: 0; background: var(--e-card); }
+body.einfach .consent-button { min-height: 48px; padding: 8px 12px; border-radius: 10px; font-size: 1rem !important; font-weight: 600 !important; overflow-wrap: anywhere; cursor: pointer; }
 /* Ablehnen und Erlauben gleich gestaltet (keine Wahl optisch bevorzugt). */
-body.einfach :is(.consent-decline, .consent-accept, .consent-save) { background: var(--e-purple); color: #fff; border: 0; }
+body.einfach :is(.consent-decline, .consent-accept, .consent-save) { background: var(--e-card); color: var(--e-purple); border: 1px solid var(--e-purple); }
+body.einfach .consent-button:hover { background: var(--e-lav); }
 body.einfach .consent-choices { display: grid; gap: 8px; }
 body.einfach .consent-choices[hidden] { display: none; }
 body.einfach .consent-choice { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
@@ -246,12 +249,15 @@ body.einfach .consent-choice input { width: 24px; height: 24px; flex: 0 0 auto; 
 body.einfach .consent-choose { min-height: 44px; padding: 4px 8px; background: none; border: 0; color: var(--e-muted); text-decoration: underline; cursor: pointer; font-size: var(--e-small) !important; }
 body.einfach .consent-settings { display: block; margin: 0 auto 24px; padding: 8px 12px; min-height: 44px; background: none; border: 0; color: var(--e-muted); text-decoration: underline; cursor: pointer; font-size: var(--e-small) !important; }
 body.einfach .consent-settings[hidden] { display: none; }
-@media (min-width: 720px) { body.einfach .consent-banner:not(:has(.consent-choose)) { flex-direction: row; align-items: center; } body.einfach .consent-actions { flex: 0 0 auto; } }
+@media (min-width: 900px) { body.einfach .consent-banner:not(:has(.consent-choose)) { flex-direction: row; align-items: center; } body.einfach .consent-copy { flex: 1; } body.einfach .consent-actions { flex: 0 0 auto; min-width: 224px; } }
 body.einfach .e-privacy > summary span { font-size: .875rem !important; }
 body.einfach .translator-retry { margin-block: 12px; padding: 20px !important; background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: var(--e-radius) !important; }
 body.einfach .translator-result:not([hidden]) + :is(.e-moments-block, .e-tiles-block) .e-moments-title { margin-top: 32px; }
 body.einfach p.e-privacy, body.einfach p.e-privacy a { font-size: .875rem !important; color: var(--e-muted) !important; }
 body.einfach p.e-privacy { margin: 10px 0 0; }
+/* Hinweise am Übersetzer: als Links erkennbar, ohne dauerhaften Unterstrich. */
+body.einfach .translator-privacy.e-privacy a { color: var(--e-purple) !important; font-weight: 600; text-decoration: none; }
+body.einfach :is(.consent-copy, .translator-privacy.e-privacy) a::after { content: " ›"; }
 
 /* ---------- Runde 3 (Daniel, 8. Nov 09:32): Zeichnung in der Antwort, Sätze als Sprechblasen, rechte Spalte ---------- */
 body.einfach .translator-answer-art { display: block; width: auto; max-width: 64%; height: 180px; object-fit: contain; margin: 0 auto 16px; }
