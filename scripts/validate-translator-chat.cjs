@@ -72,6 +72,9 @@ const screenshotDir = process.env.SCREENSHOT_DIR;
           assert.equal(core.key, null);
           assert.ok(await page.locator('.translator-clarify').evaluate(node => Boolean(node.previousElementSibling.querySelector('a[href="tel:112"]'))));
           assert.equal(await page.locator('.translator-plan-cta').count(), 0);
+          assert.equal(await page.locator('#translator-result .translator-suggest').count(), 0);
+          const links = await page.locator('#translator-result a[href]').evaluateAll(nodes => nodes.map(node => decodeURIComponent(node.getAttribute('href'))));
+          assert.ok(links.every(href => !href.includes(text)), 'no original input in clarification links');
           assert.ok(!page.url().toLowerCase().includes('eis'));
           if (screenshotDir && width === 1280 && entry === 'chat' && text === 'sie ist mein eis weg') {
             await page.locator('#translator-result').screenshot({ path: path.join(screenshotDir, 'eis-chat-hinweis-und-rueckfrage.png') });

@@ -779,6 +779,7 @@
         // Der Dienst liefert hier keine Formulierung. Die Sicherheitsinformation bleibt
         // zuerst stehen; bei einer unbekannten Eingabe braucht es auch einen nächsten Schritt.
         if (source === 'unknown' && !ui) {
+          output.querySelector('.translator-suggest')?.remove();
           note.after(element('section', { className: 'translator-clarify' }, [
             element('h3', { className: 'translator-step', text: 'Was genau ist passiert?' }),
             element('p', { text: 'Hat die Person diesen Satz gesagt, oder beschreibst du, was sie gerade tut? Schreib bitte noch einen Satz dazu.' }),
