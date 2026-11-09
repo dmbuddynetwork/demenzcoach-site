@@ -166,3 +166,9 @@ body[data-screen="plan"] .start-page { padding-bottom: 110px; }
 .start-trial { display: grid; gap: 2px; margin: 0 0 6px; padding: 12px 16px; border-radius: 16px; background: var(--lav); color: var(--lav-ink); text-align: center; }
 .start-trial strong { font-size: 1.25rem; line-height: 1.2; }
 .start-trial span { font-size: var(--small); }
+
+/* Fester Weiter-Knopf unten (Yazio) und Plan-Stand (Headway). */
+.start-next { position: sticky; bottom: 12px; z-index: 5; box-shadow: 0 6px 18px rgba(28, 27, 31, .18); }
+.start-ready { display: grid; gap: 6px; margin: 0 0 14px; font-size: var(--small); font-weight: 700; color: var(--purple); text-align: center; }
+.start-ready-bar { display: block; height: 8px; border-radius: 999px; background: var(--lav); overflow: hidden; }
+.start-ready-bar::after { content: ""; display: block; width: var(--p); height: 100%; border-radius: 999px; background: var(--purple); }

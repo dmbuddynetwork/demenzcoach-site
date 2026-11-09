@@ -59,7 +59,9 @@
     for (const child of [].concat(children)) if (child) node.append(child);
     return node;
   };
-  const next = (name) => el("button", { type: "button", class: "abo-button", text: "Weiter", onclick: () => go(after(name)) });
+  // Fester Weiter-Knopf unten wie bei Yazio, Zwischenseiten melden den Stand des Plans wie bei Headway ("Dein Plan ist zu 94 % bereit").
+  const next = (name) => el("button", { type: "button", class: "abo-button start-next", text: "Weiter", onclick: () => go(after(name)) });
+  const ready = (percent) => el("p", { class: "start-ready" }, [el("span", { class: "start-ready-bar", style: `--p:${percent}%` }), el("span", { text: `Dein Plan ist zu ${percent} % bereit` })]);
 
   function optionList(items, chosen, onPick) {
     return el("ul", { class: "start-options", role: "list" }, items.map((item) => {
@@ -125,7 +127,9 @@
           type: "button", class: "start-pic", "aria-label": item.label, onclick: () => choose(item)
         }, [el("img", { src: `../assets/zeichnungen/${pictures[item.key]}`, alt: "", width: "200", height: "180" }),
           el("span", {}, [short[item.key], el("span", { html: icons.arrow })])]))),
-        optionList(relations.filter((item) => !pictures[item.key]), answers.relation, choose)
+        optionList(relations.filter((item) => !pictures[item.key]), answers.relation, choose),
+        // Wie Noom/Liven: Hinweis auf die Bedingungen schon unter der ersten Frage (nur Information, keine Einwilligung per Klick).
+        el("p", { class: "start-small start-center" }, ["Es gelten die ", el("a", { href: "/nutzungsbedingungen.html", text: "Nutzungsbedingungen" }), " und der ", el("a", { href: "/datenschutz.html", text: "Datenschutz" }), ". Deine Antworten bleiben auf deinem Gerät."])
       ];
     },
     name: () => {
@@ -157,6 +161,7 @@
     ],
     thanks: () => [
       el("img", { class: "start-art", src: "../assets/zeichnungen/nach-hause-ruhig.webp", width: "720", height: "702", alt: "" }),
+      ready(35),
       el("h1", { text: "Danke, dass du das teilst" }),
       el("p", { text: `Hilfe zu suchen ist ein wichtiger erster Schritt. Viele Familien erleben genau das${answers.dayTime && answers.dayTime.key !== "immer" ? `, oft ${answers.dayTime.text}` : ""}. Du machst nichts falsch.` }),
       next("thanks")
@@ -178,6 +183,7 @@
     insight: () => {
       const explained = answers.tries.some((item) => item.key === "erklaeren" || item.key === "widersprechen");
       return [
+        ready(65),
         el("p", { class: "start-big-number", text: "1,8 Mio." }),
         el("h1", { text: "Menschen in Deutschland leben mit Demenz" }),
         el("p", { class: "start-small", text: "Quelle: Deutsche Alzheimer Gesellschaft, Stand Ende 2023" }),
@@ -204,6 +210,7 @@
       optionList(data.minutes, answers.minutes, pick("minutes", "minutes"))
     ],
     how: () => [
+      ready(90),
       el("h1", { text: "So funktioniert dein Plan" }),
       el("ol", { class: "start-steps", role: "list" }, [
         ["Jeden Tag ein Moment", `Zuerst „${bare(chosen().quote)}“, dann die nächsten häufigen Momente.`],
