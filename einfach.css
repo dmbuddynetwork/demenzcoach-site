@@ -522,4 +522,10 @@ body.einfach .translator-ai-steps li:nth-child(3), body.einfach .translator-ai-s
 @keyframes e-step-on { to { opacity: 1; } }
 @keyframes e-step-done { to { border-color: var(--e-purple); background-color: var(--e-purple); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); } }
 @media (prefers-reduced-motion: reduce) { body.einfach .translator-ai-steps li, body.einfach .translator-ai-steps li::before { animation-duration: .01s; } }
-body.einfach .translator-ai-wait-plan { justify-self: center; text-align: center; color: var(--e-purple); font-size: var(--e-small); font-weight: 700; }
+body.einfach .translator-ai-wait-title { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 !important; font-weight: 800; font-size: 1.125rem; }
+body.einfach .translator-spinner { flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; border: 3px solid var(--e-lav, #ece9f7); border-top-color: var(--e-purple); animation: e-spin .9s linear infinite; }
+@keyframes e-spin { to { transform: rotate(360deg); } }
+body.einfach .translator-ai-wait-bar { position: relative; display: block; height: 6px; overflow: hidden; border-radius: 999px; background: var(--e-lav, #ece9f7); }
+body.einfach .translator-ai-wait-bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 0; background: var(--e-purple); border-radius: inherit; animation: e-wait-bar 9s cubic-bezier(.2,.7,.3,1) forwards; }
+@keyframes e-wait-bar { to { width: 92%; } }
+@media (prefers-reduced-motion: reduce) { body.einfach .translator-spinner { animation-duration: 2.5s; } }

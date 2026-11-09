@@ -619,21 +619,18 @@
     ]);
   };
   // Warte-Ansicht (Daniel, 9. Nov: Ladeanimation auf Conversion optimiert): ruhige Zeichnung und drei Schritte,
-  // die nacheinander abgehakt werden, wie „Dein Plan wird erstellt“ bei Noom. Darunter leise der Web-Plan (nur Deutsch).
+  // die nacheinander abgehakt werden, wie „Dein Plan wird erstellt“ bei Noom. Oben deutlich: Es lädt (Daniel, 9. Nov 02:41).
   // Rein gestalterisch: die Schritte laufen per CSS, die Antwort erscheint, sobald sie da ist.
-  const aiWaiting = () => {
-    const plan = ui ? null : element('a', { className: 'translator-ai-wait-plan', text: 'Solche Antworten für euren Alltag: Plan in ein paar Fragen', attributes: { href: '/start/?src=warten', 'data-related-link': 'plan_warten' } });
-    plan?.addEventListener('click', () => track('plan_start_click', { place: 'warten' }));
-    return element('div', { className: 'translator-ai-wait' }, [
-      sceneArt(data.waitImage),
-      element('ol', { className: 'translator-ai-steps', attributes: { 'aria-hidden': 'true' } }, [
-        element('li', { text: 'Satz verstehen' }),
-        element('li', { text: 'Gefühl dahinter erkennen' }),
-        element('li', { text: 'Passende Sätze finden' })
-      ]),
-      plan
-    ]);
-  };
+  const aiWaiting = () => element('div', { className: 'translator-ai-wait' }, [
+    element('p', { className: 'translator-ai-wait-title' }, [element('span', { className: 'translator-spinner', attributes: { 'aria-hidden': 'true' } }), 'Deine Antwort wird geschrieben …']),
+    element('span', { className: 'translator-ai-wait-bar', attributes: { 'aria-hidden': 'true' } }),
+    sceneArt(data.waitImage),
+    element('ol', { className: 'translator-ai-steps', attributes: { 'aria-hidden': 'true' } }, [
+      element('li', { text: 'Satz verstehen' }),
+      element('li', { text: 'Gefühl dahinter erkennen' }),
+      element('li', { text: 'Passende Sätze finden' })
+    ])
+  ]);
   // Runde 198 (Daniels Wahl „Automatisch“): Unbekannte Sätze gehen ohne Knopf an die KI.
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
