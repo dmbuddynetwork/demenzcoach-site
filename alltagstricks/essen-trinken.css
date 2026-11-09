@@ -1,0 +1,49 @@
+/* Only the curated food/drink page; the shared collection keeps its layout. */
+body.einfach[data-page-slug="essen-trinken"] { overflow-wrap: anywhere; }
+body.einfach[data-page-slug="essen-trinken"] :is(.content-narrow, .e-wrap) { max-width: 960px; }
+body.einfach[data-page-slug="essen-trinken"] .e-wrap { width: min(960px, calc(100% - 32px)); }
+body.einfach[data-page-slug="essen-trinken"] .e-header .e-wrap { flex-wrap: wrap; padding-block: 12px; }
+body.einfach[data-page-slug="essen-trinken"] .e-brand { min-width: 0; }
+body.einfach[data-page-slug="essen-trinken"] .e-brand img { flex: 0 0 32px; }
+body.einfach[data-page-slug="essen-trinken"] .content-hero { padding-top: 24px; }
+body.einfach[data-page-slug="essen-trinken"] nav[aria-label="Brotkrumen"] { margin-bottom: 24px; color: var(--e-muted); }
+body.einfach[data-page-slug="essen-trinken"] h1 { max-width: 25ch; font-size: clamp(2rem, 3.3vw, 2.75rem) !important; }
+body.einfach[data-page-slug="essen-trinken"] .food-lead { max-width: 55ch; margin: 0 0 32px; color: var(--e-muted); }
+body.einfach[data-page-slug="essen-trinken"] .food-choices h2 { margin-bottom: 16px; font-size: 1.375rem !important; }
+body.einfach[data-page-slug="essen-trinken"] .food-choices ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; padding: 0; margin: 0; list-style: none; }
+body.einfach[data-page-slug="essen-trinken"] .food-choice { display: flex; flex-direction: column; gap: 16px; height: 100%; padding: 24px; border: 1px solid var(--e-line); border-radius: 20px; background: var(--e-card); color: var(--e-text); text-decoration: none; }
+body.einfach[data-page-slug="essen-trinken"] .food-choice:hover { border-color: var(--e-purple); background: #fdfcfe; }
+body.einfach[data-page-slug="essen-trinken"] .food-choice:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 4px; }
+body.einfach[data-page-slug="essen-trinken"] .food-choice img { width: 100%; height: 108px; object-fit: contain; }
+body.einfach[data-page-slug="essen-trinken"] .food-choice-copy { flex: 1; min-width: 0; }
+body.einfach[data-page-slug="essen-trinken"] .food-choice-copy strong { display: block; color: var(--e-purple); margin-bottom: 8px; }
+body.einfach[data-page-slug="essen-trinken"] .food-choice-copy > span { display: block; color: var(--e-muted); font-size: var(--e-small) !important; }
+body.einfach[data-page-slug="essen-trinken"] .food-choice-arrow { display: flex; align-items: center; justify-content: center; align-self: flex-end; width: 36px; min-height: 36px; flex-shrink: 0; border-radius: 50%; background: var(--e-lav); color: var(--e-purple); }
+body.einfach[data-page-slug="essen-trinken"] .food-care-note { margin-top: 24px; padding: 20px 24px; border-left: 4px solid var(--e-purple); border-radius: 4px 16px 16px 4px; background: var(--e-lav); }
+body.einfach[data-page-slug="essen-trinken"] .food-care-note p { margin: 0; }
+body.einfach[data-page-slug="essen-trinken"] .food-context { margin: 16px 0 0; }
+body.einfach[data-page-slug="essen-trinken"] .food-context summary { display: list-item; min-height: 44px; padding-block: 10px; cursor: pointer; color: var(--e-purple); }
+body.einfach[data-page-slug="essen-trinken"] .food-context p { max-width: 65ch; margin: 8px 0 16px; }
+body.einfach[data-page-slug="essen-trinken"] .tricks-jump { margin-top: 32px; }
+body.einfach[data-page-slug="essen-trinken"] .tricks-jump .translator-next-rows { display: flex; flex-wrap: wrap; gap: 12px; }
+body.einfach[data-page-slug="essen-trinken"] .tricks-jump a { flex: 1 1 180px; min-width: 0; }
+body.einfach[data-page-slug="essen-trinken"] .tricks-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+body.einfach[data-page-slug="essen-trinken"] .tricks-group > :is(h2, .tricks-safety, .tricks-sources) { grid-column: 1 / -1; }
+body.einfach[data-page-slug="essen-trinken"] .translator-result .translator-step { font-size: 1.5rem !important; color: var(--e-text) !important; margin-bottom: 0 !important; }
+body.einfach[data-page-slug="essen-trinken"] .tricks-safety { max-width: 70ch; color: var(--e-muted); }
+body.einfach[data-page-slug="essen-trinken"] .translator-trick { flex-direction: column; align-items: stretch; margin: 0; padding: 24px; border-radius: 20px; }
+body.einfach[data-page-slug="essen-trinken"] .translator-trick-art { align-self: center; flex: 0 0 auto; width: 100%; max-width: 160px; height: 116px; max-height: 116px; object-fit: contain; }
+body.einfach[data-page-slug="essen-trinken"] .translator-trick-text { width: 100%; }
+body.einfach[data-page-slug="essen-trinken"] .tricks-sources { padding: 12px 0; }
+body.einfach[data-page-slug="essen-trinken"] .tricks-sources summary { min-height: 44px; padding-block: 10px; cursor: pointer; color: var(--e-purple); }
+body.einfach[data-page-slug="essen-trinken"] .tricks-group + .tricks-group { margin-top: 48px; }
+@media (max-width: 699px) {
+  body.einfach[data-page-slug="essen-trinken"] .content-hero { padding-top: 12px; }
+  body.einfach[data-page-slug="essen-trinken"] .food-choices ul { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  body.einfach[data-page-slug="essen-trinken"] .food-choice { flex-direction: row; align-items: center; padding: 16px; gap: 12px; }
+  body.einfach[data-page-slug="essen-trinken"] .food-choice img { flex: 0 0 64px; width: 64px; height: 76px; }
+  body.einfach[data-page-slug="essen-trinken"] .food-choice-arrow { align-self: center; width: 28px; min-height: 28px; }
+  body.einfach[data-page-slug="essen-trinken"] .food-care-note { padding: 16px; }
+  body.einfach[data-page-slug="essen-trinken"] .tricks-group { grid-template-columns: minmax(0, 1fr); }
+  body.einfach[data-page-slug="essen-trinken"] .translator-trick { padding: 20px; }
+}
