@@ -210,30 +210,25 @@
   const onComputer = () => window.matchMedia?.('(min-width: 900px) and (hover: hover) and (pointer: fine)').matches === true;
   // Web-Plan (Daniel, 9. Nov: „Webfunnel in die neue Webseite integrieren, damit Nutzer zu Zahlenden werden“).
   // Nur Deutsch, nie bei Notfall oder Entlastung. Der Link trägt nur den Ort und den festen Situations-Schlüssel, nie Text.
-  const planMoments = new Set(['nachhause', 'mutter', 'wer', 'geld', 'arbeit', 'waschen']);
-  // Direkt unter der Antwort statt unten (Daniel, 9. Nov 03:44): ab der zweiten eigenen Eingabe
-  // („Das passiert öfter?“) und beim Ziel „Tipps“ („Mehr Tipps für euren Alltag im Plan“).
+  const planMoments = new Set(['nachhause', 'mutter', 'wer', 'geld', 'arbeit', 'waschen', 'wiederholt']);
+  // Erst nach der vollständigen Antwort, freiwillig und ohne Preis-/Testzeitversprechen.
   let typedCount = 0;
-  const planTitles = { ergebnis: 'Dein Plan für solche Momente', wieder: 'Das passiert öfter? Dein Plan für solche Momente', tipps: 'Mehr Tipps für euren Alltag im Plan' };
+  const planTitles = { ergebnis: 'Und wenn dieser Satz wiederkommt?', wieder: 'Das passiert öfter?', tipps: 'Ein Plan für euren Alltag' };
   const planCTA = (result, place = 'ergebnis') => {
-    if (ui || result?.safetyOnly || result?.selfCare) return null;
+    if (ui || result?.safetyOnly || result?.selfCare || result?.feeling) return null;
     const moment = result?.key && planMoments.has(result.key) ? `&m=${result.key}` : '';
-    const link = element('a', { className: 'button', text: 'Plan erstellen', attributes: { href: `/start/?src=${place}${moment}`, 'data-related-link': `plan_${place}` } });
+    const link = element('a', { className: 'button', text: 'Meinen Plan zusammenstellen', attributes: { href: `/start/?src=${place}${moment}`, 'data-related-link': `plan_${place}` } });
     link.addEventListener('click', () => track('plan_start_click', { place, result_key: result?.key ?? '' }));
     return element('aside', { className: `translator-plan-cta${place === 'ergebnis' ? '' : ' translator-plan-up'}` }, [
       data.planImage ? element('img', { className: 'translator-plan-art', attributes: { src: data.planImage.src, width: String(data.planImage.width), height: String(data.planImage.height), alt: '', decoding: 'async' } }) : null,
       element('div', {}, [
         element('h2', { text: planTitles[place] ?? planTitles.ergebnis }),
-        element('ul', { className: 'e-checks' }, [
-          element('li', { text: 'Ein paar kurze Fragen zu eurer Lage' }),
-          element('li', { text: 'Dann ein Plan mit Sätzen für euren Alltag' }),
-          element('li', { text: '7 Tage kostenlos testen' })
-        ]),
+        element('p', { text: 'Passende Satzideen für euren Alltag. Beantworte dafür ein paar Fragen zu eurer Lage.' }),
         link
       ])
     ]);
   };
-  const offers = (result, safetyHit = false, planShown = false) => [safetyHit || planShown ? null : planCTA(result), ...(onComputer() ? [signupBox(), appCTA(result)] : [appCTA(result), signupBox()])];
+  const offers = (result, safetyHit = false, planShown = false) => [safetyHit || planShown || !result ? null : planCTA(result), ...(onComputer() ? [signupBox(), appCTA(result)] : [appCTA(result), signupBox()])];
   const appCTA = (result) => element('aside', { className: 'article-cta translator-app-cta' }, [
     element('div', {}, [
       element('h2', { text: 'Für eure eigene Situation' }),
@@ -764,6 +759,12 @@
         output.querySelector('.translator-notes')?.remove();
         if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
+        // Unbekannte Sätze: erst die fertige KI-Antwort; nie während des Ladens,
+        // bei Sicherheitshinweisen oder mit eingegebenem Text im Planlink.
+        if (source === 'unknown' && result.safetyLevel === 'standard' && !output.querySelector('.safety-note, .translator-plan-cta')) {
+          const invitation = planCTA(null);
+          if (invitation) node.after(invitation);
+        }
         document.body.classList.remove('translator-answers-seen');
         if (!auto) {
           focus.setAttribute('tabindex', '-1');
@@ -775,6 +776,20 @@
       if (result.kind === 'safety') {
         const note = urgentNote(data.safetySignals.text);
         box.replaceWith(note);
+        // Der Dienst liefert hier keine Formulierung. Die Sicherheitsinformation bleibt
+        // zuerst stehen; bei einer unbekannten Eingabe braucht es auch einen nächsten Schritt.
+        if (source === 'unknown' && !ui) {
+          output.querySelector('.translator-suggest')?.remove();
+          note.after(element('section', { className: 'translator-clarify' }, [
+            element('h3', { className: 'translator-step', text: 'Was genau ist passiert?' }),
+            element('p', { text: 'Hat die Person diesen Satz gesagt, oder beschreibst du, was sie gerade tut? Schreib bitte noch einen Satz dazu.' }),
+            button('Genauer beschreiben', 'translator-copy', () => {
+              if (!input.value.trim()) { input.value = text; grow(); }
+              input.focus({ preventScroll: true });
+              form.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+            })
+          ]));
+        }
         note.setAttribute('tabindex', '-1');
         note.focus({ preventScroll: true });
         return;
@@ -844,11 +859,9 @@
     ]);
     if (box) fallbackBox.hidden = true;
     nodes.push(fallbackBox);
-    const planUp = !safetyHit && typedCount >= 2 ? planCTA(null, 'wieder') : null;
-    nodes.push(planUp);
     nodes.push(notesCard(disclaimer()));
     nodes.push(suggestLink(typed));
-    nodes.push(...offers(null, safetyHit, Boolean(planUp)));
+    nodes.push(...offers(null, safetyHit));
     output.replaceChildren(...nodes.filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
@@ -1074,7 +1087,7 @@
     // Unter den Sätzen dieselbe Situation, wenn es wieder ruhig ist („Danach“-Zeichnung).
     if (phraseBlock.length && !result.safetyOnly && !result.selfCare && !safetyHit) phraseBlock.push(sceneArt(result.afterImage));
     answerCard.append(...order.flat().filter(Boolean));
-    const planPlace = safetyHit || result.feeling ? '' : typedCount >= 2 ? 'wieder' : goal === 'tipps' ? 'tipps' : '';
+    const planPlace = safetyHit || result.feeling || result.selfCare || result.safetyOnly ? '' : typedCount >= 2 ? 'wieder' : goal === 'tipps' ? 'tipps' : 'ergebnis';
     const planUp = planPlace ? planCTA(result, planPlace) : null;
     if (planUp) nodes.push(planUp);
     // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
