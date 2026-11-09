@@ -38,6 +38,11 @@
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(result.message || String(response.status));
+      const incomplete = response.status === 202 || result.processingIncomplete === true || result.processingState === "needs_review";
+      $("done-title").textContent = incomplete ? "Eingang bestätigt" : "Kündigung erhalten";
+      $("done-mail").textContent = incomplete
+        ? "Deine Erklärung ist eingegangen. Die Bearbeitung ist noch nicht vollständig abgeschlossen."
+        : "Eine Bestätigung mit dem Ende deines Abos kommt gleich per E-Mail.";
       $("done-time").textContent = result.receivedAtText;
       $("done-kind").textContent = result.kindText;
       $("done-name").textContent = result.name;
@@ -48,10 +53,12 @@
         $("done-date-line").hidden = false;
       }
       // Außerordentliche Kündigung und Widerruf führt erst der Link in der E-Mail aus (Schutz vor Fremden).
-      $("done-mail").hidden = Boolean(result.confirmByMail);
+      $("done-mail").hidden = Boolean(result.confirmByMail) && !incomplete;
       $("done-confirm").hidden = !result.confirmByMail;
       $("cancel-form-section").hidden = true;
       $("cancel-done").hidden = false;
+      $("done-title").tabIndex = -1;
+      $("done-title").focus({ preventScroll: true });
       window.scrollTo({ top: 0 });
     } catch {
       $("cancel-button").disabled = false;
