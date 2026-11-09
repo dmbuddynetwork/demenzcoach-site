@@ -9,7 +9,21 @@
     "directory": ".",
     "binding": "ASSETS",
     "html_handling": "none",
-    "not_found_handling": "none"
+    "not_found_handling": "none",
+    // Alte Startseiten-Dateien liegen als HTML-Weiterleitungs-Stubs weiter im Repo (Fallback für
+    // GitHub Pages). Damit Cloudflare sie nicht direkt ausliefert, läuft für genau diese Adressen
+    // der Worker zuerst und antwortet mit 301 auf /de/ bzw. /xx/ (Liste wie HOME_LANGUAGES im Worker).
+    "run_worker_first": [
+      "/index.html",
+      "/index-en.html", "/index-pl.html", "/index-ro.html", "/index-bg.html",
+      "/index-hr.html", "/index-sk.html", "/index-hu.html", "/index-cs.html",
+      "/index-uk.html", "/index-bs.html", "/index-sr.html", "/index-lt.html",
+      "/index-sl.html", "/index-lv.html", "/index-et.html", "/index-ru.html",
+      "/index-tr.html", "/index-ar.html", "/index-fr.html", "/index-it.html",
+      "/index-es.html", "/index-pt.html", "/index-nl.html", "/index-el.html",
+      "/index-sq.html", "/index-fa.html", "/index-th.html", "/index-da.html",
+      "/index-fi.html", "/index-ga.html", "/index-mt.html", "/index-sv.html"
+    ]
   },
   "observability": { "enabled": false },
   // Branch-Builds in Cloudflare laufen mit "npx wrangler preview" und brauchen diesen Block (sonst schlägt jeder PR-Build fehl).

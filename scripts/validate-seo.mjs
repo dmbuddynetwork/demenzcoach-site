@@ -46,6 +46,24 @@ const indexableURLs = new Map();
 const titles = new Map();
 const descriptions = new Map();
 
+// Alte Startseiten-Adressen (/, /index.html, /index-xx.html) sind dauerhaft auf /de/ bzw. /xx/
+// umgezogen. Auf Cloudflare leitet der Worker per 301 um; die Dateien selbst sind nur noch
+// HTML-Weiterleitungs-Stubs als Fallback für Hosting ohne Server-Weiterleitungen (GitHub Pages).
+const legacyHomeStubTarget = (file) => {
+  if (file === "index.html") return "/de/";
+  const match = /^index-([a-z]{2})\.html$/.exec(file);
+  return match ? `/${match[1]}/` : null;
+};
+
+const validateRedirectStub = (file, html, robots, canonical, title, expectedTarget) => {
+  const refreshTarget = /<meta\s+http-equiv=["']refresh["']\s+content=["']0;\s*url=([^"']+)["']/i.exec(html)?.[1];
+  if (refreshTarget !== expectedTarget) fail(`${file}: stub must refresh to ${expectedTarget}, found ${refreshTarget}`);
+  if (!robots.toLowerCase().includes("noindex")) fail(`${file}: redirect stub must be noindex`);
+  if (canonical !== `${baseURL}${expectedTarget}`) fail(`${file}: stub canonical must be ${baseURL}${expectedTarget}`);
+  if (!html.includes(`<a href="${expectedTarget}"`)) fail(`${file}: stub needs a crawlable link to ${expectedTarget}`);
+  if (!title) fail(`${file}: missing title`);
+};
+
 for (const file of htmlFiles) {
   const html = read(file);
   const documentLanguage = attribute(html, "html", "lang") ?? "und";
@@ -56,6 +74,12 @@ for (const file of htmlFiles) {
   const h1Count = (html.match(/<h1\b/gi) ?? []).length;
   const canonical = /<link\s+[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/i.exec(html)?.[1]
     ?? /<link\s+[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["'][^>]*>/i.exec(html)?.[1];
+
+  const stubTarget = legacyHomeStubTarget(file);
+  if (stubTarget) {
+    validateRedirectStub(file, html, robots, canonical, title, stubTarget);
+    continue;
+  }
 
   if (!title) fail(`${file}: missing title`);
   // Schlichtes Layout im App-Stil (einfach.css, 8. Nov 2026) für Startseite und Übersetzer-Seiten.
@@ -147,7 +171,7 @@ for (const measurementField of ["campaign_token", "related_guide_click", "guide_
   }
 }
 
-for (const file of ["index.html", "index-en.html"]) {
+for (const file of ["de/index.html", "en/index.html"]) {
   const html = read(file);
   const scripts = [...html.matchAll(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)]
     .map((match) => JSON.parse(match[1]));
@@ -181,7 +205,8 @@ const storeLocaleByLanguage = {
 };
 
 for (const language of homeLanguages) {
-  const file = language === "de" ? "index.html" : `index-${language}.html`;
+  // Seit Nov 2026 liegt jede Startseite unter ihrer Sprach-Adresse /xx/ (SEO: eine stabile URL je Sprache).
+  const file = `${language}/index.html`;
   const html = read(file);
   const robots = meta(html, "robots") ?? "";
   if (robots.toLowerCase().includes("noindex")) fail(`${file}: localized home must be indexable`);
@@ -199,11 +224,16 @@ for (const language of homeLanguages) {
   const alternates = new Map([...html.matchAll(/<link\s+rel=["']alternate["']\s+hreflang=["']([^"']+)["']\s+href=["']([^"']+)["'][^>]*>/gi)]
     .map((match) => [match[1], match[2]]));
   for (const alternateLanguage of [...homeLanguages, "x-default"]) {
+    // x-default zeigt auf /de/: die Wurzel / leitet dauerhaft dorthin, Deutsch ist die Standardsprache.
+    const expectedAlternateURL = `${baseURL}/${alternateLanguage === "x-default" ? "de" : alternateLanguage}/`;
     if (!alternates.has(alternateLanguage)) fail(`${file}: missing reciprocal hreflang ${alternateLanguage}`);
+    else if (alternates.get(alternateLanguage) !== expectedAlternateURL) {
+      fail(`${file}: hreflang ${alternateLanguage} must point to ${expectedAlternateURL}, found ${alternates.get(alternateLanguage)}`);
+    }
   }
 
   const expectedStoreLocale = storeLocaleByLanguage[language] ?? "en-US";
-  const storeImages = [...html.matchAll(/<img\s+[^>]*src=["']assets\/store\/([^/]+)\/([^"']+\.webp)["'][^>]*>/gi)];
+  const storeImages = [...html.matchAll(/<img\s+[^>]*src=["']\/?assets\/store\/([^/]+)\/([^"']+\.webp)["'][^>]*>/gi)];
   if (storeImages.length < 6 && !simpleHome) fail(`${file}: expected at least six final Store screenshot references`);
   for (const [, storeLocale, asset] of storeImages) {
     if (storeLocale !== expectedStoreLocale) fail(`${file}: unexpected Store locale ${storeLocale}`);
