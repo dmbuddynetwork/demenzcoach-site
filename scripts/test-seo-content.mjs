@@ -59,3 +59,12 @@ test('publisher attribution uses the real provider and preserves distinct mother
   assert.ok(guide.includes('href="/demenz-uebersetzer/wo-ist-meine-mutter.html"'));
   assert.ok(quick.includes('ratgeber/demenz-fragt-nach-verstorbener-mutter.html'));
 });
+
+test('marketing entry pages do not hard-code an unverified free-week offer', () => {
+  const files = ['de/index.html', ...fs.readdirSync(new URL('demenz-uebersetzer/', root))
+    .filter(file => file.endsWith('.html')).map(file => `demenz-uebersetzer/${file}`)];
+  for (const file of files) {
+    const visible = read(file).replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
+    assert.ok(!visible.includes('7 Tage kostenlos testen'), `${file}: unsupported static trial promise`);
+  }
+});
