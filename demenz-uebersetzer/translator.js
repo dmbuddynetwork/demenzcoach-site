@@ -1254,6 +1254,7 @@
     const key = location.hash.startsWith(`#${phraseHash}`) ? location.hash.slice(phraseHash.length + 1) : '';
     const entry = entryByKey.get(key);
     if (!entry) return;
+    setHash(key);
     input.value = entry.says;
     grow();
     render(entry);
@@ -1261,7 +1262,8 @@
   };
   const params = new URLSearchParams(location.search);
   const linkedEntry = entryByKey.get(params.get('situation'));
-  if (linkedEntry && !linkedEntry.safetyOnly) {
+  const hasLegacyState = location.hash.startsWith(`#${phraseHash}`) || location.hash.startsWith(`#${feelingHash}`);
+  if (!hasLegacyState && linkedEntry && !linkedEntry.safetyOnly) {
     const goal = params.get('ziel');
     input.value = linkedEntry.says;
     grow();

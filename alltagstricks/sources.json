@@ -136,6 +136,10 @@
     "wasser-fuehlen": {
       "text": "Prüfe vor dem Waschen eine angenehme Wassertemperatur. Danach kann die Person das Wasser mit der Hand kennenlernen, wenn sie das möchte.",
       "source": "bathing"
+    },
+    "teller-rot": {
+      "text": "Wähle einen Teller, der sich vom Tisch und vom Essen abhebt. Rot ist eine Möglichkeit, wenn der Kontrast passt.",
+      "source": "home"
     }
   }
 }

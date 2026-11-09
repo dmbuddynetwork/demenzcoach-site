@@ -103,7 +103,7 @@ body.einfach .e-brand { display: inline-flex; align-items: center; gap: 10px; co
 .e-header nav a { font-weight: 600; text-decoration: none; }
 .e-footer { margin-top: 40px; padding: 24px 0 8px; border-top: 1px solid var(--e-line); }
 .e-footer nav { display: flex; flex-wrap: wrap; gap: 0 20px; margin: 0 0 8px; }
-body.einfach .e-footer nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--e-muted); }
+body.einfach .e-footer nav a { display: inline-flex; align-items: center; min-height: 44px; min-width: 0; max-width: 100%; overflow-wrap: anywhere; color: var(--e-muted); }
 
 /* ---------- Eingabe wie in der App ---------- */
 .e-hero { padding: 8px 0 16px; }

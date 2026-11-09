@@ -61,6 +61,12 @@ const production = 'https://dementiacoachapp.com';
     assert.equal(await page.locator('link[rel="canonical"]').getAttribute('href'), `${production}/demenz-uebersetzer/`);
     await page.goto(new URL('/de/?situation=unknown&ziel=invalid', base).href);
     assert.ok(await page.locator('#translator-input').isVisible());
+    await page.goto(new URL('/de/?situation=nachhause&ziel=tipps#satz-mutter', base).href);
+    await page.locator('.translator-phrases').waitFor();
+    assert.equal(new URL(page.url()).hash, '#satz-mutter');
+    assert.ok(!new URL(page.url()).searchParams.has('situation'), 'legacy link must replace an earlier query state');
+    await page.reload();
+    assert.match(await page.locator('#translator-result').innerText(), /Mutter/);
 
     // Examples-first home: a not-yet-reached input must not put the chat over the choices.
     await page.setViewportSize({ width: 390, height: 844 });
@@ -101,7 +107,15 @@ const production = 'https://dementiacoachapp.com';
     assert.equal(await noJS.locator('link[rel="canonical"]').getAttribute('href'), `${production}/ratgeber/demenz-nach-hause-was-sagen.html`);
     assert.match(await noJS.locator('h1').innerText(), /nach Hause/);
     await plain.close();
-    assert.deepEqual(errors, [], 'no browser script errors across routing and homepage checks');
+    await page.goto(new URL('/alltagstricks/', base).href);
+    const topicLink = page.locator('a[href="/alltagstricks/essen-trinken.html"]');
+    assert.ok(await topicLink.isVisible(), 'topic discovery link must be visible, not only in the HTML');
+    await topicLink.click();
+    assert.ok(await page.locator('.tricks-intro > p').first().isVisible());
+    assert.equal(await page.locator('article.translator-trick').count(), 6);
+    await page.locator('details.tricks-sources summary').first().click();
+    assert.ok(await page.locator('details.tricks-sources a').first().isVisible());
+    assert.deepEqual(errors, [], 'no browser script errors across routing, homepage and topic checks');
   } finally { await browser.close(); }
   console.log('Translator/home passed: three entry points, empty input, stable metadata, share/reload/back, safety-state clearing, real no-JS links, examples-first chat visibility, 320/390/768/1440px and 225% text.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
