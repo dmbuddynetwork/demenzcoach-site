@@ -70,3 +70,21 @@ legend { font-weight: 700; margin: 0 0 8px; padding: 0; }
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media print { .abo-top, .abo-footer, .abo-noprint { display: none !important; } body { background: #fff; } }
+
+/* Cookie-Hinweis und "Datenschutz-Einstellungen" (lovable-home.js) im Stil der Website (einfach.css), damit sie auf /start/ und /abo/ nicht ungestaltet erscheinen. */
+.consent-banner { position: fixed; z-index: 50; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 12px; max-width: 720px; margin: 0 auto; padding: 16px; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 8px 32px rgba(28, 27, 31, .16); font-size: .9375rem; }
+.consent-banner[hidden] { display: none; }
+.consent-copy p { margin: 4px 0 0; color: var(--ink-2); }
+.consent-copy a { color: var(--purple); }
+.consent-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.consent-button { min-height: 52px; padding: 8px 12px; border-radius: 14px; font: inherit; font-weight: 700; cursor: pointer; }
+.consent-decline, .consent-accept, .consent-save { background: var(--purple); color: #fff; border: 0; }
+.consent-choices { display: grid; gap: 8px; }
+.consent-choices[hidden] { display: none; }
+.consent-choice { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
+.consent-choice input { width: 24px; height: 24px; flex: 0 0 auto; accent-color: var(--purple); }
+.consent-choose, .consent-settings { min-height: 44px; padding: 8px 12px; background: none; border: 0; color: var(--ink-2); text-decoration: underline; cursor: pointer; font: inherit; font-size: .9375rem; }
+.consent-settings { display: block; margin: 0 auto 24px; }
+.consent-settings[hidden] { display: none; }
+@media (min-width: 720px) { .consent-banner:not(:has(.consent-choose)) { flex-direction: row; align-items: center; } .consent-actions { flex: 0 0 auto; } }
+@media print { .consent-banner, .consent-settings { display: none !important; } }
