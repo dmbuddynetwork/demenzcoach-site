@@ -87,18 +87,17 @@
         <button class="abo-link-button" type="button" id="have-account">Ich habe schon ein App-Konto</button>
       </div>
       <div id="pay-block" hidden>
-        <!-- § 312j Abs. 2 BGB: Preis, Laufzeit und Kündigung stehen vor allen Zahlungsknöpfen (auch Apple Pay / Google Pay)
-             und noch einmal direkt über dem Bestellknopf. -->
-        <div class="abo-card abo-summary">
+        <!-- Zahlungsfelder zuerst; Preis/Laufzeit bleiben vor sämtlichen auslösenden Zahlungsknöpfen. -->
+        <div id="payment-element"></div>
+        <div class="abo-summary" role="group" aria-label="Preis und Laufzeit">
           <p id="pay-summary"></p>
           <p id="pay-terms"></p>
-          <p class="abo-muted">Online kündbar, ohne Anmeldung (<a href="kuendigen.html">Verträge hier kündigen</a>). 30 Tage <a href="garantie.html">Geld-zurück-Garantie</a>. Es gelten die <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>. <a href="widerruf.html">Widerrufsbelehrung</a>. <a href="/datenschutz.html">Datenschutz</a>.</p>
         </div>
         <div id="express-checkout"></div>
         <p class="abo-divider" id="express-divider" hidden>oder</p>
-        <div id="payment-element"></div>
-        <p id="pay-summary-short"></p>
+        <p id="pay-summary-short" hidden></p>
         <button class="abo-button" type="button" id="pay-button" disabled>Zahlungspflichtig abonnieren</button>
+        <p class="abo-checkout-details">Online kündbar, ohne Anmeldung (<a href="kuendigen.html">Verträge hier kündigen</a>). 30 Tage <a href="garantie.html">Geld-zurück-Garantie</a>. Es gelten die <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>. <a href="widerruf.html">Widerrufsbelehrung</a>. <a href="/datenschutz.html">Datenschutz</a>.</p>
       </div>
       <button class="abo-link-button" type="button" data-back="plan">Anderes Angebot wählen</button>
     </section>

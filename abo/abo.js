@@ -284,10 +284,10 @@ async function mountStripe(clientSecret) {
   const stripe = window.Stripe(state.offer.publishableKey, { locale: "de" });
   const appearance = {
     theme: "stripe",
-    variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "18px", borderRadius: "12px" }
+    variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" }
   };
   const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
-  state.checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance } });
+  state.checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
   const express = state.checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
   express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
     $("express-divider").hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean);
@@ -295,8 +295,12 @@ async function mountStripe(clientSecret) {
   express.on("confirm", () => confirmPayment());
   express.mount("#express-checkout");
   const payment = state.checkout.createPaymentElement({ layout: "tabs" });
+  payment.on("ready", () => { $("pay-button").disabled = false; });
+  payment.on("loaderror", () => {
+    $("pay-button").disabled = true;
+    fail("Die Zahlungsarten konnten nicht geladen werden. Wähle dein Angebot bitte erneut.");
+  });
   payment.mount("#payment-element");
-  $("pay-button").disabled = false;
 }
 
 async function confirmPayment() {

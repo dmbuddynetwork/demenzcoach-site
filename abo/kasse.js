@@ -95,35 +95,40 @@ export async function open(options) {
   close();
   const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
   const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
-  const summary = el("p", { text: "Einen Moment, die Kasse lädt …" });
+  const loading = el("p", { class: "kasse-loading", role: "status", text: "Zahlungsarten werden geladen …" });
+  const summary = el("p");
   const terms = el("p");
-  const short = el("p", { class: "kasse-short" });
+  let loadingTimer = null;
+  const short = el("p", { class: "kasse-short", hidden: "" });
   const divider = el("p", { class: "abo-divider", text: "oder", hidden: "" });
   const express = el("div", { id: "kasse-express" });
   const payment = el("div", { id: "kasse-payment" });
   const payButton = el("button", { type: "button", class: "abo-button", disabled: "", text: "Zahlungspflichtig abonnieren" });
   const emailLine = el("p", { class: "abo-muted", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
-  const title = el("h2", { id: "kasse-title", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
+  const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
   const card = el("div", { class: "kasse-card" }, [
     el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": "Schließen", text: "×", onclick: () => close() })]),
     error,
-    el("div", { class: "abo-card abo-summary" }, [summary, terms,
-      el("p", { class: "abo-muted" }, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
+    loading, payment, emailLine,
+    el("div", { class: "abo-summary", role: "group", "aria-label": "Preis und Laufzeit", hidden: "" }, [summary, terms]),
+    express, divider, short, payButton,
+    el("p", { class: "abo-checkout-details" }, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
         el("a", { href: "/abo/garantie.html", target: "_blank", text: "Geld-zurück-Garantie" }), ". Es gelten die ",
         el("a", { href: "/nutzungsbedingungen.html", target: "_blank", text: "Nutzungsbedingungen" }), ". ",
         el("a", { href: "/abo/widerruf.html", target: "_blank", text: "Widerrufsbelehrung" }), ". ",
         el("a", { href: "/datenschutz.html", target: "_blank", text: "Datenschutz" }), "."])
-    ]),
-    express, divider, payment, emailLine, short, payButton
   ]);
   const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title",
     onclick: (event) => { if (event.target === node) close(); } }, card);
   const onKey = (event) => { if (event.key === "Escape") close(); };
   document.addEventListener("keydown", onKey);
-  sheet = { node, onClose: () => { document.removeEventListener("keydown", onKey); options.onClose?.(); } };
+  sheet = { node, onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
   document.body.append(node);
   document.body.classList.add("start-noscroll");
-  payButton.focus();
+  title.focus();
+  loadingTimer = setTimeout(() => {
+    if (sheet?.node === node && !loading.hidden) loading.textContent = "Das Laden dauert länger. Du kannst die Kasse schließen und erneut öffnen.";
+  }, 15_000);
 
   let checkout = null;
   const confirm = async () => {
@@ -144,8 +149,8 @@ export async function open(options) {
   payButton.addEventListener("click", confirm);
 
   try {
-    publicConfig ??= await api("/config");
-    const user = await signedInUser();
+    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser(), loadStripe()]);
+    publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
     const session = await api("/session", {
       method: "POST",
@@ -159,22 +164,39 @@ export async function open(options) {
     summary.textContent = text;
     short.textContent = text;
     terms.textContent = termsText(options.plan);
-    await loadStripe();
+    summary.parentElement.hidden = false;
     const stripe = window.Stripe(publicConfig.publishableKey, { locale: "de" });
-    const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "18px", borderRadius: "12px" } };
+    const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" } };
     const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
-    checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance } });
+    checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
     if (!sheet || sheet.node !== node) return;
     const expressElement = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
     expressElement.on("availablepaymentmethodschange", ({ paymentMethods }) => { divider.hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean); });
     expressElement.on("confirm", () => confirm());
     expressElement.mount(express);
-    checkout.createPaymentElement({ layout: "tabs" }).mount(payment);
-    payButton.disabled = false;
-    options.track?.("checkout_sheet_ready");
+    const paymentElement = checkout.createPaymentElement({ layout: "tabs" });
+    paymentElement.on("ready", () => {
+      if (!sheet || sheet.node !== node) return;
+      clearTimeout(loadingTimer);
+      loading.hidden = true;
+      payButton.disabled = false;
+      options.track?.("checkout_sheet_ready");
+    });
+    paymentElement.on("loaderror", () => {
+      if (!sheet || sheet.node !== node) return;
+      clearTimeout(loadingTimer);
+      loading.hidden = true;
+      payButton.disabled = true;
+      fail("Die Zahlungsarten konnten nicht geladen werden. Schließe die Kasse und öffne sie erneut.");
+    });
+    paymentElement.mount(payment);
   } catch (problem) {
+    clearTimeout(loadingTimer);
+    loading.hidden = true;
+    if (!sheet || sheet.node !== node) return;
     if (problem.code === "already_subscribed") {
       summary.textContent = "Du hast schon ein Abo. Dein Plan ist freigeschaltet.";
+      summary.parentElement.hidden = false;
       payButton.replaceWith(el("a", { class: "abo-button", href: "/abo/mein-plan.html", text: "Zu deinem Plan" }));
       return;
     }
