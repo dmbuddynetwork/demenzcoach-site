@@ -57,7 +57,7 @@ export async function webAuth(){if(localStorage.getItem('test.auth.hang'))await 
       await context.route('**/*', async (route) => {
         const request = route.request(), url = new URL(request.url());
         if (url.pathname === '/abo/web-auth.js') return route.fulfill({ contentType: 'text/javascript', body: fakeAuth });
-        if (url.origin === base && url.pathname === '/abo/abo-config.js') return route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(root, 'abo/abo-config.js'), 'utf8').replace('emailLink: false', 'emailLink: true').replace(/translatorGate: Object.freeze\(\{\s*enabled: false/u, 'translatorGate: Object.freeze({ enabled: true') });
+        if (url.origin === base && url.pathname === '/abo/abo-config.js') return route.fulfill({ contentType: 'text/javascript', body: fs.readFileSync(path.join(root, 'abo/abo-config.js'), 'utf8').replace('emailLink: false', 'emailLink: true').replace('google: true', 'google: false').replace(/translatorGate: Object.freeze\(\{\s*enabled: false/u, 'translatorGate: Object.freeze({ enabled: true') });
         if (url.pathname.endsWith('/account-status')) {
           assert.equal(request.headers().authorization, 'Bearer anonymous');
           return route.fulfill({status:200,headers:{'Access-Control-Allow-Origin':base},contentType:'application/json',body:JSON.stringify({hasCustomer:hasPurchase})});
@@ -92,17 +92,16 @@ export async function webAuth(){if(localStorage.getItem('test.auth.hang'))await 
       assert.equal(operationIDs[0], operationIDs[1]); assert.notEqual(operationIDs[1], operationIDs[2]);
       assert.equal(repository.records.get('browser-user').used, 1); checks++;
 
-      await page.getByRole('link', { name: 'Konto erstellen oder anmelden', exact: true }).waitFor();
+      await page.locator('.dc-signup input[type=email]').waitFor();
       assert.equal(repository.records.get('browser-user').used, 1); checks++;
       await page.locator('.translator-feedback').first().getByRole('button', { name: /Ja, merken/ }).click();
       assert.equal(await page.locator('.ki-supporter').count(), 0); checks++;
-      await ask(2); await page.getByRole('link', { name: 'Konto erstellen oder anmelden', exact: true }).waitFor();
+      await ask(2); await page.locator('.dc-signup input[type=email]').waitFor();
       assert.equal(repository.records.get('browser-user').used, 1); checks++;
-      await page.getByRole('link', { name: 'Konto erstellen oder anmelden', exact: true }).click();
-      await page.locator('#web-account-form:not([hidden])').waitFor();
-      await page.locator('#account-email').fill('caregiver@example.test');
-      await page.locator('#account-send').click();
-      await page.getByText('Dein Anmeldelink ist unterwegs. Prüfe dein Postfach und den Spamordner. Der Link funktioniert ohne Passwort.', {exact:true}).waitFor();
+      assert.equal(new URL(page.url()).pathname, '/de/'); checks++;
+      await page.locator('.dc-signup input[type=email]').fill('caregiver@example.test');
+      await page.locator('.dc-signup .primary').click();
+      await page.getByText('Prüfe dein Postfach und den Spamordner. Öffne den Anmeldelink, um weiterzufragen.', {exact:true}).waitFor();
       const callback = await page.evaluate(() => window.__testEmailLink);
       assert.ok(callback.includes('/abo/email-link.html?state=')); checks++;
       const callbackPage = await context.newPage();
@@ -148,15 +147,14 @@ export async function webAuth(){if(localStorage.getItem('test.auth.hang'))await 
       await page.evaluate(() => { localStorage.removeItem('test.auth.failure'); localStorage.removeItem('test.auth.verified'); localStorage.setItem('test.auth.collision', 'yes'); });
       hasPurchase = true;
       await page.goto(base + '/abo/konto.html?returnTo=%2Fde%2F', { waitUntil: 'domcontentloaded' });
-      await page.locator('#web-account-form:not([hidden])').waitFor();
-      await page.locator('#account-existing').click();
-      await page.locator('#account-email').fill('caregiver@example.test'); await page.locator('#account-send').click();
+      await page.locator('.dc-signup input[type=email]').waitFor();
+      await page.locator('.dc-signup input[type=email]').fill('caregiver@example.test'); await page.locator('.dc-signup .primary').click();
       await page.waitForFunction(() => window.__testEmailLink);
       await page.goto(await page.evaluate(() => window.__testEmailLink), {waitUntil:'domcontentloaded'});
       await page.getByText(/damit vorhandene Käufe erhalten bleiben/).waitFor();
       assert.equal(await page.evaluate(() => localStorage.getItem('test.auth.verified')), null); checks++;
       await page.goto(base + '/abo/konto.html?returnTo=%2Fen%2Fdementia-translator%2F', { waitUntil: 'domcontentloaded' });
-      await page.getByRole('button', { name: 'Send sign-in link', exact: true }).waitFor();
+      await page.getByRole('button', { name: 'Continue with email', exact: true }).waitFor();
       assert.equal(await page.title(), 'Your account · DemenzCoach');
       assert.equal(await page.locator('#account-back').textContent(), 'Back without signing in');
       assert.match(await page.locator('#account-safety').textContent(), /remain free/); checks++;

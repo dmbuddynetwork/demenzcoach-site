@@ -16,9 +16,9 @@ function fixture(t,reviewed=true) {
   const copy=rel=>{fs.mkdirSync(path.dirname(path.join(dir,rel)),{recursive:true});fs.copyFileSync(path.join(root,rel),path.join(dir,rel));};
   for(const rel of [...pages,'sitemap.xml','content/generator-route-manifest.json','de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html','de/ratgeber/pflegende-angehoerige-ueberfordert.html','en/dementia-translator/i-dont-need-the-bathroom.html','guides/dementia-caregiver-overwhelmed.html','demenz-uebersetzer/translator.js','demenz-uebersetzer/translator-core.js','demenz-uebersetzer/translator-core-en.js','demenz-uebersetzer/translator-locale.js'])copy(rel);
   // The app shell is the renderer/helper dependency manifest.
-  const js=new Set(['start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js']);
+  const js=new Set(['start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css']);
   for(const lang of ['de','en'])for(const m of fs.readFileSync(path.join(root,lang+'/index.html'),'utf8').matchAll(/<script\b[^>]*src="([^"]+)"[^>]*>/g)){const u=new URL(m[1],'https://dementiacoachapp.com/'+lang+'/');if(u.origin==='https://dementiacoachapp.com')js.add(u.pathname.slice(1));}
-  for(const rel of ['abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js'])js.add(rel);
+  for(const rel of ['abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css'])js.add(rel);
   for(const lang of ['de','en'])for(const m of fs.readFileSync(path.join(root,lang+'/index.html'),'utf8').matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)){const u=new URL(m[1],'https://dementiacoachapp.com/'+lang+'/');if(u.origin==='https://dementiacoachapp.com')js.add(u.pathname.slice(1));}
   for(const rel of js)copy(rel);
   for(const lang of ['de','en']) {
@@ -63,11 +63,12 @@ test('Four static generator-app states, one primary input/result, reciprocal lan
     assert.ok(html.includes(`data-translator-initial-situation="${e.key}"`));
     assert.ok(html.includes('id="translator-data"'));
     assert.equal((html.match(/id="translator-form"/g)||[]).length,1);
-    const originalForm=before[`${lang}/index.html`].match(/<form\b[^>]*\bid="translator-form"[^>]*>[\s\S]*?<\/form>/)[0];
+    const originalForm=fs.readFileSync(path.join(dir,`${lang}/index.html`),'utf8').match(/<form\b[^>]*\bid="translator-form"[^>]*>[\s\S]*?<\/form>/)[0];
     assert.ok(html.includes(originalForm),'Original primary form bytes stay in the shared shell');
     assert.ok(html.indexOf(originalForm)<html.indexOf('id="translator-result"'),'Original form position precedes the result, rather than moving to a new sibling');
 
     assert.equal((html.match(/id="translator-result"/g)||[]).length,1);
+    assert.ok(!html.includes('data-ready-situations="v1"'),'Prepared answer omits the home-only example disclosure');
     assert.ok(!html.includes('Open this situation in the web app'));
     assert.ok(!html.includes('Situation in der Web-App öffnen'));
     assert.ok(html.includes(`href="${e.page.alternatePath}" lang="${lang==='de'?'en':'de'}"`));
@@ -83,7 +84,18 @@ test('Four static generator-app states, one primary input/result, reciprocal lan
     const html=fs.readFileSync(path.join(dir,rel),'utf8'),old=data(before[rel]),d=data(html);
     assert.equal(d.entries.length,old.entries.length+2);assert.deepEqual(d.entries.slice(0,old.entries.length),old.entries);
     for(const[k,v]of Object.entries(old.formal))assert.equal(d.formal[k],v);
-    assert.equal(html.replace(pattern,'DATA').replace(/<section data-ready-situations="v1"[\s\S]*?<\/section>/,''),before[rel].replace(pattern,'DATA'));
+    assert.match(html, /data-translator-input-position="top"/);
+    assert.match(html, /<label class="translator-form-label" for="translator-input">/);
+    assert.match(html, /<textarea[^>]*id="translator-input"[^>]*rows="2"/);
+    const expectedIntro=rel.startsWith('de/')?'Passende Worte und praktische Tipps für deine Situation.':'Find the right words and practical tips for your situation.';
+    assert.ok(html.includes(`<p class="translator-form-intro" id="translator-form-intro">${expectedIntro}</p>`));
+    assert.match(html, /aria-describedby="translator-form-intro translator-empty-hint translator-privacy-note"/);
+    const normalizeInputLayout=markup=>markup.replace(/ data-translator-input-position="top"/,'')
+      .replace(/<label\b[^>]*for="translator-input"[^>]*>[\s\S]*?<\/label>/,'<label for="translator-input">INPUT_LABEL</label>')
+      .replace(/<p\b[^>]*id="translator-form-intro"[^>]*>[\s\S]*?<\/p>/g,'')
+      .replace(/(<textarea[^>]*id="translator-input"[^>]*rows=")[^"]*(")/,'$1ROWS$2')
+      .replace(/(<textarea[^>]*id="translator-input"[^>]*aria-describedby=")([^"]*)(")/,(_match,a,ids,b)=>a+ids.split(/\s+/).filter(id=>id!=='translator-form-intro').join(' ')+b);
+    assert.equal(normalizeInputLayout(html).replace(pattern,'DATA').replace(/<section data-ready-situations="v1"[\s\S]*?<\/section>/,''),normalizeInputLayout(before[rel]).replace(pattern,'DATA'));
     assert.equal(d.entries.find(e=>e.key==='pflegeaufteilen'||e.key==='sharecare').keywords.length,0);
     for(const url of allUrls.filter(u=>u.includes('/'+rel.slice(0,2)+'/')))assert.ok(html.includes(`href="${new URL(url).pathname}"`));
   }
@@ -104,7 +116,7 @@ test('A new topic requires a fresh actual generator export instead of manufactur
   assert.notEqual(r.status,0);assert.match(r.stderr,/Missing\/stale actual app view/);assert.deepEqual(contents(dir),before);
 });
 test('Changed renderer or locale causes fail-closed stale-view rejection before writes',t=>{
-  for(const rel of ['demenz-uebersetzer/translator.js','demenz-uebersetzer/translator-locale.js','demenz-uebersetzer/translator-signup.js','start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js']) {
+  for(const rel of ['demenz-uebersetzer/translator.js','demenz-uebersetzer/translator-locale.js','demenz-uebersetzer/translator-signup.js','start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css']) {
     const dir=fixture(t),before=contents(dir);fs.appendFileSync(path.join(dir,rel),'\n// synthetic change\n');const r=build(dir);assert.notEqual(r.status,0);assert.match(r.stderr,/Missing\/stale actual app view/);assert.deepEqual(contents(dir),before);
   }
 });
@@ -132,13 +144,13 @@ const init=controller.slice(controller.indexOf('  const params = new URLSearchPa
 assert.ok(init.includes('staticDefault'));
 function initialize({query='',hash='',isStatic=true}={}) {
   const def={key:'toilettefinden',says:'Ich finde die Toilette nicht.'},normal={key:'waschen',says:'Ich will nicht duschen.'},safety={key:'sterben',says:'Synthetic urgent public key',safetyOnly:true};
-  const calls=[],context={URLSearchParams,location:{search:query,hash},entryByKey:new Map([def,normal,safety].map(e=>[e.key,e])),feelingEntries:new Map([['angst',{}]]),phraseHash:'satz-',feelingHash:'gefuehl-',staticDefault:isStatic?def:null,validGoals:new Set(['jetzt','verstehen','tipps']),input:{value:''},document:{body:{dataset:{translatorInitialGoal:'jetzt'}},title:'SEO title'},initialTitle:'SEO title',grow(){},render(e,opts){calls.push(['render',e.key,opts]);},askGoal(e){calls.push(['goal',e.key]);},track(...args){calls.push(['track',...args]);},formBelow(opts){calls.push(['form',opts]);},setPage(...args){calls.push(['page',...args]);},openFromHash(){calls.push(['legacy']);}};
+  const calls=[],context={URLSearchParams,location:{search:query,hash},entryByKey:new Map([def,normal,safety].map(e=>[e.key,e])),feelingEntries:new Map([['angst',{}]]),phraseHash:'satz-',feelingHash:'gefuehl-',staticDefault:isStatic?def:null,keepInputAtTop:true,validGoals:new Set(['jetzt','verstehen','tipps']),input:{value:''},document:{body:{dataset:{translatorInitialGoal:'jetzt'}},title:'SEO title'},initialTitle:'SEO title',grow(){},render(e,opts){calls.push(['render',e.key,opts]);},askGoal(e){calls.push(['goal',e.key]);},track(...args){calls.push(['track',...args]);},formBelow(opts){calls.push(['form',opts]);},setPage(...args){calls.push(['page',...args]);},openFromHash(){calls.push(['legacy']);}};
   Object.assign(context,{URL,publicByKey:new Map(),goalsFor:e=>e.safetyOnly?null:['fixed'],pathState:isStatic?{route:{selectionPath:'/de/topic/auswahl/'},goal:'jetzt'}:null,history:{state:null,replaceState(){} }});
   context.location.pathname=isStatic?'/de/topic.html':'/de/';context.location.href='https://dementiacoachapp.com'+context.location.pathname+query+hash;
   vm.runInNewContext(init,context);return {calls,context};
 }
 test('Actual init block hydrates default once without AI/history and opens one followup form',()=>{
-  const {calls,context}=initialize();assert.equal(calls.filter(c=>c[0]==='render').length,1);assert.equal(calls.filter(c=>c[0]==='track').length,1);assert.equal(calls.filter(c=>c[0]==='page').length,0);assert.equal(calls.find(c=>c[0]==='render')[2].goal,'jetzt');assert.equal(calls.find(c=>c[0]==='form')[1].open,true);assert.equal(context.document.title,'SEO title');
+  const {calls,context}=initialize();assert.equal(calls.filter(c=>c[0]==='render').length,1);assert.equal(calls.filter(c=>c[0]==='track').length,1);assert.equal(calls.filter(c=>c[0]==='page').length,0);assert.equal(calls.find(c=>c[0]==='render')[2].goal,'jetzt');assert.equal(calls.find(c=>c[0]==='render')[2].preserveViewport,true);assert.equal(calls.find(c=>c[0]==='form')[1].open,true);assert.equal(context.document.title,'SEO title');
 });
 test('Actual init honors valid query/hash, hydrates invalid states, and never downgrades an explicit safety key',()=>{
   assert.equal(initialize({query:'?situation=waschen&ziel=jetzt'}).calls.find(c=>c[0]==='render')[1],'waschen');
@@ -174,8 +186,9 @@ test('Actual setPage uses registered fixed goal/selection paths without query st
 });
 test('Actual view-state title retains a fixed public topic and uses generic titles for private output',()=>{
  const block=controller.slice(controller.indexOf('  const setViewState ='),controller.indexOf('  const translatedAttributes'));
- const context={requestAnimationFrame(){},document:{body:{dataset:{}},title:''},homeHeading:{hidden:false},initialTitle:'Home',ui:null,syncHelpful(){},activePublicRoute:{title:'Fixed public topic'}};
+ const examples={hidden:false};
+ const context={requestAnimationFrame(){},document:{body:{dataset:{}},title:'',querySelector(selector){assert.equal(selector,'[data-ready-situations]');return examples;}},homeHeading:{hidden:false},initialTitle:'Home',ui:null,syncHelpful(){},activePublicRoute:{title:'Fixed public topic'}};
  vm.runInNewContext(block+'\nthis.change=setViewState;',context);
- context.change('answer');assert.equal(context.document.title,'Fixed public topic');context.change('goal');assert.equal(context.document.title,'Fixed public topic');
- context.activePublicRoute=null;context.change('answer');assert.equal(context.document.title,'Deine Antwort | Demenz Coach');context.change('input');assert.equal(context.document.title,'Home');
+ context.change('answer');assert.equal(context.document.title,'Fixed public topic');assert.equal(examples.hidden,true);context.change('goal');assert.equal(context.document.title,'Fixed public topic');assert.equal(examples.hidden,true);
+ context.activePublicRoute=null;context.change('answer');assert.equal(context.document.title,'Deine Antwort | Demenz Coach');context.change('input');assert.equal(context.document.title,'Home');assert.equal(examples.hidden,false);
 });

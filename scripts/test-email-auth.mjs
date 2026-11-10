@@ -164,3 +164,7 @@ test('bootstrap removes action parameters before any other scripts and keeps the
     assert.doesNotMatch(html, /lovable-home|web-experiments|gtag|facebook|recaptcha|type="tel"/iu);
   }
 });
+
+test('email collision stops if another account takes over during purchase-binding lookup',async()=>{const f=fixture({collision:true});await f.api.begin({email:address,intent:'signin'});f.host.fetch=async()=>{f.auth.currentUser={uid:'other-account',isAnonymous:false,emailVerified:true,email:'other@example.test'};return new Response(JSON.stringify({hasCustomer:false}))};await assert.rejects(f.api.finish({url:f.link(),state:f.api.attempt().nonce}),{code:'identity_changed'});assert(!f.calls.some(c=>c.kind==='signin'));assert.equal(f.auth.currentUser.uid,'other-account');});
+
+test('no-pending email callback preserves a same-UID account upgraded during lookup',async()=>{const f=fixture();f.host.fetch=async()=>{f.auth.currentUser={...f.auth.currentUser,isAnonymous:false,emailVerified:true,email:'other@example.test'};return new Response(JSON.stringify({hasCustomer:false}))};await assert.rejects(f.api.finish({url:'https://dementiacoachapp.com/abo/email-link.html?oobCode=synthetic',state:'foreign',email:address}),{code:'identity_changed'});assert(!f.calls.some(c=>c.kind==='signin'));assert.equal(f.auth.currentUser.uid,'guest-one');});

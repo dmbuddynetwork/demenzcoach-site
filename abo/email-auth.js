@@ -93,6 +93,7 @@ export function createEmailAccess({ webAuth, config, host = window, now = Date.n
       if (!email) throw new EmailAccessError('email_required');
       if (matched && email.toLowerCase() !== pending.email.toLowerCase()) throw new EmailAccessError('email_mismatch');
       const current = value.auth.currentUser;
+      const wasAnonymous = current?.isAnonymous === true;
       if (matched && pending.uid && current?.uid !== pending.uid) throw new EmailAccessError('original_browser_required');
       const credential = value.sdk.EmailAuthProvider.credentialWithLink(email, url);
       const wantsLink = matched && pending.uid && (pending.intent === 'link' || current?.isAnonymous || !current?.emailVerified);
@@ -106,10 +107,12 @@ export function createEmailAccess({ webAuth, config, host = window, now = Date.n
           if (!['auth/credential-already-in-use', 'auth/email-already-in-use'].includes(error.code)) throw error;
           // A paid/pending or unknown guest identity may never be abandoned.
           if (pending.intent !== 'signin' || !current.isAnonymous || await binding(current) !== false) throw new EmailAccessError('account_collision');
+          if (value.auth.currentUser?.uid !== current.uid || !value.auth.currentUser?.isAnonymous) throw new EmailAccessError('identity_changed');
           await timeout(value.sdk.signInWithCredential(value.auth, credential));
         }
       } else {
         if (current?.isAnonymous && await binding(current) !== false) throw new EmailAccessError('original_browser_required');
+        if ((value.auth.currentUser?.uid || null) !== (current?.uid || null) || (wasAnonymous && value.auth.currentUser?.isAnonymous !== true)) throw new EmailAccessError('identity_changed');
         if (current && !current.isAnonymous && !current.emailVerified) throw new EmailAccessError('original_browser_required');
         if (current?.emailVerified && current.email?.toLowerCase() !== email.toLowerCase()) throw new EmailAccessError('account_collision');
         if (current?.emailVerified) await timeout(value.sdk.reauthenticateWithCredential(current, credential));
@@ -117,6 +120,7 @@ export function createEmailAccess({ webAuth, config, host = window, now = Date.n
       }
       const user = value.auth.currentUser;
       await timeout(user?.getIdToken(true));
+      if (!user?.uid || value.auth.currentUser?.uid !== user.uid) throw new EmailAccessError('identity_changed');
       if (!user?.emailVerified || !user.email || user.email.toLowerCase() !== email.toLowerCase()) throw new EmailAccessError('verification_pending');
       forget(); queueSignup();
       return { user, target: safeEmailReturn(matched ? pending.target : returnTo, host.location.origin) };

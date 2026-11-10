@@ -63,7 +63,7 @@ const list = values => `<ul>${values.map(v => `<li>${escape(v)}</li>`).join('')}
 const sha = value => createHash('sha256').update(value).digest('hex');
 // Include UI helpers too: signup/access/experiment code can change rendered
 // controls without changing translator.js. The home shell is the dependency list.
-const rendererFiles = new Set(['demenz-uebersetzer/translator.js','demenz-uebersetzer/translator-core.js','demenz-uebersetzer/translator-core-en.js','demenz-uebersetzer/translator-locale.js','start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js']);
+const rendererFiles = new Set(['demenz-uebersetzer/translator.js','demenz-uebersetzer/translator-core.js','demenz-uebersetzer/translator-core-en.js','demenz-uebersetzer/translator-locale.js','start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/signup-offer-view.css']);
 for (const lang of ['de','en']) for (const match of read(`${lang}/index.html`).matchAll(/<script\b[^>]*\bsrc="([^"]+)"[^>]*>/g)) {
   const url = new URL(decodeURI(match[1]),origin+`/${lang}/`);
   if (url.origin===origin) rendererFiles.add(url.pathname.slice(1));
@@ -114,6 +114,8 @@ function renderPage(lang, e) {
   html=html.replace('</head>',()=>`<link rel="alternate" hreflang="de" href="${origin+dePath}"><link rel="alternate" hreflang="en" href="${origin+enPath}"><link rel="alternate" hreflang="x-default" href="${origin+dePath}"><script type="application/ld+json" id="translator-situation-schema">${json(schema)}</script><script type="application/json" id="translator-app-meta">${json(appMeta)}</script></head>`);
   html=html.replace(/<body\b([^>]*)>/,(_m,attrs)=>`<body${attrs.replace(/class="([^"]*)"/,(_a,classes)=>`class="${classes} translator-has-result"`)} data-translator-state="answer" data-translator-initial-situation="${e.key}" data-translator-initial-goal="${view.goal}" data-translator-app-path="/${lang}/" data-situation-topic="${p.topicId}">`);
   html=html.replace(/<h1\b([^>]*\bid="home-title"[^>]*)>([\s\S]*?)<\/h1>/,(_m,attrs,text)=>`<h2${attrs} hidden>${text}</h2>`);
+  // Ready examples belong to the input home, not between a prepared answer and its form.
+  html=html.replace(/<section data-ready-situations="v1"[\s\S]*?<\/section>/g,'');
   const form=html.match(/<form\b[^>]*\bid="translator-form"[^>]*>[\s\S]*?<\/form>/)?.[0];
   if (!form) throw new Error('Missing original app form');
   const output=/<div\b[^>]*\bid="translator-result"[^>]*>\s*<\/div>/;
@@ -163,7 +165,8 @@ for (const lang of ['de','en']) {
     return e;
   });
   const additions = selected[lang].filter(e=>!e.page.legacySourceSHA256);
-  const selection = `<section data-ready-situations="v1" aria-labelledby="ready-situations-title"><h2 id="ready-situations-title">${ui[lang].choices}</h2><div class="translator-chips" role="group" aria-label="${ui[lang].choices}">${additions.map(e=>`<button type="button" class="translator-chip" data-translator-key="${e.key}">${escape(e.page.label)}</button>`).join('')}</div><ul>${additions.map(e=>`<li><a href="${e.page.path}">${escape(e.page.label)}</a></li>`).join('')}</ul></section>`;
+  const examplesLabel = lang === 'de' ? 'Oder wähle ein Beispiel' : 'Or choose an example';
+  const selection = `<section data-ready-situations="v1" class="translator-ready-examples"><details><summary>${examplesLabel}</summary><ul>${additions.map(e=>`<li><a href="${e.page.path}">${escape(e.page.label)}</a></li>`).join('')}</ul></details></section>`;
   for (const rel of [`${lang}/index.html`, toolPath(lang)]) {
     const original = read(rel), data = parse(original);
     for (const e of entries) {
@@ -183,6 +186,12 @@ for (const lang of ['de','en']) {
       Object.assign(data.formal, {'Ich zeige dir gern den Weg zur Toilette.':'Ich zeige Ihnen gern den Weg zur Toilette.','Hier ist die Toilette. Möchtest du allein hineingehen?':'Hier ist die Toilette. Möchten Sie allein hineingehen?','Soll ich in der Nähe bleiben?':'Soll ich in der Nähe bleiben?','Ich brauche Entlastung. Kannst du diese Woche den Einkauf übernehmen?':'Ich brauche Entlastung. Können Sie diese Woche den Einkauf übernehmen?','Welche Aufgabe kannst du verlässlich übernehmen?':'Welche Aufgabe können Sie verlässlich übernehmen?','Lass uns festhalten, wer was bis wann erledigt.':'Lassen Sie uns festhalten, wer was bis wann erledigt.'});
     }
     let html = original.replace(dataPattern, (_m,a,_data,c) => a+json(data)+c);
+    html = html.replace(/<body\b([^>]*)>/, (_match, attrs) => `<body${attrs.replace(/\sdata-translator-input-position="[^"]*"/, '')} data-translator-input-position="top">`);
+    html = html.replace(/(<form\b[^>]*\bid="translator-form"[^>]*>)([\s\S]*?)(<\/form>)/, (_match, open, content, close) => open + content
+      .replace(/<p\b[^>]*\bid="translator-form-intro"[^>]*>[\s\S]*?<\/p>/g, '')
+      .replace(/<label\b[^>]*\bfor="translator-input"[^>]*>[\s\S]*?<\/label>/, () => `<label class="translator-form-label" for="translator-input">${lang === 'de' ? 'Was sagen und tun bei Demenz?' : 'What can I say and do?'}</label><p class="translator-form-intro" id="translator-form-intro">${lang === 'de' ? 'Passende Worte und praktische Tipps für deine Situation.' : 'Find the right words and practical tips for your situation.'}</p>`)
+      .replace(/(<textarea\b[^>]*\bid="translator-input"[^>]*\baria-describedby=")([^"]*)(")/, (_match, before, ids, after) => before + ['translator-form-intro', ...ids.split(/\s+/).filter(id => id && id !== 'translator-form-intro')].join(' ') + after)
+      .replace(/(<textarea\b[^>]*\bid="translator-input"[^>]*\brows=")[^"]*(")/, (_match, before, after) => before + '2' + after) + close);
     if (html.includes('data-ready-situations="v1"')) html = html.replace(/<section data-ready-situations="v1"[\s\S]*?<\/section>/,()=>selection);
     else {
       if (!/<form\b[^>]*\bid="translator-form"/.test(html)) throw new Error(`Missing form: ${rel}`);

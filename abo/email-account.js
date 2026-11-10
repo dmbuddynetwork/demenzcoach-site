@@ -1,3 +1,4 @@
+import { mountInlineSignup } from './inline-signup.js';
 import { webAuth } from './web-auth.js';
 import { createEmailAccess, safeEmailReturn } from './email-auth.js';
 const $ = (id) => document.getElementById(id);
@@ -36,6 +37,7 @@ function complete(result) {
   status(copy.success); $('account-continue').focus(); callbackURL = '';
 }
 function failure(error) {
+  $('account-status').hidden = false;
   let code = error?.code;
   if (['auth/operation-not-allowed', 'auth/unauthorized-domain'].includes(code)) code = 'not_enabled';
   if (['auth/expired-action-code', 'auth/invalid-action-code', 'invalid_link'].includes(code)) {
@@ -58,7 +60,12 @@ try {
   } else {
     callbackURL = '';
     if (inspected.user?.emailVerified && input.intent !== 'signin') complete({ target });
-    else { status(copy.ready); $('web-account-form').hidden = false; $('account-existing').hidden = intent === 'signin'; }
+    else {
+      const placeholder = document.createElement('div'); $('web-account-form').before(placeholder);
+      $('account-title').classList.add('account-sr-only');
+      for (const id of ['account-description','account-privacy','account-status','web-account-form','account-existing']) $(id).hidden = true;
+      await mountInlineSignup(placeholder, { bonus: 3, en, purpose: 'account', onBegin() {}, returnTo: target });
+    }
   }
 } catch (error) { failure(error); }
 $('web-account-form').addEventListener('submit', async (event) => {

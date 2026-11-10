@@ -11,7 +11,7 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
   }),
   // Anmeldung mit Apple erst anzeigen, wenn die Apple-Services-ID in Firebase eingerichtet ist (docs/WEB_CHECKOUT.md, Schritt 3).
   // Web sign-in uses email links. Enable emailLink only after provider/domain preflight; no SMS UI.
-  signIn: Object.freeze({ apple: false, emailLink: false }),
+  signIn: Object.freeze({ apple: false, emailLink: true, google: true, offerAfterAnswer: true }),
   // Server-side normal-answer introduction. Enable only after backend/auth readiness checks.
   // GrowthBook is evaluated on the backend, never trusted for browser entitlements.
   translatorGate: Object.freeze({
