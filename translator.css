@@ -490,3 +490,15 @@ body[data-page-type="translator-tool"] .translator-section { padding-top: 32px; 
 @media (min-width: 721px) { .translator-hero { padding: 56px 0 28px; } }
 @media (min-width: 900px) { .footer-grid > p { min-width: 14rem; } .footer-grid nav { max-width: 34rem; } }
 .translator-teaser .button-light-outline { color: var(--ink); background: var(--paper); border: 1px solid var(--line); }
+
+/* Helpful answers: quiet local list, isolated from the homepage's large CTA tiles. */
+.translator-helpful { margin: 24px 0; }
+.translator-helpful > ul { display: grid; gap: 8px; margin: 12px 0; padding: 0; list-style: none; }
+.translator-helpful > ul > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line, #d5d5d5); }
+.translator-helpful .translator-copy:is(.translator-helpful-open, .translator-helpful-remove, .translator-helpful-clear) { display: block; width: auto; min-width: 0; max-width: 100%; min-height: 44px; padding: 8px; text-align: start; white-space: normal; overflow-wrap: anywhere; color: var(--ink, #222) !important; background: transparent !important; border: 0 !important; border-radius: 6px; font-size: 1rem; font-weight: 600 !important; }
+.translator-helpful .translator-copy:is(.translator-helpful-open, .translator-helpful-remove, .translator-helpful-clear)::after { display: none; }
+.translator-helpful .translator-copy:is(.translator-helpful-open, .translator-helpful-remove, .translator-helpful-clear):hover { background: #f0f0f0 !important; }
+.translator-helpful .translator-copy:is(.translator-helpful-remove, .translator-helpful-clear) { font-size: .875rem; font-weight: 400 !important; text-decoration: underline; text-underline-offset: 3px; }
+.translator-helpful > p, .translator-helpful-notice { font-size: .875rem; }
+.translator-helpful-status:empty { display: none; }
+@media (max-width: 360px) { .translator-helpful > ul > li { grid-template-columns: minmax(0, 1fr); } .translator-helpful .translator-helpful-remove { justify-self: start; } }

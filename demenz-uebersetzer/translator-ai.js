@@ -1,6 +1,7 @@
 // KI-Antwort für Sätze, die der Übersetzer nicht kennt.
 // Wird nur für Sätze aufgerufen, die die feste Liste nicht kennt (automatisch, Hinweis unter dem Feld). Gesendet wird
-// nur der eingegebene Satz (höchstens 200 Zeichen) und ob du oder Sie – ohne Cookies, ohne Kennung.
+// der eingegebene Satz (höchstens 200 Zeichen) und Sprache/Anrede. Bei aktiviertem
+// Web-Zugang prüft der Server zusätzlich das Firebase-Konto und das Antwortkontingent.
 // Teilen schickt allein die bereinigte Fassung der KI (mit Sprachkürzel außer Deutsch) zurück.
 // Der Server (Demenz Coach, Firebase) prüft Notfälle, fragt OpenAI ohne
 // Speicherung (store: false) und gibt nur geprüfte, kurze Antworten zurück.
@@ -9,7 +10,8 @@
   // Englische Seiten (<html lang="en">) bitten um eine englische Antwort. Deutsch schickt kein Sprachfeld.
   const language = typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'en' : '';
 
-  const ask = async (text, { formal = false } = {}) => {
+  const ask = async (text, { formal = false, correctionOf = "", requestID = "" } = {}) => {
+    if (!requestID && root.DemenzKiFreigabe?.enabled()) requestID = root.crypto.randomUUID();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
@@ -18,14 +20,18 @@
         mode: 'cors',
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}) },
         body: JSON.stringify(language === 'en'
           ? { text: String(text).trim().slice(0, 200), formal: false, language: 'en' }
           : { text: String(text).trim().slice(0, 200), formal: formal === true }),
         signal: controller.signal
       });
       if (response.status === 429) return { kind: 'error', reason: 'busy' };
-      if (!response.ok) return { kind: 'error', reason: 'unavailable' };
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        if ([401, 402, 409, 410, 503].includes(response.status) && ['signup_required', 'payment_required', 'authentication_required', 'access_unavailable', 'request_in_progress', 'request_completed', 'correction_unavailable', 'answer_recovery_credit', 'answer_unavailable'].includes(error.code)) return { kind: 'access', reason: error.code, access: error.access };
+        return { kind: 'error', reason: 'unavailable' };
+      }
       const result = await response.json();
       const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
       const invalid = () => ({ kind: 'error', reason: 'unavailable', safetyLevel: result?.safetyLevel,

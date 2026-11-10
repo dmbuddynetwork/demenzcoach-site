@@ -230,15 +230,18 @@ body.einfach ul, body.einfach ol { padding-left: 1.3em; }
 body.einfach :is(.e-moments, .e-checks, .translator-phrases) { padding-left: 0; }
 
 /* ---------- Einwilligungs-Banner (aus site.js / lovable-home.js) ---------- */
-body.einfach .consent-banner { position: fixed; z-index: 50; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 12px; max-width: 720px; margin: 0 auto; padding: 16px; background: var(--e-card); color: var(--e-text); border: 1px solid var(--e-line); border-radius: var(--e-radius); box-shadow: 0 8px 32px rgba(28, 27, 31, .16); }
+body.einfach .consent-banner { position: fixed; z-index: 50; left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; max-width: 960px; max-height: calc(100dvh - 24px - env(safe-area-inset-bottom)); overflow: auto; margin: 0 auto; padding: 12px; background: var(--e-card); color: var(--e-text); border: 1px solid var(--e-line); border-radius: 12px; box-shadow: 0 3px 16px rgba(28, 27, 31, .07); }
 body.einfach .consent-banner[hidden] { display: none; }
-body.einfach .consent-copy p { margin: 4px 0 0; color: var(--e-muted); font-size: var(--e-small) !important; }
+body.einfach .consent-copy { min-width: 0; }
+body.einfach .consent-copy strong { font-size: 1rem !important; }
+body.einfach .consent-copy p { margin: 3px 0 0; color: var(--e-muted); font-size: var(--e-small) !important; }
 body.einfach .consent-copy p a { font-size: var(--e-small) !important; }
-body.einfach .consent-copy a { color: var(--e-purple); }
-body.einfach .consent-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-body.einfach .consent-button { min-height: 52px; padding: 8px 12px; border-radius: 14px; font-weight: 700 !important; cursor: pointer; }
+body.einfach .consent-copy a { color: var(--e-purple); font-weight: 600; text-decoration: none; }
+body.einfach .consent-banner .consent-actions { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5rem), 1fr)); gap: 8px; min-width: 0; background: var(--e-card); }
+body.einfach .consent-button { min-height: 48px; padding: 8px 12px; border-radius: 10px; font-size: 1rem !important; font-weight: 600 !important; overflow-wrap: anywhere; cursor: pointer; }
 /* Ablehnen und Erlauben gleich gestaltet (keine Wahl optisch bevorzugt). */
-body.einfach :is(.consent-decline, .consent-accept, .consent-save) { background: var(--e-purple); color: #fff; border: 0; }
+body.einfach :is(.consent-decline, .consent-accept, .consent-save) { background: var(--e-card); color: var(--e-purple); border: 1px solid var(--e-purple); }
+body.einfach .consent-button:hover { background: var(--e-lav); }
 body.einfach .consent-choices { display: grid; gap: 8px; }
 body.einfach .consent-choices[hidden] { display: none; }
 body.einfach .consent-choice { display: flex; align-items: center; gap: 12px; min-height: 48px; cursor: pointer; }
@@ -246,12 +249,15 @@ body.einfach .consent-choice input { width: 24px; height: 24px; flex: 0 0 auto; 
 body.einfach .consent-choose { min-height: 44px; padding: 4px 8px; background: none; border: 0; color: var(--e-muted); text-decoration: underline; cursor: pointer; font-size: var(--e-small) !important; }
 body.einfach .consent-settings { display: block; margin: 0 auto 24px; padding: 8px 12px; min-height: 44px; background: none; border: 0; color: var(--e-muted); text-decoration: underline; cursor: pointer; font-size: var(--e-small) !important; }
 body.einfach .consent-settings[hidden] { display: none; }
-@media (min-width: 720px) { body.einfach .consent-banner:not(:has(.consent-choose)) { flex-direction: row; align-items: center; } body.einfach .consent-actions { flex: 0 0 auto; } }
+@media (min-width: 900px) { body.einfach .consent-banner:not(:has(.consent-choose)) { flex-direction: row; align-items: center; } body.einfach .consent-copy { flex: 1; } body.einfach .consent-actions { flex: 0 0 auto; min-width: 224px; } }
 body.einfach .e-privacy > summary span { font-size: .875rem !important; }
 body.einfach .translator-retry { margin-block: 12px; padding: 20px !important; background: var(--e-card) !important; border: 1px solid var(--e-line) !important; border-radius: var(--e-radius) !important; }
 body.einfach .translator-result:not([hidden]) + :is(.e-moments-block, .e-tiles-block) .e-moments-title { margin-top: 32px; }
 body.einfach p.e-privacy, body.einfach p.e-privacy a { font-size: .875rem !important; color: var(--e-muted) !important; }
 body.einfach p.e-privacy { margin: 10px 0 0; }
+/* Hinweise am Übersetzer: als Links erkennbar, ohne dauerhaften Unterstrich. */
+body.einfach .translator-privacy.e-privacy a { color: var(--e-purple) !important; font-weight: 600; text-decoration: none; }
+body.einfach :is(.consent-copy, .translator-privacy.e-privacy) a::after { content: " ›"; }
 
 /* ---------- Runde 3 (Daniel, 8. Nov 09:32): Zeichnung in der Antwort, Sätze als Sprechblasen, rechte Spalte ---------- */
 body.einfach .translator-answer-art { display: block; width: auto; max-width: 64%; height: 180px; object-fit: contain; margin: 0 auto 16px; }
@@ -362,19 +368,19 @@ body.einfach .translator-call-link { color: inherit !important; font-weight: 700
 }
 
 /* ---------- Gehörter Satz als Sprechblase mit Zeichnung daneben (wie App-Store-Bilder, Daniel 8. Nov) ---------- */
-body.einfach .translator-said { display: flex; align-items: center; gap: 14px; margin: 0 0 20px; }
+body.einfach .translator-said { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; }
 body.einfach .translator-said-text { flex: 1 1 auto; min-width: 0; }
-body.einfach .translator-said-label { margin: 0 0 8px !important; color: var(--e-purple) !important; font-size: var(--e-small) !important; font-weight: 700 !important; }
-body.einfach :is(h1, h2).translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 16px 20px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
+body.einfach .translator-said-label { margin: 0 0 4px !important; color: var(--e-purple) !important; font-size: var(--e-small) !important; font-weight: 700 !important; }
+body.einfach :is(h1, h2).translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 10px 14px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
 body.einfach :is(h1, h2).translator-said-bubble::before { display: none !important; }
 body.einfach :is(h1, h2).translator-said-bubble::after { content: ""; position: absolute; left: 30px; bottom: -9px; width: 16px; height: 16px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
 body.einfach .translator-said-with-art :is(h1, h2).translator-said-bubble::after { left: auto; right: -9px; bottom: auto; top: calc(50% - 8px); border-bottom: 0; border-top: 1px solid var(--e-line); }
-body.einfach .translator-said-art { flex: 0 0 34%; max-width: 210px; width: 34%; height: auto; max-height: 210px; object-fit: contain; }
+body.einfach .translator-said-art { flex: 0 0 22%; max-width: 112px; width: 22%; height: auto; max-height: 112px; object-fit: contain; }
 @media (max-width: 480px) {
-  body.einfach :is(h1, h2).translator-said-bubble { padding: 14px 16px !important; font-size: 1.25rem !important; }
+  body.einfach :is(h1, h2).translator-said-bubble { padding: 10px 12px !important; font-size: 1.25rem !important; }
 }
 body.einfach .translator-answer .translator-goal-chosen { margin-bottom: 14px; }
-@media (min-width: 720px) { body.einfach :is(h1, h2).translator-said-bubble { font-size: 1.75rem !important; padding: 20px 26px !important; } }
+@media (min-width: 720px) { body.einfach :is(h1, h2).translator-said-bubble { font-size: 1.75rem !important; padding: 12px 16px !important; } }
 
 /* ---------- Alltagstrick in der Antwort und als Kacheln im Archiv (Daniel, 8. Nov) ---------- */
 body.einfach .translator-trick { display: flex; align-items: center; gap: 16px; margin: 14px 0 4px; padding: 16px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 18px; }
@@ -390,7 +396,7 @@ body.einfach .e-tiles .e-tiles-heading h2 { margin: 0 0 4px; }
 body.einfach .e-tiles .e-tiles-heading p { margin: 0; }
 body.einfach a.e-tile { text-decoration: none; }
 /* Gewähltes Ziel als positive Bestätigung mit Häkchen (Daniel, 8. Nov 16:51). */
-body.einfach .translator-answer .translator-goal-chosen { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 18px !important; padding: 10px 16px 10px 12px; background: #e7f4ea; color: #1d5e33 !important; border-radius: 999px; font-size: var(--e-small) !important; font-weight: 700; }
+body.einfach .translator-answer .translator-goal-chosen { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 10px !important; padding: 6px 10px; background: #e7f4ea; color: #1d5e33 !important; border-radius: 999px; font-size: var(--e-small) !important; font-weight: 700; }
 body.einfach .translator-answer .translator-goal-chosen::before {
   content: ""; flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: #2e7d4a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 16px no-repeat;
 }
@@ -407,7 +413,7 @@ body.einfach .translator-phrase:has(> .translator-save) > q { flex: 1 1 0 !impor
 body.einfach .translator-phrase { position: relative; overflow: visible !important; border-radius: 20px !important; }
 body.einfach .translator-phrase::before { content: none !important; display: none !important; }
 body.einfach .translator-phrase::after { content: ""; position: absolute; left: 26px; bottom: -8px; width: 14px; height: 14px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
-body.einfach .translator-phrases { gap: 18px !important; }
+body.einfach .translator-phrases { gap: 10px !important; }
 /* Mehr Platz für den Text (Daniel, 8. Nov 16:52): Trick-Bild auf dem Handy kleiner, Anrede mit Abstand zum Zipfel. */
 @media (max-width: 480px) {
   body.einfach .translator-trick { gap: 12px; padding: 14px; }
@@ -417,11 +423,11 @@ body.einfach .translator-phrases { gap: 18px !important; }
 body.einfach .translator-answer .translator-quick { margin-top: 18px; }
 /* Besser lesbar (Daniel, 8. Nov 16:52): klare dunkle Zwischenüberschriften in normaler Größe, mehr Luft statt Trennlinien, ruhigere Zeilenhöhe. */
 body.einfach .translator-result .translator-answer .translator-step { margin: 0 0 8px !important; color: var(--e-text) !important; font-size: 1.125rem !important; font-weight: 800 !important; }
-body.einfach .translator-answer .translator-step ~ .translator-step { margin-top: 32px !important; padding-top: 0 !important; border-top: 0 !important; }
+body.einfach .translator-answer .translator-step ~ .translator-step { margin-top: 20px !important; padding-top: 0 !important; border-top: 0 !important; }
 body.einfach .translator-answer :is(.translator-meaning, .translator-goal-list li) { line-height: 1.6 !important; }
 body.einfach .translator-answer .translator-meaning + .translator-meaning { margin-top: 10px !important; }
-/* Herz und Teilen rechts oben in der Sprechblase, untereinander (Daniel, 8. Nov 17:02: Satz an die Familie schicken). */
-body.einfach .translator-phrase-actions { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; margin: -8px -6px -8px auto; }
+/* Merken und Teilen teilen sich eine Zeile; beide Tippflächen bleiben44px groß. */
+body.einfach .translator-phrase-actions { display: flex; flex-direction: row; align-items: center; gap: 4px; flex: 0 0 auto; margin: 0 0 0 auto; }
 body.einfach .translator-phrase-actions:empty { display: none; }
 body.einfach .translator-phrase-actions .translator-save { margin: 0 !important; }
 body.einfach .translator-phrase-share { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: 0; padding: 0; background: transparent; border: 0; border-radius: 50%; color: var(--e-purple); cursor: pointer; }
@@ -538,6 +544,29 @@ body.einfach .translator-notes .safety-note.safety-quiet { margin: 0 !important;
 body.einfach .translator-notes .safety-quiet strong { display: block; margin-bottom: 4px; }
 body.einfach .translator-notes .translator-disclaimer { margin: 0; }
 body.einfach .translator-notes .safety-quiet + .translator-disclaimer { padding-top: 10px; border-top: 1px solid var(--e-line); }
+body.einfach .translator-notes .translator-disclaimer a { color: var(--e-purple); font-weight: 600; text-decoration: none; }
+body.einfach .translator-notes .translator-disclaimer a:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; border-radius: 2px; }
+/* Rückmeldung und genau ein vorhandenes Rückfrageformular, nach der vollständigen Hilfe. */
+body.einfach .translator-followup { margin: 24px 0; padding: 18px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: var(--e-radius); }
+body.einfach .translator-followup .translator-feedback { margin: 0 !important; padding: 0 0 14px; gap: 8px; align-items: center; flex-wrap: wrap; }
+body.einfach .translator-followup .translator-feedback > span { flex: 1 1 auto; min-width: 0; }
+body.einfach .translator-followup .translator-feedback .translator-copy { width: auto !important; min-height: 44px !important; padding: 8px 14px !important; }
+body.einfach .translator-followup .translator-form-below { margin: 0 !important; padding: 0 !important; background: transparent !important; border: 0 !important; box-shadow: none !important; }
+body.einfach .translator-followup-question > summary { display: flex; align-items: center; gap: 12px; min-height: 48px; color: var(--e-purple); font-weight: 700; cursor: pointer; list-style: none; }
+body.einfach .translator-followup-question > summary::-webkit-details-marker { display: none; }
+body.einfach .translator-followup-question > summary::after { content: "+"; flex: 0 0 auto; margin-left: auto; font-size: 1.5rem; }
+body.einfach .translator-followup-question[open] > summary::after { content: "−"; }
+body.einfach .translator-followup-question[open] > .translator-card { padding-top: 16px !important; }
+body.einfach .translator-followup-question > summary:focus-visible, body.einfach .translator-extra-offers > summary:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; border-radius: 4px; }
+body.einfach .translator-change-situation { margin: 24px 0 0 !important; }
+body.einfach .translator-change-situation > a { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; }
+body.einfach .translator-extra-offers { margin: 16px 0; padding-top: 12px; border-top: 1px solid var(--e-line); }
+body.einfach .translator-extra-offers > summary { min-height: 44px; padding: 8px 0; color: var(--e-purple); font-weight: 600; cursor: pointer; }
+body.einfach .translator-extra-offers > .translator-signup { margin-top: 12px; }
+body.einfach .translator-ai-answer, body.einfach .translator-ai-answer > * { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+  body.einfach .translator-followup .translator-feedback > span { flex-basis: 100%; }
+}
 body.einfach .translator-form-below { margin-top: 28px; }
 body.einfach .translator-form-below .translator-form-title { display: none; }
 body.einfach .translator-form-below-title { margin: 0 0 10px !important; font-weight: 800; }
@@ -616,3 +645,12 @@ body.einfach .tricks-sources, body.einfach .tricks-safety { overflow-wrap: anywh
 
 body.einfach .translator-plan-cta p { margin: 0 0 20px; }
 body.einfach .translator-plan-cta .button { white-space: normal; text-align: center; }
+
+/* Compact shared answer layout. Text sizes remain unchanged and grow with text zoom. */
+body.einfach.translator-has-result .e-hero { padding-top: 8px; padding-bottom: 8px; }
+body.einfach.translator-has-result .e-header .e-wrap { flex-wrap: wrap; gap: 8px 16px; }
+body.einfach.translator-has-result .e-brand { min-width: 0; overflow-wrap: anywhere; }
+body.einfach.translator-has-result .translator-result { margin-top: 12px; }
+body.einfach #translator-result .translator-phrase:has(> .translator-phrase-actions) { flex-wrap: wrap !important; align-items: center; gap: 4px 8px; padding: 8px 12px !important; }
+body.einfach #translator-result .translator-phrase:has(> .translator-phrase-actions) > q { flex: 1 1 calc(100% - 100px); min-width: min(100%, 10rem); overflow-wrap: anywhere; }
+body.einfach #translator-result .translator-scene-art { max-width: 180px; max-height: 140px; margin: .5rem auto .25rem; }

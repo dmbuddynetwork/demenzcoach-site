@@ -1,0 +1,851 @@
+{
+  "version": 1,
+  "language": "de",
+  "pages": [
+    {
+      "source": "demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+      "target": "de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+      "from": "/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+      "to": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+      "aliases": [
+        "/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+        "/demenz-uebersetzer/da-ist-jemand-im-zimmer"
+      ],
+      "visibleTextSha256": "d01e59765b9c9b28268bfb57dbcf95efd268880354c911866ba9e7cb74264f8c"
+    },
+    {
+      "source": "demenz-uebersetzer/das-essen-ist-vergiftet.html",
+      "target": "de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+      "from": "/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+      "to": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+      "aliases": [
+        "/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+        "/demenz-uebersetzer/das-essen-ist-vergiftet"
+      ],
+      "visibleTextSha256": "e06293b00c00de9e98447c799a208241912e7b09de42b5af1b65ae3f0930f03a"
+    },
+    {
+      "source": "demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+      "target": "de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+      "from": "/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+      "to": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+      "aliases": [
+        "/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+        "/demenz-uebersetzer/die-nachbarn-reden-ueber-mich"
+      ],
+      "visibleTextSha256": "ee650b0fc43c034f6f109b21e8c6d56a8e1fd22289fc6ef9cf30990061d26d84"
+    },
+    {
+      "source": "demenz-uebersetzer/du-hast-einen-anderen.html",
+      "target": "de/demenz-uebersetzer/du-hast-einen-anderen.html",
+      "from": "/demenz-uebersetzer/du-hast-einen-anderen.html",
+      "to": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+      "aliases": [
+        "/demenz-uebersetzer/du-hast-einen-anderen.html",
+        "/demenz-uebersetzer/du-hast-einen-anderen"
+      ],
+      "visibleTextSha256": "b157999e82330018caae2d5ca21f40a1cabe63a5da127a7da857c7089181fc1f"
+    },
+    {
+      "source": "demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+      "target": "de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+      "from": "/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+      "to": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+      "aliases": [
+        "/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+        "/demenz-uebersetzer/du-hast-mein-geld-gestohlen"
+      ],
+      "visibleTextSha256": "e84aebbb8a6995221000410803ad4387a68182783a81ab2f82b8255fb89a2109"
+    },
+    {
+      "source": "demenz-uebersetzer/du-luegst-mich-an.html",
+      "target": "de/demenz-uebersetzer/du-luegst-mich-an.html",
+      "from": "/demenz-uebersetzer/du-luegst-mich-an.html",
+      "to": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+      "aliases": [
+        "/demenz-uebersetzer/du-luegst-mich-an.html",
+        "/demenz-uebersetzer/du-luegst-mich-an"
+      ],
+      "visibleTextSha256": "5ecbc095c2c43b424c424f6ba8663e61b13b2391cb5b62b86dc7351c1fe81a49"
+    },
+    {
+      "source": "demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+      "target": "de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+      "from": "/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+      "to": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+      "aliases": [
+        "/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+        "/demenz-uebersetzer/es-wird-dunkel-ich-muss-los"
+      ],
+      "visibleTextSha256": "e59bc25f1efa8a1b2966fc8b66742f989add91c7bc802280c127e523c28b0693"
+    },
+    {
+      "source": "demenz-uebersetzer/gespraechstrainer.html",
+      "target": "de/demenz-uebersetzer/gespraechstrainer.html",
+      "from": "/demenz-uebersetzer/gespraechstrainer.html",
+      "to": "/de/demenz-uebersetzer/gespraechstrainer.html",
+      "aliases": [
+        "/demenz-uebersetzer/gespraechstrainer.html",
+        "/demenz-uebersetzer/gespraechstrainer"
+      ],
+      "visibleTextSha256": "27159cbc06e415ff01a71f8debd8e13d23ca296f8a5d160019f2536eb9c4f224"
+    },
+    {
+      "source": "demenz-uebersetzer/hilfe-hilfe-rufen.html",
+      "target": "de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+      "from": "/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+      "to": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+      "aliases": [
+        "/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+        "/demenz-uebersetzer/hilfe-hilfe-rufen"
+      ],
+      "visibleTextSha256": "d04f15ec088fc8851b707967175445d0e31154c6f80720875e21e6aafd9b1c0a"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+      "target": "de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+      "from": "/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+      "to": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+        "/demenz-uebersetzer/ich-bin-doch-kein-kind"
+      ],
+      "visibleTextSha256": "b52ea2251311436276422bdaa8a5ee904046f3675324fccb64e846ccd0c265a8"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+      "target": "de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+      "from": "/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+      "to": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+        "/demenz-uebersetzer/ich-bin-doch-nicht-dement"
+      ],
+      "visibleTextSha256": "72ec764e67ab54c85d121e60fc6fd886697796baa97c27858b5a378543a6f585"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+      "target": "de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+      "from": "/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+      "to": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+        "/demenz-uebersetzer/ich-bin-hier-eingesperrt"
+      ],
+      "visibleTextSha256": "d76bcfdb9106ce3ef9031d8116c2240ec7296a5cd89463bd9d84d9ebec88de0b"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+      "target": "de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+      "from": "/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+      "to": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+        "/demenz-uebersetzer/ich-bleibe-heute-im-bett"
+      ],
+      "visibleTextSha256": "fff8f208b650c4a4f7773bd91b9fa20a3bfe611cd39fdfe54dc5ea803d1f5d39"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+      "target": "de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+      "from": "/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+      "to": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+        "/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege"
+      ],
+      "visibleTextSha256": "8e7bdddedd4d19ba667b8a57e5397db85ce1f3be7ef63cb680dc69c3c10d9d4e"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+      "target": "de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+      "from": "/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+      "to": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+        "/demenz-uebersetzer/ich-habe-noch-nichts-gegessen"
+      ],
+      "visibleTextSha256": "df70e578f7923eabeb7edf24ad6a0e5eb6f4048c26043f87409450bc946d29bd"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-habe-schon-gegessen.html",
+      "target": "de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+      "from": "/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+      "to": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+        "/demenz-uebersetzer/ich-habe-schon-gegessen"
+      ],
+      "visibleTextSha256": "b5785947ea7d6395fd48faa33e2e0f326c144dbbbc6db05e55fcabd5ce9a611b"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+      "target": "de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+      "from": "/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+      "to": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+        "/demenz-uebersetzer/ich-kann-gar-nichts-mehr"
+      ],
+      "visibleTextSha256": "ae2e3d7033c10b1cd9525884f9731ca4f7b7e2827d0dd240d4645509409b80f9"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+      "target": "de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+      "from": "/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+      "to": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+        "/demenz-uebersetzer/ich-muss-aufstehen-nachts"
+      ],
+      "visibleTextSha256": "2075265390ca07a1f2ed29a892a1986b12d8066e0c6b5e9d8ca5036d491c506b"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+      "target": "de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+      "from": "/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+      "to": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+        "/demenz-uebersetzer/ich-muss-jemanden-anrufen"
+      ],
+      "visibleTextSha256": "3669e0fb6592ef429d77abb40b1e96de958681fb501842d161e97f9adc31813a"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+      "target": "de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+      "from": "/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+      "to": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+        "/demenz-uebersetzer/ich-muss-nicht-aufs-klo"
+      ],
+      "visibleTextSha256": "7fafa53c3b80789291317ed9b09bdd7f16d560e6c133e4e0651ef9e337c42e17"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+      "target": "de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+      "from": "/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+      "to": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+        "/demenz-uebersetzer/ich-muss-noch-einkaufen"
+      ],
+      "visibleTextSha256": "dc1735f18d24c0b669579239f62de53b1034d8d38a6c9a428d130a8bae32af2a"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-muss-zur-arbeit.html",
+      "target": "de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+      "from": "/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+      "to": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+        "/demenz-uebersetzer/ich-muss-zur-arbeit"
+      ],
+      "visibleTextSha256": "282bcc7fa6d65c80398f814a24c233f1dab8ded0e6f0ec22db31db907c6a0784"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+      "target": "de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+      "from": "/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+      "to": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+        "/demenz-uebersetzer/ich-nehme-keine-tabletten"
+      ],
+      "visibleTextSha256": "449c1c63836357cbd262f623c7427ba4395ae9c054e82670c5b86179ea289357"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-will-auto-fahren.html",
+      "target": "de/demenz-uebersetzer/ich-will-auto-fahren.html",
+      "from": "/demenz-uebersetzer/ich-will-auto-fahren.html",
+      "to": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-will-auto-fahren.html",
+        "/demenz-uebersetzer/ich-will-auto-fahren"
+      ],
+      "visibleTextSha256": "b8844c71d871c0a7f72157ba34df3243c042ccc752d71ef1f17bbb3e016c42c2"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-will-das-ausziehen.html",
+      "target": "de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+      "from": "/demenz-uebersetzer/ich-will-das-ausziehen.html",
+      "to": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-will-das-ausziehen.html",
+        "/demenz-uebersetzer/ich-will-das-ausziehen"
+      ],
+      "visibleTextSha256": "76739592fb0f150ea3fadcea81d700a6a2b4706953d5359f96025e4b560072b8"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-will-nicht-duschen.html",
+      "target": "de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+      "from": "/demenz-uebersetzer/ich-will-nicht-duschen.html",
+      "to": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-will-nicht-duschen.html",
+        "/demenz-uebersetzer/ich-will-nicht-duschen"
+      ],
+      "visibleTextSha256": "09cfb10e5c3605555d64afd67f9396eb0d097cee02375c9a83ad9785a40bf402"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+      "target": "de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+      "from": "/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+      "to": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+        "/demenz-uebersetzer/ich-will-nicht-ins-bett"
+      ],
+      "visibleTextSha256": "f7b86d6d4b03aeca289fe83b6a3153bd7d38f1e0c6d582fb98e04d05a09eed7a"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+      "target": "de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+      "from": "/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+      "to": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+        "/demenz-uebersetzer/ich-will-nicht-ins-heim"
+      ],
+      "visibleTextSha256": "25ccf2658e7a3b46df53dfb4ebe87536f56c5ea3d0436ac8e4bd9498c1a26bee"
+    },
+    {
+      "source": "demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+      "target": "de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+      "from": "/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+      "to": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+      "aliases": [
+        "/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+        "/demenz-uebersetzer/ich-ziehe-mich-nicht-um"
+      ],
+      "visibleTextSha256": "f3c36824ff55f2fa67a7b3aae6a32b85495e2e852fdec07b5cfa031ae8e43062",
+      "contentSourceRevision": "b7a3076403ad2c29f91ca1ef9c0edd6d607966cf"
+    },
+    {
+      "source": "demenz-uebersetzer/index.html",
+      "target": "de/demenz-uebersetzer/index.html",
+      "from": "/demenz-uebersetzer/",
+      "to": "/de/demenz-uebersetzer/",
+      "aliases": [
+        "/demenz-uebersetzer/",
+        "/demenz-uebersetzer",
+        "/demenz-uebersetzer/index.html"
+      ],
+      "visibleTextSha256": "e1b3f1dea0892e26264a0b69d1517143af5cdc79186d87d9cabbffafca92a37a"
+    },
+    {
+      "source": "demenz-uebersetzer/lass-mich-in-ruhe.html",
+      "target": "de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+      "from": "/demenz-uebersetzer/lass-mich-in-ruhe.html",
+      "to": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+      "aliases": [
+        "/demenz-uebersetzer/lass-mich-in-ruhe.html",
+        "/demenz-uebersetzer/lass-mich-in-ruhe"
+      ],
+      "visibleTextSha256": "9b7741fea96c082e01669c773a68d6c49fbc9f5f74e51dd460da2f707b84cecc"
+    },
+    {
+      "source": "demenz-uebersetzer/lass-mich-nicht-allein.html",
+      "target": "de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+      "from": "/demenz-uebersetzer/lass-mich-nicht-allein.html",
+      "to": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+      "aliases": [
+        "/demenz-uebersetzer/lass-mich-nicht-allein.html",
+        "/demenz-uebersetzer/lass-mich-nicht-allein"
+      ],
+      "visibleTextSha256": "04834d786ff2867cef69de37a766e97a6ade07cbef26797a1c1c23acb213e203"
+    },
+    {
+      "source": "demenz-uebersetzer/mir-ist-langweilig.html",
+      "target": "de/demenz-uebersetzer/mir-ist-langweilig.html",
+      "from": "/demenz-uebersetzer/mir-ist-langweilig.html",
+      "to": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+      "aliases": [
+        "/demenz-uebersetzer/mir-ist-langweilig.html",
+        "/demenz-uebersetzer/mir-ist-langweilig"
+      ],
+      "visibleTextSha256": "658833bacfc1e59a9734e944b913ed31d2b4048eb74043e28e99009f2cd3b7ae"
+    },
+    {
+      "source": "demenz-uebersetzer/mir-ist-so-kalt.html",
+      "target": "de/demenz-uebersetzer/mir-ist-so-kalt.html",
+      "from": "/demenz-uebersetzer/mir-ist-so-kalt.html",
+      "to": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+      "aliases": [
+        "/demenz-uebersetzer/mir-ist-so-kalt.html",
+        "/demenz-uebersetzer/mir-ist-so-kalt"
+      ],
+      "visibleTextSha256": "9e8a0b466d6f6bfa6f14c9f3435db3dca3b03bd80ec502389a3fb3f3e5bace2c"
+    },
+    {
+      "source": "demenz-uebersetzer/wann-gehen-wir.html",
+      "target": "de/demenz-uebersetzer/wann-gehen-wir.html",
+      "from": "/demenz-uebersetzer/wann-gehen-wir.html",
+      "to": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+      "aliases": [
+        "/demenz-uebersetzer/wann-gehen-wir.html",
+        "/demenz-uebersetzer/wann-gehen-wir"
+      ],
+      "visibleTextSha256": "602d915e3d7e7a191691c7fbe7b2f46d36a97a61e6426246192081d86724c71d",
+      "contentSourceRevision": "b7a3076403ad2c29f91ca1ef9c0edd6d607966cf"
+    },
+    {
+      "source": "demenz-uebersetzer/wann-kommt-mein-sohn.html",
+      "target": "de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+      "from": "/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+      "to": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+      "aliases": [
+        "/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+        "/demenz-uebersetzer/wann-kommt-mein-sohn"
+      ],
+      "visibleTextSha256": "010dcae9ab1a9c72e2888ef498adcda5005ee61086b27b6ab6b89e52ecb6e491"
+    },
+    {
+      "source": "demenz-uebersetzer/wer-sind-sie.html",
+      "target": "de/demenz-uebersetzer/wer-sind-sie.html",
+      "from": "/demenz-uebersetzer/wer-sind-sie.html",
+      "to": "/de/demenz-uebersetzer/wer-sind-sie.html",
+      "aliases": [
+        "/demenz-uebersetzer/wer-sind-sie.html",
+        "/demenz-uebersetzer/wer-sind-sie"
+      ],
+      "visibleTextSha256": "7f2a44ef2f4235c1e7c5d2a4aa6dbe808f63758bea29189e89b61110ff3c8513"
+    },
+    {
+      "source": "demenz-uebersetzer/wo-bin-ich.html",
+      "target": "de/demenz-uebersetzer/wo-bin-ich.html",
+      "from": "/demenz-uebersetzer/wo-bin-ich.html",
+      "to": "/de/demenz-uebersetzer/wo-bin-ich.html",
+      "aliases": [
+        "/demenz-uebersetzer/wo-bin-ich.html",
+        "/demenz-uebersetzer/wo-bin-ich"
+      ],
+      "visibleTextSha256": "93c537b3b42fe99f2abd976646592a71294ed6b13728c1642f97df3f1d81d25b",
+      "contentSourceRevision": "b7a3076403ad2c29f91ca1ef9c0edd6d607966cf"
+    },
+    {
+      "source": "demenz-uebersetzer/wo-ist-mein-hund.html",
+      "target": "de/demenz-uebersetzer/wo-ist-mein-hund.html",
+      "from": "/demenz-uebersetzer/wo-ist-mein-hund.html",
+      "to": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+      "aliases": [
+        "/demenz-uebersetzer/wo-ist-mein-hund.html",
+        "/demenz-uebersetzer/wo-ist-mein-hund"
+      ],
+      "visibleTextSha256": "39a312a104d61ed6f739ae9c21b1da3bcb38363e1c1a6125fa5e30db04667f59"
+    },
+    {
+      "source": "demenz-uebersetzer/wo-ist-mein-mann.html",
+      "target": "de/demenz-uebersetzer/wo-ist-mein-mann.html",
+      "from": "/demenz-uebersetzer/wo-ist-mein-mann.html",
+      "to": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+      "aliases": [
+        "/demenz-uebersetzer/wo-ist-mein-mann.html",
+        "/demenz-uebersetzer/wo-ist-mein-mann"
+      ],
+      "visibleTextSha256": "962e276b1fd5aa815e60249749d0a0299ced9b72ddd72fc0581853e85b2e7f0d"
+    },
+    {
+      "source": "demenz-uebersetzer/wo-ist-meine-mutter.html",
+      "target": "de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+      "from": "/demenz-uebersetzer/wo-ist-meine-mutter.html",
+      "to": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+      "aliases": [
+        "/demenz-uebersetzer/wo-ist-meine-mutter.html",
+        "/demenz-uebersetzer/wo-ist-meine-mutter"
+      ],
+      "visibleTextSha256": "329c6af4fe530bf337b8b2a4eedca91c74bb24926e3a2ff8249c18599cf711c9"
+    },
+    {
+      "source": "demenz-uebersetzer/wo-sind-meine-kinder.html",
+      "target": "de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+      "from": "/demenz-uebersetzer/wo-sind-meine-kinder.html",
+      "to": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+      "aliases": [
+        "/demenz-uebersetzer/wo-sind-meine-kinder.html",
+        "/demenz-uebersetzer/wo-sind-meine-kinder"
+      ],
+      "visibleTextSha256": "5bd68186465dee860a4859bbd9fceb1a0792a19a5291607a5bf6ccaa91e6d35a"
+    },
+    {
+      "source": "ratgeber/demenz-diebstahlvorwuerfe.html",
+      "target": "de/ratgeber/demenz-diebstahlvorwuerfe.html",
+      "from": "/ratgeber/demenz-diebstahlvorwuerfe.html",
+      "to": "/de/ratgeber/demenz-diebstahlvorwuerfe.html",
+      "aliases": [
+        "/ratgeber/demenz-diebstahlvorwuerfe.html",
+        "/ratgeber/demenz-diebstahlvorwuerfe"
+      ],
+      "visibleTextSha256": "280b5d940c9612b50fd1f5d0a5779f1d40a13a0d04ae6f335afd894e7a041248"
+    },
+    {
+      "source": "ratgeber/demenz-fragt-nach-verstorbener-mutter.html",
+      "target": "de/ratgeber/demenz-fragt-nach-verstorbener-mutter.html",
+      "from": "/ratgeber/demenz-fragt-nach-verstorbener-mutter.html",
+      "to": "/de/ratgeber/demenz-fragt-nach-verstorbener-mutter.html",
+      "aliases": [
+        "/ratgeber/demenz-fragt-nach-verstorbener-mutter.html",
+        "/ratgeber/demenz-fragt-nach-verstorbener-mutter"
+      ],
+      "visibleTextSha256": "d2d5049b4f2f12b392a272e5e60f290da9223d288b3f12ee6dcb434e04a7df1b"
+    },
+    {
+      "source": "ratgeber/demenz-immer-dieselbe-frage.html",
+      "target": "de/ratgeber/demenz-immer-dieselbe-frage.html",
+      "from": "/ratgeber/demenz-immer-dieselbe-frage.html",
+      "to": "/de/ratgeber/demenz-immer-dieselbe-frage.html",
+      "aliases": [
+        "/ratgeber/demenz-immer-dieselbe-frage.html",
+        "/ratgeber/demenz-immer-dieselbe-frage"
+      ],
+      "visibleTextSha256": "f262c44fe179ed7c520e095cbe357d05293e8e9af7992d0c18b93f1fe2d3ee0b"
+    },
+    {
+      "source": "ratgeber/demenz-kommunikation.html",
+      "target": "de/ratgeber/demenz-kommunikation.html",
+      "from": "/ratgeber/demenz-kommunikation.html",
+      "to": "/de/ratgeber/demenz-kommunikation.html",
+      "aliases": [
+        "/ratgeber/demenz-kommunikation.html",
+        "/ratgeber/demenz-kommunikation"
+      ],
+      "visibleTextSha256": "1e7637fe892b7b73a4e32a687cef30cb7f956c41d7010763751bc9f5409aca37"
+    },
+    {
+      "source": "ratgeber/demenz-nach-hause-was-sagen.html",
+      "target": "de/ratgeber/demenz-nach-hause-was-sagen.html",
+      "from": "/ratgeber/demenz-nach-hause-was-sagen.html",
+      "to": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+      "aliases": [
+        "/ratgeber/demenz-nach-hause-was-sagen.html",
+        "/ratgeber/demenz-nach-hause-was-sagen"
+      ],
+      "visibleTextSha256": "831f45e57028862f8505cd7745d6f33e76298586bed8924c42ed0bb316375b76"
+    },
+    {
+      "source": "ratgeber/demenz-nachts-zur-arbeit.html",
+      "target": "de/ratgeber/demenz-nachts-zur-arbeit.html",
+      "from": "/ratgeber/demenz-nachts-zur-arbeit.html",
+      "to": "/de/ratgeber/demenz-nachts-zur-arbeit.html",
+      "aliases": [
+        "/ratgeber/demenz-nachts-zur-arbeit.html",
+        "/ratgeber/demenz-nachts-zur-arbeit"
+      ],
+      "visibleTextSha256": "005bf9d45511ed4145df64d98e184c0d594a3901b9b868e4b6d3171cefa012b6"
+    },
+    {
+      "source": "ratgeber/demenz-will-sich-nicht-waschen.html",
+      "target": "de/ratgeber/demenz-will-sich-nicht-waschen.html",
+      "from": "/ratgeber/demenz-will-sich-nicht-waschen.html",
+      "to": "/de/ratgeber/demenz-will-sich-nicht-waschen.html",
+      "aliases": [
+        "/ratgeber/demenz-will-sich-nicht-waschen.html",
+        "/ratgeber/demenz-will-sich-nicht-waschen"
+      ],
+      "visibleTextSha256": "4e3fe237684791c3598c7214aa55e92560e32303e7183c6ed3c195f3540b17da"
+    },
+    {
+      "source": "ratgeber/index.html",
+      "target": "de/ratgeber/index.html",
+      "from": "/ratgeber/",
+      "to": "/de/ratgeber/",
+      "aliases": [
+        "/ratgeber/",
+        "/ratgeber",
+        "/ratgeber/index.html"
+      ],
+      "visibleTextSha256": "21474debd1601706751f4703099d9f25546f4c7bf96f35ebd21bdc6d7ef222b7"
+    },
+    {
+      "source": "ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "target": "de/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "from": "/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "to": "/de/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "aliases": [
+        "/ratgeber/pflegende-angehoerige-ueberfordert.html",
+        "/ratgeber/pflegende-angehoerige-ueberfordert"
+      ],
+      "visibleTextSha256": "b6bbb077cde61acc0286667224cce593a3c4d107954d671c5420e596be5b2ce6"
+    },
+    {
+      "source": "ratgeber/redaktion.html",
+      "target": "de/ratgeber/redaktion.html",
+      "from": "/ratgeber/redaktion.html",
+      "to": "/de/ratgeber/redaktion.html",
+      "aliases": [
+        "/ratgeber/redaktion.html",
+        "/ratgeber/redaktion"
+      ],
+      "visibleTextSha256": "84c89317796a896e90b285c37ac08e128278b92e19ff36986038e6510baf4377"
+    }
+  ],
+  "situations": {
+    "mutter": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+    "arbeit": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+    "geld": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+    "wer": "/de/demenz-uebersetzer/wer-sind-sie.html",
+    "hunger": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+    "waschen": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+    "ruhe": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+    "jemand": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+    "krank": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+    "dumm": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+    "uhrzeit": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+    "heim": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+    "hilfe": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+    "auto": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+    "tabletten": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+    "luegen": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+    "eingesperrt": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+    "aufstehen": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+    "kinder": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+    "langweilig": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+    "wobin": "/de/demenz-uebersetzer/wo-bin-ich.html",
+    "vergiftet": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+    "bett": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+    "einkaufen": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+    "nachbarn": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+    "haustier": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+    "kalt": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+    "besuch": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+    "anrufen": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+    "partner": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+    "allein": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+    "schongegessen": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+    "toilette": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+    "umziehen": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+    "ausziehen": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+    "liegen": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+    "abend": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+    "untreue": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+    "kind": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+    "tagespflege": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+    "nachhause": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+    "sterben": "/de/demenz-uebersetzer/#satz-sterben",
+    "erschoepft": "/de/ratgeber/pflegende-angehoerige-ueberfordert.html",
+    "betrug": "/de/demenz-uebersetzer/#satz-betrug",
+    "pflegesorge": "/de/demenz-uebersetzer/#satz-pflegesorge"
+  },
+  "sourceRevision": "bc8754738cd096c93c3db85a495039327ee33415",
+  "query": {
+    "enums": {
+      "ziel": [
+        "jetzt",
+        "verstehen",
+        "tipps"
+      ],
+      "teller": [
+        "website",
+        "funnel"
+      ]
+    },
+    "tokenKeys": [
+      "src",
+      "utm_source",
+      "utm_medium",
+      "utm_campaign",
+      "utm_content",
+      "utm_term",
+      "ct"
+    ],
+    "tokenPattern": "^[a-z0-9_-]{1,80}$"
+  },
+  "hreflangSources": [
+    {
+      "file": "en/dementia-translator/im-not-taking-those-pills.html",
+      "unchangedExceptAlternateHrefsSha256": "0c2c6e1e7a276c1b78671b33e380e4ec6159483ce71987e04ac35dc001278433"
+    },
+    {
+      "file": "en/dementia-translator/where-is-my-husband.html",
+      "unchangedExceptAlternateHrefsSha256": "7bee83441179392b3ce1e1bdd27a3124985e4e0e00c2537513e9545e2d1aa562"
+    },
+    {
+      "file": "en/dementia-translator/someone-stole-my-purse.html",
+      "unchangedExceptAlternateHrefsSha256": "f159b2e9905da8474b601e719605c06cf21bcdf14462d0dfc8812288fb6adba8"
+    },
+    {
+      "file": "en/dementia-translator/when-is-my-son-coming.html",
+      "unchangedExceptAlternateHrefsSha256": "b18abcbc58131af1b96bead95e86ddf7abcaa00e13a0bd1dbf83885517220d9b"
+    },
+    {
+      "file": "en/dementia-translator/i-havent-eaten-all-day.html",
+      "unchangedExceptAlternateHrefsSha256": "8834b54bc8e81fc2497fd49c73bba2b047430a5e250e7fa0b4edeb39d58aec12"
+    },
+    {
+      "file": "en/dementia-translator/where-am-i.html",
+      "unchangedExceptAlternateHrefsSha256": "a65ab97f53f95d9296a5c041b5a5d12e2f998db6592a85c0ac1305fa41b4c7db"
+    },
+    {
+      "file": "en/dementia-translator/i-can-still-drive.html",
+      "unchangedExceptAlternateHrefsSha256": "fee6ff952771041d9b20910dbf006fdadcf46ce915159afeb39f2c13e6213117"
+    },
+    {
+      "file": "en/dementia-translator/im-so-bored.html",
+      "unchangedExceptAlternateHrefsSha256": "264f1c2b19378d95070fdb37cb9b3220b356e2de7bf0f3da9ca8fdecbe07af59"
+    },
+    {
+      "file": "en/dementia-translator/index.html",
+      "unchangedExceptAlternateHrefsSha256": "9dbf71c776b89aa072bfc044e5eda6f57c1d4b3e24660d327d73b48586e45aae"
+    },
+    {
+      "file": "en/dementia-translator/the-neighbors-are-talking-about-me.html",
+      "unchangedExceptAlternateHrefsSha256": "85d1740c80fe5f696b9df288842ffb42fb1a3b995e092ec1138b9a8e2df292a8"
+    },
+    {
+      "file": "en/dementia-translator/ive-already-eaten.html",
+      "unchangedExceptAlternateHrefsSha256": "b317eb53af6550c73e004f6a2225251b06a1a721ecb026b99bda28ab80b059e0"
+    },
+    {
+      "file": "en/dementia-translator/where-is-my-mother.html",
+      "unchangedExceptAlternateHrefsSha256": "89fb6d028c963eefa97b664b71fcf014fb2fa705f88335a2112bd325d10efcb6"
+    },
+    {
+      "file": "en/dementia-translator/im-not-going-to-day-care.html",
+      "unchangedExceptAlternateHrefsSha256": "e1cb3af5c3bc3ef3a170861bc63719b421efb30ad3b91615b96c0e7ea03b2766"
+    },
+    {
+      "file": "en/dementia-translator/i-dont-want-to-go-to-bed.html",
+      "unchangedExceptAlternateHrefsSha256": "303d278a60f5c33be33e514327bff1a658e04b91616d292c4277efc57cf301bf"
+    },
+    {
+      "file": "en/dementia-translator/im-not-changing-my-clothes.html",
+      "unchangedExceptAlternateHrefsSha256": "cf497b6592840cf7e3bf081a1393a3c45cfd40328420bfd1b752b2843ef72959"
+    },
+    {
+      "file": "en/dementia-translator/i-dont-need-the-bathroom.html",
+      "unchangedExceptAlternateHrefsSha256": "53c1aad5058e55e547f187a5925d50de5e0270a56552efb22a465858f7ad7528"
+    },
+    {
+      "file": "en/dementia-translator/help-help.html",
+      "unchangedExceptAlternateHrefsSha256": "d67032a2afde44f5f51fa14f330440a6b7c38f88eb9aba4616ee89ce2ced3b3a"
+    },
+    {
+      "file": "en/dementia-translator/who-are-you.html",
+      "unchangedExceptAlternateHrefsSha256": "921cfbf6c447855136210d88dd9ce13b9b3afd05a19e4effd5f7eba1ed8c0705"
+    },
+    {
+      "file": "en/dementia-translator/the-food-is-poisoned.html",
+      "unchangedExceptAlternateHrefsSha256": "1bf5ed4d4b93b256c9a1a81104c00ab7ab2ac373b96c404905abf76413c1a9a3"
+    },
+    {
+      "file": "en/dementia-translator/theres-someone-in-the-room.html",
+      "unchangedExceptAlternateHrefsSha256": "7447a3a2ce7bbb6baf6d540cb97dc46155aa9d1171c40ab912df1dd128a3bc5b"
+    },
+    {
+      "file": "en/dementia-translator/youre-seeing-someone-else.html",
+      "unchangedExceptAlternateHrefsSha256": "000498463ca1c1da10cc612e07644bd534e21f1815b22b2f1ba438fd14454ebc"
+    },
+    {
+      "file": "en/dementia-translator/its-getting-dark-i-have-to-go.html",
+      "unchangedExceptAlternateHrefsSha256": "789a8b3c89c06c1e4ab372b69646cb89f9f7407321baa542357ab32ad0b7bd5e"
+    },
+    {
+      "file": "en/dementia-translator/i-have-to-call-someone.html",
+      "unchangedExceptAlternateHrefsSha256": "c4fc83a7a707b717a528f043a7a3817bb2abbe57e9b8dfe40e0bd56e1d1c3b46"
+    },
+    {
+      "file": "en/dementia-translator/i-want-to-take-this-off.html",
+      "unchangedExceptAlternateHrefsSha256": "423f104017512a3b3ae4b62a9a326a3c92767d5913501f59bafb3df1d6ba93df"
+    },
+    {
+      "file": "en/dementia-translator/i-have-to-go-to-work.html",
+      "unchangedExceptAlternateHrefsSha256": "b8dc19b2ffe7b47c2e74f81a876bfdcd223dbebd9d452180dcae94a39f173f09"
+    },
+    {
+      "file": "en/dementia-translator/youre-lying-to-me.html",
+      "unchangedExceptAlternateHrefsSha256": "38838e0252c15aaeb9f97847cedd469e5c3e12716ed1f4fcceefac8eb21b3717"
+    },
+    {
+      "file": "en/dementia-translator/i-cant-do-anything-anymore.html",
+      "unchangedExceptAlternateHrefsSha256": "b9ad51f11d52ca6198944cdc0a8b7b356b56cb7ead47b088bb33665fc3549776"
+    },
+    {
+      "file": "en/dementia-translator/im-not-going-into-a-home.html",
+      "unchangedExceptAlternateHrefsSha256": "ef934f1d349b41defa3476734a01badeb9e0bbf03fbe423390bb018548780732"
+    },
+    {
+      "file": "en/dementia-translator/i-have-to-go-shopping.html",
+      "unchangedExceptAlternateHrefsSha256": "49c8abb6bde693a0e4314c222fbe9880f3956df53386c943bb3b80b07dea6c9a"
+    },
+    {
+      "file": "en/dementia-translator/dont-leave-me.html",
+      "unchangedExceptAlternateHrefsSha256": "2572ba8f92a070c400fc1a66a91e556f15ca0aefc05bc772924baca792eeeca1"
+    },
+    {
+      "file": "en/dementia-translator/i-dont-want-a-shower.html",
+      "unchangedExceptAlternateHrefsSha256": "ad5dc273d8e4ea42b9f5ec8a61f55afa26360f4540efdcb9456cf24117edff90"
+    },
+    {
+      "file": "en/dementia-translator/i-have-to-get-up-now.html",
+      "unchangedExceptAlternateHrefsSha256": "92852633c33b52e3fcac3949e54d41fc8c8c39219bacea5007feca25bd3bdceb"
+    },
+    {
+      "file": "en/dementia-translator/im-staying-in-bed-today.html",
+      "unchangedExceptAlternateHrefsSha256": "a0076f84759b48c9cb3f1bb69b24c51b7676400af8cf5c783916d869a2a30317"
+    },
+    {
+      "file": "en/dementia-translator/where-is-my-dog.html",
+      "unchangedExceptAlternateHrefsSha256": "4332a26d7f55170e5ece7ee09a46a7930a428732afa588fef753c97de0cce140"
+    },
+    {
+      "file": "en/dementia-translator/theres-nothing-wrong-with-me.html",
+      "unchangedExceptAlternateHrefsSha256": "012e0618bc3e45acde9555ab112f7f487bb251fe0b4aa669c55c3dd188ee13f1"
+    },
+    {
+      "file": "en/dementia-translator/im-not-a-child.html",
+      "unchangedExceptAlternateHrefsSha256": "56ac7f31271d540eba91486e13e5caf754ce3ba8cabaf70c450f58ff358aeae2"
+    },
+    {
+      "file": "en/dementia-translator/when-are-we-leaving.html",
+      "unchangedExceptAlternateHrefsSha256": "ff14316268174d79f4a4392e0f96d14807a74102d25cbedf31a8bf63ddd41b80"
+    },
+    {
+      "file": "en/dementia-translator/im-so-cold.html",
+      "unchangedExceptAlternateHrefsSha256": "23d56e864cb5e20c683db3ebdc250c7e2715233272a297bf3065f12dd003b6c1"
+    },
+    {
+      "file": "en/dementia-translator/im-locked-in-here.html",
+      "unchangedExceptAlternateHrefsSha256": "3b25ed0c17e868b0c14545e2d0a35e0f57f8f3513857687b6b5929114a5d45c3"
+    },
+    {
+      "file": "en/dementia-translator/leave-me-alone.html",
+      "unchangedExceptAlternateHrefsSha256": "2400578f87f9dd8377e6618fd7cc8725f989b90700d73998e02abcbe67073267"
+    },
+    {
+      "file": "en/dementia-translator/where-are-my-children.html",
+      "unchangedExceptAlternateHrefsSha256": "d32a71aacdcdbd7d9b2ce19f47b6539ce7e610df0ee469f490a37efad719375a"
+    },
+    {
+      "file": "guides/index.html",
+      "unchangedExceptAlternateHrefsSha256": "3c36b457a50e03a37743ba96377e2f2a0026b12927f2d3cfbfd455f3c7812db6"
+    },
+    {
+      "file": "guides/redaktion.html",
+      "unchangedExceptAlternateHrefsSha256": "7a4719edce15f4d55c90255cf7ae7d2cc37356d06f8847ab2672b023c235fcfa"
+    },
+    {
+      "file": "guides/dementia-communication.html",
+      "unchangedExceptAlternateHrefsSha256": "5cad34aadf1c198748f7d80a1b6c9318085f15ba457d387b302541be6b436992"
+    },
+    {
+      "file": "guides/dementia-wants-to-go-home.html",
+      "unchangedExceptAlternateHrefsSha256": "efdf38a1d99a03d71a7d67c6ccf2ae3cd65af38d3299c0d2c56ceb9a1f1f9a04"
+    },
+    {
+      "file": "guides/dementia-caregiver-overwhelmed.html",
+      "unchangedExceptAlternateHrefsSha256": "ab7cdb9d14e77a3c88d24ffc71ccff51529a778912f9dc5f55f3375bc5a23a54"
+    }
+  ],
+  "approvedContentDeltas": [
+    {
+      "revision": "b7a3076403ad2c29f91ca1ef9c0edd6d607966cf",
+      "topics": [
+        "wobin",
+        "uhrzeit",
+        "umziehen"
+      ],
+      "scope": "Only approved phrase/formal/share/FAQ replacements; three visible canonical pages changed intentionally."
+    }
+  ]
+}

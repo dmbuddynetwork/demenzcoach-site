@@ -7,7 +7,7 @@
 const config = window.DEMENZ_ABO_CONFIG || {};
 const firebaseVersion = "12.16.0";
 const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
-const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long", year: "numeric" }).format(date);
+const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
 
 let firebase = null;
 let auth = null;
@@ -50,7 +50,7 @@ async function signedInUser() {
     auth.languageCode = "de";
     await new Promise((resolve) => { const stop = firebase.onAuthStateChanged(auth, () => { stop(); resolve(); }); });
   }
-  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Das Gast-Konto trägt den Kauf, die Nummer kommt auf der Danke-Seite dazu.
+  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Das Gast-Konto trägt den Kauf; eine bestätigte E-Mail wird anschließend mit derselben Nutzerkennung verknüpft.
   return auth.currentUser ?? (await firebase.signInAnonymously(auth)).user;
 }
 
@@ -66,21 +66,22 @@ function loadStripe() {
 }
 
 export function summaryText(plan, price, trialDays, firstYear = null) {
-  const priceText = `${euro(price.amount, price.currency)} pro ${plan === "yearly" ? "Jahr" : "Monat"}`;
+  const period = plan === "yearly" ? "Jahr" : "Monat";
+  const recurring = `${euro(price.amount, price.currency)}/${period}`;
   const deal = Number.isInteger(firstYear) ? euro(firstYear, price.currency) : null;
   if (trialDays > 0) {
     const start = new Date(Date.now() + trialDays * 86_400_000);
     return deal
-      ? `Heute 0,00 €. Ab ${dateText(start)} ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt. Kündigst du vorher, zahlst du nichts.`
-      : `Heute 0,00 €. Ab ${dateText(start)} ${priceText} inklusive MwSt. Kündigst du vorher, zahlst du nichts.`;
+      ? `Heute 0,00 €. Ab ${dateText(start)}: ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
+      : `Heute 0,00 €. Ab ${dateText(start)}: ${recurring}. Inkl. MwSt.`;
   }
   return deal
-    ? `Heute ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt.`
-    : `Heute ${priceText.replace(" pro ", " für 1 ")} inklusive MwSt. Danach ${priceText}.`;
+    ? `Heute ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
+    : `Heute ${euro(price.amount, price.currency)} für 1 ${period}, danach ${recurring}. Inkl. MwSt.`;
 }
 export const termsText = (plan) => (plan === "yearly"
-  ? "Laufzeit: 1 Jahr. Danach läuft das Abo unbefristet weiter und ist mit einer Frist von einem Monat kündbar."
-  : "Das Abo verlängert sich jeden Monat automatisch und ist jederzeit zum Monatsende kündbar.");
+  ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist."
+  : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.");
 
 function close() {
   if (!sheet) return;
@@ -95,35 +96,41 @@ export async function open(options) {
   close();
   const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
   const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
-  const summary = el("p", { text: "Einen Moment, die Kasse lädt …" });
+  const loading = el("p", { class: "kasse-loading", role: "status", text: "Zahlungsarten werden geladen …" });
+  const summary = el("p");
   const terms = el("p");
-  const short = el("p", { class: "kasse-short" });
+  const trialNote = el("p", { hidden: "" });
+  let loadingTimer = null;
+  const short = el("p", { class: "kasse-short", hidden: "" });
   const divider = el("p", { class: "abo-divider", text: "oder", hidden: "" });
   const express = el("div", { id: "kasse-express" });
   const payment = el("div", { id: "kasse-payment" });
   const payButton = el("button", { type: "button", class: "abo-button", disabled: "", text: "Zahlungspflichtig abonnieren" });
-  const emailLine = el("p", { class: "abo-muted", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
-  const title = el("h2", { id: "kasse-title", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
+  const emailLine = el("p", { class: "abo-checkout-email", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
+  const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
   const card = el("div", { class: "kasse-card" }, [
     el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": "Schließen", text: "×", onclick: () => close() })]),
     error,
-    el("div", { class: "abo-card abo-summary" }, [summary, terms,
-      el("p", { class: "abo-muted" }, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
+    loading, payment,
+    el("div", { class: "abo-summary", role: "group", "aria-label": "Preis und Laufzeit", hidden: "" }, [summary, terms]),
+    express, divider, short, payButton, emailLine,
+    el("div", { class: "abo-checkout-details" }, [trialNote, el("p", {}, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
         el("a", { href: "/abo/garantie.html", target: "_blank", text: "Geld-zurück-Garantie" }), ". Es gelten die ",
         el("a", { href: "/nutzungsbedingungen.html", target: "_blank", text: "Nutzungsbedingungen" }), ". ",
         el("a", { href: "/abo/widerruf.html", target: "_blank", text: "Widerrufsbelehrung" }), ". ",
-        el("a", { href: "/datenschutz.html", target: "_blank", text: "Datenschutz" }), "."])
-    ]),
-    express, divider, payment, emailLine, short, payButton
+        el("a", { href: "/datenschutz.html", target: "_blank", text: "Datenschutz" }), "."])])
   ]);
   const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title",
     onclick: (event) => { if (event.target === node) close(); } }, card);
   const onKey = (event) => { if (event.key === "Escape") close(); };
   document.addEventListener("keydown", onKey);
-  sheet = { node, onClose: () => { document.removeEventListener("keydown", onKey); options.onClose?.(); } };
+  sheet = { node, onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
   document.body.append(node);
   document.body.classList.add("start-noscroll");
-  payButton.focus();
+  title.focus();
+  loadingTimer = setTimeout(() => {
+    if (sheet?.node === node && !loading.hidden) loading.textContent = "Das Laden dauert länger. Du kannst die Kasse schließen und erneut öffnen.";
+  }, 15_000);
 
   let checkout = null;
   const confirm = async () => {
@@ -144,8 +151,8 @@ export async function open(options) {
   payButton.addEventListener("click", confirm);
 
   try {
-    publicConfig ??= await api("/config");
-    const user = await signedInUser();
+    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser(), loadStripe()]);
+    publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
     const session = await api("/session", {
       method: "POST",
@@ -159,22 +166,41 @@ export async function open(options) {
     summary.textContent = text;
     short.textContent = text;
     terms.textContent = termsText(options.plan);
-    await loadStripe();
+    trialNote.hidden = !(session.trialDays > 0);
+    trialNote.textContent = session.trialDays > 0 ? `${session.trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
+    summary.parentElement.hidden = false;
     const stripe = window.Stripe(publicConfig.publishableKey, { locale: "de" });
-    const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "18px", borderRadius: "12px" } };
+    const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" } };
     const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
-    checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance } });
+    checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
     if (!sheet || sheet.node !== node) return;
     const expressElement = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
     expressElement.on("availablepaymentmethodschange", ({ paymentMethods }) => { divider.hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean); });
     expressElement.on("confirm", () => confirm());
     expressElement.mount(express);
-    checkout.createPaymentElement({ layout: "tabs" }).mount(payment);
-    payButton.disabled = false;
-    options.track?.("checkout_sheet_ready");
+    const paymentElement = checkout.createPaymentElement({ layout: "tabs", wallets: { link: "never" } });
+    paymentElement.on("ready", () => {
+      if (!sheet || sheet.node !== node) return;
+      clearTimeout(loadingTimer);
+      loading.hidden = true;
+      payButton.disabled = false;
+      options.track?.("checkout_sheet_ready");
+    });
+    paymentElement.on("loaderror", () => {
+      if (!sheet || sheet.node !== node) return;
+      clearTimeout(loadingTimer);
+      loading.hidden = true;
+      payButton.disabled = true;
+      fail("Die Zahlungsarten konnten nicht geladen werden. Schließe die Kasse und öffne sie erneut.");
+    });
+    paymentElement.mount(payment);
   } catch (problem) {
+    clearTimeout(loadingTimer);
+    loading.hidden = true;
+    if (!sheet || sheet.node !== node) return;
     if (problem.code === "already_subscribed") {
       summary.textContent = "Du hast schon ein Abo. Dein Plan ist freigeschaltet.";
+      summary.parentElement.hidden = false;
       payButton.replaceWith(el("a", { class: "abo-button", href: "/abo/mein-plan.html", text: "Zu deinem Plan" }));
       return;
     }

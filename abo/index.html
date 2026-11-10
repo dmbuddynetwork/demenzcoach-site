@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Demenz Coach Premium</title>
-  <meta name="description" content="Demenz Coach Premium für Web und App: passende Worte für schwierige Momente mit einem Menschen mit Demenz. 7 Tage kostenlos testen.">
+  <meta name="description" content="Demenz Coach Premium für die Web-App: passende Worte für schwierige Momente mit einem Menschen mit Demenz. 7 Tage kostenlos testen.">
   <meta name="robots" content="noindex">
   <link rel="canonical" href="https://dementiacoachapp.com/abo/">
   <link rel="icon" href="/assets/lovable-logo.jpg">
@@ -24,12 +24,13 @@
 
     <!-- Schritt 1: Angebot (1:1 nach dem App-Paywall-Entwurf B "Wähle dein Angebot") -->
     <section id="step-plan" aria-labelledby="plan-title">
-      <h1 id="plan-title">Wähle dein Angebot</h1>
+      <h1 id="plan-title">Persönliche Hilfe für euren Alltag</h1>
+      <p>Passende Worte und kleine nächste Schritte für schwierige Situationen.</p>
       <ul class="abo-checks">
-        <li>Finde schneller passende Worte</li>
-        <li>Jede Woche ein neuer Moment für euren Alltag</li>
-        <li>Ein Blatt für Helfer zum Ausdrucken</li>
-        <li>In der App und hier im Web</li>
+        <li>Satzideen für die Situation, die dich beschäftigt</li>
+        <li>Weitere Alltagssituationen zum Nachschauen</li>
+        <li>Ein Blatt über die Person für Helfer ausfüllen</li>
+        <li>Wochenplan als zusätzliche Hilfe</li>
       </ul>
       <div role="radiogroup" aria-label="Angebot">
         <button class="abo-plan" type="button" role="radio" aria-checked="true" data-plan="yearly">
@@ -53,52 +54,43 @@
       <button class="abo-button" type="button" id="plan-next">Weiter</button>
     </section>
 
-    <!-- Schritt 2: Konto, damit die App das Abo erkennt -->
+    <!-- Schritt 2: Bestehenden Web-Zugang wiederverwenden -->
     <section id="step-account" aria-labelledby="account-title" hidden>
       <p class="abo-steps">Schritt 2 von 3</p>
-      <h1 id="account-title">Konto für die App</h1>
-      <p>Mit diesem Konto meldest du dich danach in der App an. So gilt dein Abo dort auch.</p>
+      <h1 id="account-title">Mit E-Mail anmelden</h1>
+      <p>Du erhältst einen Anmeldelink per E-Mail. Dein bestehender Zugang und zugehörige Käufe bleiben erhalten.</p>
       <button class="abo-button" type="button" id="apple-button">Mit Apple fortfahren</button>
-      <button class="abo-button abo-button-light" type="button" id="phone-toggle">Mit Telefonnummer</button>
-      <form id="phone-form" class="abo-card" hidden novalidate>
-        <label for="phone">Telefonnummer</label>
-        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+49 170 1234567">
-        <button class="abo-button" type="submit" id="phone-send">Code per SMS schicken</button>
-        <div id="code-block" hidden>
-          <label for="code">Code aus der SMS</label>
-          <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
-          <button class="abo-button" type="button" id="code-confirm">Bestätigen</button>
-        </div>
-        <div id="recaptcha"></div>
-      </form>
+      <a class="abo-button" id="email-login" href="/abo/konto.html?returnTo=%2Fabo%2F&amp;intent=signin">Mit E-Mail fortfahren</a>
       <button class="abo-link-button" type="button" data-back="plan">Zurück</button>
     </section>
 
-    <!-- Schritt 3: Bezahlen. Der letzte Knopf erfüllt § 312j BGB. -->
+    <!-- Schritt 3: Bezahlen mit Preis- und Laufzeitangaben vor den Zahlungsbuttons. -->
     <section id="step-pay" aria-labelledby="pay-title" hidden>
       <p class="abo-steps">Letzter Schritt</p>
       <h1 id="pay-title">Zahlungsart</h1>
-      <p class="abo-muted" id="signed-in-as"></p>
       <div id="email-block" hidden>
         <label for="email">Deine E-Mail-Adresse</label>
         <input id="email" type="email" autocomplete="email" inputmode="email">
         <p class="abo-muted">Dafür bekommst du Bestätigung, Rechnung und deinen Zugang. Mehr nicht.</p>
         <button class="abo-button" type="button" id="email-next">Weiter</button>
-        <button class="abo-link-button" type="button" id="have-account">Ich habe schon ein App-Konto</button>
+        <button class="abo-link-button" type="button" id="have-account">Ich habe bereits ein Konto</button>
       </div>
       <div id="pay-block" hidden>
-        <!-- § 312j Abs. 2 BGB: Preis, Laufzeit und Kündigung stehen vor allen Zahlungsknöpfen (auch Apple Pay / Google Pay)
-             und noch einmal direkt über dem Bestellknopf. -->
-        <div class="abo-card abo-summary">
+        <!-- Zahlungsfelder zuerst; Preis/Laufzeit bleiben vor sämtlichen auslösenden Zahlungsknöpfen. -->
+        <div id="payment-element"></div>
+        <div class="abo-summary" role="group" aria-label="Preis und Laufzeit">
           <p id="pay-summary"></p>
           <p id="pay-terms"></p>
-          <p class="abo-muted">Online kündbar, ohne Anmeldung (<a href="kuendigen.html">Verträge hier kündigen</a>). 30 Tage <a href="garantie.html">Geld-zurück-Garantie</a>. Es gelten die <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>. <a href="widerruf.html">Widerrufsbelehrung</a>. <a href="/datenschutz.html">Datenschutz</a>.</p>
         </div>
         <div id="express-checkout"></div>
         <p class="abo-divider" id="express-divider" hidden>oder</p>
-        <div id="payment-element"></div>
-        <p id="pay-summary-short"></p>
+        <p id="pay-summary-short" hidden></p>
         <button class="abo-button" type="button" id="pay-button" disabled>Zahlungspflichtig abonnieren</button>
+        <p class="abo-checkout-email" id="signed-in-as"></p>
+        <div class="abo-checkout-details">
+          <p id="pay-trial-note" hidden></p>
+          <p>Online kündbar, ohne Anmeldung (<a href="kuendigen.html">Verträge hier kündigen</a>). 30 Tage <a href="garantie.html">Geld-zurück-Garantie</a>. Es gelten die <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>. <a href="widerruf.html">Widerrufsbelehrung</a>. <a href="/datenschutz.html">Datenschutz</a>.</p>
+        </div>
       </div>
       <button class="abo-link-button" type="button" data-back="plan">Anderes Angebot wählen</button>
     </section>
@@ -110,33 +102,23 @@
       <button class="abo-button" id="payment-status-manage" type="button" data-manage hidden>Zahlungsstatus in Abo-Verwaltung prüfen</button>
       <button class="abo-button" id="payment-status-retry" type="button" hidden>Status erneut prüfen</button>
       <div class="abo-card" id="done-plan" hidden>
-        <p><strong>Dein Plan ist fertig.</strong> Du findest ihn hier im Web, auf jedem Handy und Computer.</p>
-        <p class="abo-muted">Auf dem iPhone geht es auch in der App: Demenz Coach laden, Einstellungen öffnen, mit demselben Konto anmelden.</p>
+        <p><strong>Deine persönliche Hilfe ist bereit.</strong> Öffne deine Übersicht und beginne mit der Situation, die dich beschäftigt.</p>
+        <p class="abo-muted">Mit deinem bestätigten E-Mail-Zugang kannst du deine Mitgliedschaft später wieder in der Web-App öffnen.</p>
       </div>
-      <!-- Konto nach dem Kauf (wie Noom, BetterMe): Gast-Konto bekommt jetzt die Telefonnummer, die UID bleibt gleich. -->
+      <!-- Link a verified email while preserving the paid Firebase guest UID. -->
       <div class="abo-card" id="link-card" hidden>
-        <p><strong>Sichere dein Konto</strong></p>
-        <p class="abo-muted">Mit deiner Handynummer meldest du dich in der App an und kommst jederzeit wieder an deinen Plan. Ohne diesen Schritt bleibt dein Abo an diesen Browser gebunden.</p>
-        <form id="link-form" novalidate>
-          <label for="link-phone">Telefonnummer</label>
-          <input id="link-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+49 170 1234567">
-          <button class="abo-button" type="submit">Code per SMS schicken</button>
-          <div id="link-code-block" hidden>
-            <label for="link-code">Code aus der SMS</label>
-            <input id="link-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
-            <button class="abo-button" type="button" id="link-confirm">Bestätigen</button>
-          </div>
-          <div id="link-recaptcha"></div>
-        </form>
+        <p><strong>Sichere deinen E-Mail-Zugang</strong></p>
+        <p class="abo-muted">Verknüpfe eine bestätigte E-Mail-Adresse mit diesem Zugang, damit du später wieder an deine Mitgliedschaft kommst. Es wird kein Newsletter bestellt.</p>
+        <a class="abo-button" id="email-link-after" href="/abo/konto.html?returnTo=%2Fabo%2F&amp;intent=link">E-Mail-Zugang einrichten</a>
       </div>
-      <a class="abo-button" id="done-plan-link" href="mein-plan.html" hidden>Zu deinem Plan</a>
+      <a class="abo-button" id="done-plan-link" href="mein-plan.html" hidden>Zu deiner persönlichen Hilfe</a>
       <a class="abo-button abo-button-light" id="app-store-link" href="#">Für iPhone: Demenz Coach laden</a>
     </section>
 
     <section id="step-already" aria-labelledby="already-title" hidden>
       <h1 id="already-title">Du hast schon ein Abo</h1>
       <p>Dein Abo besteht bereits. Den Zahlungsstatus und die Zahlungsart kannst du unter „Abo verwalten“ prüfen.</p>
-      <a class="abo-button" href="mein-plan.html">Zu deinem Plan</a>
+      <a class="abo-button" href="mein-plan.html">Zu deiner persönlichen Hilfe</a>
       <button class="abo-button abo-button-light" type="button" data-manage>Abo verwalten</button>
     </section>
 

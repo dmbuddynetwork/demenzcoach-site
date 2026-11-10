@@ -1,4 +1,4 @@
-// „Mein Plan“ für Web-Abonnenten: Plan aus dem Fragebogen (Moment des Tages + Woche), eigener Übersetzer,
+// Persönliche Hilfe für Web-Abonnenten: gewählte Situation zuerst, weitere Hilfen und ergänzender Wochenplan,
 // Liste zum Ausdrucken, App-Hinweis. Freigabe über GET /entitlement mit dem Firebase-Konto (dasselbe wie die App).
 // ?vorschau=1 zeigt den Plan ohne Anmeldung (die Inhalte sind ohnehin öffentlich, nur zur Ansicht).
 import { subscriberState } from "./konto.js";
@@ -77,27 +77,42 @@ function selfCareCard() {
 
 function renderPlan() {
   const saved = savedPlan();
+  const directContext = window.DemenzSituationContext?.resolve(saved.directSituation) || null;
   const who = String(saved.name || "").slice(0, 30);
   const person = who || "sie oder er";
   const moments = data.situations.filter((item) => item.say);
-  const first = moments.find((item) => item.key === saved.situation) || moments[0];
+  const selected = directContext ? moments.find(item => item.key === directContext.planKey) : moments.find(item => item.key === saved.situation);
+  const first = selected || moments[0];
   const firstWeek = [first, ...moments.filter((item) => item !== first)].slice(0, 6);
   const week = planWeek(saved);
 
-  const nodes = [el("h1", { text: who ? `Dein Plan für ${who}` : "Dein Plan" })];
+  // Die bestehende Eingabe bleibt auf der Startseite. Kein neuer Speicher und keine
+  // Übertragung freier Angaben per URL; der Link führt direkt zum vorhandenen Feld.
+  const nodes = [
+    el("h1", { text: "Deine persönliche Hilfe" }),
+    el("p", { class: "start-lead", text: who && !directContext ? `Wobei brauchst du im Alltag mit ${who} Unterstützung?` : "Wobei brauchst du heute Unterstützung?" }),
+    el("a", { class: "abo-button", href: "/de/#translator-input", text: "Eigene Situation beschreiben" }),
+    el("h2", { class: "start-section", text: directContext || selected ? "Deine gewählte Situation" : "Ein Beispiel für den Anfang" }),
+    el("h3", { class: "plan-today", text: `„${directContext?.title || first.quote}“` }),
+    directContext && !selected ? el("div", { class: "start-card" }, [
+      el("p", { text: "Öffne die vorhandene Hilfe zu dieser Situation mit Satzideen und nächsten Schritten." }),
+      el("a", { class: "abo-button abo-button-light", href: directContext.href, text: "Hilfe zu dieser Situation öffnen" })
+    ]) : card(first)
+  ];
+  const weekly = [];
   if (week === 1) {
-    nodes.push(
+    weekly.push(
       el("p", { class: "start-lead", text: "Jeden Tag ein Moment, mit Sätzen zum Sagen und einem kleinen Schritt. Fang mit heute an." }),
       el("h2", { class: "plan-today", text: `Heute: Wenn ${person} sagt „${first.quote}“` }),
       card(first),
-      el("h2", { class: "start-section", text: "Deine Woche" })
+      el("h2", { class: "start-section", text: "Weitere Situationen in dieser Woche" })
     );
-    firstWeek.slice(1).forEach((moment, index) => nodes.push(dayDetails(`Tag ${index + 2}`, `„${moment.quote}“`, card(moment))));
-    nodes.push(dayDetails("Tag 7", data.selfCare.title, selfCareCard()));
-    nodes.push(el("p", { class: "start-small abo-muted", text: "Ab nächster Woche kommt jede Woche ein neuer Moment dazu." }));
+    firstWeek.slice(1).forEach((moment, index) => weekly.push(dayDetails(`Tag ${index + 2}`, `„${moment.quote}“`, card(moment))));
+    weekly.push(dayDetails("Tag 7", data.selfCare.title, selfCareCard()));
+    weekly.push(el("p", { class: "start-small abo-muted", text: "Ab nächster Woche kommt jede Woche ein neuer Moment dazu." }));
   } else {
     const current = weekMoment(week);
-    nodes.push(
+    weekly.push(
       el("p", { class: "start-lead", text: "Jede Woche ein neuer Moment, mit Sätzen zum Sagen und einem kleinen Schritt." }),
       el("h2", { class: "plan-today", text: `Woche ${week}: Wenn ${person} sagt „${current.quote}“` }),
       card(current),
@@ -105,10 +120,10 @@ function renderPlan() {
     );
     for (let earlier = week - 1; earlier >= 2 && earlier > week - 8; earlier -= 1) {
       const moment = weekMoment(earlier);
-      nodes.push(dayDetails(`Woche ${earlier}`, `„${moment.quote}“`, card(moment)));
+      weekly.push(dayDetails(`Woche ${earlier}`, `„${moment.quote}“`, card(moment)));
     }
-    firstWeek.forEach((moment) => nodes.push(dayDetails("Woche 1", `„${moment.quote}“`, card(moment))));
-    nodes.push(dayDetails("Woche 1", data.selfCare.title, selfCareCard()));
+    firstWeek.forEach((moment) => weekly.push(dayDetails("Woche 1", `„${moment.quote}“`, card(moment))));
+    weekly.push(dayDetails("Woche 1", data.selfCare.title, selfCareCard()));
   }
 
   const row = (href, text) => {
@@ -117,13 +132,17 @@ function renderPlan() {
     return el("li", {}, link);
   };
   nodes.push(
-    el("h2", { class: "start-section", text: "Für jeden anderen Moment" }),
+    el("h2", { class: "start-section", text: "Weitere Hilfen für euren Alltag" }),
     el("ul", { class: "plan-rows", role: "list" }, [
-      row("/demenz-uebersetzer/", "Eigenen Satz eingeben"),
       row("ueber-mama.html", aboutRow(saved)),
-      row("/demenz-uebersetzer/#phrase-index-title", "Alle Momente ansehen"),
+      row("/de/#e-tiles-more-title", "Weitere Alltagssituationen ansehen"),
       row("/demenz-uebersetzer/saetze-zum-ausdrucken.pdf", "Liste zum Ausdrucken")
     ]),
+    el("details", { class: "plan-weekly" }, [
+      el("summary", { text: "Wochenplan als zusätzliche Hilfe" }),
+      el("div", { class: "plan-weekly-body" }, weekly)
+    ]),
+    el("p", { class: "start-small abo-muted", text: "Dein Name und die Auswahl aus dem Fragebogen bleiben in diesem Browser. Sie werden nicht mit der App synchronisiert." }),
     el("div", { class: "start-card" }, [
       el("p", {}, el("strong", { text: "Auf dem iPhone" })),
       el("p", { class: "abo-muted", text: "Lade Demenz Coach und melde dich in den Einstellungen mit demselben Konto an. Dein Abo gilt dort auch." }),
@@ -148,7 +167,7 @@ async function start() {
   if (state === "active") return renderPlan();
   show(state === "no-subscription" ? "no-subscription" : "signed-out");
   if (state === "error") {
-    $("error").textContent = "Dein Plan lädt gerade nicht. Bitte versuch es gleich noch einmal.";
+    $("error").textContent = "Deine Hilfe lädt gerade nicht. Bitte versuch es gleich noch einmal.";
     $("error").hidden = false;
   }
 }

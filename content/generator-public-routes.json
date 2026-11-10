@@ -1,0 +1,1225 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "key": "mutter",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+      "alternatePath": "/en/dementia-translator/where-is-my-mother.html",
+      "topicId": "legacy-mutter",
+      "title": "Demenz: „Wo ist meine Mutter?“ – kurze Antworten | Demenz Coach",
+      "description": "Wenn ein Mensch mit Demenz nach verstorbenen Eltern fragt: was dahinterstecken kann, ruhige Antworten zum Ausprobieren und was du eher vermeiden solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-ist-meine-mutter/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-ist-meine-mutter/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-ist-meine-mutter/auswahl/"
+    },
+    {
+      "key": "arbeit",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+      "alternatePath": "/en/dementia-translator/i-have-to-go-to-work.html",
+      "topicId": "legacy-arbeit",
+      "title": "Demenz: „Ich muss zur Arbeit“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will zur Arbeit oder die Kinder abholen? Was hinter dem Satz stecken kann und welche Antworten du in diesem Moment ausprobieren kannst.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-zur-arbeit/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-zur-arbeit/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-zur-arbeit/auswahl/"
+    },
+    {
+      "key": "geld",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+      "alternatePath": "/en/dementia-translator/someone-stole-my-purse.html",
+      "topicId": "legacy-geld",
+      "title": "Demenz: „Du hast mein Geld gestohlen“ – was tun? | Demenz Coach",
+      "description": "Diebstahlvorwürfe bei Demenz tun weh. Was dahinterstecken kann, welche Sätze die Lage entschärfen und wie du dich selbst dabei schützt.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+        "verstehen": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen/auswahl/"
+    },
+    {
+      "key": "wer",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/wer-sind-sie.html",
+      "alternatePath": "/en/dementia-translator/who-are-you.html",
+      "topicId": "legacy-wer",
+      "title": "Demenz: „Wer sind Sie?“ – wenn sie dich nicht erkennt | Demenz Coach",
+      "description": "Nicht erkannt zu werden, schmerzt. Warum das bei Demenz passieren kann, wie du dich ruhig vorstellst und was dir selbst in diesem Moment hilft.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wer-sind-sie.html",
+        "verstehen": "/de/demenz-uebersetzer/wer-sind-sie/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wer-sind-sie/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wer-sind-sie/auswahl/"
+    },
+    {
+      "key": "hunger",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+      "alternatePath": "/en/dementia-translator/i-havent-eaten-all-day.html",
+      "topicId": "legacy-hunger",
+      "title": "Demenz: „Ich habe nichts gegessen“ – was tun? | Demenz Coach",
+      "description": "Kurz nach dem Essen sagt ein Mensch mit Demenz, er habe nichts bekommen? Was dahinterstecken kann und wie du ohne Streit reagierst.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen/auswahl/"
+    },
+    {
+      "key": "waschen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+      "alternatePath": "/en/dementia-translator/i-dont-want-a-shower.html",
+      "topicId": "legacy-waschen",
+      "title": "Demenz: „Ich will nicht duschen“ – was hilft? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz lehnt Duschen oder Waschen ab? Mögliche Gründe, Sätze mit Wahlfreiheit und kleine Schritte für mehr Ruhe im Bad.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-nicht-duschen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-nicht-duschen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-nicht-duschen/auswahl/"
+    },
+    {
+      "key": "ruhe",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+      "alternatePath": "/en/dementia-translator/leave-me-alone.html",
+      "topicId": "legacy-ruhe",
+      "title": "Demenz: „Lass mich in Ruhe!“ – Abwehr verstehen | Demenz Coach",
+      "description": "Wenn ein Mensch mit Demenz dich wegschickt oder wütend wird: was dahinterstecken kann, ruhige Sätze zum Ausprobieren und wann du Hilfe holen solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+        "verstehen": "/de/demenz-uebersetzer/lass-mich-in-ruhe/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/lass-mich-in-ruhe/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/lass-mich-in-ruhe/auswahl/"
+    },
+    {
+      "key": "jemand",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+      "alternatePath": "/en/dementia-translator/theres-someone-in-the-room.html",
+      "topicId": "legacy-jemand",
+      "title": "Demenz: „Da ist jemand im Zimmer“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz sieht Personen oder Tiere, die nicht da sind? Ruhige Sätze zum Ausprobieren, was die Umgebung beitragen kann und wann du ärztlichen Rat holen solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+        "verstehen": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer/auswahl/"
+    },
+    {
+      "key": "krank",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+      "alternatePath": "/en/dementia-translator/theres-nothing-wrong-with-me.html",
+      "topicId": "legacy-krank",
+      "title": "Demenz: „Ich bin doch nicht dement!“ – was sagen? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will keine Hilfe und sieht keine Erkrankung? Warum Überzeugen selten klappt und welche Sätze Würde und Unterstützung verbinden.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement/auswahl/"
+    },
+    {
+      "key": "dumm",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+      "alternatePath": "/en/dementia-translator/i-cant-do-anything-anymore.html",
+      "topicId": "legacy-dumm",
+      "title": "Demenz: „Ich kann gar nichts mehr“ – trösten | Demenz Coach",
+      "description": "Wenn ein Mensch mit Demenz sagt, er sei dumm oder nur noch eine Last: wie du Gefühle anerkennst, statt sie wegzureden, und wann ärztlicher Rat wichtig ist.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr/auswahl/"
+    },
+    {
+      "key": "uhrzeit",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+      "alternatePath": "/en/dementia-translator/when-are-we-leaving.html",
+      "topicId": "legacy-uhrzeit",
+      "title": "Demenz: „Wann gehen wir?“ – dieselbe Frage immer wieder | Demenz Coach",
+      "description": "Ein Mensch mit Demenz fragt alle paar Minuten dasselbe? Warum das passiert, wie du gelassen antwortest und was gegen die eigene Ungeduld hilft.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+        "verstehen": "/de/demenz-uebersetzer/wann-gehen-wir/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wann-gehen-wir/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wann-gehen-wir/auswahl/"
+    },
+    {
+      "key": "heim",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+      "alternatePath": "/en/dementia-translator/im-not-going-into-a-home.html",
+      "topicId": "legacy-heim",
+      "title": "Demenz: „Ich will nicht ins Heim“ – was sagen? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz wehrt sich gegen Pflegeheim oder Tagespflege? Welche Ängste dahinterstehen können und wie du ehrlich und behutsam darüber sprichst.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim/auswahl/"
+    },
+    {
+      "key": "hilfe",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+      "alternatePath": "/en/dementia-translator/help-help.html",
+      "topicId": "legacy-hilfe",
+      "title": "Demenz: ständiges Rufen „Hilfe!“ – was hilft? | Demenz Coach",
+      "description": "Ständiges Rufen bei Demenz zerrt an den Nerven. Welche Bedürfnisse dahinterstecken können, wie du reagierst und wann du ärztlich nachfragen solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+        "verstehen": "/de/demenz-uebersetzer/hilfe-hilfe-rufen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/hilfe-hilfe-rufen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/hilfe-hilfe-rufen/auswahl/"
+    },
+    {
+      "key": "auto",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+      "alternatePath": "/en/dementia-translator/i-can-still-drive.html",
+      "topicId": "legacy-auto",
+      "title": "Demenz und Autofahren: „Ich kann das noch“ | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will weiter Auto fahren? Wie du über ein schwieriges Thema sprichst, ohne die Würde zu verletzen, und wer dich dabei unterstützen kann.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-auto-fahren/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-auto-fahren/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-auto-fahren/auswahl/"
+    },
+    {
+      "key": "tabletten",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+      "alternatePath": "/en/dementia-translator/im-not-taking-those-pills.html",
+      "topicId": "legacy-tabletten",
+      "title": "Demenz: „Ich nehme keine Tabletten“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz verweigert Medikamente? Mögliche Gründe, ruhige Sätze und warum du Fragen zu Medikamenten immer mit Arztpraxis oder Apotheke klären solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten/auswahl/"
+    },
+    {
+      "key": "luegen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+      "alternatePath": "/en/dementia-translator/youre-lying-to-me.html",
+      "topicId": "legacy-luegen",
+      "title": "Demenz: „Du lügst mich an!“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz wirft dir Lügen vor? Warum Misstrauen entstehen kann, wie du nicht in den Streit gehst und was dir selbst hilft.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+        "verstehen": "/de/demenz-uebersetzer/du-luegst-mich-an/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/du-luegst-mich-an/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/du-luegst-mich-an/auswahl/"
+    },
+    {
+      "key": "eingesperrt",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+      "alternatePath": "/en/dementia-translator/im-locked-in-here.html",
+      "topicId": "legacy-eingesperrt",
+      "title": "Demenz: „Ich bin hier eingesperrt“ – was hilft? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz fühlt sich eingesperrt und will raus? Was dahinterstecken kann, ruhige Sätze zum Ausprobieren und wie du Sicherheit und Freiheit verbindest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt/auswahl/"
+    },
+    {
+      "key": "aufstehen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+      "alternatePath": "/en/dementia-translator/i-have-to-get-up-now.html",
+      "topicId": "legacy-aufstehen",
+      "title": "Demenz: nachts wach – „Ich muss aufstehen“ | Demenz Coach",
+      "description": "Ein Mensch mit Demenz steht nachts auf und will in den Tag starten? Mögliche Gründe, ruhige Sätze für die Nacht und was tagsüber den Schlaf unterstützen kann.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts/auswahl/"
+    },
+    {
+      "key": "kinder",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+      "alternatePath": "/en/dementia-translator/where-are-my-children.html",
+      "topicId": "legacy-kinder",
+      "title": "Demenz: „Wo sind meine Kinder?“ – was sagen? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz sucht seine kleinen Kinder, die längst erwachsen sind? Was dahinterstecken kann und wie du die Fürsorge würdigst, ohne zu streiten.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-sind-meine-kinder/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-sind-meine-kinder/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-sind-meine-kinder/auswahl/"
+    },
+    {
+      "key": "langweilig",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+      "alternatePath": "/en/dementia-translator/im-so-bored.html",
+      "topicId": "legacy-langweilig",
+      "title": "Demenz: „Mir ist langweilig“ – Beschäftigungsideen | Demenz Coach",
+      "description": "Ein Mensch mit Demenz langweilt sich und wird unruhig? Was dahinterstecken kann, passende Sätze und einfache Beschäftigungsideen für den Alltag.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+        "verstehen": "/de/demenz-uebersetzer/mir-ist-langweilig/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/mir-ist-langweilig/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/mir-ist-langweilig/auswahl/"
+    },
+    {
+      "key": "wobin",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/wo-bin-ich.html",
+      "alternatePath": "/en/dementia-translator/where-am-i.html",
+      "topicId": "legacy-wobin",
+      "title": "Demenz: „Wo bin ich?“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz fragt „Wo bin ich?“ oder „Was mache ich hier?“ Was hinter der Frage stecken kann und welche kurzen Antworten Halt geben.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-bin-ich.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-bin-ich/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-bin-ich/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-bin-ich/auswahl/"
+    },
+    {
+      "key": "vergiftet",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+      "alternatePath": "/en/dementia-translator/the-food-is-poisoned.html",
+      "topicId": "legacy-vergiftet",
+      "title": "Demenz: „Das Essen ist vergiftet“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz lehnt Essen ab oder glaubt, es sei vergiftet? Was dahinterstecken kann, ruhige Sätze und wann du ärztlichen Rat holen solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+        "verstehen": "/de/demenz-uebersetzer/das-essen-ist-vergiftet/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/das-essen-ist-vergiftet/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/das-essen-ist-vergiftet/auswahl/"
+    },
+    {
+      "key": "bett",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+      "alternatePath": "/en/dementia-translator/i-dont-want-to-go-to-bed.html",
+      "topicId": "legacy-bett",
+      "title": "Demenz: „Ich will nicht ins Bett“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will abends nicht schlafen gehen? Was hinter dem Satz stecken kann, ruhige Sätze und kleine Abendrituale, die helfen können.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett/auswahl/"
+    },
+    {
+      "key": "einkaufen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+      "alternatePath": "/en/dementia-translator/i-have-to-go-shopping.html",
+      "topicId": "legacy-einkaufen",
+      "title": "Demenz: „Ich muss noch einkaufen“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will dringend einkaufen oder zur Bank? Was hinter dem Satz stecken kann und wie du die Aufgabe würdigst, ohne zu streiten.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen/auswahl/"
+    },
+    {
+      "key": "nachbarn",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+      "alternatePath": "/en/dementia-translator/the-neighbors-are-talking-about-me.html",
+      "topicId": "legacy-nachbarn",
+      "title": "Demenz: „Die Nachbarn reden über mich“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz fühlt sich von Nachbarn beobachtet oder bestohlen? Was dahinterstecken kann, ruhige Sätze zum Ausprobieren und wann ärztlicher Rat wichtig ist.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+        "verstehen": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich/auswahl/"
+    },
+    {
+      "key": "haustier",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+      "alternatePath": "/en/dementia-translator/where-is-my-dog.html",
+      "topicId": "legacy-haustier",
+      "title": "Demenz: „Wo ist mein Hund?“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz sucht ein Haustier, das längst nicht mehr lebt? Was hinter der Frage stecken kann und welche Antworten trösten, statt zu verletzen.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-ist-mein-hund/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-ist-mein-hund/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-ist-mein-hund/auswahl/"
+    },
+    {
+      "key": "kalt",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+      "alternatePath": "/en/dementia-translator/im-so-cold.html",
+      "topicId": "legacy-kalt",
+      "title": "Demenz: „Mir ist so kalt“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz friert, obwohl es warm ist? Was hinter dem Satz stecken kann und welche Antworten und kleinen Handgriffe wirklich wärmen.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+        "verstehen": "/de/demenz-uebersetzer/mir-ist-so-kalt/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/mir-ist-so-kalt/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/mir-ist-so-kalt/auswahl/"
+    },
+    {
+      "key": "besuch",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+      "alternatePath": "/en/dementia-translator/when-is-my-son-coming.html",
+      "topicId": "legacy-besuch",
+      "title": "Demenz: „Wann kommt mein Sohn?“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz fragt ständig nach Besuch oder sagt, seit Wochen sei niemand da gewesen, obwohl ihr gestern da wart? Was dahinterstecken kann und welche Sätze helfen.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+        "verstehen": "/de/demenz-uebersetzer/wann-kommt-mein-sohn/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wann-kommt-mein-sohn/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wann-kommt-mein-sohn/auswahl/"
+    },
+    {
+      "key": "anrufen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+      "alternatePath": "/en/dementia-translator/i-have-to-call-someone.html",
+      "topicId": "legacy-anrufen",
+      "title": "Demenz: „Ich muss jemanden anrufen“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will ständig telefonieren oder jemanden anrufen, der nicht erreichbar ist? Was dahinterstecken kann und welche Sätze Ruhe geben.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen/auswahl/"
+    },
+    {
+      "key": "partner",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+      "alternatePath": "/en/dementia-translator/where-is-my-husband.html",
+      "topicId": "legacy-partner",
+      "title": "Demenz: „Wo ist mein Mann?“ – was antworten? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz fragt nach dem verstorbenen Mann oder der Frau? Was hinter der Frage stecken kann und welche Antworten trösten, ohne jedes Mal neu zu verletzen.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-ist-mein-mann/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-ist-mein-mann/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-ist-mein-mann/auswahl/"
+    },
+    {
+      "key": "allein",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+      "alternatePath": "/en/dementia-translator/dont-leave-me.html",
+      "topicId": "legacy-allein",
+      "title": "Demenz: „Lass mich nicht allein!“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz folgt dir überallhin und hat Angst, allein zu sein? Was dahinterstecken kann, Sätze, die Sicherheit geben, und wie du trotzdem kurz Luft bekommst.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+        "verstehen": "/de/demenz-uebersetzer/lass-mich-nicht-allein/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/lass-mich-nicht-allein/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/lass-mich-nicht-allein/auswahl/"
+    },
+    {
+      "key": "schongegessen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+      "alternatePath": "/en/dementia-translator/ive-already-eaten.html",
+      "topicId": "legacy-schongegessen",
+      "title": "Demenz: „Ich habe schon gegessen“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz sagt, er habe schon gegessen oder keinen Hunger? Was hinter dem Satz stecken kann, Sätze ohne Druck und wann du ärztlichen Rat holen solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-habe-schon-gegessen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-habe-schon-gegessen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-habe-schon-gegessen/auswahl/"
+    },
+    {
+      "key": "toilette",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+      "alternatePath": "/en/dementia-translator/i-dont-need-the-bathroom.html",
+      "topicId": "legacy-toilette",
+      "title": "Demenz: „Ich muss nicht aufs Klo“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will nicht zur Toilette oder ein Missgeschick ist passiert? Was dahinterstecken kann, Sätze, die die Würde schützen, und wann du ärztlich abklären solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo/auswahl/"
+    },
+    {
+      "key": "umziehen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+      "alternatePath": "/en/dementia-translator/im-not-changing-my-clothes.html",
+      "topicId": "legacy-umziehen",
+      "title": "Demenz: „Ich ziehe mich nicht um“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz trägt seit Tagen dieselben Sachen und will sich nicht umziehen? Was dahinterstecken kann und wie du ohne Machtkampf weiterkommst.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um/auswahl/"
+    },
+    {
+      "key": "ausziehen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+      "alternatePath": "/en/dementia-translator/i-want-to-take-this-off.html",
+      "topicId": "legacy-ausziehen",
+      "title": "Demenz: Zieht sich ständig aus – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz zieht sich immer wieder aus, auch vor anderen? Was dahinterstecken kann und welche ruhigen Sätze helfen.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-das-ausziehen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-das-ausziehen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-das-ausziehen/auswahl/"
+    },
+    {
+      "key": "liegen",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+      "alternatePath": "/en/dementia-translator/im-staying-in-bed-today.html",
+      "topicId": "legacy-liegen",
+      "title": "Demenz: Will morgens nicht aufstehen – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will morgens nicht aus dem Bett? Was dahinterstecken kann und welche ruhigen Sätze helfen, ohne Druck in den Tag zu kommen.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett/auswahl/"
+    },
+    {
+      "key": "abend",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+      "alternatePath": "/en/dementia-translator/its-getting-dark-i-have-to-go.html",
+      "topicId": "legacy-abend",
+      "title": "Demenz: Abends unruhig – was sagen? | Demenz Coach",
+      "description": "Am späten Nachmittag oder Abend wird ein Mensch mit Demenz unruhig, will weg oder erkennt die Wohnung nicht? Was dahinterstecken kann, ruhige Sätze zum Ausprobieren und Ideen für den Abend.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+        "verstehen": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los/auswahl/"
+    },
+    {
+      "key": "untreue",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+      "alternatePath": "/en/dementia-translator/youre-seeing-someone-else.html",
+      "topicId": "legacy-untreue",
+      "title": "Demenz: „Du hast einen anderen!“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz wirft dem Partner Untreue vor? Was hinter der Eifersucht stecken kann, ruhige Sätze zum Ausprobieren und wann du ärztlichen Rat holen solltest.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+        "verstehen": "/de/demenz-uebersetzer/du-hast-einen-anderen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/du-hast-einen-anderen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/du-hast-einen-anderen/auswahl/"
+    },
+    {
+      "key": "kind",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+      "alternatePath": "/en/dementia-translator/im-not-a-child.html",
+      "topicId": "legacy-kind",
+      "title": "Demenz: „Ich bin doch kein Kind!“ – was sagen? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz fühlt sich bevormundet und wehrt sich? Was hinter dem Satz stecken kann und wie du hilfst, ohne die Würde zu verletzen.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind/auswahl/"
+    },
+    {
+      "key": "tagespflege",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+      "alternatePath": "/en/dementia-translator/im-not-going-to-day-care.html",
+      "topicId": "legacy-tagespflege",
+      "title": "Demenz: „Ich gehe nicht in die Tagespflege“ – was tun? | Demenz Coach",
+      "description": "Ein Mensch mit Demenz will nicht in die Tagespflege oder lässt den Pflegedienst nicht herein? Was dahinterstecken kann und wie neue Hilfe leichter angenommen wird.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege/auswahl/"
+    },
+    {
+      "key": "nachhause",
+      "language": "de",
+      "path": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+      "alternatePath": "/en/dementia-translator/i-want-to-go-home.html",
+      "topicId": "legacy-nachhause",
+      "title": "Demenz will nach Hause: Was sagen? | Demenz Coach",
+      "description": "Ruhige Antworten, wenn ein Mensch mit Demenz nach Hause möchte – auch wenn die Person bereits zu Hause ist.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+        "verstehen": "/de/ratgeber/demenz-nach-hause-was-sagen/verstehen/",
+        "tipps": "/de/ratgeber/demenz-nach-hause-was-sagen/tipps/"
+      },
+      "selectionPath": "/de/ratgeber/demenz-nach-hause-was-sagen/auswahl/"
+    },
+    {
+      "key": "erschoepft",
+      "language": "de",
+      "path": "/de/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "alternatePath": "/guides/dementia-caregiver-overwhelmed.html",
+      "topicId": "legacy-erschoepft",
+      "title": "Pflegende Angehörige überfordert: Was tun? | Demenz Coach",
+      "description": "Ein kurzer Plan mit Sicherheitscheck für pflegende Angehörige, wenn die Belastung im Demenz-Alltag zu groß wird.",
+      "selfCare": true,
+      "safetyOnly": true
+    },
+    {
+      "key": "toilettefinden",
+      "language": "de",
+      "path": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html",
+      "alternatePath": "/en/dementia-translator/i-cant-find-the-toilet.html",
+      "topicId": "finding-toilet",
+      "title": "Demenz: Toilette nicht finden – was hilft? | Demenz Coach",
+      "description": "Bei Demenz die Toilette nicht finden: ruhige Satzvorschläge, Orientierungshilfen, Privatsphäre und Warnzeichen, bei denen ärztliche Hilfe wichtig ist.",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht/auswahl/"
+    },
+    {
+      "key": "pflegeaufteilen",
+      "language": "de",
+      "path": "/de/angehoerige/pflege-mit-geschwistern-aufteilen.html",
+      "alternatePath": "/en/caregivers/share-dementia-care-with-siblings.html",
+      "topicId": "sharing-family-care",
+      "title": "Demenzpflege mit Geschwistern aufteilen | Demenz Coach",
+      "description": "Wenn Geschwister bei der Demenzpflege wenig helfen: konkrete Bitten formulieren, Aufgaben und Grenzen besprechen und Unterstützung für dich finden.",
+      "selfCare": true,
+      "safetyOnly": false
+    },
+    {
+      "key": "home",
+      "language": "en",
+      "path": "/en/dementia-translator/i-want-to-go-home.html",
+      "alternatePath": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+      "topicId": "legacy-nachhause",
+      "title": "Dementia: “I want to go home” – what to say | Dementia Coach",
+      "description": "What to say when a person with dementia wants to go home, even when they are home: what may be behind it, gentle replies to try and what to avoid.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "mother",
+      "language": "en",
+      "path": "/en/dementia-translator/where-is-my-mother.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+      "topicId": "legacy-mutter",
+      "title": "Dementia: “Where is my mother?” – what to say | Dementia Coach",
+      "description": "When a person with dementia asks for a parent who has died: what may be behind it, gentle replies to try and what to avoid.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "work",
+      "language": "en",
+      "path": "/en/dementia-translator/i-have-to-go-to-work.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+      "topicId": "legacy-arbeit",
+      "title": "Dementia: “I have to go to work” – what to say | Dementia Coach",
+      "description": "Someone with dementia wants to go to work or pick up the kids? What may be behind it and gentle replies to try, without arguing.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "stolen",
+      "language": "en",
+      "path": "/en/dementia-translator/someone-stole-my-purse.html",
+      "alternatePath": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+      "topicId": "legacy-geld",
+      "title": "Dementia: “Someone stole my purse” – what to say | Dementia Coach",
+      "description": "Accusations of stealing hurt. What may be behind them with dementia, replies to try instead of arguing, and how to look after yourself.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "who",
+      "language": "en",
+      "path": "/en/dementia-translator/who-are-you.html",
+      "alternatePath": "/de/demenz-uebersetzer/wer-sind-sie.html",
+      "topicId": "legacy-wer",
+      "title": "Dementia: “Who are you?” – when they don't know you | Dementia Coach",
+      "description": "Not being recognized hurts. Why it can happen with dementia, how to introduce yourself gently and what you can do for yourself in that moment.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "hungry",
+      "language": "en",
+      "path": "/en/dementia-translator/i-havent-eaten-all-day.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+      "topicId": "legacy-hunger",
+      "title": "Dementia: “I haven't eaten all day” – what to say | Dementia Coach",
+      "description": "They've just eaten but say they haven't? What may be behind it with dementia, gentle replies to try and simple ideas for everyday life.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "shower",
+      "language": "en",
+      "path": "/en/dementia-translator/i-dont-want-a-shower.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+      "topicId": "legacy-waschen",
+      "title": "Dementia: “I don't want a shower” – what to say | Dementia Coach",
+      "description": "Refusing to shower or bathe is common with dementia. What may be behind it, gentle words to try and ideas that protect their dignity.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "leavemealone",
+      "language": "en",
+      "path": "/en/dementia-translator/leave-me-alone.html",
+      "alternatePath": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+      "topicId": "legacy-ruhe",
+      "title": "Dementia: “Leave me alone!” – what to say | Dementia Coach",
+      "description": "Anger and rejection with dementia: what may be behind it, short sentences to try and how to step back safely.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "someone",
+      "language": "en",
+      "path": "/en/dementia-translator/theres-someone-in-the-room.html",
+      "alternatePath": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+      "topicId": "legacy-jemand",
+      "title": "Dementia: “There's someone in the room” – what to say | Dementia Coach",
+      "description": "When a person with dementia sees people or animals that aren't there: gentle replies to try, what to avoid and what you can do.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "nothingwrong",
+      "language": "en",
+      "path": "/en/dementia-translator/theres-nothing-wrong-with-me.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+      "topicId": "legacy-krank",
+      "title": "Dementia: “There's nothing wrong with me” – what to say | Dementia Coach",
+      "description": "Many people with dementia don't see any change in themselves. What may be behind it, gentle replies to try and what to avoid.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "useless",
+      "language": "en",
+      "path": "/en/dementia-translator/i-cant-do-anything-anymore.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+      "topicId": "legacy-dumm",
+      "title": "Dementia: “I can't do anything anymore” – what to say | Dementia Coach",
+      "description": "When a person with dementia feels useless or like a burden: what may be behind it, kind words to try and small ways to feel needed.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "when",
+      "language": "en",
+      "path": "/en/dementia-translator/when-are-we-leaving.html",
+      "alternatePath": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+      "topicId": "legacy-uhrzeit",
+      "title": "Dementia: “When are we leaving?” – the same question again | Dementia Coach",
+      "description": "The same question over and over? What may be behind it with dementia, answers to try and simple aids for everyday life.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "carehome",
+      "language": "en",
+      "path": "/en/dementia-translator/im-not-going-into-a-home.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+      "topicId": "legacy-heim",
+      "title": "Dementia: “I'm not going into a home” – what to say | Dementia Coach",
+      "description": "When a person with dementia refuses a care home or has just moved in: what may be behind it, gentle replies to try and what to avoid.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "help",
+      "language": "en",
+      "path": "/en/dementia-translator/help-help.html",
+      "alternatePath": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+      "topicId": "legacy-hilfe",
+      "title": "Dementia: calling out “Help! Help!” – what to do | Dementia Coach",
+      "description": "Calling out over and over is hard to bear. What may be behind it with dementia, words to try and what you can check.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "drive",
+      "language": "en",
+      "path": "/en/dementia-translator/i-can-still-drive.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+      "topicId": "legacy-auto",
+      "title": "Dementia: “I can still drive” – what to say | Dementia Coach",
+      "description": "When a person with dementia wants to keep driving: what may be behind it, respectful words to try and who can help with the decision.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "pills",
+      "language": "en",
+      "path": "/en/dementia-translator/im-not-taking-those-pills.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+      "topicId": "legacy-tabletten",
+      "title": "Dementia: “I'm not taking those pills” – what to say | Dementia Coach",
+      "description": "When a person with dementia refuses tablets: what may be behind it, respectful words to try and who to ask about the medicines.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "lying",
+      "language": "en",
+      "path": "/en/dementia-translator/youre-lying-to-me.html",
+      "alternatePath": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+      "topicId": "legacy-luegen",
+      "title": "Dementia: “You're lying to me!” – what to say | Dementia Coach",
+      "description": "Being called a liar hurts. What may be behind distrust with dementia, replies to try and how to look after yourself.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "lockedin",
+      "language": "en",
+      "path": "/en/dementia-translator/im-locked-in-here.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+      "topicId": "legacy-eingesperrt",
+      "title": "Dementia: “I'm locked in here!” – what to say | Dementia Coach",
+      "description": "When a person with dementia feels locked in or pulls at the door: what may be behind it, words to try and safe ideas for everyday life.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "night",
+      "language": "en",
+      "path": "/en/dementia-translator/i-have-to-get-up-now.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+      "topicId": "legacy-aufstehen",
+      "title": "Dementia: up at night – “I have to get up now!” | Dementia Coach",
+      "description": "Up at night, dressed at 3 am, sure it's morning? What may be behind it with dementia, gentle words to try and ideas for the night.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "children",
+      "language": "en",
+      "path": "/en/dementia-translator/where-are-my-children.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+      "topicId": "legacy-kinder",
+      "title": "Dementia: “Where are my children?” – what to say | Dementia Coach",
+      "description": "When a person with dementia looks for children who grew up long ago: what may be behind it and gentle replies to try.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "bored",
+      "language": "en",
+      "path": "/en/dementia-translator/im-so-bored.html",
+      "alternatePath": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+      "topicId": "legacy-langweilig",
+      "title": "Dementia: “I'm so bored” – ideas and words | Dementia Coach",
+      "description": "When a person with dementia is bored at home: what may be behind it, words to try and simple activities for everyday life.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "whereami",
+      "language": "en",
+      "path": "/en/dementia-translator/where-am-i.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-bin-ich.html",
+      "topicId": "legacy-wobin",
+      "title": "Dementia: “Where am I?” – what to say | Dementia Coach",
+      "description": "When a person with dementia feels lost, even at home: what may be behind it, reassuring words to try and what to avoid.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "poisoned",
+      "language": "en",
+      "path": "/en/dementia-translator/the-food-is-poisoned.html",
+      "alternatePath": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+      "topicId": "legacy-vergiftet",
+      "title": "Dementia: “The food is poisoned” – what to say | Dementia Coach",
+      "description": "When a person with dementia thinks the food is poisoned: what may be behind it, words to try and simple ideas at the table.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "bed",
+      "language": "en",
+      "path": "/en/dementia-translator/i-dont-want-to-go-to-bed.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+      "topicId": "legacy-bett",
+      "title": "Dementia: “I don't want to go to bed” – what to say | Dementia Coach",
+      "description": "When a person with dementia doesn't want to go to bed: what may be behind it, gentle words to try and ideas for the evening.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "shopping",
+      "language": "en",
+      "path": "/en/dementia-translator/i-have-to-go-shopping.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+      "topicId": "legacy-einkaufen",
+      "title": "Dementia: “I have to go shopping” – what to say | Dementia Coach",
+      "description": "A person with dementia wants to go shopping or to the bank? What may be behind it, words to try and safe ways to go along.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "neighbors",
+      "language": "en",
+      "path": "/en/dementia-translator/the-neighbors-are-talking-about-me.html",
+      "alternatePath": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+      "topicId": "legacy-nachbarn",
+      "title": "Dementia: “The neighbors are talking about me” | Dementia Coach",
+      "description": "When a person with dementia feels watched or talked about: what may be behind it, words to try and what to avoid.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "dog",
+      "language": "en",
+      "path": "/en/dementia-translator/where-is-my-dog.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+      "topicId": "legacy-haustier",
+      "title": "Dementia: “Where is my dog?” – what to say | Dementia Coach",
+      "description": "When a person with dementia asks for a pet that died long ago: what may be behind it and gentle replies to try.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "cold",
+      "language": "en",
+      "path": "/en/dementia-translator/im-so-cold.html",
+      "alternatePath": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+      "topicId": "legacy-kalt",
+      "title": "Dementia: “I'm so cold” – what to say | Dementia Coach",
+      "description": "When a person with dementia often feels cold: what may be behind it, words to try and simple things you can check.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "visit",
+      "language": "en",
+      "path": "/en/dementia-translator/when-is-my-son-coming.html",
+      "alternatePath": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+      "topicId": "legacy-besuch",
+      "title": "Dementia: “When is my son coming?” – what to say | Dementia Coach",
+      "description": "When a person with dementia waits for visitors or feels forgotten: what may be behind it, gentle replies to try and simple aids.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "phone",
+      "language": "en",
+      "path": "/en/dementia-translator/i-have-to-call-someone.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+      "topicId": "legacy-anrufen",
+      "title": "Dementia: “I have to call someone!” – what to say | Dementia Coach",
+      "description": "When a person with dementia keeps wanting to call someone: what may be behind it, words to try and simple ideas.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "husband",
+      "language": "en",
+      "path": "/en/dementia-translator/where-is-my-husband.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+      "topicId": "legacy-partner",
+      "title": "Dementia: “Where is my husband?” – what to say | Dementia Coach",
+      "description": "When a person with dementia asks for a husband or wife who has died: what may be behind it, gentle replies to try and what to avoid.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "alone",
+      "language": "en",
+      "path": "/en/dementia-translator/dont-leave-me.html",
+      "alternatePath": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+      "topicId": "legacy-allein",
+      "title": "Dementia: “Don't leave me!” – what to say | Dementia Coach",
+      "description": "When a person with dementia can't be alone and follows you everywhere: what may be behind it, words to try and ideas for your breaks.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "alreadyate",
+      "language": "en",
+      "path": "/en/dementia-translator/ive-already-eaten.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+      "topicId": "legacy-schongegessen",
+      "title": "Dementia: “I've already eaten” – what to say | Dementia Coach",
+      "description": "When a person with dementia says they've eaten but hasn't: what may be behind it, gentle words to try and ideas for meals.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "toilet",
+      "language": "en",
+      "path": "/en/dementia-translator/i-dont-need-the-bathroom.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+      "topicId": "legacy-toilette",
+      "title": "Dementia: “I don't need the bathroom” – what to say | Dementia Coach",
+      "description": "When a person with dementia refuses the bathroom or has accidents: what may be behind it, gentle words to try and practical ideas.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "clothes",
+      "language": "en",
+      "path": "/en/dementia-translator/im-not-changing-my-clothes.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+      "topicId": "legacy-umziehen",
+      "title": "Dementia: “I'm not changing my clothes” – what to say | Dementia Coach",
+      "description": "When a person with dementia wears the same clothes or refuses to get dressed: what may be behind it, words to try and ideas.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "undress",
+      "language": "en",
+      "path": "/en/dementia-translator/i-want-to-take-this-off.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+      "topicId": "legacy-ausziehen",
+      "title": "Dementia: “I want to take this off!” – what to say | Dementia Coach",
+      "description": "When a person with dementia keeps undressing: what may be behind it, gentle words to try and what you can check.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "stayinbed",
+      "language": "en",
+      "path": "/en/dementia-translator/im-staying-in-bed-today.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+      "topicId": "legacy-liegen",
+      "title": "Dementia: “I'm staying in bed today” – what to say | Dementia Coach",
+      "description": "When a person with dementia doesn't want to get up: what may be behind it, gentle words to try and ideas for the morning.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "dark",
+      "language": "en",
+      "path": "/en/dementia-translator/its-getting-dark-i-have-to-go.html",
+      "alternatePath": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+      "topicId": "legacy-abend",
+      "title": "Dementia: unsettled in the evening – “I have to go!” | Dementia Coach",
+      "description": "Unsettled in the late afternoon or evening? What may be behind it with dementia, gentle words to try and ideas for the evening.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "affair",
+      "language": "en",
+      "path": "/en/dementia-translator/youre-seeing-someone-else.html",
+      "alternatePath": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+      "topicId": "legacy-untreue",
+      "title": "Dementia: “You're seeing someone else!” – what to say | Dementia Coach",
+      "description": "When a person with dementia accuses their partner of cheating: what may be behind it, words to try and how to look after yourself.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "child",
+      "language": "en",
+      "path": "/en/dementia-translator/im-not-a-child.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+      "topicId": "legacy-kind",
+      "title": "Dementia: “I'm not a child!” – what to say | Dementia Coach",
+      "description": "When a person with dementia feels treated like a child: what may be behind it, respectful words to try and how to share decisions.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "daycare",
+      "language": "en",
+      "path": "/en/dementia-translator/im-not-going-to-day-care.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+      "topicId": "legacy-tagespflege",
+      "title": "Dementia: “I'm not going to day care!” – what to say | Dementia Coach",
+      "description": "When a person with dementia refuses day care or help at home: what may be behind it, words to try and ideas for a gentle start.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "exhausted",
+      "language": "en",
+      "path": "/guides/dementia-caregiver-overwhelmed.html",
+      "alternatePath": "/de/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "topicId": "legacy-erschoepft",
+      "title": "Overwhelmed dementia caregiver: what helps? | Demenz Coach",
+      "description": "A short plan with a safety check for family caregivers when the demands of dementia care feel overwhelming.",
+      "selfCare": true,
+      "safetyOnly": true
+    },
+    {
+      "key": "findtoilet",
+      "language": "en",
+      "path": "/en/dementia-translator/i-cant-find-the-toilet.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html",
+      "topicId": "finding-toilet",
+      "title": "Dementia: Can't find the toilet? What helps | Dementia Coach",
+      "description": "Practical help when a person with dementia cannot find the toilet: calm phrases, signs and lighting, privacy, and changes that need medical help.",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "key": "sharecare",
+      "language": "en",
+      "path": "/en/caregivers/share-dementia-care-with-siblings.html",
+      "alternatePath": "/de/angehoerige/pflege-mit-geschwistern-aufteilen.html",
+      "topicId": "sharing-family-care",
+      "title": "Share dementia care with siblings | Dementia Coach",
+      "description": "When siblings are not helping with dementia care: make specific requests, agree on tasks and boundaries, and find further support for yourself.",
+      "selfCare": true,
+      "safetyOnly": false
+    }
+  ]
+}

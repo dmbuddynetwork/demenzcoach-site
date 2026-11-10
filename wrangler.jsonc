@@ -15,6 +15,10 @@
     // der Worker zuerst und antwortet mit 301 auf /de/ bzw. /xx/ (Liste wie HOME_LANGUAGES im Worker).
     "run_worker_first": [
       "/teller", "/teller/", "/teller/index.html",
+      "/de/", "/de/index.html",
+      "/en/", "/en/index.html",
+      "/demenz-uebersetzer", "/demenz-uebersetzer/*",
+      "/ratgeber", "/ratgeber/*",
       "/",
       "/index.html",
       "/index-en.html", "/index-pl.html", "/index-ro.html", "/index-bg.html",
@@ -24,7 +28,16 @@
       "/index-tr.html", "/index-ar.html", "/index-fr.html", "/index-it.html",
       "/index-es.html", "/index-pt.html", "/index-nl.html", "/index-el.html",
       "/index-sq.html", "/index-fa.html", "/index-th.html", "/index-da.html",
-      "/index-fi.html", "/index-ga.html", "/index-mt.html", "/index-sv.html"
+      "/index-fi.html", "/index-ga.html", "/index-mt.html", "/index-sv.html",
+      // Bounded groups also cover their old hub/index entries; redundant rules are rejected by Cloudflare.
+      // They keep canonical queries worker-first within Cloudflare's 100-rule limit.
+      // The worker still maps only registered topics/goal paths; other assets and404s remain unchanged.
+      "/de/demenz-uebersetzer/*",
+      "/de/ratgeber/*",
+      "/de/angehoerige/*",
+      "/en/dementia-translator/*",
+      "/en/caregivers/*",
+      "/guides/dementia-caregiver-overwhelmed.html"
     ]
   },
   "observability": { "enabled": false },

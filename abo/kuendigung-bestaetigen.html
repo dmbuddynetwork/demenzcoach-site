@@ -26,12 +26,12 @@
       <p class="abo-muted">Du warst das nicht? Dann schließ diese Seite einfach. Dein Abo läuft weiter.</p>
     </section>
     <section id="done" hidden>
-      <h1>Bestätigt</h1>
+      <h1 id="done-title" tabindex="-1">Bestätigt</h1>
       <div class="abo-card">
         <p><strong>Eingang:</strong> <span id="done-time"></span></p>
         <p><strong>Art:</strong> <span id="done-kind"></span></p>
       </div>
-      <p>Eine E-Mail mit dem Ergebnis kommt gleich.</p>
+      <p id="done-message">Eine E-Mail mit dem Ergebnis kommt gleich.</p>
     </section>
     <footer class="abo-footer">
       <a class="abo-cancel-link" href="kuendigen.html">Verträge hier kündigen</a>
@@ -54,10 +54,16 @@
         }).then(function (response) {
           return response.json().catch(function () { return {}; }).then(function (result) {
             if (!response.ok) { var failure = new Error(String(response.status)); failure.code = result.code; throw failure; }
+            var incomplete = response.status === 202 || result.processingIncomplete === true || result.processingState === "needs_review";
+            document.getElementById("done-title").textContent = incomplete ? "Eingang bestätigt" : "Bestätigt";
+            document.getElementById("done-message").textContent = incomplete
+              ? "Deine Erklärung ist eingegangen. Die Bearbeitung ist noch nicht vollständig abgeschlossen."
+              : "Eine E-Mail mit dem Ergebnis kommt gleich.";
             document.getElementById("done-time").textContent = result.receivedAtText || "";
             document.getElementById("done-kind").textContent = result.kindText || "";
             document.getElementById("ask").hidden = true;
             document.getElementById("done").hidden = false;
+            document.getElementById("done-title").focus({ preventScroll: true });
           });
         }).catch(function (failure) {
           button.disabled = false;

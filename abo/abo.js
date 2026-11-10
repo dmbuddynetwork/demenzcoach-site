@@ -1,6 +1,7 @@
 // Web-Kasse: Angebot wählen, mit demselben Firebase-Konto wie die App anmelden, über Stripe bezahlen.
 // Netzwerk nur zu unserem Backend (DEMENZ_ABO_CONFIG.endpoint), zu Firebase Auth und zu Stripe.
 import { createPaymentStatusController, paymentStatusText } from "./payment-status.js";
+import { emailAccountURL } from "./email-auth.js";
 const config = window.DEMENZ_ABO_CONFIG;
 const firebaseVersion = "12.16.0";
 const $ = (id) => document.getElementById(id);
@@ -14,11 +15,40 @@ const state = {
   auth: null,
   firebase: null,
   user: null,
-  checkout: null
+  checkout: null,
+  checkoutAttempt: null,
+  checkoutGeneration: 0,
+  checkoutReady: false,
+  checkoutElements: [],
+  confirming: false,
+  step: "plan"
 };
 
 const steps = ["plan", "account", "pay", "done", "already"];
+function invalidateCheckout() {
+  state.checkoutGeneration += 1;
+  state.checkoutAttempt = null;
+  state.checkout = null;
+  state.checkoutReady = false;
+  state.confirming = false;
+  $("pay-button").disabled = true;
+  for (const element of state.checkoutElements) {
+    try { element.unmount?.(); } catch { /* Already detached. */ }
+  }
+  state.checkoutElements = [];
+  for (const id of ["payment-element", "express-checkout", "pay-summary", "pay-terms", "pay-summary-short", "pay-trial-note"]) $(id).replaceChildren();
+  $("express-divider").hidden = true;
+}
+function currentAttempt(attempt) {
+  return state.checkoutAttempt === attempt && attempt?.generation === state.checkoutGeneration
+    && attempt.plan === state.plan && attempt.user === state.user && state.step === "pay" && !$("step-pay").hidden;
+}
+function currentCheckout(attempt, checkout) {
+  return Boolean(checkout && currentAttempt(attempt) && state.checkout === checkout);
+}
 function show(step) {
+  invalidateCheckout();
+  state.step = step;
   for (const name of steps) $(`step-${name}`).hidden = name !== step;
   $("error").hidden = true;
   window.scrollTo({ top: 0 });
@@ -36,7 +66,7 @@ const track = (name, values = {}, marketing = null) => {
 };
 
 const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
-const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long", year: "numeric" }).format(date);
+const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
 
 async function api(path, { method = "GET", body, token } = {}) {
   const headers = {};
@@ -62,7 +92,7 @@ function renderPlans() {
   $("trial-note").textContent = `${trialDays} Tage kostenlos. Jetzt wird nichts berechnet.`;
 }
 for (const button of document.querySelectorAll("[data-plan]")) {
-  button.addEventListener("click", () => { state.plan = button.dataset.plan; renderPlans(); });
+  button.addEventListener("click", () => { invalidateCheckout(); state.plan = button.dataset.plan; renderPlans(); });
 }
 // Willkommenspreis aus dem Fragebogen (angebot.js): gilt nur, solange das signierte Angebot läuft.
 const currentDeal = () => (state.offer?.offers ? window.DemenzAngebot?.current() ?? null : null);
@@ -97,16 +127,16 @@ $("plan-next").addEventListener("click", async () => {
   track("begin_checkout", { plan: state.plan, source: state.source }, { event: "InitiateCheckout" });
   await ensureFirebase();
   if (state.user) return goToPay();
-  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Ein stilles Gast-Konto trägt den Kauf, die Nummer kommt auf der Danke-Seite dazu.
+  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Ein stilles Gast-Konto trägt den Kauf, der E-Mail-Zugang kann danach verknüpft werden.
   try {
     state.user = (await state.firebase.signInAnonymously(state.auth)).user;
     track("sign_up", { method: "guest" });
     return goToPay();
   } catch {
-    show("account");
+    refreshEmailEntry(); show("account");
   }
 });
-$("have-account").addEventListener("click", () => show("account"));
+$("have-account").addEventListener("click", () => { refreshEmailEntry(); show("account"); });
 for (const back of document.querySelectorAll("[data-back]")) back.addEventListener("click", () => show(back.dataset.back));
 
 // --- Schritt 2: Konto (Firebase Auth, dasselbe Projekt wie die App) ---------------------------------
@@ -152,48 +182,25 @@ $("apple-button").addEventListener("click", async () => {
   }
 });
 
-// Ohne Apple-Services-ID: nur die Telefonnummer zeigen, das Formular gleich offen.
-if (!config.signIn?.apple) {
-  $("apple-button").hidden = true;
-  $("phone-toggle").hidden = true;
-  $("phone-form").hidden = false;
+// Email is the only new web registration path. Existing identity providers
+// remain on the Firebase account; this does not delete native/legacy accounts.
+if (!config.signIn?.apple) $("apple-button").hidden = true;
+function emailReturn() {
+  if (params.get("status") === "fertig") return `/abo/${location.search}`;
+  const query = new URLSearchParams({ plan: state.plan, src: state.source, weiter: "1" });
+  if (state.campaign) query.set("c", state.campaign);
+  return `/abo/?${query}`;
 }
-
-$("phone-toggle").addEventListener("click", () => {
-  $("phone-form").hidden = false;
-  $("phone").focus();
-});
-let phoneConfirmation;
-let recaptcha;
-$("phone-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const raw = $("phone").value.replace(/[\s/()-]/gu, "");
-  const phone = raw.startsWith("00") ? `+${raw.slice(2)}` : raw.startsWith("0") ? `+49${raw.slice(1)}` : raw;
-  if (!/^\+\d{8,15}$/u.test(phone)) return fail("Bitte gib deine Telefonnummer mit Vorwahl ein, zum Beispiel +49 170 1234567.");
-  try {
-    await ensureFirebase();
-    recaptcha ??= new state.firebase.RecaptchaVerifier(state.auth, "recaptcha", { size: "invisible" });
-    phoneConfirmation = await state.firebase.signInWithPhoneNumber(state.auth, phone, recaptcha);
-    $("code-block").hidden = false;
-    $("code").focus();
-  } catch {
-    fail("Die SMS konnte nicht geschickt werden. Prüf bitte die Nummer.");
-  }
-});
-$("code-confirm").addEventListener("click", async () => {
-  try {
-    state.user = (await phoneConfirmation.confirm($("code").value.trim())).user;
-    track("sign_up", { method: "phone" });
-    goToPay();
-  } catch {
-    fail("Der Code stimmt nicht. Bitte prüf ihn noch einmal.");
-  }
-});
+function refreshEmailEntry() {
+  $("email-login").href = emailAccountURL(emailReturn(), location.origin, "signin");
+}
+$("email-login").addEventListener("click", refreshEmailEntry);
+refreshEmailEntry();
 
 // --- Schritt 3: Bezahlen -------------------------------------------------------------------------
 function goToPay() {
   show("pay");
-  const who = state.user.isAnonymous ? "" : (state.user.email || state.user.phoneNumber || "");
+  const who = state.user.isAnonymous ? "" : (state.user.email || "");
   $("signed-in-as").textContent = who ? `Angemeldet als ${who}` : "";
   if (state.user.email) return startCheckout();
   $("email-block").hidden = false;
@@ -208,23 +215,33 @@ $("email-next").addEventListener("click", () => {
 });
 
 async function startCheckout(email) {
+  invalidateCheckout();
+  const attempt = { generation: state.checkoutGeneration, plan: state.plan, user: state.user };
+  state.checkoutAttempt = attempt;
   $("email-block").hidden = true;
   $("pay-block").hidden = false;
   $("pay-button").disabled = true;
+  const receiptEmail = email || attempt.user.email;
+  if (receiptEmail) $("signed-in-as").textContent = `Bestätigung und Zugang an ${receiptEmail}`;
   try {
-    const token = await state.user.getIdToken();
-    const deal = state.plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
+    const token = await attempt.user.getIdToken();
+    if (!currentAttempt(attempt)) return;
+    const deal = attempt.plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
     await window.DemenzTeller?.ready;
+    if (!currentAttempt(attempt)) return;
     const session = await api("/session", {
       method: "POST",
       token,
-      body: { plan: state.plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+      body: { plan: attempt.plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
+    if (!currentAttempt(attempt)) return;
     renderSummary(session.trialDays, session.firstYear);
-    await mountStripe(session.clientSecret);
+    await mountStripe(session.clientSecret, attempt);
   } catch (error) {
+    if (!currentAttempt(attempt)) return;
+    invalidateCheckout();
     if (error.code === "already_subscribed") return show("already");
     if (error.code === "offer_expired" || error.code === "invalid_offer") {
       const deal = window.DemenzAngebot?.current();
@@ -243,28 +260,31 @@ async function startCheckout(email) {
   }
 }
 
-// § 312j Abs. 2 BGB und Art. 246a § 1 EGBGB: Gesamtpreis inkl. Steuern, Laufzeit und Kündigungsbedingungen stehen
-// vor den Zahlungsknöpfen und noch einmal direkt über dem Bestellknopf; mit Sonderpreis fürs erste Jahr, wenn die Kasse ihn bestätigt hat.
+// Wesentliche Preis- und Laufzeitangaben bleiben vor allen Zahlungsbuttons sichtbar.
+// Erläuterungen zur Probezeit und weiterführende Links folgen unter den Buttons.
 function renderSummary(trialDays, firstYear = null) {
   const price = state.offer?.plans?.[state.plan];
-  const priceText = price ? `${euro(price.amount, price.currency)} pro ${state.plan === "yearly" ? "Jahr" : "Monat"}` : "";
+  const period = state.plan === "yearly" ? "Jahr" : "Monat";
+  const recurring = price ? `${euro(price.amount, price.currency)}/${period}` : "";
   const deal = Number.isInteger(firstYear) && price ? euro(firstYear, price.currency) : null;
   let summary;
   if (trialDays > 0) {
-    const start = new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000);
+    const start = new Date(Date.now() + trialDays * 86_400_000);
     summary = deal
-      ? `Heute 0,00 €. Ab ${dateText(start)} ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt. Kündigst du vorher, zahlst du nichts.`
-      : `Heute 0,00 €. Ab ${dateText(start)} ${priceText} inklusive MwSt. Kündigst du vorher, zahlst du nichts.`;
+      ? `Heute 0,00 €. Ab ${dateText(start)}: ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
+      : `Heute 0,00 €. Ab ${dateText(start)}: ${recurring}. Inkl. MwSt.`;
   } else {
     summary = deal
-      ? `Heute ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt.`
-      : `Heute ${priceText.replace(" pro ", " für 1 ")} inklusive MwSt. Danach ${priceText}.`;
+      ? `Heute ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
+      : `Heute ${price ? euro(price.amount, price.currency) : ""} für 1 ${period}, danach ${recurring}. Inkl. MwSt.`;
   }
   $("pay-summary").textContent = summary;
   $("pay-summary-short").textContent = summary;
   $("pay-terms").textContent = state.plan === "yearly"
-    ? "Laufzeit: 1 Jahr. Danach läuft das Abo unbefristet weiter und ist mit einer Frist von einem Monat kündbar."
-    : "Das Abo verlängert sich jeden Monat automatisch und ist jederzeit zum Monatsende kündbar.";
+    ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist."
+    : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.";
+  $("pay-trial-note").hidden = !(trialDays > 0);
+  $("pay-trial-note").textContent = trialDays > 0 ? `${trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
 }
 
 // Stripe.js erst laden, wenn jemand wirklich bezahlen will (nicht schon beim Betrachten der Angebote).
@@ -279,81 +299,78 @@ function loadStripe() {
   });
 }
 
-async function mountStripe(clientSecret) {
+async function mountStripe(clientSecret, attempt) {
   await loadStripe();
+  if (!currentAttempt(attempt)) return;
   const stripe = window.Stripe(state.offer.publishableKey, { locale: "de" });
   const appearance = {
     theme: "stripe",
-    variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "18px", borderRadius: "12px" }
+    variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" }
   };
   const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
-  state.checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance } });
-  const express = state.checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
+  const checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
+  if (!currentAttempt(attempt)) return;
+  state.checkout = checkout;
+  const express = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
   express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
+    if (!currentCheckout(attempt, checkout)) return;
     $("express-divider").hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean);
   });
-  express.on("confirm", () => confirmPayment());
+  express.on("confirm", () => confirmPayment(attempt, checkout));
+  const payment = checkout.createPaymentElement({ layout: "tabs", wallets: { link: "never" } });
+  state.checkoutElements = [express, payment];
   express.mount("#express-checkout");
-  const payment = state.checkout.createPaymentElement({ layout: "tabs" });
+  payment.on("ready", () => {
+    if (!currentCheckout(attempt, checkout)) return;
+    state.checkoutReady = true;
+    $("pay-button").disabled = state.confirming;
+  });
+  payment.on("loaderror", () => {
+    if (!currentCheckout(attempt, checkout)) return;
+    state.checkoutReady = false;
+    $("pay-button").disabled = true;
+    fail("Die Zahlungsarten konnten nicht geladen werden. Wähle dein Angebot bitte erneut.");
+  });
   payment.mount("#payment-element");
-  $("pay-button").disabled = false;
 }
 
-async function confirmPayment() {
+async function confirmPayment(attempt = state.checkoutAttempt, checkout = state.checkout) {
+  if (!currentCheckout(attempt, checkout) || !state.checkoutReady || state.confirming) return;
+  state.confirming = true;
   $("pay-button").disabled = true;
   try {
-    const loaded = await state.checkout.loadActions?.();
-    const actions = loaded?.actions ?? state.checkout;
-    const result = await actions.confirm();
-    if (result?.type === "error" || result?.error) {
-      fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
-      $("pay-button").disabled = false;
+    const loaded = await checkout.loadActions?.();
+    // A plan change/retry while actions load invalidates this exact session.
+    if (!currentCheckout(attempt, checkout) || !state.checkoutReady) return;
+    if (loaded?.type === "error") {
+      fail(loaded.error?.message || "Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
+      return;
     }
+    const actions = loaded?.actions ?? checkout;
+    const result = await actions.confirm();
+    if (!currentCheckout(attempt, checkout)) return;
+    if (result?.type === "error" || result?.error) fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
   } catch {
-    fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
-    $("pay-button").disabled = false;
+    if (currentCheckout(attempt, checkout)) fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
+  } finally {
+    if (currentCheckout(attempt, checkout)) {
+      state.confirming = false;
+      $("pay-button").disabled = !state.checkoutReady;
+    }
   }
 }
-$("pay-button").addEventListener("click", confirmPayment);
+$("pay-button").addEventListener("click", () => confirmPayment());
 
-// --- Konto nach dem Kauf: Gast-Konto bekommt die Telefonnummer (UID und damit Stripe/Adapty-Zuordnung bleiben gleich) ----
-let linkConfirmation;
-let linkRecaptcha;
+// Preserve the paid guest UID by linking email in the same Firebase account.
 async function offerAccountLink() {
   try {
     await ensureFirebase();
-    if (!state.user?.isAnonymous) return;
+    if (!state.user || state.user.emailVerified) return;
+    $("email-link-after").href = emailAccountURL(emailReturn(), location.origin, "link");
     $("link-card").hidden = false;
     track("account_link_shown", { source: state.source });
-  } catch { /* Konto später im Plan nachholbar */ }
+  } catch { /* The verified account can be recovered through support. */ }
 }
-$("link-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const raw = $("link-phone").value.replace(/[\s/()-]/gu, "");
-  const phone = raw.startsWith("00") ? `+${raw.slice(2)}` : raw.startsWith("0") ? `+49${raw.slice(1)}` : raw;
-  if (!/^\+\d{8,15}$/u.test(phone)) return fail("Bitte gib deine Telefonnummer mit Vorwahl ein, zum Beispiel +49 170 1234567.");
-  try {
-    linkRecaptcha ??= new state.firebase.RecaptchaVerifier(state.auth, "link-recaptcha", { size: "invisible" });
-    linkConfirmation = await state.firebase.linkWithPhoneNumber(state.user, phone, linkRecaptcha);
-    $("link-code-block").hidden = false;
-    $("link-code").focus();
-  } catch (error) {
-    fail(error?.code === "auth/credential-already-in-use"
-      ? "Diese Nummer hat schon ein App-Konto. Schreib uns bitte kurz über das Kontaktformular, wir verbinden dein Abo."
-      : "Die SMS konnte nicht geschickt werden. Prüf bitte die Nummer.");
-  }
-});
-$("link-confirm").addEventListener("click", async () => {
-  try {
-    state.user = (await linkConfirmation.confirm($("link-code").value.trim())).user;
-    track("account_linked", { source: state.source });
-    $("link-card").hidden = true;
-  } catch (error) {
-    fail(error?.code === "auth/credential-already-in-use"
-      ? "Diese Nummer hat schon ein App-Konto. Schreib uns bitte kurz über das Kontaktformular, wir verbinden dein Abo."
-      : "Der Code stimmt nicht. Bitte prüf ihn noch einmal.");
-  }
-});
 
 // --- Abo verwalten (Stripe-Kundenportal) ----------------------------------------------------------
 async function openPortal() {
@@ -443,7 +460,7 @@ if (params.get("status") === "fertig") {
       portalAvailable = true;
       // Das eigene Firebase-Gastkonto sichern, unabhängig vom Zahlungsstatus.
       // Es wird keine Kundenzuordnung aus einer öffentlichen Session übernommen.
-      if (state.user.isAnonymous && $("link-card").hidden) await offerAccountLink();
+      if (!state.user.emailVerified && $("link-card").hidden) await offerAccountLink();
       return api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
     },
     render: (outcome) => {

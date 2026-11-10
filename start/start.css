@@ -1,8 +1,22 @@
 /* Fragebogen für Meta/TikTok. Bausteine wie die App und einfach.css: hellila Zeilen mit Symbol und Pfeil,
    weiße Karten mit feinem Rand, ein lila Knopf pro Seite, drei Schriftgrößen. */
 .start-page { padding-top: 12px; }
+/* Bestehende Footerlinks und Controls bleiben sichtbar und zusammen bedienbar. */
+.start-footer-clean { display: grid; gap: 12px; margin-top: 24px; padding-top: 16px; font-size: 1rem; line-height: 1.45; }
+.start-footer-clean-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
+.start-footer-clean-links > .abo-cancel-link { grid-column: 1 / -1; }
+.start-footer-clean-links > a, .start-footer-clean-controls > button:not([hidden]) { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; font: inherit; text-decoration: none; overflow-wrap: anywhere; }
+.start-footer-clean-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-top: 8px; border-top: 1px solid var(--line); }
+.start-footer-clean-controls > button:not([hidden]) { position: static; margin: 0; padding: 6px 0; border: 0; background: transparent; color: var(--purple); }
+.start-footer-clean-controls > button[hidden] { display: none; }
+.start-footer-clean a:focus-visible, .start-footer-clean button:focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; border-radius: 2px; }
+.start-footer-clean > p { margin: 0; font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
 .start-top { display: grid; grid-template-columns: 72px 1fr 72px; align-items: center; min-height: 52px; margin-bottom: 8px; }
 .start-top .abo-brand { justify-self: center; white-space: nowrap; }
+/* Nur Start: Nutzerzoom bleibt erhalten, Marke bricht innerhalb der verfügbaren Breite um. */
+.start-page .start-top { grid-template-columns: 44px minmax(0, 1fr) 44px; }
+.start-page .abo-brand { min-width: 0; max-width: 100%; white-space: normal; }
+.start-page .abo-brand > span { min-width: 0; overflow-wrap: anywhere; }
 .start-card > :last-child { margin-bottom: 0; }
 .start-back { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: var(--purple); cursor: pointer; padding: 0; }
 /* Wie BetterMe: Abschnittsname über drei Balken, ein Balken je Abschnitt. */
@@ -190,11 +204,11 @@ body[data-screen="plan"] .start-top, body[data-screen="plan"] .start-count { dis
 /* Preisseite 1:1 nach BetterMe (9. Nov 2026): Kopf mit Uhr, Vorher/Nachher, Ticket, Tarife mit Tagespreis, Rahmen fürs Kleingedruckte. */
 body[data-screen="plan"] { background: #fbfaf7; }
 body[data-screen="plan"] .start-page { padding-top: 0; }
-.start-head { position: sticky; top: 0; z-index: 7; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+.start-head { position: sticky; top: 0; z-index: 7; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
   margin: 0 -16px 12px; padding: 10px 16px; background: rgba(251, 250, 247, .97); border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
 .start-head-text { margin: 0; display: grid; line-height: 1.2; }
 .start-head-text span { font-size: var(--small); color: var(--ink-2); }
-.start-head-button { flex: none; min-height: 52px; padding: 0 26px; border: 0; border-radius: 999px; background: var(--purple); color: #fff;
+.start-head-button { flex: none; max-width: 100%; min-height: 52px; padding: 10px 26px; white-space: normal; border: 0; border-radius: 999px; background: var(--purple); color: #fff;
   font: 700 1rem/1 var(--sans); letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
 .start-clock { display: inline-grid; grid-template-columns: auto auto auto; column-gap: 4px; align-items: end; justify-items: center; line-height: 1; }
 .start-clock b { font-size: 2.1rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ink); }
