@@ -15,3 +15,7 @@
   border-radius: 14px; font-weight: 700; text-decoration: none; }
 .plan-rows a span { flex: 1 1 auto; }
 .plan-rows svg { flex: none; width: 22px; height: 22px; }
+.plan-weekly { margin: 24px 0 18px; border: 1px solid var(--lav-ink); border-radius: 14px; }
+.plan-weekly > summary { min-height: 60px; padding: 16px 18px; cursor: pointer; font-weight: 700; color: var(--purple); }
+.plan-weekly-body { padding: 0 18px 18px; }
+.plan-weekly > summary:focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; border-radius: 14px; }

@@ -1,7 +1,7 @@
 // Fragebogen-Landingpage für Meta (Facebook, Instagram) und TikTok (Daniel, 8. Nov 2026).
 // Aufbau nach Noom/BetterMe (Daniel, 8. Nov 12:04: „adaptiere es 1:1“): 11 Fragen zum Alltag (keine Diagnose,
 // kein Stadium; mit ?m=<moment> aus der Anzeige 10), Zwischenbildschirme, „Plan wird erstellt“, E-Mail vor dem Ergebnis,
-// Ergebnis mit Zeitstrahl, lange Angebotsseite, dann die Web-Kasse (/abo/?weiter=1). Sätze aus den geprüften Satz-Seiten.
+// Konkrete Hilfe als Vorschau, Angebotsseite, dann die Web-Kasse (/abo/?weiter=1). Sätze aus den geprüften Satz-Seiten.
 // Datenschutz: freie Angaben bleiben in dieser Seite; nur feste Auswahl-Schlüssel werden im selben Tab
 // kurz für Neuladen gemerkt. Werbe- und Analyse-Ereignisse laufen über die gemeinsame
 // Einwilligung (DemenzConsent) und tragen nur den Schritt, nie eine Antwort.
@@ -176,9 +176,9 @@
       const pictures = { mama: "v-umarmung.webp", papa: "papa.webp", partner: "paar.webp", grosseltern: "grosseltern.webp" };
       const short = { mama: "Mutter", papa: "Vater", partner: "Partner", grosseltern: "Oma oder Opa" };
       return [
-        el("h1", { class: "start-center", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Dein Plan für schwierige Momente mit Demenz" }),
+        el("h1", { class: "start-center", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Persönliche Hilfe für schwierige Alltagssituationen" }),
         typed ? el("p", { class: "start-typed", text: `Deine Frage: „${typed}“` }) : null,
-        el("p", { class: "start-lead start-center", text: `Test in 2 Minuten · ${questions} kurze Fragen` }),
+        el("p", { class: "start-lead start-center", text: `Wähle, wobei du Unterstützung brauchst · ${questions} kurze Fragen` }),
         el("h2", { class: "start-question start-center", text: "Für wen suchst du Hilfe?" }),
         el("div", { class: "start-pics" }, relations.filter((item) => pictures[item.key]).map((item) => el("button", {
           type: "button", class: "start-pic", "aria-label": item.label, onclick: () => choose(item)
@@ -196,7 +196,7 @@
       input.addEventListener("keydown", (event) => { if (event.key === "Enter") save(); });
       return [
         el("h1", { text: `Wie nennst du ${answers.relation?.pron ?? "die Person"}?` }),
-        el("p", { class: "start-lead", text: "Dann klingt dein Plan nach euch. Der Name bleibt auf deinem Gerät." }),
+        el("p", { class: "start-lead", text: "So wird die Person in deiner Übersicht genannt. Der Name bleibt auf deinem Gerät." }),
         el("label", { for: "name", class: "sr-only", text: "Name" }),
         input,
         el("button", { type: "button", class: "abo-button", text: "Weiter", onclick: save }),
@@ -261,16 +261,16 @@
     ],
     minutes: () => [
       el("h1", { text: "Wie viel Zeit hast du dafür?" }),
-      el("p", { class: "start-lead", text: "Dein Plan passt sich an. Auch 2 Minuten reichen." }),
+      el("p", { class: "start-lead", text: "Du kannst auch mit einem einzelnen Satz oder einem kleinen Schritt beginnen." }),
       optionList(data.minutes, answers.minutes, pick("minutes", "minutes"))
     ],
     how: () => [
-      el("h1", { text: "So funktioniert dein Plan" }),
+      el("h1", { text: "So unterstützt dich Demenz Coach" }),
       el("ol", { class: "start-steps", role: "list" }, [
-        ["Jeden Tag ein Moment", `Zuerst „${bare(chosen().quote)}“, dann die nächsten häufigen Momente.`],
+        ["Eure Situation zuerst", answers.situation?.say ? `Wir beginnen mit „${bare(chosen().quote)}“.` : "Wähle eine Alltagssituation oder beschreibe selbst, was gerade schwierig ist."],
         ["Sätze zum Sagen", "Ruhige Sätze, die du gleich ausprobieren kannst."],
         ["Ein kleiner Schritt", "Was du tun kannst, in wenigen Minuten."],
-        ["Jede Woche neu", "Ein neuer Moment pro Woche, im Web, in der App und per E-Mail."]
+        ["Wochenplan als Ergänzung", "Weitere Alltagssituationen in kleinen Schritten kennenlernen."]
       ].map(([title, text]) => el("li", {}, [el("strong", { text: title }), el("span", { text })]))),
       next("how")
     ],
@@ -313,13 +313,13 @@
     };
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") send(); });
     return [
-      el("h1", { text: forWho() ? `Dein Plan für ${forWho()} ist fertig` : "Dein Plan ist fertig" }),
-      el("p", { class: "start-lead", text: "Gib deine E-Mail-Adresse ein, um deinen Plan zu sehen." }),
+      el("h1", { text: forWho() ? `Deine Hilfe für ${forWho()} ansehen` : "Deine persönliche Hilfe ansehen" }),
+      el("p", { class: "start-lead", text: "Gib deine E-Mail-Adresse ein, um zum Angebot zu kommen." }),
       el("label", { for: "email", class: "sr-only", text: "E-Mail" }),
       input,
-      el("button", { type: "button", class: "abo-button", text: "Plan ansehen", onclick: send }),
+      el("button", { type: "button", class: "abo-button", text: "Zum Angebot", onclick: send }),
       status,
-      el("p", { class: "start-small" }, ["Damit sichern wir deinen Plan und deinen Preis. Startest du ein Abo, kommen Bestätigung und Zugang an diese Adresse. Keine Werbung ohne dein Ja. ",
+      el("p", { class: "start-small" }, ["Startest du ein Abo, kommen Bestätigung und Zugang an diese Adresse. Für einen Willkommenspreis prüfen wir die Adresse. Keine Werbung ohne dein Ja. ",
         el("a", { href: "/datenschutz.html", text: "Datenschutz" }), "."])
     ];
   }
@@ -350,31 +350,25 @@
     ];
   }
 
-  // ---- Ergebnis mit Zeitstrahl (wie Noom: Prognose mit Datum, hier ehrlich: Momente, für die du Sätze hast) --
+  // Vorschau auf die konkrete Hilfe, ohne Lernprognose oder Wirkungsdarstellung.
   function resultScreen() {
     if (!completed) { completed = true; track("quiz_complete", "Lead"); window.DemenzTeller?.stage("complete"); }
-    const short = (date) => new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "short" }).format(date).replace(".", "");
-    const points = [[1, "Heute"], [7, short(inDays(7))], [10, short(inDays(28))], [18, short(inDays(84))]];
-    const width = 320;
-    const height = 170;
-    const x = (index) => 30 + index * ((width - 60) / (points.length - 1));
-    const y = (count) => height - 30 - (count / 18) * (height - 60);
-    const line = points.map(([count], index) => `${index ? "L" : "M"}${x(index).toFixed(1)} ${y(count).toFixed(1)}`).join(" ");
-    const dots = points.map(([count], index) => `<circle cx="${x(index).toFixed(1)}" cy="${y(count).toFixed(1)}" r="5" fill="#47408c"/>`).join("");
-    const labels = points.map(([count, label], index) => `<text x="${x(index).toFixed(1)}" y="${height - 8}" text-anchor="middle" font-size="12" fill="#55525e">${label}</text>`
-      + `<text x="${x(index).toFixed(1)}" y="${(y(count) - 12).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="#2e2870">${count}</text>`).join("");
-    const chart = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Momente, für die du Sätze hast: heute 1, nach 7 Tagen 7, nach 4 Wochen 10, nach 12 Wochen 18">`
-      + `<path d="${line} L${x(points.length - 1).toFixed(1)} ${height - 30} L${x(0).toFixed(1)} ${height - 30} Z" fill="#ece9f7"/>`
-      + `<path d="${line}" fill="none" stroke="#47408c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${dots}${labels}</svg>`;
+    const s = chosen();
     return [
-      el("h1", { text: forWho() ? `Dein Plan für ${forWho()} ist fertig` : "Dein Plan ist fertig" }),
-      el("p", { class: "start-lead", text: `Bis ${dateText(inDays(7))} kennst du ruhige Sätze für die 7 häufigsten Momente, angefangen mit „${bare(chosen().quote)}“.` }),
-      el("div", { class: "start-card start-chart" }, [
-        el("p", { class: "start-small", text: "Momente, für die du passende Sätze hast" }),
-        el("div", { html: chart })
+      el("h1", { text: "Passende Worte für euren Alltag" }),
+      el("p", { class: "start-lead", text: answers.situation?.say
+        ? "Wir beginnen mit der Situation, die dich gerade beschäftigt."
+        : "Hier siehst du ein Beispiel. Deine eigene Situation kannst du im Übersetzer beschreiben." }),
+      el("div", { class: "start-card" }, [
+        el("p", { class: "start-small", text: answers.situation?.say ? "Deine gewählte Situation" : "Ein Beispiel für die Hilfe" }),
+        el("h2", { text: `„${s.quote}“` }),
+        el("p", { class: "plan-label", text: "Ein Satz zum Ausprobieren" }),
+        el("ul", { class: "start-say", role: "list" }, [el("li", { text: `„${s.say[0]}“` })]),
+        el("p", { class: "plan-label", text: "Ein kleiner nächster Schritt" }),
+        el("p", { text: s.tip })
       ]),
-      el("p", { class: "start-small", text: "So ist der Plan aufgebaut: 7 Momente in der ersten Woche, danach jede Woche einer mehr. Allgemeine Hinweise ohne Gewähr." }),
-      el("button", { type: "button", class: "abo-button", text: "Weiter", onclick: () => go(after("result")) })
+      el("p", { class: "start-small", text: "Satzideen, nächste Schritte und weitere Alltagssituationen zum Nachschauen. Der Wochenplan ist eine zusätzliche Hilfe." }),
+      el("button", { type: "button", class: "abo-button", text: "Zum Angebot", onclick: () => go(after("result")) })
     ];
   }
 
@@ -448,7 +442,7 @@
   }
 
   // ---- Angebotsseite 1:1 nach BetterMe, Liven und Noom (lange Seite) --------------------------------
-  // Oben eine feste Leiste mit Probezeit und Knopf, Vorher/Nachher mit Zeichnungen, deine Angaben als Schilder,
+  // Oben eine feste Leiste mit Probezeit und Knopf, konkrete Situationsvorschau,
   // Rabatt-Box, Tarife mit Preis pro Tag, Knopf, sicher bezahlen, was du bekommst, Probezeit, FAQ, Tarife noch einmal.
   // Keine erfundenen Bewertungen, Nutzerzahlen oder unbelegte zeitliche Verknappung.
   function planScreen() {
@@ -468,7 +462,7 @@
     const name = forWho();
     // Labels wie BetterMe („GET MY PLAN“, „MOST POPULAR“). Statt „Beliebtester“ (ohne Verkaufszahlen nicht belegbar, UWG)
     // steht auf dem Jahresplan „Bester Preis“: belegbar, weil er pro Tag am günstigsten ist.
-    const ctaText = "Meinen Plan holen";
+    const ctaText = "Persönliche Hilfe starten";
 
     const tables = [];
     const select = (key) => {
@@ -510,26 +504,18 @@
 
     // Fester Kopf: sachliche Probezeit oder gewählter Plan, daneben der Knopf zu den Tarifen.
     const head = el("div", { class: "start-head" }, [
-      el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewählter Plan" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
-      el("button", { type: "button", class: "start-head-button", text: "Plan holen", onclick: scrollToPlans })
+      el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewähltes Abo" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
+      el("button", { type: "button", class: "start-head-button", text: "Abo ansehen", onclick: scrollToPlans })
     ]);
 
-    // Vorher/Nachher wie BetterMe: eine Karte mit „Jetzt | Mit deinem Plan“, zwei Zeichnungen, darunter Werte mit Balken.
-    const level = (filled) => el("span", { class: "start-level", "aria-hidden": "true" }, [1, 2, 3].map((index) => el("i", { class: index <= filled ? "on" : "" })));
-    const rows = [["Passende Worte", "fehlen oft", 1, "sind parat", 3], ["Ruhe im Alltag", "selten", 1, "öfter", 3]];
-    const compare = el("div", { class: "start-hero" }, [
-      el("div", { class: "start-hero-pics" }, [
-        el("p", { class: "start-hero-tabs" }, [el("span", { text: "Jetzt" }), el("span", { text: "Mit deinem Plan" })]),
-        el("img", { src: "../assets/zeichnungen/worte-fehlen.webp", alt: "", width: "260", height: "240", loading: "eager" }),
-        el("img", { src: "../assets/zeichnungen/v-umarmung.webp", alt: "", width: "260", height: "240", loading: "eager" })
-      ]),
-      el("div", { class: "start-hero-rows" }, [0, 1].map((side) => el("div", {}, rows.map((row) => el("div", { class: "start-hero-row" }, [
-        el("span", { text: row[0] }), el("strong", { text: side ? row[3] : row[1] }), level(side ? row[4] : row[2])]))))),
-      el("p", { class: "start-small start-center", text: "Beispielhafte Darstellung, kein Versprechen." })
+    // Nur tatsächlich vorhandene Hilfen zeigen. Keine Vorher-/Nachher-Wirkung versprechen.
+    const preview = el("div", { class: "start-card" }, [
+      el("p", { class: "start-small", text: answers.situation?.say ? "Deine gewählte Situation" : "Zum Beispiel" }),
+      el("h2", { text: `„${s.quote}“` }),
+      el("p", { text: "Satzideen zum Ausprobieren und kleine nächste Schritte für diesen Moment." })
     ]);
-
-    const gets = ["Jeden Tag ein Moment mit Sätzen zum Sagen", "Unbegrenzt eigene Sätze übersetzen lassen", "Jede Woche ein neuer Moment, auch per E-Mail",
-      "Blatt für Helfer zum Ausdrucken", "In der iPhone-App und hier im Web"];
+    const gets = ["Satzideen und nächste Schritte für die gewählte Situation", "Weitere Alltagssituationen zum Nachschauen",
+      "Ein Blatt über die Person für Helfer ausfüllen", "Wochenplan als zusätzliche Hilfe"];
     if (answers.burden?.key === "kraft") gets.splice(3, 0, "Kleine Hilfen für dich selbst");
     const faq = [
       ["Was kostet es?", (deal
@@ -552,20 +538,21 @@
 
     return [
       head,
-      compare,
       reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
-      el("h1", { class: "start-center start-plan-title", text: name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!" }),
+      el("h1", { class: "start-center start-plan-title", text: "Passende Worte für euren Alltag" }),
+      el("p", { class: "start-lead", text: name ? `Persönliche Hilfe für schwierige Alltagssituationen mit ${name}.` : "Persönliche Hilfe für schwierige Alltagssituationen." }),
+      preview,
       ticket(),
       table(),
       cta(),
       fine(),
       payments(),
       guarantee(),
-      el("h2", { class: "start-section start-center", text: "Was ist in deinem Plan?" }),
+      el("h2", { class: "start-section start-center", text: "Diese Hilfen gehören dazu" }),
       el("img", { class: "start-art", src: "../assets/zeichnungen/v-tanzen.webp", width: "600", height: "650", alt: "" }),
       el("ul", { class: "start-checks", role: "list" }, gets.map((text) => el("li", { text }))),
       el("div", { class: "start-card" }, [
-        el("h2", { text: `Wenn ${who()} sagt: „${s.quote}“` }),
+        el("h2", { text: `Wenn „${s.quote}“ fällt` }),
         el("p", { class: "start-small", text: "Probier heute einen dieser Sätze:" }),
         el("ul", { class: "start-say", role: "list" }, s.say.map((line) => el("li", { text: `„${line}“` })))
       ]),
@@ -578,7 +565,7 @@
       ]) : null,
       el("h2", { class: "start-section start-center", text: "Häufige Fragen" }),
       el("div", { class: "start-faq" }, faq.map(([question, answer]) => el("details", {}, [el("summary", { text: question }), el("p", { text: answer })]))),
-      el("h2", { class: "start-section start-center", text: name ? `Hol dir den Plan für ${name}` : "Hol dir deinen Plan" }),
+      el("h2", { class: "start-section start-center", text: name ? `Persönliche Hilfe für ${name}` : "Persönliche Hilfe für euren Alltag" }),
       ticket(),
       table(),
       cta(),

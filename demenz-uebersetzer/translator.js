@@ -234,13 +234,13 @@
   const planCTA = (result, place = 'ergebnis') => {
     if (ui || result?.safetyOnly || result?.selfCare || result?.feeling) return null;
     const moment = result?.key && planMoments.has(result.key) ? `&m=${result.key}` : '';
-    const link = element('a', { className: 'button', text: 'Meinen Plan zusammenstellen', attributes: { href: `/start/?src=${place}${moment}`, 'data-related-link': `plan_${place}` } });
+    const link = element('a', { className: 'button', text: 'Persönliche Hilfe ansehen', attributes: { href: `/start/?src=${place}${moment}`, 'data-related-link': `plan_${place}` } });
     link.addEventListener('click', () => track('plan_start_click', { place, result_key: result?.key ?? '' }));
     return element('aside', { className: `translator-plan-cta${place === 'ergebnis' ? '' : ' translator-plan-up'}` }, [
       data.planImage ? element('img', { className: 'translator-plan-art', attributes: { src: data.planImage.src, width: String(data.planImage.width), height: String(data.planImage.height), alt: '', decoding: 'async' } }) : null,
       element('div', {}, [
         element('h2', { text: planTitles[place] ?? planTitles.ergebnis }),
-        element('p', { text: 'Passende Satzideen für euren Alltag. Beantworte dafür ein paar Fragen zu eurer Lage.' }),
+        element('p', { text: 'Passende Worte und nächste Schritte für schwierige Alltagssituationen. Wähle, wobei du Unterstützung brauchst.' }),
         link
       ])
     ]);
