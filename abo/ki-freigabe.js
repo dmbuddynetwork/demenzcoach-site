@@ -6,7 +6,7 @@
   const endpoint = config.translatorGate?.endpoint || 'https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web';
   const pendingKey = 'demenzCoachKiOffen';
   const en = root.document?.documentElement?.lang === 'en';
-  let access, headerPromise, authModule, mountGeneration = 0;
+  let access, headerPromise, authModule, mountGeneration = 0, invitationShown = false;
   const exp = () => root.DemenzWebExperiments;
   const node = (doc, tag, text = '') => { const item = doc.createElement(tag); item.textContent = text; return item; };
   const returnPath = () => en ? '/en/dementia-translator/' : '/de/';
@@ -80,10 +80,23 @@
     link.addEventListener('click', () => { remember(sentence); exp()?.track(signup ? 'web_signup_shown' : 'web_checkout_clicked'); }); card.append(link);
     if (!signup) { const login = node(doc, 'a', en ? 'Already a member? Sign in' : 'Schon Mitglied? Anmelden'); login.href = accountURL(); login.addEventListener('click', () => remember(sentence)); card.append(login); }
     card.append(node(doc, 'p', en ? 'Safety information and public guides remain free.' : 'Sicherheitshinweise und öffentliche Ratgeber bleiben kostenlos.'));
+    if (signup && config.signIn?.emailLink === true) {
+      import('/abo/inline-signup.js').then(({ mountInlineSignup }) => {
+        if (card.isConnected) return mountInlineSignup(card, { bonus, en, purpose: enabled() ? 'intro' : 'invitation', returnTo: returnPath(), onBegin: () => remember(sentence) });
+      }).catch(() => { /* The existing accessible account link remains usable. */ });
+    }
     exp()?.track(signup ? 'web_signup_shown' : 'web_paywall_shown'); return card;
   }
   function afterAnswer(result, doc = root.document) {
-    if (!enabled()) return null;
+    if (!enabled()) {
+      if (config.signIn?.offerAfterAnswer !== true || config.signIn?.emailLink !== true || invitationShown || result?.safetyLevel !== 'standard' || result?.safetyMessage) return null;
+      invitationShown = true;
+      const card = offerCard({ reason: 'signup_required', doc });
+      card.querySelector('h3').textContent = en ? 'Your free account' : 'Dein kostenloser Zugang';
+      card.querySelector('p').textContent = en ? 'Continue with Google or email. No password or payment details required.' : 'Mit Google oder E-Mail weiter. Ohne Passwort und ohne Zahlungsdaten.';
+      card.querySelector('a').textContent = en ? 'Create or sign in to an account' : 'Kostenloses Konto einrichten';
+      return card;
+    }
     accept(result.access);
     if (!access || result.safetyLevel !== 'standard' || result.safetyMessage) return null;
     exp()?.track('web_answer_completed');

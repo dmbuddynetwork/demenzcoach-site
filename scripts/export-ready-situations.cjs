@@ -53,7 +53,7 @@ const server = http.createServer((req, res) => {
     for (const lang of ['de', 'en']) for (const entry of entries[lang].filter(value=>!topicFilter||topicFilter.has(value.page.topicId))) {
       const goal = lang === 'de' && !entry.selfCare ? 'jetzt' : '';
       if (entry.reviewStatus !== 'reviewed') throw Error('Only reviewed public catalog entries may be exported');
-      const captures = [];
+      const captures = [], formPositions = [];
       for (let repetition = 0; repetition < 2; repetition++) {
         const context = await browser.newContext({ viewport: { width: 1280, height: 1100 }, reducedMotion: 'reduce' });
         const errors = [], forbidden = [];
@@ -76,15 +76,18 @@ const server = http.createServer((req, res) => {
           await page.locator('#translator-result:not([hidden])').waitFor();
           const observed = await page.evaluate(key => {
             const output = document.getElementById('translator-result');
-            const primary = output.querySelectorAll('#translator-form');
-            if (primary.length !== 1 || document.querySelectorAll('#translator-form').length !== 1) throw Error('Expected one real primary form in rendered output');
-            const clone = output.cloneNode(true); clone.querySelector('#translator-form').remove();
+            const primary = document.querySelectorAll('#translator-form');
+            const topMode = document.body.dataset.translatorInputPosition === 'top';
+            if (primary.length !== 1) throw Error('Expected exactly one real primary form in document');
+            const isBefore = Boolean(primary[0].compareDocumentPosition(output) & Node.DOCUMENT_POSITION_FOLLOWING);
+            if (topMode ? (output.contains(primary[0]) || !isBefore || !primary[0].getBoundingClientRect().height) : !output.contains(primary[0])) throw Error('Primary form is not in its declared live position');
+            const clone = output.cloneNode(true); clone.querySelector('#translator-form')?.remove();
             const data=JSON.parse(document.getElementById('translator-data').textContent),entry=data.entries.find(item=>item.key===key);
             if(!entry)throw Error('Expected fixed catalog key');
             const translate=window.DemenzTranslatorLocale?.create(data.ui)||((text)=>text);
             const publicPersonal={formal:false,callName:'',me:'',role:''};
             const expectedPhrases=entry.phrases.map(phrase=>translate(entry.selfCare?phrase:window.DemenzTranslatorCore.personalize(phrase,publicPersonal,data.formal)));
-            return { expectedPhrases, html: clone.innerHTML, text: output.textContent, input: document.getElementById('translator-input').value,
+            return { primaryFormPosition: topMode ? 'top' : 'below', expectedPhrases, html: clone.innerHTML, text: output.textContent, input: document.getElementById('translator-input').value,
               rawData: JSON.stringify(JSON.parse(document.getElementById('translator-data').textContent)),
               personalKeys: Object.keys(localStorage).filter(key => !['demenzcoach.analyticsConsent.v1', 'demenzcoach.marketingConsent.v1'].includes(key)), sessionKeys: Object.keys(sessionStorage) };
           },entry.key);
@@ -96,11 +99,13 @@ const server = http.createServer((req, res) => {
           const actualPath=new URL(page.url()).pathname;
           if(actualPath!==entry.page.path)throw Error(`Public entry did not normalize to its fixed path: ${lang}/${entry.key}`);
           captures.push(observed.html.split(origin).join('https://dementiacoachapp.com'));
+          formPositions.push(observed.primaryFormPosition);
         } finally { await context.close(); }
       }
+      if (formPositions[0] !== formPositions[1]) throw Error('Nondeterministic primary form position');
       if (captures[0] !== captures[1]) throw Error(`Nondeterministic actual DOM: ${lang}/${entry.key}`);
       entry.view = { key: entry.key, language: lang, goal, bindings: bindings[lang], html: captures[0], formExcluded: true };
-      report.cases.push({ language: lang, key: entry.key, goal, freshContexts: 2, identicalDOM: true, htmlSHA256: sha(captures[0]), originalFormRemovedMechanically: true });
+      report.cases.push({ language: lang, key: entry.key, goal, freshContexts: 2, identicalDOM: true, htmlSHA256: sha(captures[0]), originalFormExcluded: true, primaryFormPosition: formPositions[0] });
       verifySources();
       console.log(JSON.stringify({exported:lang+'/'+entry.key,cases:report.cases.length,freshContexts:report.cases.length*2,identicalDOM:true}));
     }

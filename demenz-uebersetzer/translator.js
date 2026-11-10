@@ -25,11 +25,14 @@
   let initialTitle = document.title;
   const formStartParent = form.parentNode;
   const formStartNext = form.nextSibling;
+  const keepInputAtTop = document.body.dataset.translatorInputPosition === 'top';
   const initialPlaceholder = input.getAttribute('placeholder') ?? '';
   let syncChat = () => {};
   let syncHelpful = () => {};
   const setViewState = (state) => {
     document.body.dataset.translatorState = state;
+    const examples = document.querySelector('[data-ready-situations]');
+    if (examples) examples.hidden = state !== 'input';
     syncHelpful();
     requestAnimationFrame(() => syncChat());
     if (!homeHeading) return;
@@ -553,13 +556,30 @@
   // Nach dem Ergebnis rückt das Eingabefeld unter die Antwort (Daniel, 9. Nov: oben lenkt es von den Ziel-Knöpfen ab;
   // statt „Neuen Satz übersetzen“ einfach weiterschreiben). Dasselbe Formular, nur verschoben und leer.
   let formMoved = false;
-  // Es steht direkt nach Hinweis und „War das hilfreich?“, vor App- und Listen-Angeboten.
+  // Legacy pages keep the follow-up below; prepared app pages keep the same form above the answer.
   const setFollowupOpen = (open) => {
     const details = output.querySelector('.translator-followup-question');
     if (details) details.open = open || Boolean(input.value.trim()) || form.contains(document.activeElement);
   };
+  const foldSignup = () => {
+    const signup = output.querySelector(':scope > .translator-signup');
+    if (signup) {
+      const extra = element('details', { className: 'translator-extra-offers' }, [element('summary', { text: 'Alle Sätze zum Ausdrucken' })]);
+      signup.before(extra);
+      extra.append(signup);
+    }
+  };
   const formBelow = ({ open = false } = {}) => {
     form.hidden = false;
+    if (keepInputAtTop) {
+      formStartParent.insertBefore(form, formStartNext?.parentNode === formStartParent ? formStartNext : null);
+      form.classList.remove('translator-form-below');
+      formMoved = false;
+      input.setAttribute('placeholder', initialPlaceholder);
+      grow();
+      foldSignup();
+      return;
+    }
     let followup = output.querySelector(':scope > .translator-followup');
     if (!followup) {
       followup = element('section', { className: 'translator-followup' });
@@ -573,12 +593,7 @@
     input.value = '';
     grow();
     setFollowupOpen(open);
-    const signup = output.querySelector(':scope > .translator-signup');
-    if (signup) {
-      const extra = element('details', { className: 'translator-extra-offers' }, [element('summary', { text: 'Alle Sätze zum Ausdrucken' })]);
-      signup.before(extra);
-      extra.append(signup);
-    }
+    foldSignup();
     if (formMoved) return;
     formMoved = true;
     form.classList.add('translator-form-below');
@@ -640,17 +655,18 @@
       element('div', { className: 'translator-goals', attributes: { role: 'group', 'aria-labelledby': 'translator-goal-heading', 'aria-describedby': 'translator-selected-situation' } }, goals.map((goal) => goalButton(goal, () => {
         track('translator_goal', { goal: goal.id, result_key: entry.key });
         setPage(entry, goal.id);
-        render(entry, { ...options, goal: goal.id });
+        render(entry, { ...options, goal: goal.id, preserveViewport: false });
       }))),
       element('p', { className: 'translator-change-situation' }, [changeSituation])
     ].filter(Boolean));
     output.hidden = false;
     document.body.classList.add('translator-has-result');
-    // Vor einer Antwort gibt es noch keine Rückfrage: denselben Entwurf behalten,
-    // das große Formular erst beim Zurückgehen oder nach dem Ergebnis zeigen.
-    form.hidden = true;
-    heading.focus({ preventScroll: true });
-    output.scrollIntoView({ behavior: 'instant', block: 'start' });
+    // Keep the one top input available even while choosing a goal.
+    form.hidden = !keepInputAtTop;
+    if (!options.preserveViewport) {
+      heading.focus({ preventScroll: true });
+      output.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
   };
 
   // Sätze merken (Daniel, 8. Nov): nur in diesem Browser (translator-saved.js), nur Sätze aus den festen Antworten.
@@ -1235,7 +1251,7 @@
 
   const moodLead = ui?.moodLead ?? { wut: 'Zuerst beruhigen', trauer: 'Zuerst trösten', angst: 'Zuerst Sicherheit geben' };
 
-  const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null, goal = '', protection = '' } = {}) => {
+  const render = (entry, { safetyHit = false, alternatives = [], also = [], typed = '', mood = null, goal = '', protection = '', preserveViewport = false } = {}) => {
     if (!entry) {
       renderUnknown({ safetyHit, typed });
       return;
@@ -1458,7 +1474,7 @@
       ]));
     }
 
-    // „Neuen Satz übersetzen“ entfällt (Daniel, 9. Nov): Unter dem Ergebnis steht das Feld zum Weiterschreiben (formBelow).
+    // Continue through the one shared form; its declared layout decides the position.
     if (!moreContent.length && !deeperInList && deeper.length) nodes.push(element('div', { className: 'translator-result-links' }, deeper));
     // Sicherheits- und Haftungshinweis als EINE ruhige Karte (Daniel, 9. Nov: „gestalte disclaimer besser“).
     nodes.push(notesCard(result.safety && !result.safetyOnly && !safetyHit && !safetyFirst ? safetyAside() : null, disclaimer()));
@@ -1476,8 +1492,10 @@
     document.body.classList.remove('translator-answers-seen');
     formBelow();
     requestAnimationFrame(() => syncSticky());
-    focusResult(heading);
-    output.scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (!preserveViewport) {
+      focusResult(heading);
+      output.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
   };
 
   const setHash = (key, prefix = phraseHash) => {
@@ -1499,7 +1517,7 @@
   }
 
   function show(entry, source) {
-    if (!input.value.trim()) input.value = entry.says;
+    if (!keepInputAtTop && !input.value.trim()) input.value = entry.says;
     grow();
     askGoal(entry);
     setPage(entry);
@@ -1525,6 +1543,8 @@
       return;
     }
     emptyHint.textContent = '';
+    // Clear only the submitted text; later goal changes must keep a new draft.
+    if (keepInputAtTop) { input.value = ''; grow(); }
     typedCount += 1;
     const { entry, alternatives, safetyHit, feeling, also, mood, context, protection } = core.match(text, data);
     if (protection === 'self') {
@@ -1603,7 +1623,7 @@
     const entry = entryByKey.get(key);
     if (!entry) return;
     setHash(key);
-    input.value = entry.says;
+    if (!keepInputAtTop) input.value = entry.says;
     grow();
     render(entry);
     track('translator_result', { result_key: entry.key, input_source: 'link', safety_hint: 'no' });
@@ -1614,16 +1634,16 @@
   const legacyKey = location.hash.slice(location.hash.indexOf('-') + 1);
   const validLegacyState = hasLegacyState && (location.hash.startsWith(`#${feelingHash}`)?feelingEntries.has(legacyKey):entryByKey.has(legacyKey));
   if(!validLegacyState&&linkedEntry&&(!linkedEntry.safetyOnly||staticDefault||(linkedEntry.selfCare&&publicByKey.has(linkedEntry.key)))){
-    const goal=params.get('ziel')||'';input.value=linkedEntry.says;grow();
+    const goal=params.get('ziel')||'';if(!keepInputAtTop)input.value=linkedEntry.says;grow();
     if(linkedEntry.safetyOnly&&!linkedEntry.selfCare)render(linkedEntry,{safetyHit:true});
-    else if(validGoals.has(goal)||!goalsFor(linkedEntry))render(linkedEntry,{goal});
-    else askGoal(linkedEntry);
+    else if(validGoals.has(goal)||!goalsFor(linkedEntry))render(linkedEntry,{goal,preserveViewport:keepInputAtTop});
+    else askGoal(linkedEntry,{preserveViewport:keepInputAtTop});
     setPage(linkedEntry,goal,false);
     track('translator_result',{result_key:linkedEntry.key,input_source:'link',safety_hint:linkedEntry.safetyOnly&&!linkedEntry.selfCare?'yes':'no'});
   }else if(staticDefault&&!validLegacyState){
     const requestedGoal=pathState?pathState.goal:document.body.dataset.translatorInitialGoal;
-    if(pathState&&pathState.route.selectionPath===location.pathname)askGoal(staticDefault);
-    else{render(staticDefault,{goal:validGoals.has(requestedGoal)?requestedGoal:''});formBelow({open:true});}
+    if(pathState&&pathState.route.selectionPath===location.pathname)askGoal(staticDefault,{preserveViewport:keepInputAtTop});
+    else{render(staticDefault,{goal:validGoals.has(requestedGoal)?requestedGoal:'',preserveViewport:keepInputAtTop});formBelow({open:true});}
     if(location.search||location.hash){const clean=new URL(location.href);clean.search='';clean.hash='';history.replaceState(history.state,'',clean);}
     document.title=initialTitle;
     track('translator_result',{result_key:staticDefault.key,input_source:'link',safety_hint:'no'});
