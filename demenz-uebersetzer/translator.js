@@ -21,19 +21,21 @@
   // übersetzt von translator-locale.js. Auf deutschen Seiten fehlt data.ui, alles bleibt wie bisher.
   const ui = data.ui ?? null;
   const tr = window.DemenzTranslatorLocale?.create(ui) ?? ((text) => text);
-  const homeHeading = document.getElementById('home-title');
-  const initialTitle = document.title;
+  let homeHeading = document.getElementById('home-title');
+  let initialTitle = document.title;
   const formStartParent = form.parentNode;
   const formStartNext = form.nextSibling;
   const initialPlaceholder = input.getAttribute('placeholder') ?? '';
   let syncChat = () => {};
+  let syncHelpful = () => {};
   const setViewState = (state) => {
     document.body.dataset.translatorState = state;
+    syncHelpful();
     requestAnimationFrame(() => syncChat());
     if (!homeHeading) return;
     homeHeading.hidden = state !== 'input';
     // Nur feste Zustandsnamen: eingegebener Freitext gehört nicht in Seitentitel/Analytics.
-    document.title = state === 'input' ? initialTitle : ui?.lang === 'en'
+    document.title = state !== 'input' && activePublicRoute ? activePublicRoute.title : state === 'input' ? initialTitle : ui?.lang === 'en'
       ? (state === 'goal' ? 'Choose your goal | Dementia Coach' : 'Your answer | Dementia Coach')
       : ui ? initialTitle : state === 'goal' ? 'Dein Ziel wählen | Demenz Coach' : 'Deine Antwort | Demenz Coach';
   };
@@ -43,6 +45,35 @@
   const entryByKey = new Map(data.entries.map((entry) => [entry.key, entry]));
   const toolURL = data.toolURL;
   const appURL = ui?.appURL ?? 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=seo_de_translator&mt=8';
+  // Only routes emitted by the successful current app build are public app states.
+  const routeLanguage = ui?.lang === 'en' ? 'en' : 'de';
+  const publicRoutes = (data.generatorRoutes || []).filter(route => route.language === routeLanguage && entryByKey.has(route.key) && /^\/(?!\/)[^?&#]*$/.test(route.path));
+  const publicByKey = new Map(publicRoutes.map(route => [route.key, route]));
+  const routePath = (route, goal = 'jetzt') => route.goalPaths ? (['jetzt','verstehen','tipps'].includes(goal) && Object.hasOwn(route.goalPaths, goal) ? route.goalPaths[goal] : route.selectionPath) : route.path;
+  const pathState = publicRoutes.flatMap(route => [{route,goal:route.goalPaths?'jetzt':'',path:route.path},...(route.goalPaths ? Object.entries(route.goalPaths).filter(([goal])=>goal!=='jetzt').map(([goal,path])=>({route,goal,path})).concat([{route,goal:'',path:route.selectionPath}]) : [])]).find(state=>state.path===location.pathname);
+  let activePublicRoute = pathState?.route || null;
+  let currentGoal = pathState?.goal || new URLSearchParams(location.search).get('ziel') || 'jetzt';
+  const appMetadataNode = document.getElementById('translator-app-meta');
+  const appMetadata = appMetadataNode ? JSON.parse(appMetadataNode.textContent) : {title:initialTitle,description:document.querySelector('meta[name="description"]')?.content||'',canonical:new URL('/'+routeLanguage+'/',toolURL).href,alternates:[...document.querySelectorAll('link[rel="alternate"][hreflang]')].map(node=>({lang:node.hreflang,href:node.href})),structuredData:[...document.querySelectorAll('script[type="application/ld+json"]')].map(node=>JSON.parse(node.textContent))};
+  let topicContextActive = false;
+  const topicMetadata = route => {
+    activePublicRoute=route;
+    const canonical=new URL(route.path,toolURL).href;
+    document.title=route.title;
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href',canonical);
+    for(const [selector,value] of [['meta[name="description"]',route.description],['meta[property="og:title"]',route.title],['meta[property="og:description"]',route.description],['meta[property="og:url"]',canonical],['meta[name="twitter:title"]',route.title],['meta[name="twitter:description"]',route.description]])document.querySelector(selector)?.setAttribute('content',value);
+    const de=route.language==='de'?route.path:route.alternatePath,en=route.language==='en'?route.path:route.alternatePath;
+    document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(node=>node.remove());
+    for(const [lang,path]of [['de',de],['en',en],['x-default',de]]){const node=document.createElement('link');node.rel='alternate';node.hreflang=lang;node.href=new URL(path,toolURL).href;document.head.append(node);}
+    let schema=document.getElementById('translator-situation-schema');
+    if(!schema){schema=document.createElement('script');schema.type='application/ld+json';schema.id='translator-situation-schema';document.head.append(schema);}
+    schema.textContent=JSON.stringify({'@context':'https://schema.org','@type':'WebPage','@id':canonical,url:canonical,name:route.title,description:route.description,inLanguage:route.language});
+    topicContextActive=true;
+  };
+  const shareLink = result => {
+    const route=publicByKey.get(result?.key);
+    return route ? new URL(routePath(route,currentGoal),toolURL).href : result.url || toolURL;
+  };
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Ab dieser Punktzahl (translator-core rank) gilt ein Treffer als sicher: mehrere Wörter oder ein langes Stichwort.
   const strongScore = ui?.strongScore ?? 4;
@@ -120,7 +151,7 @@
 
   // Geteilt wird nur die öffentliche Seite des Ergebnisses, nie die Eingabe.
   const shareBlock = (result) => {
-    const url = result.url || toolURL;
+    const url = shareLink(result);
     const text = tr(shareText(result));
     // Ein einziger Knopf: Teilen-Menü des Handys, sonst WhatsApp.
     if (navigator.share) {
@@ -184,36 +215,201 @@
     return { toggle, block, open, refresh, addAI };
   };
 
-  const feedbackBlock = (result, retry) => {
+  // Separate from savedPhrases: explicitly requested browser-local answer copies.
+  // No original input, personalization settings, sharing data or network writes.
+  const helpfulKey = 'demenzcoach.helpfulAnswers.v1';
+  const helpfulLanguage = ui?.lang || 'de';
+  const helpfulCopy = helpfulLanguage === 'de' ? {
+    title: 'Deine hilfreichen Antworten', ai: 'Gemerkte KI-Antwort', open: 'Antwort öffnen',
+    notice: '„Ja, merken“ speichert die Antwort in diesem Browser, sichtbar für alle, die ihn nutzen.',
+    yes: 'Ja, merken', saved: 'Antwort gemerkt.', failed: 'Das Merken konnte nicht bestätigt werden. Bitte erneut versuchen.',
+    local: 'Nur in diesem Browser gespeichert.', remove: 'Entfernen', clear: 'Alle hilfreichen Antworten löschen',
+    removed: 'Antwort entfernt.', cleared: 'Hilfreiche Antworten gelöscht.',
+    removeFailed: 'Das Löschen konnte nicht bestätigt werden.', broken: 'Die gemerkten Antworten konnten nicht gelesen werden.',
+    unavailable: 'Diese vorbereitete Antwort ist nicht mehr verfügbar.',
+    history: 'Gemerkte KI-Antwort. Prüfe, ob sie noch zu eurer Situation passt.'
+  } : helpfulLanguage === 'en' ? {
+    title: 'Your helpful answers', ai: 'Saved AI answer', open: 'Open answer',
+    notice: '“Yes, save” keeps this answer in this browser, visible to anyone who uses it.',
+    yes: 'Yes, save', saved: 'Answer saved.', failed: 'Saving could not be confirmed. Please try again.',
+    local: 'Saved only in this browser.', remove: 'Remove', clear: 'Delete all helpful answers',
+    removed: 'Answer removed.', cleared: 'Helpful answers deleted.',
+    removeFailed: 'Deletion could not be confirmed.', broken: 'Your saved answers could not be read.',
+    unavailable: 'This prepared answer is no longer available.',
+    history: 'Saved AI answer. Check whether it still fits your situation.'
+  } : null;
+  const exactFields = (value, keys) => value && typeof value === 'object' && !Array.isArray(value)
+    && Object.keys(value).length === keys.length && keys.every((key) => Object.hasOwn(value, key));
+  const helpfulText = (text, max, allowEmpty = false) => typeof text === 'string'
+    && text.length <= max && (allowEmpty || text.trim().length > 0);
+  const normalizeHelpful = (item) => {
+    if (!item || !['de', 'en'].includes(item.language)) return null;
+    if (item.kind === 'catalog' && exactFields(item, ['kind', 'language', 'key', 'goal'])
+      && typeof item.key === 'string' && /^[a-z0-9-]{1,60}$/u.test(item.key)
+      && ['', 'jetzt', 'verstehen', 'tipps'].includes(item.goal)) {
+      return { kind: 'catalog', language: item.language, key: item.key, goal: item.goal };
+    }
+    if (item.kind !== 'ai' || !exactFields(item, ['kind', 'language', 'answer'])) return null;
+    const answer = item.answer;
+    if (!exactFields(answer, ['meaning', 'phrases', 'avoid', 'nextStep', 'safetyLevel'])
+      || answer.safetyLevel !== 'standard' || !helpfulText(answer.meaning, 1600)
+      || !Array.isArray(answer.phrases) || !answer.phrases.length || answer.phrases.length > 3
+      || !answer.phrases.every((phrase) => helpfulText(phrase, 1000))
+      || !helpfulText(answer.avoid, 1000) || !helpfulText(answer.nextStep, 1600, true)) return null;
+    return { kind: 'ai', language: item.language, answer: { meaning: answer.meaning,
+      phrases: [...answer.phrases], avoid: answer.avoid, nextStep: answer.nextStep, safetyLevel: 'standard' } };
+  };
+  const helpfulStore = {
+    read() {
+      try {
+        const raw = localStorage.getItem(helpfulKey);
+        if (raw === null) return { ok: true, items: [] };
+        if (raw.length > 120000) return { ok: false, items: [] };
+        const value = JSON.parse(raw);
+        if (!exactFields(value, ['version', 'items']) || value.version !== 1
+          || !Array.isArray(value.items) || value.items.length > 20) return { ok: false, items: [] };
+        const items = value.items.map(normalizeHelpful);
+        return items.some((item) => !item) ? { ok: false, items: [] } : { ok: true, items };
+      } catch { return { ok: false, items: [] }; }
+    },
+    write(items) {
+      try {
+        const normalized = items.slice(0, 20).map(normalizeHelpful);
+        if (normalized.some((item) => !item)) return false;
+        const value = JSON.stringify({ version: 1, items: normalized });
+        if (value.length > 120000) return false;
+        if (normalized.length) {
+          localStorage.setItem(helpfulKey, value);
+          return localStorage.getItem(helpfulKey) === value;
+        }
+        localStorage.removeItem(helpfulKey);
+        return localStorage.getItem(helpfulKey) === null;
+      } catch { return false; }
+    },
+    add(item) {
+      const current = this.read(), normalized = normalizeHelpful(item);
+      if (!current.ok || !normalized) return false;
+      const encoded = JSON.stringify(normalized);
+      return this.write([normalized, ...current.items.filter((saved) => JSON.stringify(saved) !== encoded)]);
+    },
+    remove(item) {
+      const current = this.read();
+      return current.ok && this.write(current.items.filter((saved) => JSON.stringify(saved) !== JSON.stringify(item)));
+    },
+    clear() { return this.write([]); }
+  };
+  const helpfulCatalog = (entry) => entry && entryByKey.get(entry.key) === entry && !entry.safetyOnly
+    && !entry.safety && !entry.urgentLead && !(entry.safetyFirst?.length);
+  const helpfulAI = (result) => result.safetyLevel === 'standard' && !result.safetyMessage ? normalizeHelpful({
+    kind: 'ai', language: helpfulLanguage, answer: { meaning: result.meaning, phrases: result.phrases,
+      avoid: result.avoid, nextStep: result.nextStep ?? '', safetyLevel: result.safetyLevel }
+  }) : null;
+  let renderHelpful = () => {};
+
+  const feedbackCopy = !ui ? {
+    question: 'Was hat nicht gepasst?', situation: 'Die Situation wurde falsch verstanden.',
+    wording: 'Die Formulierung passte nicht.', send: 'Mit deiner Auswahl sendest du uns den Grund.',
+    saving: 'Wird gespeichert …', saved: 'Danke, deine Auswahl wurde gespeichert.',
+    missing: 'Bestätigung fehlt. Bitte versuche es erneut.', skip: 'Ohne Auswahl weiter', next: 'Weiter'
+  } : ui.lang === 'en' ? {
+    question: 'What did not fit?', situation: 'The situation was misunderstood.',
+    wording: 'The wording did not fit.', send: 'Choosing an option sends us the reason.',
+    saving: 'Saving …', saved: 'Thank you. Your choice has been saved.',
+    missing: 'Confirmation is missing. Please try again.', skip: 'Continue without choosing', next: 'Continue'
+  } : null;
+  const feedbackBlock = (result, retry, { allowShare = true, askReason = true, onContinue, helpfulItem } = {}) => {
     const wrapper = element('div', { className: 'translator-feedback', attributes: { role: 'group', 'aria-label': 'War das hilfreich?' } }, [
       element('span', { text: 'War das hilfreich?' })
     ]);
     const answer = (helpful) => () => {
       track('translator_feedback', { result_key: result.key, helpful: helpful ? 'yes' : 'no' });
+      if (helpful && helpfulItem) {
+        if (!helpfulStore.add(helpfulItem)) { saveStatus.textContent = helpfulCopy.failed; return; }
+        renderHelpful();
+      }
       // Teilen erst nach „Ja“: eine Zeile weniger unter dem Ergebnis, und
       // gefragt wird genau dann, wenn es geholfen hat.
       // Der gedrückte Knopf verschwindet; damit Tastatur und Vorlesen nicht
       // ins Leere springen, bekommt der Dank-Satz den Fokus.
       const thanks = (text) => element('span', { text, attributes: { tabindex: '-1' } });
       if (helpful) {
-        const note = thanks('Danke! Teile es gern mit deiner Familie:');
-        wrapper.replaceChildren(note, shareBlock(result));
+        const note = thanks(helpfulItem ? helpfulCopy.saved : allowShare ? 'Danke! Teile es gern mit deiner Familie:' : 'Danke für die Rückmeldung.');
+        wrapper.replaceChildren(note, ...(allowShare ? [shareBlock(result)] : []));
         note.focus({ preventScroll: true });
+        if (result.requestID) {
+          const supporter = window.DemenzKiFreigabe?.supporterCard();
+          if (supporter) wrapper.append(supporter);
+        }
         return;
       }
-      const asked = input.value.trim() || result.says || '';
-      const box = aiBox(asked, 'feedback');
-      const note = thanks(retry
-        ? 'Danke. Oben steht ein zweiter Versuch.'
-        : (box ? 'Danke. Frag gern die KI nach einer Antwort für eure Lage:' : 'Danke für die Rückmeldung.'));
-      wrapper.replaceChildren(note, retry ? '' : (box || ''));
-      note.focus({ preventScroll: true });
-      if (retry) {
-        retry.addAI(box);
-        retry.open('feedback');
+      const continueAfterFeedback = () => {
+        if (onContinue) { onContinue(); return; }
+        const asked = input.value.trim() || result.says || '';
+        const box = aiBox(asked, 'feedback', () => {}, { allowHelpful: Boolean(helpfulItem) });
+        const note = thanks(retry
+          ? 'Danke. Oben steht ein zweiter Versuch.'
+          : (box ? 'Danke. Frag gern die KI nach einer Antwort für eure Lage:' : 'Danke für die Rückmeldung.'));
+        wrapper.replaceChildren(note, retry ? '' : (box || ''));
+        note.focus({ preventScroll: true });
+        if (retry) {
+          retry.addAI(box);
+          retry.open('feedback');
+        }
+      };
+      // Other translated interfaces retain their existing feedback flow until their
+      // own wording is ready; no German fallback strings appear in those interfaces.
+      if (!feedbackCopy || !askReason) { continueAfterFeedback(); return; }
+      wrapper.setAttribute('aria-label', feedbackCopy.question);
+      const question = thanks(feedbackCopy.question);
+      const status = element('span', { attributes: { role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' } });
+      let saving = false;
+      let saved = false;
+      const choices = [];
+      const next = button(feedbackCopy.skip, 'translator-copy', () => {
+        if (!saving) continueAfterFeedback();
+      });
+      const choose = async (reason, selected) => {
+        if (saving || saved) return;
+        saving = true;
+        choices.forEach((choice) => choice.setAttribute('aria-disabled', 'true'));
+        next.setAttribute('aria-disabled', 'true');
+        status.textContent = feedbackCopy.saving;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
+        try {
+          const endpoint = window.DemenzTranslatorAI?.endpoint;
+          if (!endpoint) throw new Error('unavailable');
+          const response = await fetch(`${endpoint}/feedback`, {
+            method: 'POST', mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason }), signal: controller.signal
+          });
+          if (!response.ok || (await response.json())?.ok !== true) throw new Error('unconfirmed');
+          saved = true;
+          selected.setAttribute('aria-pressed', 'true');
+          status.textContent = feedbackCopy.saved;
+        } catch {
+          // A lost acknowledgement can follow a successful write. Never claim
+          // that nothing was saved or retry automatically.
+          status.textContent = feedbackCopy.missing;
+        } finally {
+          clearTimeout(timer);
+          saving = false;
+          choices.forEach((choice) => choice.setAttribute('aria-disabled', String(saved)));
+          next.setAttribute('aria-disabled', 'false');
+          next.textContent = feedbackCopy.next;
+        }
+      };
+      for (const [reason, label] of [['situation_mismatch', feedbackCopy.situation], ['wording_mismatch', feedbackCopy.wording]]) {
+        const choice = button(label, 'translator-copy', () => choose(reason, choice), { 'aria-pressed': 'false' });
+        choices.push(choice);
       }
+      wrapper.replaceChildren(question, element('span', { text: feedbackCopy.send }), ...choices, status, next);
+      question.focus({ preventScroll: true });
     };
-    wrapper.append(withIcon(button('', 'translator-copy', answer(true)), '👍', 'Ja'), withIcon(button('', 'translator-copy', answer(false)), '👎', 'Nein'));
+    const saveStatus = element('span', { attributes: { role: 'status', 'aria-live': 'polite' } });
+    if (helpfulItem) wrapper.append(element('small', { className: 'translator-helpful-notice', text: helpfulCopy.notice }));
+    wrapper.append(withIcon(button('', 'translator-copy', answer(true)), '👍', helpfulItem ? helpfulCopy.yes : 'Ja'), withIcon(button('', 'translator-copy', answer(false)), '👎', 'Nein'), saveStatus);
     return wrapper;
   };
 
@@ -233,14 +429,14 @@
   const planTitles = { ergebnis: 'Und wenn dieser Satz wiederkommt?', wieder: 'Das passiert öfter?', tipps: 'Ein Plan für euren Alltag' };
   const planCTA = (result, place = 'ergebnis') => {
     if (ui || result?.safetyOnly || result?.selfCare || result?.feeling) return null;
-    const moment = result?.key && planMoments.has(result.key) ? `&m=${result.key}` : '';
-    const link = element('a', { className: 'button', text: 'Meinen Plan zusammenstellen', attributes: { href: `/start/?src=${place}${moment}`, 'data-related-link': `plan_${place}` } });
+    const moment = result?.key ? `&s=${encodeURIComponent(result.key)}` : '';
+    const link = element('a', { className: 'button', text: 'Persönliche Hilfe ansehen', attributes: { href: `/start/?src=${place}&direkt=1${moment}`, 'data-related-link': `plan_${place}` } });
     link.addEventListener('click', () => track('plan_start_click', { place, result_key: result?.key ?? '' }));
     return element('aside', { className: `translator-plan-cta${place === 'ergebnis' ? '' : ' translator-plan-up'}` }, [
       data.planImage ? element('img', { className: 'translator-plan-art', attributes: { src: data.planImage.src, width: String(data.planImage.width), height: String(data.planImage.height), alt: '', decoding: 'async' } }) : null,
       element('div', {}, [
         element('h2', { text: planTitles[place] ?? planTitles.ergebnis }),
-        element('p', { text: 'Passende Satzideen für euren Alltag. Beantworte dafür ein paar Fragen zu eurer Lage.' }),
+        element('p', { text: 'Passende Worte und nächste Schritte für schwierige Alltagssituationen. Wähle, wobei du Unterstützung brauchst.' }),
         link
       ])
     ]);
@@ -257,7 +453,7 @@
     element('div', { className: 'translator-app-visual' }, [
       element('img', {
         attributes: {
-          src: ui?.appImage ?? '../assets/app-de-help.webp',
+          src: ui?.appImage ?? '/assets/app-de-help.webp',
           width: '720',
           height: '1566',
           loading: 'lazy',
@@ -301,22 +497,59 @@
   // Das Werkzeug hat eigene, teilbare Zustände. entry.href ist ein redaktioneller
   // Weiterlese-Link und darf ohne Dokumentwechsel keine Ratgeberadresse übernehmen.
   // Nur feste Situations-/Zielschlüssel gelangen in die URL, niemals Eingabetext.
-  const startPath = location.pathname;
+  // Static SEO routes hydrate the same app; later edits return to its language home.
+  const staticEntry = entryByKey.get(pathState?.route.key || document.body.dataset.translatorInitialSituation);
+  const staticAppPath = document.body.dataset.translatorAppPath || (pathState ? '/'+routeLanguage+'/' : '');
+  const staticDefault = staticEntry && (!staticEntry.safetyOnly || (pathState && staticEntry.selfCare)) && staticAppPath === (ui?.lang === 'en' ? '/en/' : '/de/') ? staticEntry : null;
+  const startPath = staticDefault ? staticAppPath : location.pathname;
+  let staticContextActive = Boolean(staticDefault);
+  const leaveStaticContext = () => {
+    if (!staticContextActive && !topicContextActive) return;
+    activePublicRoute=null;
+    const state=document.body.dataset.translatorState;
+    document.title=state==='input'?appMetadata.title:ui?.lang==='en'?(state==='goal'?'Choose your goal | Dementia Coach':'Your answer | Dementia Coach'):(state==='goal'?'Dein Ziel wählen | Demenz Coach':'Deine Antwort | Demenz Coach');
+    const meta = appMetadata;
+    if (meta) {
+      initialTitle = meta.title;
+      if (document.body.dataset.translatorState === 'input') document.title = initialTitle;
+      document.querySelector('link[rel="canonical"]')?.setAttribute('href', new URL(startPath, toolURL).href);
+      for (const [selector, key] of [['meta[name="description"]','description'], ['meta[property="og:title"]','title'], ['meta[property="og:description"]','description'], ['meta[property="og:url"]','canonical'], ['meta[name="twitter:title"]','title'], ['meta[name="twitter:description"]','description']]) {
+        document.querySelector(selector)?.setAttribute('content', meta[key]);
+      }
+      document.querySelectorAll('link[rel="alternate"][hreflang]').forEach(node => node.remove());
+      for (const alternate of meta.alternates) {
+        const link = document.createElement('link');
+        link.rel = 'alternate'; link.hreflang = alternate.lang; link.href = alternate.href;
+        document.head.append(link);
+      }
+      const schema = document.getElementById('translator-situation-schema');
+      if (schema) schema.textContent = JSON.stringify(meta.structuredData);
+    }
+    if (homeHeading?.tagName === 'H2') {
+      const heading = document.createElement('h1');
+      for (const attr of homeHeading.attributes) heading.setAttribute(attr.name, attr.value);
+      heading.textContent = homeHeading.textContent;
+      homeHeading.replaceWith(heading); homeHeading = heading;
+    }
+    staticContextActive = false;
+    topicContextActive = false;
+  };
   const validGoals = new Set(['jetzt', 'verstehen', 'tipps']);
+  const staticHistory = Boolean(staticDefault || history.state?.translatorStatic);
   let pushed = false;
   const setPage = (entry, goal = '', push = true) => {
-    if (!entryByKey.has(entry?.key) || entry.safetyOnly) { setHash(entry?.key ?? ''); return; }
-    const url = new URL(location.href);
-    url.pathname = startPath;
-    url.searchParams.set('situation', entry.key);
-    if (validGoals.has(goal)) url.searchParams.set('ziel', goal);
-    else url.searchParams.delete('ziel');
-    url.hash = '';
-    if (url.href === location.href) return;
-    history[push ? 'pushState' : 'replaceState']({ translator: true }, '', url);
-    pushed = pushed || push;
+    leaveStaticContext();
+    if (!entryByKey.has(entry?.key) || (entry.safetyOnly && !entry.selfCare)) { setHash(entry?.key ?? ''); return; }
+    currentGoal=goal;
+    const route=publicByKey.get(entry.key),url=new URL(location.href);
+    url.pathname=route?routePath(route,goal):startPath;
+    url.search='';url.hash=route?'':`${phraseHash}${entry.key}`;
+    if(route)topicMetadata(route);
+    if(url.href===location.href)return;
+    history[push?'pushState':'replaceState']({translator:true,...((staticHistory||route)?{translatorStatic:true}:{})},'',url);
+    pushed=pushed||push;
   };
-  window.addEventListener('popstate', () => { if (pushed) location.reload(); });
+  window.addEventListener('popstate', () => { if (pushed || staticHistory) location.reload(); });
   // Nach dem Ergebnis rückt das Eingabefeld unter die Antwort (Daniel, 9. Nov: oben lenkt es von den Ziel-Knöpfen ab;
   // statt „Neuen Satz übersetzen“ einfach weiterschreiben). Dasselbe Formular, nur verschoben und leer.
   let formMoved = false;
@@ -451,14 +684,14 @@
     if (navigator.share) {
       return button('', 'translator-phrase-share', async () => {
         try {
-          await navigator.share({ text, url: result.url });
+          await navigator.share({ text, url: shareLink(result) });
           track('translator_share', { result_key: result.key, method: 'native', step: 'phrase' });
         } catch {
           // Abgebrochen – nichts zu tun.
         }
       }, { 'aria-label': label, title: label });
     }
-    const link = element('a', { className: 'translator-phrase-share', attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${text} ${result.url}`)}`, rel: 'noopener', target: '_blank', 'aria-label': label, title: label } });
+    const link = element('a', { className: 'translator-phrase-share', attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${text} ${shareLink(result)}`)}`, rel: 'noopener', target: '_blank', 'aria-label': label, title: label } });
     link.addEventListener('click', () => track('translator_share', { result_key: result.key, method: 'whatsapp', step: 'phrase' }));
     return link;
   };
@@ -520,6 +753,74 @@
     );
   };
   savedStore?.onChange(renderSaved);
+
+  // A return overview stays in the input view; opening an item never sends a request.
+  if (helpfulCopy) {
+    const overview = element('section', { className: 'translator-helpful', attributes: { 'aria-labelledby': 'translator-helpful-title', hidden: '' } });
+    const message = element('p', { className: 'translator-helpful-status', attributes: { role: 'status', 'aria-live': 'polite', hidden: '' } });
+    formStartParent.insertBefore(overview, formStartNext);
+    overview.after(message);
+    const announce = (text) => { message.textContent = text; message.hidden = false; };
+    const focusList = () => ((!overview.hidden && overview.querySelector('button')) || input).focus({ preventScroll: true });
+    const erase = (item) => {
+      const ok = item ? helpfulStore.remove(item) : helpfulStore.clear();
+      if (!ok) { announce(helpfulCopy.removeFailed); return; }
+      renderHelpful();
+      announce(item ? helpfulCopy.removed : helpfulCopy.cleared);
+      focusList();
+    };
+    const reopen = (item) => {
+      const valid = normalizeHelpful(item);
+      if (!valid) return;
+      if (valid.kind === 'catalog') {
+        const entry = entryByKey.get(valid.key);
+        if (!helpfulCatalog(entry)) { announce(helpfulCopy.unavailable); return; }
+        setPage(entry,valid.goal);
+        render(entry, { goal: valid.goal });
+        return;
+      }
+      setViewState('answer');
+      const { node, focus } = aiAnswer(valid.answer, { saved: true });
+      output.replaceChildren(node);
+      output.hidden = false;
+      document.body.classList.add('translator-has-result');
+      document.body.classList.remove('translator-answers-seen');
+      formBelow();
+      focusResult(focus);
+      output.scrollIntoView({ behavior: 'instant', block: 'start' });
+    };
+    syncHelpful = () => {
+      const state = document.body.dataset.translatorState;
+      const current = helpfulStore.read();
+      message.hidden = Boolean(state && state !== 'input') || !message.textContent;
+      overview.hidden = Boolean(state && state !== 'input') || (current.ok && !current.items.some((item) => item.language === helpfulLanguage));
+    };
+    renderHelpful = () => {
+      const current = helpfulStore.read();
+      const items = current.items.filter((item) => item.language === helpfulLanguage);
+      overview.replaceChildren(element('h2', { text: helpfulCopy.title, attributes: { id: 'translator-helpful-title' } }),
+        ...(!current.ok ? [element('p', { text: helpfulCopy.broken })] : []),
+        element('ul', {}, items.map((item) => {
+          const entry = item.kind === 'catalog' ? entryByKey.get(item.key) : null;
+          const available = item.kind === 'ai' || helpfulCatalog(entry);
+          const title = item.kind === 'ai' ? `${helpfulCopy.ai}: ${item.answer.phrases[0]}` : available ? entry.says : helpfulCopy.unavailable;
+          return element('li', {}, [
+            available ? button(title.length > 160 ? `${title.slice(0, 157)}…` : title, 'translator-copy translator-helpful-open', () => reopen(item), { 'aria-label': `${helpfulCopy.open}: ${title}` }) : element('span', { text: title }),
+            button(helpfulCopy.remove, 'translator-copy translator-helpful-remove', () => erase(item), { 'aria-label': `${helpfulCopy.remove}: ${title}` })
+          ]);
+        })),
+        button(helpfulCopy.clear, 'translator-copy translator-helpful-clear', () => erase(null)),
+        element('p', { text: helpfulCopy.local }));
+      syncHelpful();
+      syncChat();
+    };
+    window.addEventListener('storage', (event) => {
+      if (event.key !== helpfulKey && event.key !== null) return;
+      const restoreFocus = overview.contains(document.activeElement);
+      renderHelpful();
+      if (restoreFocus) focusList();
+    });
+  }
 
   // Gefühle als eigene Ergebnisse: Einstieg, wenn ein Satz unbekannt ist oder nicht passt.
   const feelingEntries = new Map((data.feelings ?? []).map((feeling) => [feeling.id, {
@@ -626,14 +927,14 @@
     }
     return null;
   };
-  const aiAnswer = (result) => {
+  const aiAnswer = (result, { saved = false, allowHelpful = true } = {}) => {
     const nodes = [];
     // Ohne Stufen (englische Seiten): bei jedem Sicherheitshinweis der KI derselbe feste Hinweis.
     const ungraded = ui?.gradedSafety === false && result.safetyLevel !== 'standard';
     const safetyNote = aiSafetyNote(result, ungraded);
     if (safetyNote) nodes.push(safetyNote);
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
-    nodes.push(element('p', { className: 'translator-ai-label', text: 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
+    nodes.push(element('p', { className: 'translator-ai-label', text: saved ? helpfulCopy.history : 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
     const first = element('h3', { className: 'translator-step', text: 'Was dahintersteckt', attributes: { tabindex: '-1' } });
     nodes.push(first, element('p', { className: 'translator-meaning', text: result.meaning }));
     nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
@@ -647,6 +948,13 @@
     nodes.push(notesCard(disclaimer(true)));
     // Anonymes Teilen gibt es vorerst nur auf Deutsch (der Server bietet es sonst auch nicht an).
     if (ui?.anonShare !== false && result.share?.sentence && result.share?.token) nodes.push(shareBox(result.share));
+    if (!saved && feedbackCopy && result.safetyLevel === 'standard') {
+      nodes.push(feedbackBlock({ key: 'ai', requestID: result.requestID }, null, { allowShare: false, helpfulItem: helpfulCopy && allowHelpful ? helpfulAI(result) : null, onContinue: () => {
+        correctionRequestID = result.requestID || '';
+        setFollowupOpen(true);
+        input.focus();
+      } }));
+    }
     return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
   };
   // Hinweise in einer Karte: oben „Wann ein Gespräch nicht ausreicht“ (falls vorhanden), darunter die Haftungszeile.
@@ -716,25 +1024,15 @@
   // Runde 198 (Daniels Wahl „Automatisch“): Unbekannte Sätze gehen ohne Knopf an die KI.
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
-  // KI-Freigabe der Web-Kasse (/abo/ki-freigabe.js, Daniel 8. Nov: „1 gratis, dann Probezeit“).
-  // Aus, solange translatorGate.enabled nicht true ist; bekannte Sätze bleiben immer frei, Englisch auch.
-  // Gesperrt: Angebotskarte statt Warte-Ansicht. Der Sicherheitshinweis darüber und „Meinst du vielleicht“
-  // bleiben stehen; onFail zeigt die Gefühle-Auswahl und den allgemeinen Satz.
-  const aiLocked = async (box, text, source, waiting) => {
-    const gate = window.DemenzKiFreigabe;
-    if (!gate) return false;
-    const access = await gate.check({ language: (document.documentElement.lang || 'de').slice(0, 2) });
-    if (access.allowed) return false;
-    waiting.remove();
-    box.replaceChildren(gate.offerCard({ sentence: text }));
-    track('translator_ai', { step: 'limit', source });
-    return true;
-  };
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false } = {}) => {
+  let correctionRequestID = '';
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, allowHelpful = true } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
     const waiting = aiWaiting();
+    let operationID = window.DemenzKiFreigabe?.enabled() ? window.crypto.randomUUID() : '';
+    const correctionOf = correctionRequestID;
+    correctionRequestID = '';
     const run = async (manual = false) => {
       ask.disabled = true;
       ask.hidden = auto;
@@ -742,14 +1040,17 @@
       status.textContent = auto ? '' : tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
-      if (await aiLocked(box, text, source, waiting)) { onFail(); return; }
-      const result = await ai.ask(text, { formal: personal.formal });
+      const result = await ai.ask(text, { formal: personal.formal, correctionOf, requestID: operationID });
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
+      if (result.kind === 'access') {
+        box.replaceChildren(window.DemenzKiFreigabe.offerCard({ sentence: text, reason: result.reason, value: result.access, onRetry: () => { if (result.reason === 'answer_recovery_credit') operationID = window.crypto.randomUUID(); box.replaceChildren(ask, status); void run(true); } }));
+        return;
+      }
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
-        window.DemenzKiFreigabe?.noteAnswer();
-        const { node, focus, top } = aiAnswer(result);
+        window.DemenzKiFreigabe?.noteAnswer(result);
+        const { node, focus, top } = aiAnswer(result, { allowHelpful: allowHelpful && !localSafetyHit });
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
         output.querySelector('.translator-near-group')?.remove();
@@ -757,12 +1058,17 @@
         output.querySelector('.translator-notes')?.remove();
         if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
+        const accessCard = window.DemenzKiFreigabe?.afterAnswer(result);
+        if (accessCard) node.after(accessCard);
+        if (window.DemenzKiFreigabe?.enabled() && result.safetyLevel === 'standard') {
+          output.querySelectorAll('.translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
+        }
         if (result.safetyLevel !== 'standard') {
           output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
         }
         // Unbekannte Sätze: erst die fertige KI-Antwort; nie während des Ladens,
         // bei Sicherheitshinweisen oder mit eingegebenem Text im Planlink.
-        if (source === 'unknown' && result.safetyLevel === 'standard' && !output.querySelector('.safety-note, .translator-plan-cta')) {
+        if (!window.DemenzKiFreigabe?.enabled() && source === 'unknown' && result.safetyLevel === 'standard' && !output.querySelector('.safety-note, .translator-plan-cta')) {
           const invitation = planCTA(null);
           if (invitation) (output.querySelector('.translator-followup') ?? node).after(invitation);
         }
@@ -934,6 +1240,7 @@
       renderUnknown({ safetyHit, typed });
       return;
     }
+    currentGoal=validGoals.has(goal)?goal:'jetzt';
     setViewState('answer');
     const result = entry;
     const nodes = [];
@@ -1158,7 +1465,7 @@
 
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));
-      nodes.push(feedbackBlock(result, retry));
+      nodes.push(feedbackBlock(result, retry, { askReason: !safetyHit && !safetyFirst, helpfulItem: helpfulCopy && !safetyHit && !safetyFirst && helpfulCatalog(result) ? { kind: 'catalog', language: helpfulLanguage, key: result.key, goal: validGoals.has(goal) ? goal : '' } : null }));
       if (planUp) nodes.push(planUp);
       nodes.push(...offers(result, safetyHit, Boolean(planUp)));
     }
@@ -1174,12 +1481,13 @@
   };
 
   const setHash = (key, prefix = phraseHash) => {
+    leaveStaticContext();
     const url = new URL(location.href);
     url.pathname = startPath;
-    url.searchParams.delete('situation');
-    url.searchParams.delete('ziel');
-    url.hash = key && key !== 'none' ? `${prefix}${key}` : '';
-    history.replaceState(null, '', url);
+    url.search='';
+    const known=prefix===feelingHash?feelingEntries.has(key):entryByKey.has(key);
+    url.hash=known&&key!=='none'?`${prefix}${key}`:'';
+    history.replaceState(staticHistory ? { translator: true, translatorStatic: true } : null, '', url);
   };
 
   function showFeeling(id, source) {
@@ -1303,16 +1611,29 @@
   const params = new URLSearchParams(location.search);
   const linkedEntry = entryByKey.get(params.get('situation'));
   const hasLegacyState = location.hash.startsWith(`#${phraseHash}`) || location.hash.startsWith(`#${feelingHash}`);
-  if (!hasLegacyState && linkedEntry && !linkedEntry.safetyOnly) {
-    const goal = params.get('ziel');
-    input.value = linkedEntry.says;
-    grow();
-    if (validGoals.has(goal)) render(linkedEntry, { goal });
+  const legacyKey = location.hash.slice(location.hash.indexOf('-') + 1);
+  const validLegacyState = hasLegacyState && (location.hash.startsWith(`#${feelingHash}`)?feelingEntries.has(legacyKey):entryByKey.has(legacyKey));
+  if(!validLegacyState&&linkedEntry&&(!linkedEntry.safetyOnly||staticDefault||(linkedEntry.selfCare&&publicByKey.has(linkedEntry.key)))){
+    const goal=params.get('ziel')||'';input.value=linkedEntry.says;grow();
+    if(linkedEntry.safetyOnly&&!linkedEntry.selfCare)render(linkedEntry,{safetyHit:true});
+    else if(validGoals.has(goal)||!goalsFor(linkedEntry))render(linkedEntry,{goal});
     else askGoal(linkedEntry);
-    track('translator_result', { result_key: linkedEntry.key, input_source: 'link', safety_hint: 'no' });
-  } else openFromHash();
+    setPage(linkedEntry,goal,false);
+    track('translator_result',{result_key:linkedEntry.key,input_source:'link',safety_hint:linkedEntry.safetyOnly&&!linkedEntry.selfCare?'yes':'no'});
+  }else if(staticDefault&&!validLegacyState){
+    const requestedGoal=pathState?pathState.goal:document.body.dataset.translatorInitialGoal;
+    if(pathState&&pathState.route.selectionPath===location.pathname)askGoal(staticDefault);
+    else{render(staticDefault,{goal:validGoals.has(requestedGoal)?requestedGoal:''});formBelow({open:true});}
+    if(location.search||location.hash){const clean=new URL(location.href);clean.search='';clean.hash='';history.replaceState(history.state,'',clean);}
+    document.title=initialTitle;
+    track('translator_result',{result_key:staticDefault.key,input_source:'link',safety_hint:'no'});
+  }else{
+    if(!validLegacyState&&location.search){const clean=new URL(location.href);clean.search='';clean.hash='';history.replaceState(history.state,'',clean);}
+    openFromHash();
+  }
   window.addEventListener('hashchange', openFromHash);
   renderSaved();
+  renderHelpful();
 
   // Zurück von Kasse oder Anmeldung: den gemerkten Satz (nur sessionStorage dieses Tabs) gleich übersetzen.
   const pendingSentence = window.DemenzKiFreigabe?.takePending();
@@ -1389,9 +1710,13 @@
       const entryRect = entryPoint?.getBoundingClientRect() ?? inputRect;
       const inputVisible = entryRect.height > 0 && entryRect.bottom > 0 && entryRect.top < innerHeight;
       const wasHidden = chat.hidden;
+      const helpfulRect = document.querySelector('.translator-helpful:not([hidden])')?.getBoundingClientRect();
+      const helpfulVisible = helpfulRect?.height > 0 && helpfulRect.bottom > 0 && helpfulRect.top < innerHeight;
+      // Keep the return list readable without interrupting a deliberately focused chat draft.
+      const helpfulInUse = helpfulVisible && !chat.contains(document.activeElement);
       // Auf der Startseite stehen die Beispiele zuerst: ihr noch nicht erreichtes
       // Eingabefeld soll keinen Chat über den auswählbaren Situationen öffnen.
-      chat.hidden = inputVisible || document.body.dataset.translatorState === 'goal'
+      chat.hidden = inputVisible || helpfulInUse || document.body.dataset.translatorState === 'goal'
         || (form.hasAttribute('data-chat-after-input') && entryRect.top >= 0);
       chat.style.bottom = '';
       chat.classList.toggle('translator-chat-small', small);

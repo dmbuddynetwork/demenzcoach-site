@@ -1,0 +1,121 @@
+name: Claude connection
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: claude-wif-check
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.actor_id == '160013423' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ANTHROPIC_FEDERATION_RULE_ID: ${{ vars.CLAUDE_WIF_RULE_ID }}
+      ANTHROPIC_ORGANIZATION_ID: ${{ vars.CLAUDE_WIF_ORGANIZATION_ID }}
+      ANTHROPIC_SERVICE_ACCOUNT_ID: ${{ vars.CLAUDE_WIF_SERVICE_ACCOUNT_ID }}
+      ANTHROPIC_WORKSPACE_ID: ${{ vars.CLAUDE_WIF_WORKSPACE_ID }}
+    steps:
+      # Insert github-check.py here as an inline Python step when generating the
+      # final workflow. No checkout, third-party action, API key, or token file.
+      - name: Verify federation and fresh-token exchange
+        shell: python
+        run: |
+          """Verify GitHub -> Claude federation without printing or persisting credentials.
+          
+          Run only in the explicitly allowed workflow after its rule has been installed.
+          This makes no paid inference request and sends no repository content to Claude.
+          """
+          
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          
+          
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+          
+          
+          opener = urllib.request.build_opener(NoRedirect())
+          
+          
+          def request_json(url, *, headers=None, payload=None):
+              data = None if payload is None else json.dumps(payload).encode()
+              req = urllib.request.Request(url, data=data, headers=headers or {})
+              try:
+                  with opener.open(req, timeout=30) as response:
+                      return json.load(response)
+              except urllib.error.HTTPError as error:
+                  raise RuntimeError(f"Authentication check failed (HTTP {error.code}).") from None
+              except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+                  raise RuntimeError("Authentication check failed; inspect Claude authentication history.") from None
+          
+          
+          def fresh_identity():
+              url = os.environ["ACTIONS_ID_TOKEN_REQUEST_URL"]
+              parsed = urllib.parse.urlsplit(url)
+              if parsed.scheme != "https" or not (parsed.hostname or "").endswith(".actions.githubusercontent.com"):
+                  raise RuntimeError("Unexpected GitHub identity endpoint.")
+              query = urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
+              query = [(key, value) for key, value in query if key != "audience"]
+              query.append(("audience", "https://api.anthropic.com"))
+              url = urllib.parse.urlunsplit(parsed._replace(query=urllib.parse.urlencode(query)))
+              result = request_json(url, headers={
+                  "Authorization": "Bearer " + os.environ["ACTIONS_ID_TOKEN_REQUEST_TOKEN"],
+              })
+              identity = result.get("value")
+              if not isinstance(identity, str) or identity.count(".") != 2:
+                  raise RuntimeError("GitHub did not return a valid identity token.")
+              return identity
+          
+          
+          def exchange():
+              payload = {
+                  "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                  "assertion": fresh_identity(),
+                  "federation_rule_id": os.environ["ANTHROPIC_FEDERATION_RULE_ID"],
+                  "organization_id": os.environ["ANTHROPIC_ORGANIZATION_ID"],
+                  "service_account_id": os.environ["ANTHROPIC_SERVICE_ACCOUNT_ID"],
+                  "workspace_id": os.environ["ANTHROPIC_WORKSPACE_ID"],
+              }
+              result = request_json("https://api.anthropic.com/v1/oauth/token", payload=payload,
+                                    headers={"Content-Type": "application/json"})
+              if not result.get("access_token") or not 0 < int(result.get("expires_in", 0)) <= 600:
+                  raise RuntimeError("Unexpected Claude token response or lifetime.")
+              return result
+          
+          
+          def main():
+              first = exchange()
+              models = request_json("https://api.anthropic.com/v1/models?limit=1", headers={
+                  "Authorization": "Bearer " + first["access_token"],
+                  "anthropic-version": "2023-06-01",
+              })
+              if not isinstance(models.get("data"), list) or not models["data"]:
+                  raise RuntimeError("Claude model access could not be confirmed.")
+              second = exchange()
+              if first["access_token"] == second["access_token"]:
+                  raise RuntimeError("Fresh-token exchange could not be confirmed.")
+              print("PASS: GitHub identity, Claude exchange, model access, and fresh-token exchange.")
+              print("No inference request made; no repository content sent; no credentials persisted.")
+          
+          
+          if __name__ == "__main__":
+              try:
+                  main()
+              except (KeyError, ValueError, RuntimeError) as error:
+                  if isinstance(error, KeyError):
+                      print("Required federation configuration is missing.", file=sys.stderr)
+                  else:
+                      print(str(error), file=sys.stderr)
+                  sys.exit(1)

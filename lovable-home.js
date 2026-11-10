@@ -453,6 +453,7 @@ const applyConsent = (statistics, marketing) => {
     else websiteAnalytics.denyMarketing();
   }
   window.DemenzTeller?.consentChanged();
+  window.DemenzWebExperiments?.consentChanged();
   hideConsentBanner();
 };
 
@@ -602,3 +603,14 @@ observedSections.forEach((id) => {
   const section = document.getElementById(id);
   if (section) sectionObserver?.observe(section);
 });
+
+// Reuse the existing optional German entry cards without rewriting every article.
+// If the helper cannot load, their original links still open the normal questionnaire.
+(() => {
+  if (document.documentElement.lang !== 'de' || window.DemenzSituationContext) return;
+  if (location.pathname !== '/de/' && !document.querySelector('.translator-plan-cta a[href], .guide-plan-cta a[href]')) return;
+  const script = document.createElement('script');
+  script.src = '/start/situation-context.js';
+  script.async = true;
+  document.head.append(script);
+})();

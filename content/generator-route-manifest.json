@@ -1,0 +1,1195 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "language": "de",
+      "key": "mutter",
+      "topicId": "legacy-mutter",
+      "path": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+      "alternatePath": "/en/dementia-translator/where-is-my-mother.html",
+      "legacySourceSHA256": "41ac4b8896fe373f1050d54e32d0ba7d4083abd0220d9ac3038e8b49e81b2e79",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-ist-meine-mutter/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-ist-meine-mutter/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-ist-meine-mutter/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "arbeit",
+      "topicId": "legacy-arbeit",
+      "path": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+      "alternatePath": "/en/dementia-translator/i-have-to-go-to-work.html",
+      "legacySourceSHA256": "b9007f55dacbe850ab0284f4b65b8fefcc260b23aed6c5901b83a693908ceb3f",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-zur-arbeit/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-zur-arbeit/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-zur-arbeit/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "geld",
+      "topicId": "legacy-geld",
+      "path": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+      "alternatePath": "/en/dementia-translator/someone-stole-my-purse.html",
+      "legacySourceSHA256": "f6ee6014f4f4cd4e3f0af842567b878ca5771463fbce8ad9380a38531b944ee5",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+        "verstehen": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "wer",
+      "topicId": "legacy-wer",
+      "path": "/de/demenz-uebersetzer/wer-sind-sie.html",
+      "alternatePath": "/en/dementia-translator/who-are-you.html",
+      "legacySourceSHA256": "8ed817e2bc2653d96facb7151d506d576a55f9733a0f8a64b0934b33cfbd377c",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wer-sind-sie.html",
+        "verstehen": "/de/demenz-uebersetzer/wer-sind-sie/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wer-sind-sie/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wer-sind-sie/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "hunger",
+      "topicId": "legacy-hunger",
+      "path": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+      "alternatePath": "/en/dementia-translator/i-havent-eaten-all-day.html",
+      "legacySourceSHA256": "f213ed4798e607926a8b68071840154243c813eaa48ec58a30d73433d646e1a0",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "waschen",
+      "topicId": "legacy-waschen",
+      "path": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+      "alternatePath": "/en/dementia-translator/i-dont-want-a-shower.html",
+      "legacySourceSHA256": "016e2293f7d17ed0bbce3ff9e3a8dd6765be253fb01f4b98e58f9bf7f078ba4e",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-nicht-duschen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-nicht-duschen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-nicht-duschen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "ruhe",
+      "topicId": "legacy-ruhe",
+      "path": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+      "alternatePath": "/en/dementia-translator/leave-me-alone.html",
+      "legacySourceSHA256": "e7ce14d2d9f3fa82af8d830d14b751c921a275b324ae7c188ac0db1bf1ee0b24",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+        "verstehen": "/de/demenz-uebersetzer/lass-mich-in-ruhe/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/lass-mich-in-ruhe/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/lass-mich-in-ruhe/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "jemand",
+      "topicId": "legacy-jemand",
+      "path": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+      "alternatePath": "/en/dementia-translator/theres-someone-in-the-room.html",
+      "legacySourceSHA256": "b3b17d45e8a2ab8d568d1e2bd48493e30c0b4573683717d4dc1775f71bb83e21",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+        "verstehen": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "krank",
+      "topicId": "legacy-krank",
+      "path": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+      "alternatePath": "/en/dementia-translator/theres-nothing-wrong-with-me.html",
+      "legacySourceSHA256": "4d4efb02956a94194f1b373da0e80b2f997466d11df6c64b7595903555bbc5e2",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "dumm",
+      "topicId": "legacy-dumm",
+      "path": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+      "alternatePath": "/en/dementia-translator/i-cant-do-anything-anymore.html",
+      "legacySourceSHA256": "ba0456ecae1f82e5bd26ed5580677a064a9ccfe38ed0094e5a49c6f39fe9a45f",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "uhrzeit",
+      "topicId": "legacy-uhrzeit",
+      "path": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+      "alternatePath": "/en/dementia-translator/when-are-we-leaving.html",
+      "legacySourceSHA256": "9a9a4c20051b3fa08106b08fc93bebc753e70093dec9b541ef51ee6cc74b23cb",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+        "verstehen": "/de/demenz-uebersetzer/wann-gehen-wir/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wann-gehen-wir/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wann-gehen-wir/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "heim",
+      "topicId": "legacy-heim",
+      "path": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+      "alternatePath": "/en/dementia-translator/im-not-going-into-a-home.html",
+      "legacySourceSHA256": "2945380c162bf8390f6a7aeb9987d0f4fb3e7eec4b7b5b62a0440ac936542e3f",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "hilfe",
+      "topicId": "legacy-hilfe",
+      "path": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+      "alternatePath": "/en/dementia-translator/help-help.html",
+      "legacySourceSHA256": "499f3795c81ca505d1950bb7a5338092e9a511d4e06f257d9cd8fd8de50fec5a",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+        "verstehen": "/de/demenz-uebersetzer/hilfe-hilfe-rufen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/hilfe-hilfe-rufen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/hilfe-hilfe-rufen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "auto",
+      "topicId": "legacy-auto",
+      "path": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+      "alternatePath": "/en/dementia-translator/i-can-still-drive.html",
+      "legacySourceSHA256": "977bac14507a542365e89c549e20793a8ee7cd4a3cf6e71ccf5d28ff10ed52f3",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-auto-fahren/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-auto-fahren/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-auto-fahren/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "tabletten",
+      "topicId": "legacy-tabletten",
+      "path": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+      "alternatePath": "/en/dementia-translator/im-not-taking-those-pills.html",
+      "legacySourceSHA256": "30cdb5592f3536a6c05be141c51ac8f61cb6a6ed5263a1890a49ef2a5702d447",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "luegen",
+      "topicId": "legacy-luegen",
+      "path": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+      "alternatePath": "/en/dementia-translator/youre-lying-to-me.html",
+      "legacySourceSHA256": "57470ecf2bb02b439efa764c0d0da190b5e5e7f8d0534a161272b5ad827a76a7",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+        "verstehen": "/de/demenz-uebersetzer/du-luegst-mich-an/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/du-luegst-mich-an/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/du-luegst-mich-an/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "eingesperrt",
+      "topicId": "legacy-eingesperrt",
+      "path": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+      "alternatePath": "/en/dementia-translator/im-locked-in-here.html",
+      "legacySourceSHA256": "777e7406c892125c97d4d8e14e78d53c272b886a108e70ce5dc7c46f9f6d8d58",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "aufstehen",
+      "topicId": "legacy-aufstehen",
+      "path": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+      "alternatePath": "/en/dementia-translator/i-have-to-get-up-now.html",
+      "legacySourceSHA256": "895fe18cf4daedf025ef7dd3efe0ac28d600a484f6dd5c2367f8e0a0e1225cb1",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "kinder",
+      "topicId": "legacy-kinder",
+      "path": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+      "alternatePath": "/en/dementia-translator/where-are-my-children.html",
+      "legacySourceSHA256": "4d419a8623974c15e869f2ee7b7ad2d6baf0b7789d21fa9b9373e09e3de2d456",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-sind-meine-kinder/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-sind-meine-kinder/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-sind-meine-kinder/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "langweilig",
+      "topicId": "legacy-langweilig",
+      "path": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+      "alternatePath": "/en/dementia-translator/im-so-bored.html",
+      "legacySourceSHA256": "159750b4488d4dc35155a403a36c6d73d524c21ca7635256b3cfed1136b63cd3",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+        "verstehen": "/de/demenz-uebersetzer/mir-ist-langweilig/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/mir-ist-langweilig/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/mir-ist-langweilig/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "wobin",
+      "topicId": "legacy-wobin",
+      "path": "/de/demenz-uebersetzer/wo-bin-ich.html",
+      "alternatePath": "/en/dementia-translator/where-am-i.html",
+      "legacySourceSHA256": "ddb016226e95e49ee105f1ea2bf91f914990ccff81577616d5e0c19cd809b71c",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-bin-ich.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-bin-ich/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-bin-ich/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-bin-ich/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "vergiftet",
+      "topicId": "legacy-vergiftet",
+      "path": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+      "alternatePath": "/en/dementia-translator/the-food-is-poisoned.html",
+      "legacySourceSHA256": "936cf60bc9637b5c99106e93b08b8822b7ba05c4ec28fbaa4a93a9ecc043a100",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+        "verstehen": "/de/demenz-uebersetzer/das-essen-ist-vergiftet/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/das-essen-ist-vergiftet/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/das-essen-ist-vergiftet/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "bett",
+      "topicId": "legacy-bett",
+      "path": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+      "alternatePath": "/en/dementia-translator/i-dont-want-to-go-to-bed.html",
+      "legacySourceSHA256": "4f2771ddc844b676d0c63206848e8cf82010ef2e1bd7b7381c05eaf854b0791c",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "einkaufen",
+      "topicId": "legacy-einkaufen",
+      "path": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+      "alternatePath": "/en/dementia-translator/i-have-to-go-shopping.html",
+      "legacySourceSHA256": "d04e3ee77d48ddbc11c9d18e346c7eabb3dacaad4fe85ba71a6670e06f8c44bc",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "nachbarn",
+      "topicId": "legacy-nachbarn",
+      "path": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+      "alternatePath": "/en/dementia-translator/the-neighbors-are-talking-about-me.html",
+      "legacySourceSHA256": "eb0dacbe6e3f413f5d207a6a43c313a1235202fc0aa9241ee3fdb48618554371",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+        "verstehen": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "haustier",
+      "topicId": "legacy-haustier",
+      "path": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+      "alternatePath": "/en/dementia-translator/where-is-my-dog.html",
+      "legacySourceSHA256": "79edd22de6800bbad84f7aa8b5e0e9a3912b1361d8a5b3047addff41e03fd58a",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-ist-mein-hund/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-ist-mein-hund/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-ist-mein-hund/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "kalt",
+      "topicId": "legacy-kalt",
+      "path": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+      "alternatePath": "/en/dementia-translator/im-so-cold.html",
+      "legacySourceSHA256": "3cd1b9046682f0ee41b314192cbcc4d32c8c5ad8354cfc768ef76775b10aa7d2",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+        "verstehen": "/de/demenz-uebersetzer/mir-ist-so-kalt/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/mir-ist-so-kalt/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/mir-ist-so-kalt/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "besuch",
+      "topicId": "legacy-besuch",
+      "path": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+      "alternatePath": "/en/dementia-translator/when-is-my-son-coming.html",
+      "legacySourceSHA256": "c301b8fa0c05db4e11211f0596ed6709c20e90fe31b9ec5972b6ff1a12fcd6e5",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+        "verstehen": "/de/demenz-uebersetzer/wann-kommt-mein-sohn/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wann-kommt-mein-sohn/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wann-kommt-mein-sohn/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "anrufen",
+      "topicId": "legacy-anrufen",
+      "path": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+      "alternatePath": "/en/dementia-translator/i-have-to-call-someone.html",
+      "legacySourceSHA256": "caadaa58114b27d2a4817b0870d2ace7f86a3f40c7305b876d3d51526fd8c85b",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "partner",
+      "topicId": "legacy-partner",
+      "path": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+      "alternatePath": "/en/dementia-translator/where-is-my-husband.html",
+      "legacySourceSHA256": "3f5b20d88abe6141230b9443b204fd63b67e0f9e20faa1bc676fb8e79341eb09",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+        "verstehen": "/de/demenz-uebersetzer/wo-ist-mein-mann/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/wo-ist-mein-mann/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/wo-ist-mein-mann/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "allein",
+      "topicId": "legacy-allein",
+      "path": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+      "alternatePath": "/en/dementia-translator/dont-leave-me.html",
+      "legacySourceSHA256": "6d060da415868a82e16631dd5ff0001f2406362957791c7b146fc79caa87033d",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+        "verstehen": "/de/demenz-uebersetzer/lass-mich-nicht-allein/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/lass-mich-nicht-allein/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/lass-mich-nicht-allein/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "schongegessen",
+      "topicId": "legacy-schongegessen",
+      "path": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+      "alternatePath": "/en/dementia-translator/ive-already-eaten.html",
+      "legacySourceSHA256": "8b830cd09b7541e343cd27daf4019c6cc9624c2b17bbc9853142be34dcdfaa5f",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-habe-schon-gegessen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-habe-schon-gegessen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-habe-schon-gegessen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "toilette",
+      "topicId": "legacy-toilette",
+      "path": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+      "alternatePath": "/en/dementia-translator/i-dont-need-the-bathroom.html",
+      "legacySourceSHA256": "10de8ba9daf94617a509c9a1765b685779f0d07d36e18666fac1b00476f5c372",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "umziehen",
+      "topicId": "legacy-umziehen",
+      "path": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+      "alternatePath": "/en/dementia-translator/im-not-changing-my-clothes.html",
+      "legacySourceSHA256": "576ec976884c1850cc2088ebaa811336982c59aaaba41e67efdd9f4a94e37c67",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "ausziehen",
+      "topicId": "legacy-ausziehen",
+      "path": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+      "alternatePath": "/en/dementia-translator/i-want-to-take-this-off.html",
+      "legacySourceSHA256": "07adabac6296b307df142e3d9f3574da836b714756bc17a4ac462462c39c83fa",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-will-das-ausziehen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-will-das-ausziehen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-will-das-ausziehen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "liegen",
+      "topicId": "legacy-liegen",
+      "path": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+      "alternatePath": "/en/dementia-translator/im-staying-in-bed-today.html",
+      "legacySourceSHA256": "e09ff169aa6cc15b320cdca6c4f198665acac52e94d70b8123946886831c1d90",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "abend",
+      "topicId": "legacy-abend",
+      "path": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+      "alternatePath": "/en/dementia-translator/its-getting-dark-i-have-to-go.html",
+      "legacySourceSHA256": "b2d4ca9728c6768c4a4cdb06e970ae476a3421d28596e540127341fe3f3f41f3",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+        "verstehen": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "untreue",
+      "topicId": "legacy-untreue",
+      "path": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+      "alternatePath": "/en/dementia-translator/youre-seeing-someone-else.html",
+      "legacySourceSHA256": "2ffa26c7f2592849844d2f9f3ef286cf96393d3383f57b04d25226b7507910fe",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+        "verstehen": "/de/demenz-uebersetzer/du-hast-einen-anderen/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/du-hast-einen-anderen/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/du-hast-einen-anderen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "kind",
+      "topicId": "legacy-kind",
+      "path": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+      "alternatePath": "/en/dementia-translator/im-not-a-child.html",
+      "legacySourceSHA256": "3d6fd7de9b72b68164b04b9c3b546282be941227389d724a78f99e569fa65acd",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "tagespflege",
+      "topicId": "legacy-tagespflege",
+      "path": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+      "alternatePath": "/en/dementia-translator/im-not-going-to-day-care.html",
+      "legacySourceSHA256": "740f43a35758903bf9336b8ddf4c82a7ba855f74e736fa47c6084fa1915a3a6a",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "nachhause",
+      "topicId": "legacy-nachhause",
+      "path": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+      "alternatePath": "/en/dementia-translator/i-want-to-go-home.html",
+      "legacySourceSHA256": "a5b6af3bc5a96d27845805410bbf368b040b9ffa49a88cd5c1d88f8347fd0c93",
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+        "verstehen": "/de/ratgeber/demenz-nach-hause-was-sagen/verstehen/",
+        "tipps": "/de/ratgeber/demenz-nach-hause-was-sagen/tipps/"
+      },
+      "selectionPath": "/de/ratgeber/demenz-nach-hause-was-sagen/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "erschoepft",
+      "topicId": "legacy-erschoepft",
+      "path": "/de/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "alternatePath": "/guides/dementia-caregiver-overwhelmed.html",
+      "legacySourceSHA256": "52488fdfae6f3a87fca33587da5598de619977bde35dba3eac93487deb3d1383",
+      "selfCare": true,
+      "safetyOnly": true
+    },
+    {
+      "language": "de",
+      "key": "toilettefinden",
+      "topicId": "finding-toilet",
+      "path": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html",
+      "alternatePath": "/en/dementia-translator/i-cant-find-the-toilet.html",
+      "legacySourceSHA256": null,
+      "selfCare": false,
+      "safetyOnly": false,
+      "goalPaths": {
+        "jetzt": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html",
+        "verstehen": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht/verstehen/",
+        "tipps": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht/tipps/"
+      },
+      "selectionPath": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht/auswahl/"
+    },
+    {
+      "language": "de",
+      "key": "pflegeaufteilen",
+      "topicId": "sharing-family-care",
+      "path": "/de/angehoerige/pflege-mit-geschwistern-aufteilen.html",
+      "alternatePath": "/en/caregivers/share-dementia-care-with-siblings.html",
+      "legacySourceSHA256": null,
+      "selfCare": true,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "home",
+      "topicId": "legacy-nachhause",
+      "path": "/en/dementia-translator/i-want-to-go-home.html",
+      "alternatePath": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+      "legacySourceSHA256": "b9f40f0df8b3d5876fdc12c852e6ec656e3235f6f25497bd5cfb45db3835943d",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "mother",
+      "topicId": "legacy-mutter",
+      "path": "/en/dementia-translator/where-is-my-mother.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+      "legacySourceSHA256": "10a026be6d5172217bbb8843fba23d72f7d5ab2aeb0172d3670b9cc962e346a6",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "work",
+      "topicId": "legacy-arbeit",
+      "path": "/en/dementia-translator/i-have-to-go-to-work.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+      "legacySourceSHA256": "9a3cd00219e175bca15acd307b6bedd7eb7752552af7e255ca1c44bcc7eef842",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "stolen",
+      "topicId": "legacy-geld",
+      "path": "/en/dementia-translator/someone-stole-my-purse.html",
+      "alternatePath": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+      "legacySourceSHA256": "ad01bde2bde0da6060318f5c6d908d45e7ead4a46319289e61dc75138bd37e7a",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "who",
+      "topicId": "legacy-wer",
+      "path": "/en/dementia-translator/who-are-you.html",
+      "alternatePath": "/de/demenz-uebersetzer/wer-sind-sie.html",
+      "legacySourceSHA256": "b45142eda94c1a0ac30d953cf1ad187b0aa173fffc672c4d8f13c650611a0765",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "hungry",
+      "topicId": "legacy-hunger",
+      "path": "/en/dementia-translator/i-havent-eaten-all-day.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+      "legacySourceSHA256": "52c00ef202b7dfdeb6fb428e6478079dea869ae6d520c0d5912dc6737df2f05f",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "shower",
+      "topicId": "legacy-waschen",
+      "path": "/en/dementia-translator/i-dont-want-a-shower.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+      "legacySourceSHA256": "4901a8c9f32e38682be57049b3ce95ba2c3a491c2f9bdad6ecc87714e092ecad",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "leavemealone",
+      "topicId": "legacy-ruhe",
+      "path": "/en/dementia-translator/leave-me-alone.html",
+      "alternatePath": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+      "legacySourceSHA256": "df0b751412f064a73cac95fb9d7e06789b7d7f5f05b10f7696913f1847fbe001",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "someone",
+      "topicId": "legacy-jemand",
+      "path": "/en/dementia-translator/theres-someone-in-the-room.html",
+      "alternatePath": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+      "legacySourceSHA256": "ba12dfd1d84fdffd0a989eebb2299a1a617a229a1050c89057e9d0a46f6b4ddd",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "nothingwrong",
+      "topicId": "legacy-krank",
+      "path": "/en/dementia-translator/theres-nothing-wrong-with-me.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+      "legacySourceSHA256": "633208561bd6a99f95d2e672e8207a078607e3789a836d7d7eb7c429d2987ed5",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "useless",
+      "topicId": "legacy-dumm",
+      "path": "/en/dementia-translator/i-cant-do-anything-anymore.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+      "legacySourceSHA256": "543f640c54a10228c50de51c35f1d1b010d17e1ddb339bbd999ac0a8f592d63c",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "when",
+      "topicId": "legacy-uhrzeit",
+      "path": "/en/dementia-translator/when-are-we-leaving.html",
+      "alternatePath": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+      "legacySourceSHA256": "4309ffcbaf0f69b6466ee4fad087c20add35b8e7fe0dde4e2ee6f00e62858ef5",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "carehome",
+      "topicId": "legacy-heim",
+      "path": "/en/dementia-translator/im-not-going-into-a-home.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+      "legacySourceSHA256": "6af6d490e07214b5b22d538e8df133c0fd185f303370a3bd444c28dcf71febbd",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "help",
+      "topicId": "legacy-hilfe",
+      "path": "/en/dementia-translator/help-help.html",
+      "alternatePath": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+      "legacySourceSHA256": "cc8e996ae1b817e035c8205676e3a63909b404943b55f32a73189ba8cb176b24",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "drive",
+      "topicId": "legacy-auto",
+      "path": "/en/dementia-translator/i-can-still-drive.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+      "legacySourceSHA256": "181bbbb91ead095bb2fc49466a90691aeccaaec7dba1b4a8e9a8f4f8ed2063cc",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "pills",
+      "topicId": "legacy-tabletten",
+      "path": "/en/dementia-translator/im-not-taking-those-pills.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+      "legacySourceSHA256": "97e38d7546d88c5ac85637634f73ed9744b5319ee6622678dd694260ec4762fc",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "lying",
+      "topicId": "legacy-luegen",
+      "path": "/en/dementia-translator/youre-lying-to-me.html",
+      "alternatePath": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+      "legacySourceSHA256": "584328d89043a8dc627bf60ae1a90edfdcb652193d46e1166ad4d09687998105",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "lockedin",
+      "topicId": "legacy-eingesperrt",
+      "path": "/en/dementia-translator/im-locked-in-here.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+      "legacySourceSHA256": "bfdfe9d478a9a8bee9a2edb7bc20d1ba2fae34473e94bb0790158112e4f0d303",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "night",
+      "topicId": "legacy-aufstehen",
+      "path": "/en/dementia-translator/i-have-to-get-up-now.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+      "legacySourceSHA256": "09ff6ce531b3278cda396d5c6a4b1b4890b079e36d2670e7fc697347ac4df92b",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "children",
+      "topicId": "legacy-kinder",
+      "path": "/en/dementia-translator/where-are-my-children.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+      "legacySourceSHA256": "46040465c05823eaaf58b0a9d4076b29f649c6a3014cb54da74ca1e79d76af20",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "bored",
+      "topicId": "legacy-langweilig",
+      "path": "/en/dementia-translator/im-so-bored.html",
+      "alternatePath": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+      "legacySourceSHA256": "eb3290c28ea69dc05299f742e810db41e3b6481f5465785798367de3bb60a1df",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "whereami",
+      "topicId": "legacy-wobin",
+      "path": "/en/dementia-translator/where-am-i.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-bin-ich.html",
+      "legacySourceSHA256": "9a7c861bcf0ed8354de1960e26877ae2d2640e2a011d7e9a4dff3cb60394ccfb",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "poisoned",
+      "topicId": "legacy-vergiftet",
+      "path": "/en/dementia-translator/the-food-is-poisoned.html",
+      "alternatePath": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+      "legacySourceSHA256": "959338bcc1ee172d3d2dd864aa6bddd3d5f2d6137607bd1cb41c466bf8644e3b",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "bed",
+      "topicId": "legacy-bett",
+      "path": "/en/dementia-translator/i-dont-want-to-go-to-bed.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+      "legacySourceSHA256": "91f40c557a0e30f60c577dea07e2451d3e43016fba974c1e0275cb1ecf772456",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "shopping",
+      "topicId": "legacy-einkaufen",
+      "path": "/en/dementia-translator/i-have-to-go-shopping.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+      "legacySourceSHA256": "16ccf49f8add9e124bb15f2ee36ed386b7e13e8aa155610ccf468fcd557f2a85",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "neighbors",
+      "topicId": "legacy-nachbarn",
+      "path": "/en/dementia-translator/the-neighbors-are-talking-about-me.html",
+      "alternatePath": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+      "legacySourceSHA256": "301c51192cc064abce9fec5f428363a55a4f15abcdd4ba6ac868dd3799a757a4",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "dog",
+      "topicId": "legacy-haustier",
+      "path": "/en/dementia-translator/where-is-my-dog.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+      "legacySourceSHA256": "6da1fe84d1384370283ef995d2b8d3af3d706d806027279f794e203b5027e9db",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "cold",
+      "topicId": "legacy-kalt",
+      "path": "/en/dementia-translator/im-so-cold.html",
+      "alternatePath": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+      "legacySourceSHA256": "2c839729240fe2973e1bc22524ddc71eeddf63e7f5a3012147815cbd85d9433b",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "visit",
+      "topicId": "legacy-besuch",
+      "path": "/en/dementia-translator/when-is-my-son-coming.html",
+      "alternatePath": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+      "legacySourceSHA256": "dc05561306ca456c403805a3bb2196ccd28e5de70279158a41acf4b2edf9e3c6",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "phone",
+      "topicId": "legacy-anrufen",
+      "path": "/en/dementia-translator/i-have-to-call-someone.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+      "legacySourceSHA256": "eb6e709f0bba067fd15df29646b1480c12a4718c35a023e2e9666cc872edfad6",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "husband",
+      "topicId": "legacy-partner",
+      "path": "/en/dementia-translator/where-is-my-husband.html",
+      "alternatePath": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+      "legacySourceSHA256": "88566ad38ff8a1923628fb978859d01c37b3a4803726d7f561ab0bee60e6a7c0",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "alone",
+      "topicId": "legacy-allein",
+      "path": "/en/dementia-translator/dont-leave-me.html",
+      "alternatePath": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+      "legacySourceSHA256": "a013fe5e1bb96de5be90ececbeb0d5a700d1eb0e15a4d64de9bc7a2dcb10cc18",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "alreadyate",
+      "topicId": "legacy-schongegessen",
+      "path": "/en/dementia-translator/ive-already-eaten.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+      "legacySourceSHA256": "a9f478063e925a3919ab76c7f3581dfe267774a36ac07c1175575da571127bee",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "toilet",
+      "topicId": "legacy-toilette",
+      "path": "/en/dementia-translator/i-dont-need-the-bathroom.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+      "legacySourceSHA256": "505e62a99d9faf2893722b2d2999f6501740315fa799e732ccd45ddc3a56844e",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "clothes",
+      "topicId": "legacy-umziehen",
+      "path": "/en/dementia-translator/im-not-changing-my-clothes.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+      "legacySourceSHA256": "86d938b2877df971940b37c093e8c0df628cc2f4ba9974375fc20c738f7ac783",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "undress",
+      "topicId": "legacy-ausziehen",
+      "path": "/en/dementia-translator/i-want-to-take-this-off.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+      "legacySourceSHA256": "3b238ce7cf78a6eaad638d57a21b4919dac8b3b4302e6bb1981319ae4e29aa6d",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "stayinbed",
+      "topicId": "legacy-liegen",
+      "path": "/en/dementia-translator/im-staying-in-bed-today.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+      "legacySourceSHA256": "6c9e5ed20cc97e8fb58fd03a82a0f6ffa6baa5c3f0a583f9a425f65a762176eb",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "dark",
+      "topicId": "legacy-abend",
+      "path": "/en/dementia-translator/its-getting-dark-i-have-to-go.html",
+      "alternatePath": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+      "legacySourceSHA256": "a62f6ea80fd53bee64cb322fcf205517ee2d20043ea3127b02f7bebca6ea4afa",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "affair",
+      "topicId": "legacy-untreue",
+      "path": "/en/dementia-translator/youre-seeing-someone-else.html",
+      "alternatePath": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+      "legacySourceSHA256": "38a2b13abebf49f245c8595b571c80f39d4d40a2e0ef424b578bf2e19896afd9",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "child",
+      "topicId": "legacy-kind",
+      "path": "/en/dementia-translator/im-not-a-child.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+      "legacySourceSHA256": "37f20fed702db474aa00b0e7462c4f49326a71b5f936c523fbed6ba19b11c408",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "daycare",
+      "topicId": "legacy-tagespflege",
+      "path": "/en/dementia-translator/im-not-going-to-day-care.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+      "legacySourceSHA256": "7beee2908b84407201839f9a249724c29a72603f02183fbf8dfce91ed44de20b",
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "exhausted",
+      "topicId": "legacy-erschoepft",
+      "path": "/guides/dementia-caregiver-overwhelmed.html",
+      "alternatePath": "/de/ratgeber/pflegende-angehoerige-ueberfordert.html",
+      "legacySourceSHA256": "32afe7e7e8f0fd2138629e47b7a807811505eae8e6b875f7378502dfd288e780",
+      "selfCare": true,
+      "safetyOnly": true
+    },
+    {
+      "language": "en",
+      "key": "findtoilet",
+      "topicId": "finding-toilet",
+      "path": "/en/dementia-translator/i-cant-find-the-toilet.html",
+      "alternatePath": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html",
+      "legacySourceSHA256": null,
+      "selfCare": false,
+      "safetyOnly": false
+    },
+    {
+      "language": "en",
+      "key": "sharecare",
+      "topicId": "sharing-family-care",
+      "path": "/en/caregivers/share-dementia-care-with-siblings.html",
+      "alternatePath": "/de/angehoerige/pflege-mit-geschwistern-aufteilen.html",
+      "legacySourceSHA256": null,
+      "selfCare": true,
+      "safetyOnly": false
+    }
+  ],
+  "excludedHashStates": [
+    {
+      "language": "de",
+      "key": "sterben",
+      "url": "https://dementiacoachapp.com/de/demenz-uebersetzer/#satz-sterben",
+      "safetyOnly": true,
+      "selfCare": false
+    },
+    {
+      "language": "de",
+      "key": "betrug",
+      "url": "https://dementiacoachapp.com/de/demenz-uebersetzer/#satz-betrug",
+      "safetyOnly": true,
+      "selfCare": false
+    },
+    {
+      "language": "de",
+      "key": "pflegesorge",
+      "url": "https://dementiacoachapp.com/de/demenz-uebersetzer/#satz-pflegesorge",
+      "safetyOnly": true,
+      "selfCare": false
+    },
+    {
+      "language": "en",
+      "key": "die",
+      "url": "https://dementiacoachapp.com/en/dementia-translator/#phrase-die",
+      "safetyOnly": true,
+      "selfCare": false
+    },
+    {
+      "language": "en",
+      "key": "scam",
+      "url": "https://dementiacoachapp.com/en/dementia-translator/#phrase-scam",
+      "safetyOnly": true,
+      "selfCare": false
+    },
+    {
+      "language": "en",
+      "key": "carecomplaint",
+      "url": "https://dementiacoachapp.com/en/dementia-translator/#phrase-carecomplaint",
+      "safetyOnly": true,
+      "selfCare": false
+    }
+  ],
+  "pairingExceptions": [
+    {
+      "topic": "nachhause/home",
+      "de": "https://dementiacoachapp.com/de/ratgeber/demenz-nach-hause-was-sagen.html",
+      "catalogEnglish": "https://dementiacoachapp.com/en/dementia-translator/i-want-to-go-home.html",
+      "previousEnglishAlternate": "https://dementiacoachapp.com/guides/dementia-wants-to-go-home.html",
+      "issue": "DE guide alternate points to another English guide outside84; EN catalog page has no DE alternate",
+      "metadataOnly": {
+        "path": "/guides/dementia-wants-to-go-home.html",
+        "sourceSHA256": "a4795b28b68f31064f4e0c312e1e80dcf11fce8f6ca775ca3ecb98b2a2d2eefe",
+        "resultSHA256": "23c49fa601105cdc9acd6ff4b065e125dea1db3e1e9950120a9e4ac4e35f520d"
+      }
+    }
+  ]
+}

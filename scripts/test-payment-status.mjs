@@ -55,20 +55,23 @@ test("actual return-page code sends the owner token, hides pending access and em
   const { createContext, runInContext } = await import("node:vm");
   const { paymentStatusText } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
   const page = (await readFile(new URL("../abo/abo.js", import.meta.url), "utf8")).replace(/^import .*payment-status.js.*;\n/mu, "");
-  const split = page.indexOf('// --- Start ');
+  const emailModule = await readFile(new URL("../abo/email-auth.js", import.meta.url), "utf8");
+  const { emailAccountURL } = await import(`data:text/javascript;base64,${Buffer.from(emailModule).toString("base64")}`);
+  const code = page.replace(/^import .*email-auth.js.*;\n/mu, "");
+  const split = code.indexOf('// --- Start ');
   assert.ok(split > 0);
   for (const outcome of ["pending", "failed", "action_required", "paid", "trialing", "no_payment_due", "auth_error", "legacy_paid", "legacy_unpaid", "legacy_no_payment_required", "signed_out", "token_error"]) {
     const nodes = new Map();
     const events = [];
     const calls = [];
     const node = (id) => {
-      if (!nodes.has(id)) nodes.set(id, { hidden: true, textContent: "", handlers: {}, addEventListener(name, handler) { this.handlers[name] = handler; }, setAttribute() {}, classList: { add() {} } });
+      if (!nodes.has(id)) nodes.set(id, { hidden: true, textContent: "", handlers: {}, addEventListener(name, handler) { this.handlers[name] = handler; }, setAttribute() {}, replaceChildren(...children) { this.children = children; }, classList: { add() {} } });
       return nodes.get(id);
     };
     const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
     const context = createContext({
-      createPaymentStatusController, paymentStatusText, URLSearchParams,
-      location: { search: "?status=fertig&session_id=cs_synthetic" },
+      createPaymentStatusController, paymentStatusText, emailAccountURL, URLSearchParams,
+      location: { search: "?status=fertig&session_id=cs_synthetic", origin: "https://dementiacoachapp.com" },
       localStorage: { getItem: () => null },
       document: { getElementById: node, querySelectorAll: (selector) => selector === "[data-manage]" ? [node("payment-status-manage")] : [] },
       window: { scrollTo() {}, DEMENZ_ABO_CONFIG: { firebase: { apiKey: "synthetic" }, signIn: { apple: true }, endpoint: "https://synthetic.invalid", appStoreURL: "https://apps.apple.com/" }, DemenzConsent: { track: (...args) => events.push(args), trackMarketing: (...args) => events.push(args) } },
@@ -82,9 +85,9 @@ test("actual return-page code sends the owner token, hides pending access and em
         assert.fail(`unexpected network call ${url}`);
       }
     });
-    runInContext(page.slice(0, split), context);
+    runInContext(code.slice(0, split), context);
     runInContext(`state.auth = {}; state.user = ${outcome === "signed_out" ? "null" : `{ isAnonymous: true, getIdToken: async () => ${outcome === "token_error" ? '{ throw new Error("token unavailable"); }' : '"synthetic_owner_token"'} }`};`, context);
-    runInContext(page.slice(split), context);
+    runInContext(code.slice(split), context);
     await new Promise((resolve) => setImmediate(resolve));
     const authenticated = !["signed_out", "token_error"].includes(outcome);
     if (authenticated) assert.equal(calls[0].options.headers.Authorization, "Bearer synthetic_owner_token");
@@ -143,7 +146,8 @@ test("isolated actual page supports legacy recovery and strict rich states", { s
       { label: "status-error", error: true, view: "Zahlungsstatus noch nicht bestätigt", active: false },
       { label: "network-error", networkError: true, view: "Zahlungsstatus noch nicht bestätigt", active: false },
       { label: "legacy-portal-error", status: { status: "complete", paymentStatus: "unpaid" }, portalError: true, view: "Prüfe deinen Zahlungsstatus", active: false },
-      { label: "legacy-own-permanent-account", status: { status: "complete", paymentStatus: "paid" }, permanent: true, view: "Prüfe deinen Zahlungsstatus", active: false },
+      { label: "legacy-own-permanent-account", status: { status: "complete", paymentStatus: "paid" }, permanent: true, emailVerified: true, view: "Prüfe deinen Zahlungsstatus", active: false },
+      { label: "legacy-own-phone-account", status: { status: "complete", paymentStatus: "paid" }, permanent: true, emailVerified: false, view: "Prüfe deinen Zahlungsstatus", active: false },
       { label: "signed-out", signedOut: true, view: "Zahlungsstatus noch nicht bestätigt", active: false }
     ];
     for (const row of rows) {
@@ -157,7 +161,7 @@ test("isolated actual page supports legacy recovery and strict rich states", { s
           if (request.method() === "OPTIONS") return route.fulfill({ status: 204, headers });
           if (url.pathname.endsWith("/firebase-app.js")) return route.fulfill({ contentType: "text/javascript", body: "export const initializeApp=()=>({});", headers });
           if (url.pathname.endsWith("/firebase-auth.js")) {
-            const user = row.signedOut ? "null" : `{isAnonymous:${!row.permanent},getIdToken:async()=>"fixture-owner-token"}`;
+            const user = row.signedOut ? "null" : `{isAnonymous:${!row.permanent},emailVerified:${row.emailVerified === true},getIdToken:async()=>"fixture-owner-token"}`;
             return route.fulfill({ contentType: "text/javascript", headers, body: `const user=${user}; export const getAuth=()=>({currentUser:user}); export const getRedirectResult=async()=>null; export const onAuthStateChanged=(auth,cb)=>{setTimeout(()=>cb(user),0);return ()=>{}};` });
           }
           if (url.hostname.endsWith("cloudfunctions.net")) {
@@ -176,7 +180,7 @@ test("isolated actual page supports legacy recovery and strict rich states", { s
         await page.waitForFunction((expected) => document.getElementById("done-title")?.textContent === expected, row.view);
         assert.equal(await page.locator("#done-plan").isVisible(), row.active, row.label);
         assert.equal(await page.locator("#done-plan-link").isVisible(), row.active, row.label);
-        assert.equal(await page.locator("#link-card").isVisible(), !row.signedOut && !row.permanent, row.label);
+        assert.equal(await page.locator("#link-card").isVisible(), !row.signedOut && !row.emailVerified, row.label);
         assert.equal(await page.locator("#payment-status-manage").isVisible(), !row.signedOut && !row.active, row.label);
         assert.equal(await page.evaluate(() => (window.dataLayer || []).some((entry) => entry[0] === "event" && /purchase/iu.test(entry[1]))), false);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);

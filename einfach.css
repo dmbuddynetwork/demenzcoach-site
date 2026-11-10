@@ -368,19 +368,19 @@ body.einfach .translator-call-link { color: inherit !important; font-weight: 700
 }
 
 /* ---------- Gehörter Satz als Sprechblase mit Zeichnung daneben (wie App-Store-Bilder, Daniel 8. Nov) ---------- */
-body.einfach .translator-said { display: flex; align-items: center; gap: 14px; margin: 0 0 20px; }
+body.einfach .translator-said { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; }
 body.einfach .translator-said-text { flex: 1 1 auto; min-width: 0; }
-body.einfach .translator-said-label { margin: 0 0 8px !important; color: var(--e-purple) !important; font-size: var(--e-small) !important; font-weight: 700 !important; }
-body.einfach :is(h1, h2).translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 16px 20px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
+body.einfach .translator-said-label { margin: 0 0 4px !important; color: var(--e-purple) !important; font-size: var(--e-small) !important; font-weight: 700 !important; }
+body.einfach :is(h1, h2).translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 10px 14px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
 body.einfach :is(h1, h2).translator-said-bubble::before { display: none !important; }
 body.einfach :is(h1, h2).translator-said-bubble::after { content: ""; position: absolute; left: 30px; bottom: -9px; width: 16px; height: 16px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
 body.einfach .translator-said-with-art :is(h1, h2).translator-said-bubble::after { left: auto; right: -9px; bottom: auto; top: calc(50% - 8px); border-bottom: 0; border-top: 1px solid var(--e-line); }
-body.einfach .translator-said-art { flex: 0 0 34%; max-width: 210px; width: 34%; height: auto; max-height: 210px; object-fit: contain; }
+body.einfach .translator-said-art { flex: 0 0 22%; max-width: 112px; width: 22%; height: auto; max-height: 112px; object-fit: contain; }
 @media (max-width: 480px) {
-  body.einfach :is(h1, h2).translator-said-bubble { padding: 14px 16px !important; font-size: 1.25rem !important; }
+  body.einfach :is(h1, h2).translator-said-bubble { padding: 10px 12px !important; font-size: 1.25rem !important; }
 }
 body.einfach .translator-answer .translator-goal-chosen { margin-bottom: 14px; }
-@media (min-width: 720px) { body.einfach :is(h1, h2).translator-said-bubble { font-size: 1.75rem !important; padding: 20px 26px !important; } }
+@media (min-width: 720px) { body.einfach :is(h1, h2).translator-said-bubble { font-size: 1.75rem !important; padding: 12px 16px !important; } }
 
 /* ---------- Alltagstrick in der Antwort und als Kacheln im Archiv (Daniel, 8. Nov) ---------- */
 body.einfach .translator-trick { display: flex; align-items: center; gap: 16px; margin: 14px 0 4px; padding: 16px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 18px; }
@@ -396,7 +396,7 @@ body.einfach .e-tiles .e-tiles-heading h2 { margin: 0 0 4px; }
 body.einfach .e-tiles .e-tiles-heading p { margin: 0; }
 body.einfach a.e-tile { text-decoration: none; }
 /* Gewähltes Ziel als positive Bestätigung mit Häkchen (Daniel, 8. Nov 16:51). */
-body.einfach .translator-answer .translator-goal-chosen { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 18px !important; padding: 10px 16px 10px 12px; background: #e7f4ea; color: #1d5e33 !important; border-radius: 999px; font-size: var(--e-small) !important; font-weight: 700; }
+body.einfach .translator-answer .translator-goal-chosen { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 10px !important; padding: 6px 10px; background: #e7f4ea; color: #1d5e33 !important; border-radius: 999px; font-size: var(--e-small) !important; font-weight: 700; }
 body.einfach .translator-answer .translator-goal-chosen::before {
   content: ""; flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: #2e7d4a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 16px no-repeat;
 }
@@ -413,7 +413,7 @@ body.einfach .translator-phrase:has(> .translator-save) > q { flex: 1 1 0 !impor
 body.einfach .translator-phrase { position: relative; overflow: visible !important; border-radius: 20px !important; }
 body.einfach .translator-phrase::before { content: none !important; display: none !important; }
 body.einfach .translator-phrase::after { content: ""; position: absolute; left: 26px; bottom: -8px; width: 14px; height: 14px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
-body.einfach .translator-phrases { gap: 18px !important; }
+body.einfach .translator-phrases { gap: 10px !important; }
 /* Mehr Platz für den Text (Daniel, 8. Nov 16:52): Trick-Bild auf dem Handy kleiner, Anrede mit Abstand zum Zipfel. */
 @media (max-width: 480px) {
   body.einfach .translator-trick { gap: 12px; padding: 14px; }
@@ -423,11 +423,11 @@ body.einfach .translator-phrases { gap: 18px !important; }
 body.einfach .translator-answer .translator-quick { margin-top: 18px; }
 /* Besser lesbar (Daniel, 8. Nov 16:52): klare dunkle Zwischenüberschriften in normaler Größe, mehr Luft statt Trennlinien, ruhigere Zeilenhöhe. */
 body.einfach .translator-result .translator-answer .translator-step { margin: 0 0 8px !important; color: var(--e-text) !important; font-size: 1.125rem !important; font-weight: 800 !important; }
-body.einfach .translator-answer .translator-step ~ .translator-step { margin-top: 32px !important; padding-top: 0 !important; border-top: 0 !important; }
+body.einfach .translator-answer .translator-step ~ .translator-step { margin-top: 20px !important; padding-top: 0 !important; border-top: 0 !important; }
 body.einfach .translator-answer :is(.translator-meaning, .translator-goal-list li) { line-height: 1.6 !important; }
 body.einfach .translator-answer .translator-meaning + .translator-meaning { margin-top: 10px !important; }
-/* Herz und Teilen rechts oben in der Sprechblase, untereinander (Daniel, 8. Nov 17:02: Satz an die Familie schicken). */
-body.einfach .translator-phrase-actions { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; margin: -8px -6px -8px auto; }
+/* Merken und Teilen teilen sich eine Zeile; beide Tippflächen bleiben44px groß. */
+body.einfach .translator-phrase-actions { display: flex; flex-direction: row; align-items: center; gap: 4px; flex: 0 0 auto; margin: 0 0 0 auto; }
 body.einfach .translator-phrase-actions:empty { display: none; }
 body.einfach .translator-phrase-actions .translator-save { margin: 0 !important; }
 body.einfach .translator-phrase-share { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: 0; padding: 0; background: transparent; border: 0; border-radius: 50%; color: var(--e-purple); cursor: pointer; }
@@ -645,3 +645,12 @@ body.einfach .tricks-sources, body.einfach .tricks-safety { overflow-wrap: anywh
 
 body.einfach .translator-plan-cta p { margin: 0 0 20px; }
 body.einfach .translator-plan-cta .button { white-space: normal; text-align: center; }
+
+/* Compact shared answer layout. Text sizes remain unchanged and grow with text zoom. */
+body.einfach.translator-has-result .e-hero { padding-top: 8px; padding-bottom: 8px; }
+body.einfach.translator-has-result .e-header .e-wrap { flex-wrap: wrap; gap: 8px 16px; }
+body.einfach.translator-has-result .e-brand { min-width: 0; overflow-wrap: anywhere; }
+body.einfach.translator-has-result .translator-result { margin-top: 12px; }
+body.einfach #translator-result .translator-phrase:has(> .translator-phrase-actions) { flex-wrap: wrap !important; align-items: center; gap: 4px 8px; padding: 8px 12px !important; }
+body.einfach #translator-result .translator-phrase:has(> .translator-phrase-actions) > q { flex: 1 1 calc(100% - 100px); min-width: min(100%, 10rem); overflow-wrap: anywhere; }
+body.einfach #translator-result .translator-scene-art { max-width: 180px; max-height: 140px; margin: .5rem auto .25rem; }

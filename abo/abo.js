@@ -1,6 +1,7 @@
 // Web-Kasse: Angebot wählen, mit demselben Firebase-Konto wie die App anmelden, über Stripe bezahlen.
 // Netzwerk nur zu unserem Backend (DEMENZ_ABO_CONFIG.endpoint), zu Firebase Auth und zu Stripe.
 import { createPaymentStatusController, paymentStatusText } from "./payment-status.js";
+import { emailAccountURL } from "./email-auth.js";
 const config = window.DEMENZ_ABO_CONFIG;
 const firebaseVersion = "12.16.0";
 const $ = (id) => document.getElementById(id);
@@ -126,16 +127,16 @@ $("plan-next").addEventListener("click", async () => {
   track("begin_checkout", { plan: state.plan, source: state.source }, { event: "InitiateCheckout" });
   await ensureFirebase();
   if (state.user) return goToPay();
-  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Ein stilles Gast-Konto trägt den Kauf, die Nummer kommt auf der Danke-Seite dazu.
+  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Ein stilles Gast-Konto trägt den Kauf, der E-Mail-Zugang kann danach verknüpft werden.
   try {
     state.user = (await state.firebase.signInAnonymously(state.auth)).user;
     track("sign_up", { method: "guest" });
     return goToPay();
   } catch {
-    show("account");
+    refreshEmailEntry(); show("account");
   }
 });
-$("have-account").addEventListener("click", () => show("account"));
+$("have-account").addEventListener("click", () => { refreshEmailEntry(); show("account"); });
 for (const back of document.querySelectorAll("[data-back]")) back.addEventListener("click", () => show(back.dataset.back));
 
 // --- Schritt 2: Konto (Firebase Auth, dasselbe Projekt wie die App) ---------------------------------
@@ -181,48 +182,25 @@ $("apple-button").addEventListener("click", async () => {
   }
 });
 
-// Ohne Apple-Services-ID: nur die Telefonnummer zeigen, das Formular gleich offen.
-if (!config.signIn?.apple) {
-  $("apple-button").hidden = true;
-  $("phone-toggle").hidden = true;
-  $("phone-form").hidden = false;
+// Email is the only new web registration path. Existing identity providers
+// remain on the Firebase account; this does not delete native/legacy accounts.
+if (!config.signIn?.apple) $("apple-button").hidden = true;
+function emailReturn() {
+  if (params.get("status") === "fertig") return `/abo/${location.search}`;
+  const query = new URLSearchParams({ plan: state.plan, src: state.source, weiter: "1" });
+  if (state.campaign) query.set("c", state.campaign);
+  return `/abo/?${query}`;
 }
-
-$("phone-toggle").addEventListener("click", () => {
-  $("phone-form").hidden = false;
-  $("phone").focus();
-});
-let phoneConfirmation;
-let recaptcha;
-$("phone-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const raw = $("phone").value.replace(/[\s/()-]/gu, "");
-  const phone = raw.startsWith("00") ? `+${raw.slice(2)}` : raw.startsWith("0") ? `+49${raw.slice(1)}` : raw;
-  if (!/^\+\d{8,15}$/u.test(phone)) return fail("Bitte gib deine Telefonnummer mit Vorwahl ein, zum Beispiel +49 170 1234567.");
-  try {
-    await ensureFirebase();
-    recaptcha ??= new state.firebase.RecaptchaVerifier(state.auth, "recaptcha", { size: "invisible" });
-    phoneConfirmation = await state.firebase.signInWithPhoneNumber(state.auth, phone, recaptcha);
-    $("code-block").hidden = false;
-    $("code").focus();
-  } catch {
-    fail("Die SMS konnte nicht geschickt werden. Prüf bitte die Nummer.");
-  }
-});
-$("code-confirm").addEventListener("click", async () => {
-  try {
-    state.user = (await phoneConfirmation.confirm($("code").value.trim())).user;
-    track("sign_up", { method: "phone" });
-    goToPay();
-  } catch {
-    fail("Der Code stimmt nicht. Bitte prüf ihn noch einmal.");
-  }
-});
+function refreshEmailEntry() {
+  $("email-login").href = emailAccountURL(emailReturn(), location.origin, "signin");
+}
+$("email-login").addEventListener("click", refreshEmailEntry);
+refreshEmailEntry();
 
 // --- Schritt 3: Bezahlen -------------------------------------------------------------------------
 function goToPay() {
   show("pay");
-  const who = state.user.isAnonymous ? "" : (state.user.email || state.user.phoneNumber || "");
+  const who = state.user.isAnonymous ? "" : (state.user.email || "");
   $("signed-in-as").textContent = who ? `Angemeldet als ${who}` : "";
   if (state.user.email) return startCheckout();
   $("email-block").hidden = false;
@@ -383,44 +361,16 @@ async function confirmPayment(attempt = state.checkoutAttempt, checkout = state.
 }
 $("pay-button").addEventListener("click", () => confirmPayment());
 
-// --- Konto nach dem Kauf: Gast-Konto bekommt die Telefonnummer (UID und damit Stripe/Adapty-Zuordnung bleiben gleich) ----
-let linkConfirmation;
-let linkRecaptcha;
+// Preserve the paid guest UID by linking email in the same Firebase account.
 async function offerAccountLink() {
   try {
     await ensureFirebase();
-    if (!state.user?.isAnonymous) return;
+    if (!state.user || state.user.emailVerified) return;
+    $("email-link-after").href = emailAccountURL(emailReturn(), location.origin, "link");
     $("link-card").hidden = false;
     track("account_link_shown", { source: state.source });
-  } catch { /* Konto später im Plan nachholbar */ }
+  } catch { /* The verified account can be recovered through support. */ }
 }
-$("link-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const raw = $("link-phone").value.replace(/[\s/()-]/gu, "");
-  const phone = raw.startsWith("00") ? `+${raw.slice(2)}` : raw.startsWith("0") ? `+49${raw.slice(1)}` : raw;
-  if (!/^\+\d{8,15}$/u.test(phone)) return fail("Bitte gib deine Telefonnummer mit Vorwahl ein, zum Beispiel +49 170 1234567.");
-  try {
-    linkRecaptcha ??= new state.firebase.RecaptchaVerifier(state.auth, "link-recaptcha", { size: "invisible" });
-    linkConfirmation = await state.firebase.linkWithPhoneNumber(state.user, phone, linkRecaptcha);
-    $("link-code-block").hidden = false;
-    $("link-code").focus();
-  } catch (error) {
-    fail(error?.code === "auth/credential-already-in-use"
-      ? "Diese Nummer hat schon ein App-Konto. Schreib uns bitte kurz über das Kontaktformular, wir verbinden dein Abo."
-      : "Die SMS konnte nicht geschickt werden. Prüf bitte die Nummer.");
-  }
-});
-$("link-confirm").addEventListener("click", async () => {
-  try {
-    state.user = (await linkConfirmation.confirm($("link-code").value.trim())).user;
-    track("account_linked", { source: state.source });
-    $("link-card").hidden = true;
-  } catch (error) {
-    fail(error?.code === "auth/credential-already-in-use"
-      ? "Diese Nummer hat schon ein App-Konto. Schreib uns bitte kurz über das Kontaktformular, wir verbinden dein Abo."
-      : "Der Code stimmt nicht. Bitte prüf ihn noch einmal.");
-  }
-});
 
 // --- Abo verwalten (Stripe-Kundenportal) ----------------------------------------------------------
 async function openPortal() {
@@ -510,7 +460,7 @@ if (params.get("status") === "fertig") {
       portalAvailable = true;
       // Das eigene Firebase-Gastkonto sichern, unabhängig vom Zahlungsstatus.
       // Es wird keine Kundenzuordnung aus einer öffentlichen Session übernommen.
-      if (state.user.isAnonymous && $("link-card").hidden) await offerAccountLink();
+      if (!state.user.emailVerified && $("link-card").hidden) await offerAccountLink();
       return api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
     },
     render: (outcome) => {

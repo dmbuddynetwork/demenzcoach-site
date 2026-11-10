@@ -50,7 +50,7 @@ async function signedInUser() {
     auth.languageCode = "de";
     await new Promise((resolve) => { const stop = firebase.onAuthStateChanged(auth, () => { stop(); resolve(); }); });
   }
-  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Das Gast-Konto trägt den Kauf, die Nummer kommt auf der Danke-Seite dazu.
+  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Das Gast-Konto trägt den Kauf; eine bestätigte E-Mail wird anschließend mit derselben Nutzerkennung verknüpft.
   return auth.currentUser ?? (await firebase.signInAnonymously(auth)).user;
 }
 

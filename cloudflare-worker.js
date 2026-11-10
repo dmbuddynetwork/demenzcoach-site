@@ -1,4 +1,19 @@
+import publicGeneratorRoutes from './content/generator-public-routes.json' with { type: 'json' };
 import germanRoutes from './german-situation-routes.json' with { type: 'json' };
+
+// This generated registry is emitted only after every selected view passed the compiler.
+// The88-route source inventory alone must never enable an unbuilt public app alias.
+export const generatorRouteTarget = (request, routes = publicGeneratorRoutes.routes) => {
+  if (!['GET','HEAD'].includes(request.method)) return null;
+  const url=new URL(request.url);
+  const states=routes.flatMap(route=>[{route,path:route.path},...(route.goalPaths?Object.values(route.goalPaths).filter(path=>path!==route.path).map(path=>({route,path})).concat([{route,path:route.selectionPath}]):[])]);
+  const state=states.find(item=>item.path===url.pathname);
+  const homeLanguage=/^\/(de|en)\/(?:index\.html)?$/.exec(url.pathname)?.[1] || (/^\/de\/demenz-uebersetzer\/(?:index\.html)?$/.test(url.pathname)?'de':/^\/en\/dementia-translator\/(?:index\.html)?$/.test(url.pathname)?'en':null);
+  const language=state?.route.language||homeLanguage;
+  const linked=language&&routes.find(route=>route.language===language&&route.key===url.searchParams.get('situation'));
+  if(linked){const goal=url.searchParams.get('ziel');const path=linked.goalPaths?(['jetzt','verstehen','tipps'].includes(goal)&&Object.hasOwn(linked.goalPaths,goal)?linked.goalPaths[goal]:linked.selectionPath):linked.path;return {redirect:new URL(path,url.origin).href};}
+  return state?{assetPath:state.route.path,canonicalPath:state.route.path}:null;
+};
 
 const germanAliases = new Map(germanRoutes.pages.flatMap(page => page.aliases.map(alias => [alias, page.to])));
 const germanHubQueries = new Set(['/', '/index.html', '/de/', '/de/index.html',
@@ -92,6 +107,15 @@ export default {
     };
     if (request.method === 'GET' || request.method === 'HEAD') {
       const path = url.pathname;
+      const generatorTarget=generatorRouteTarget(request);
+      if(generatorTarget?.redirect)return new Response(null,{status:301,headers:{Location:generatorTarget.redirect,'Referrer-Policy':'no-referrer'}});
+      if(generatorTarget?.assetPath){
+        const assetURL=new URL(generatorTarget.assetPath,url.origin);
+        const response=await env.ASSETS.fetch(assetURL,request);
+        if(response.ok||response.status===304)return response;
+        // A missing app asset fails closed; no language-home or arbitrary-path fallback.
+        return new Response('Not found',{status:404,headers:{'Content-Type':'text/plain;charset=utf-8'}});
+      }
       const germanTarget = germanSituationTarget(request);
       if (germanTarget) return new Response(null, { status: 301, headers: { Location: germanTarget, 'Referrer-Policy': 'no-referrer' } });
       const homeTarget = legacyHomeTarget(path);

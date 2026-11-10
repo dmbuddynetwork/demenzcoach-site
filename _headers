@@ -5,3 +5,11 @@
   X-Frame-Options: SAMEORIGIN
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
   Strict-Transport-Security: max-age=31536000
+
+# Authentication action links must not leave cached/referrer copies.
+/abo/konto.html
+  Cache-Control: private, no-store
+  Referrer-Policy: no-referrer
+/abo/email-link.html
+  Cache-Control: private, no-store
+  Referrer-Policy: no-referrer
