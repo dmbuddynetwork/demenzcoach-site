@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import {inspectGeneratorPage} from "./seo-generator-guard.mjs";
 
 const root = path.resolve(process.argv[2] ?? "landingpage");
 const baseURL = "https://dementiacoachapp.com";
@@ -10,6 +11,11 @@ const fail = (message) => errors.push(message);
 const warn = (message) => warnings.push(message);
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const htmlFiles = [];
+const optionalJSON = (file, fallback) => fs.existsSync(path.join(root, file)) ? JSON.parse(read(file)) : fallback;
+const generatorRoutes = optionalJSON('content/generator-public-routes.json', {routes: []}).routes;
+const generatorInventory = optionalJSON('content/generator-route-manifest.json', {routes: []}).routes;
+const generatorSources = Object.fromEntries(['de', 'en'].map(language => [language, optionalJSON(`content/ready-situations.${language}.json`, [])]));
+const validatedGeneratorPaths = new Set();
 
 const walk = (directory, prefix = "") => {
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -84,6 +90,9 @@ for (const file of htmlFiles) {
     continue;
   }
 
+  const generator = inspectGeneratorPage({pathname: '/' + file, html, routes: generatorRoutes, inventory: generatorInventory, sources: generatorSources});
+  generator.errors.forEach(message => fail(`${file}: ${message}`));
+  if (generator.registered && !generator.errors.length) validatedGeneratorPaths.add('/' + file);
   if (!title) fail(`${file}: missing title`);
   // Schlichtes Layout im App-Stil (einfach.css, 8. Nov 2026) für Startseite und Übersetzer-Seiten.
   if (!/href=["'][^"']*lovable-home\.css\?v=/.test(html) && !/href=["'][^"']*einfach\.css["']/.test(html)) fail(`${file}: missing current shared layout`);
@@ -145,11 +154,15 @@ if (!fs.existsSync(campaignManifestPath)) {
     const relativePath = new URL(campaign.page_url).pathname
       .replace("/demenzcoach-site/", "");
     const html = read(relativePath);
-    if (!html.includes(`ct=${campaign.campaign_token}&amp;mt=8`)) {
-      fail(`${relativePath}: missing mapped campaign token ${campaign.campaign_token}`);
-    }
-    if ((html.match(/data-related-link=/g) ?? []).length < 2) {
-      fail(`${relativePath}: expected at least two internal related-guide links`);
+    if (generatorRoutes.some(route => route.path === relativePath)) {
+      if (!validatedGeneratorPaths.has(relativePath)) fail(`${relativePath}: registered generator must satisfy the full app contract`);
+    } else {
+      if (!html.includes(`ct=${campaign.campaign_token}&amp;mt=8`)) {
+        fail(`${relativePath}: missing mapped campaign token ${campaign.campaign_token}`);
+      }
+      if ((html.match(/data-related-link=/g) ?? []).length < 2) {
+        fail(`${relativePath}: expected at least two internal related-guide links`);
+      }
     }
   }
   const expectedStageEvents = [
