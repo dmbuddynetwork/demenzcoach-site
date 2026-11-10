@@ -7,7 +7,7 @@
 const config = window.DEMENZ_ABO_CONFIG || {};
 const firebaseVersion = "12.16.0";
 const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
-const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long", year: "numeric" }).format(date);
+const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
 
 let firebase = null;
 let auth = null;
@@ -66,21 +66,22 @@ function loadStripe() {
 }
 
 export function summaryText(plan, price, trialDays, firstYear = null) {
-  const priceText = `${euro(price.amount, price.currency)} pro ${plan === "yearly" ? "Jahr" : "Monat"}`;
+  const period = plan === "yearly" ? "Jahr" : "Monat";
+  const recurring = `${euro(price.amount, price.currency)}/${period}`;
   const deal = Number.isInteger(firstYear) ? euro(firstYear, price.currency) : null;
   if (trialDays > 0) {
     const start = new Date(Date.now() + trialDays * 86_400_000);
     return deal
-      ? `Heute 0,00 €. Ab ${dateText(start)} ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt. Kündigst du vorher, zahlst du nichts.`
-      : `Heute 0,00 €. Ab ${dateText(start)} ${priceText} inklusive MwSt. Kündigst du vorher, zahlst du nichts.`;
+      ? `Heute 0,00 €. Ab ${dateText(start)}: ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
+      : `Heute 0,00 €. Ab ${dateText(start)}: ${recurring}. Inkl. MwSt.`;
   }
   return deal
-    ? `Heute ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt.`
-    : `Heute ${priceText.replace(" pro ", " für 1 ")} inklusive MwSt. Danach ${priceText}.`;
+    ? `Heute ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
+    : `Heute ${euro(price.amount, price.currency)} für 1 ${period}, danach ${recurring}. Inkl. MwSt.`;
 }
 export const termsText = (plan) => (plan === "yearly"
-  ? "Laufzeit: 1 Jahr. Danach läuft das Abo unbefristet weiter und ist mit einer Frist von einem Monat kündbar."
-  : "Das Abo verlängert sich jeden Monat automatisch und ist jederzeit zum Monatsende kündbar.");
+  ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist."
+  : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.");
 
 function close() {
   if (!sheet) return;
@@ -98,25 +99,26 @@ export async function open(options) {
   const loading = el("p", { class: "kasse-loading", role: "status", text: "Zahlungsarten werden geladen …" });
   const summary = el("p");
   const terms = el("p");
+  const trialNote = el("p", { hidden: "" });
   let loadingTimer = null;
   const short = el("p", { class: "kasse-short", hidden: "" });
   const divider = el("p", { class: "abo-divider", text: "oder", hidden: "" });
   const express = el("div", { id: "kasse-express" });
   const payment = el("div", { id: "kasse-payment" });
   const payButton = el("button", { type: "button", class: "abo-button", disabled: "", text: "Zahlungspflichtig abonnieren" });
-  const emailLine = el("p", { class: "abo-muted", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
+  const emailLine = el("p", { class: "abo-checkout-email", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
   const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
   const card = el("div", { class: "kasse-card" }, [
     el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": "Schließen", text: "×", onclick: () => close() })]),
     error,
-    loading, payment, emailLine,
+    loading, payment,
     el("div", { class: "abo-summary", role: "group", "aria-label": "Preis und Laufzeit", hidden: "" }, [summary, terms]),
-    express, divider, short, payButton,
-    el("p", { class: "abo-checkout-details" }, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
+    express, divider, short, payButton, emailLine,
+    el("div", { class: "abo-checkout-details" }, [trialNote, el("p", {}, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
         el("a", { href: "/abo/garantie.html", target: "_blank", text: "Geld-zurück-Garantie" }), ". Es gelten die ",
         el("a", { href: "/nutzungsbedingungen.html", target: "_blank", text: "Nutzungsbedingungen" }), ". ",
         el("a", { href: "/abo/widerruf.html", target: "_blank", text: "Widerrufsbelehrung" }), ". ",
-        el("a", { href: "/datenschutz.html", target: "_blank", text: "Datenschutz" }), "."])
+        el("a", { href: "/datenschutz.html", target: "_blank", text: "Datenschutz" }), "."])])
   ]);
   const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title",
     onclick: (event) => { if (event.target === node) close(); } }, card);
@@ -164,6 +166,8 @@ export async function open(options) {
     summary.textContent = text;
     short.textContent = text;
     terms.textContent = termsText(options.plan);
+    trialNote.hidden = !(session.trialDays > 0);
+    trialNote.textContent = session.trialDays > 0 ? `${session.trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
     summary.parentElement.hidden = false;
     const stripe = window.Stripe(publicConfig.publishableKey, { locale: "de" });
     const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" } };

@@ -23,7 +23,9 @@ html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--paper); color: var(--ink); font: 400 var(--body)/1.5 var(--sans); }
 a { color: var(--purple); }
 .abo-page { max-width: 34rem; margin: 0 auto; padding: 20px 16px 48px; }
-.abo-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.abo-page, .kasse-card { overflow-wrap: anywhere; }
+.start-noscroll .abo-page .abo-brand, .start-noscroll .abo-page .abo-brand span { min-width: 0; white-space: normal; }
+.abo-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
 .abo-brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 700; }
 .abo-brand img { width: 40px; height: 40px; border-radius: 10px; }
 h1 { font-size: var(--big); line-height: 1.15; margin: 0 0 16px; font-weight: 700; }
@@ -59,11 +61,13 @@ legend { font-weight: 700; margin: 0 0 8px; padding: 0; }
 .abo-choice { display: flex; gap: 10px; align-items: flex-start; padding: 12px 0; font-weight: 400; margin: 0; }
 .abo-choice input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--purple); flex: none; }
 .abo-error { color: var(--error); font-weight: 700; }
-.abo-summary { margin: 16px 0; padding: 0; border: 0; background: none; font-size: 1rem; line-height: 1.45; color: var(--ink); }
-.abo-summary > p { margin: 0 0 8px; }
-.abo-summary > p:first-child { font-weight: 600; }
+.abo-summary { margin: 12px 0; padding: 0; border: 0; background: none; font-size: .875rem; font-weight: 400; line-height: 1.3; color: var(--ink); }
+.abo-summary > p { margin: 0; }
 .abo-summary > p:last-child { margin-bottom: 0; }
-.abo-checkout-details { margin: 16px 0 0; color: var(--ink-2); font-size: .875rem; line-height: 1.5; }
+.abo-checkout-email { margin: 12px 0; font-size: .875rem; color: var(--ink-2); overflow-wrap: anywhere; }
+.abo-checkout-email:empty { display: none; }
+.abo-checkout-details { margin: 12px 0 0; color: var(--ink-2); font-size: .875rem; line-height: 1.5; }
+.abo-checkout-details > p { margin: 0 0 8px; }
 .abo-steps { color: var(--ink-2); margin: 0 0 8px; }
 #express-checkout, #payment-element { margin: 0 0 14px; }
 .abo-divider { display: flex; align-items: center; gap: 10px; color: var(--ink-2); margin: 4px 0 14px; }
@@ -112,6 +116,7 @@ legend { font-weight: 700; margin: 0 0 8px; padding: 0; }
 .kasse-card .abo-muted { font-size: .875rem; overflow-wrap: anywhere; margin: 12px 0; }
 .kasse-card h2 { font-size: 1.125rem; }
 .abo-checkout-details a { text-underline-offset: 3px; }
+.abo-checkout-details a:is([href="/nutzungsbedingungen.html"], [href="/datenschutz.html"]) { text-decoration: none; font-weight: 600; }
 .abo-checkout-details a:focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; }
 .kasse-loading { margin: 0 0 14px; color: var(--ink-2); font-size: 1rem; }
 

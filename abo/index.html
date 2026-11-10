@@ -74,11 +74,10 @@
       <button class="abo-link-button" type="button" data-back="plan">Zurück</button>
     </section>
 
-    <!-- Schritt 3: Bezahlen. Der letzte Knopf erfüllt § 312j BGB. -->
+    <!-- Schritt 3: Bezahlen mit Preis- und Laufzeitangaben vor den Zahlungsbuttons. -->
     <section id="step-pay" aria-labelledby="pay-title" hidden>
       <p class="abo-steps">Letzter Schritt</p>
       <h1 id="pay-title">Zahlungsart</h1>
-      <p class="abo-muted" id="signed-in-as"></p>
       <div id="email-block" hidden>
         <label for="email">Deine E-Mail-Adresse</label>
         <input id="email" type="email" autocomplete="email" inputmode="email">
@@ -97,7 +96,11 @@
         <p class="abo-divider" id="express-divider" hidden>oder</p>
         <p id="pay-summary-short" hidden></p>
         <button class="abo-button" type="button" id="pay-button" disabled>Zahlungspflichtig abonnieren</button>
-        <p class="abo-checkout-details">Online kündbar, ohne Anmeldung (<a href="kuendigen.html">Verträge hier kündigen</a>). 30 Tage <a href="garantie.html">Geld-zurück-Garantie</a>. Es gelten die <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>. <a href="widerruf.html">Widerrufsbelehrung</a>. <a href="/datenschutz.html">Datenschutz</a>.</p>
+        <p class="abo-checkout-email" id="signed-in-as"></p>
+        <div class="abo-checkout-details">
+          <p id="pay-trial-note" hidden></p>
+          <p>Online kündbar, ohne Anmeldung (<a href="kuendigen.html">Verträge hier kündigen</a>). 30 Tage <a href="garantie.html">Geld-zurück-Garantie</a>. Es gelten die <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>. <a href="widerruf.html">Widerrufsbelehrung</a>. <a href="/datenschutz.html">Datenschutz</a>.</p>
+        </div>
       </div>
       <button class="abo-link-button" type="button" data-back="plan">Anderes Angebot wählen</button>
     </section>
