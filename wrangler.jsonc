@@ -16,11 +16,9 @@
     "run_worker_first": [
       "/teller", "/teller/", "/teller/index.html",
       "/de/", "/de/index.html",
-      "/en/", "/en/index.html", "/en/dementia-translator/", "/en/dementia-translator/index.html",
+      "/en/", "/en/index.html",
       "/demenz-uebersetzer", "/demenz-uebersetzer/*",
       "/ratgeber", "/ratgeber/*",
-      "/de/demenz-uebersetzer/", "/de/demenz-uebersetzer/index.html",
-      "/de/ratgeber/", "/de/ratgeber/index.html",
       "/",
       "/index.html",
       "/index-en.html", "/index-pl.html", "/index-ro.html", "/index-bg.html",
@@ -31,7 +29,8 @@
       "/index-es.html", "/index-pt.html", "/index-nl.html", "/index-el.html",
       "/index-sq.html", "/index-fa.html", "/index-th.html", "/index-da.html",
       "/index-fi.html", "/index-ga.html", "/index-mt.html", "/index-sv.html",
-      // Bounded generator groups keep canonical queries worker-first within Cloudflare's100-rule limit.
+      // Bounded groups also cover their old hub/index entries; redundant rules are rejected by Cloudflare.
+      // They keep canonical queries worker-first within Cloudflare's 100-rule limit.
       // The worker still maps only registered topics/goal paths; other assets and404s remain unchanged.
       "/de/demenz-uebersetzer/*",
       "/de/ratgeber/*",

@@ -25,6 +25,9 @@ const generatorWorkerFirst=[
  '/de/demenz-uebersetzer/*','/de/ratgeber/*','/de/angehoerige/*',
  '/en/dementia-translator/*','/en/caregivers/*','/guides/dementia-caregiver-overwhelmed.html'
 ];
+// Cloudflare also rejects exact hub/index entries already covered by a prefix rule.
+const redundantLegacyWorkerFirst=legacyWorkerFirst.filter(path=>generatorWorkerFirst.some(pattern=>pattern.endsWith('*')&&path.startsWith(pattern.slice(0,-1))));
+const retainedLegacyWorkerFirst=legacyWorkerFirst.filter(path=>!redundantLegacyWorkerFirst.includes(path));
 const matchesWorkerFirst=path=>workerFirst.some(pattern=>pattern.endsWith('*')?path.startsWith(pattern.slice(0,-1)):path===pattern);
 const routePaths=route=>[...new Set([route.path,...Object.values(route.goalPaths||{}),...(route.selectionPath?[route.selectionPath]:[])])];
 test('Public registry enables exactly88 compiled assets, not inventory-only aliases',()=>{
@@ -53,8 +56,13 @@ test('Missing registered assets fail closed instead of returning the language ho
 test('Cloudflare worker-first stays within100 rules and preserves legacy routing with bounded generator groups',()=>{
  assert.ok(workerFirst.length<=100,`${workerFirst.length} exceeds Cloudflare limit100`);
  assert.equal(workerFirst.length,new Set(workerFirst).size,'no duplicate rules');
- assert.deepEqual(workerFirst.slice(0,legacyWorkerFirst.length),legacyWorkerFirst,'all51 legacy rules remain in order');
- assert.deepEqual(workerFirst.slice(legacyWorkerFirst.length),generatorWorkerFirst,'only the bounded groups and exact guide are added');
+ assert.equal(redundantLegacyWorkerFirst.length,6,'only the six fully covered old hub/index entries are removed');
+ assert.deepEqual(workerFirst.slice(0,retainedLegacyWorkerFirst.length),retainedLegacyWorkerFirst,'all other legacy rules remain in order');
+ for(const path of legacyWorkerFirst)assert.ok(path.endsWith('*')?workerFirst.includes(path):matchesWorkerFirst(path),'legacy coverage '+path);
+ assert.deepEqual(workerFirst.slice(retainedLegacyWorkerFirst.length),generatorWorkerFirst,'only the bounded groups and exact guide are added');
+ for(const pattern of workerFirst.filter(path=>path.endsWith('*')))for(const other of workerFirst){
+  if(other!==pattern)assert.ok(!other.startsWith(pattern.slice(0,-1)),`${other} is redundant under ${pattern}`);
+ }
  for(const route of active)for(const path of routePaths(route))assert.ok(matchesWorkerFirst(path),path);
  for(const path of ['/unrelated.html','/guides/unregistered.html','/en/unregistered.html'])assert.equal(matchesWorkerFirst(path),false,path);
 });
