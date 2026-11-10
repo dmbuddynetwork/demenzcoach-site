@@ -29,6 +29,11 @@
 
   const data = window.DEMENZ_PLAN_DATA;
   const { relations, situations, frequencies, burdens, storageKey } = data;
+  const requestedContext = params.get("s") || params.get("m") || "";
+  const contextCandidate = window.DemenzSituationContext?.resolve(requestedContext) || null;
+  // Invalid or excluded keys use the existing general entry, never an invented situation.
+  const directMode = params.get("direkt") === "1" && (!requestedContext || Boolean(contextCandidate));
+  const directContext = directMode ? contextCandidate : null;
 
   const answers = { relation: null, name: "", situation: null, frequency: null, dayTime: null, duration: null, living: null,
     tries: [], goal: null, burden: null, minutes: null, email: "" };
@@ -109,6 +114,7 @@
   // eine lange Angebotsseite. Anzeige und Seite passen zusammen: ?m=<moment> setzt den Moment, die Frage entfällt.
   const preset = situations.find((item) => item.say && item.key === params.get("m")) || null;
   if (preset) answers.situation = preset;
+  if (directMode && directContext?.planKey) answers.situation = situations.find(item => item.key === directContext.planKey) || null;
   // Vom Übersetzer (Angebotskarte): der zuletzt eingegebene Satz bleibt nur in diesem Tab und wird nur angezeigt.
   let typed = "";
   try { typed = String(sessionStorage.getItem("demenzCoachKiOffen") || "").slice(0, 120); } catch { /* */ }
@@ -133,6 +139,7 @@
     goal: data.goals, burden: burdens, minutes: data.minutes };
   const forgetProgress = () => { clearTimeout(progressExpiryTimer); try { sessionStorage.removeItem(progressKey); } catch { /* privates Fenster */ } };
   function saveProgress(screen) {
+    if (directMode) return;
     if (screen === "relation") { forgetProgress(); return; }
     const choices = {};
     for (const [key, items] of Object.entries(choiceSets)) {
@@ -303,21 +310,33 @@
     const input = el("input", { id: "email", type: "email", autocomplete: "email", inputmode: "email", placeholder: "Deine E-Mail-Adresse" });
     input.value = answers.email;
     const status = el("p", { class: "start-small", role: "status" });
-    const send = () => {
+    let sending = false;
+    const send = async () => {
+      if (sending) return;
       const value = input.value.trim();
       if (!validEmail(value)) { status.textContent = "Bitte gib deine E-Mail-Adresse ein."; input.focus(); return; }
       answers.email = value;
       try { sessionStorage.setItem("demenzCoachEmail", value); } catch { /* */ }
-      track("quiz_email");
-      go(after("email"), { replace: true });
+      track(directMode ? "direct_offer_email" : "quiz_email");
+      if (directMode) {
+        // The existing contact requirement remains before checkout. Reserve an intro
+        // only with this validated address, then let the visitor review the real price.
+        sending = true;
+        if (validEmail(answers.email) && offer.offers?.intro && deals && !dealAsked && !reservationEnded) {
+          dealAsked = true;
+          status.textContent = "Dein Angebot wird geladen …";
+          try { await deals.start("intro", { email: value }); } catch { /* regular tariff remains available */ }
+        }
+        go("plan", { replace: true });
+      } else go(after("email"), { replace: true });
     };
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") send(); });
     return [
-      el("h1", { text: forWho() ? `Deine Hilfe für ${forWho()} ansehen` : "Deine persönliche Hilfe ansehen" }),
-      el("p", { class: "start-lead", text: "Gib deine E-Mail-Adresse ein, um zum Angebot zu kommen." }),
+      el("h1", { text: directMode ? "E-Mail für deinen Zugang" : forWho() ? `Deine Hilfe für ${forWho()} ansehen` : "Deine persönliche Hilfe ansehen" }),
+      el("p", { class: "start-lead", text: directMode ? "An diese Adresse kommen Bestätigung und Zugang, wenn du ein Abo abschließt." : "Gib deine E-Mail-Adresse ein, um zum Angebot zu kommen." }),
       el("label", { for: "email", class: "sr-only", text: "E-Mail" }),
       input,
-      el("button", { type: "button", class: "abo-button", text: "Zum Angebot", onclick: send }),
+      el("button", { type: "button", class: "abo-button", text: directMode ? "Angebot prüfen" : "Zum Angebot", onclick: send }),
       status,
       el("p", { class: "start-small" }, ["Startest du ein Abo, kommen Bestätigung und Zugang an diese Adresse. Für einen Willkommenspreis prüfen wir die Adresse. Keine Werbung ohne dein Ja. ",
         el("a", { href: "/datenschutz.html", text: "Datenschutz" }), "."])
@@ -447,7 +466,7 @@
   // Keine erfundenen Bewertungen, Nutzerzahlen oder unbelegte zeitliche Verknappung.
   function planScreen() {
     const s = chosen();
-    if (offer.offers?.intro && deals && !dealAsked && !reservationEnded) {
+    if (validEmail(answers.email) && offer.offers?.intro && deals && !dealAsked && !reservationEnded) {
       dealAsked = true;
       deals.start("intro", { email: answers.email }).then((started) => { if (started && current === "plan") render("plan"); });
     }
@@ -462,7 +481,7 @@
     const name = forWho();
     // Labels wie BetterMe („GET MY PLAN“, „MOST POPULAR“). Statt „Beliebtester“ (ohne Verkaufszahlen nicht belegbar, UWG)
     // steht auf dem Jahresplan „Bester Preis“: belegbar, weil er pro Tag am günstigsten ist.
-    const ctaText = "Persönliche Hilfe starten";
+    const ctaText = directMode && validEmail(answers.email) ? "Weiter zur Zahlung" : "Persönliche Hilfe starten";
 
     const tables = [];
     const select = (key) => {
@@ -509,12 +528,13 @@
     ]);
 
     // Nur tatsächlich vorhandene Hilfen zeigen. Keine Vorher-/Nachher-Wirkung versprechen.
-    const preview = el("div", { class: "start-card" }, [
-      el("p", { class: "start-small", text: answers.situation?.say ? "Deine gewählte Situation" : "Zum Beispiel" }),
-      el("h2", { text: `„${s.quote}“` }),
+    const hasSpecificPlan = !directMode || Boolean(answers.situation?.say);
+    const preview = directMode && !directContext ? null : el("div", { class: "start-card" }, [
+      el("p", { class: "start-small", text: directContext || answers.situation?.say ? "Deine gewählte Situation" : "Zum Beispiel" }),
+      el("h2", { text: `„${directContext?.title || s.quote}“` }),
       el("p", { text: "Satzideen zum Ausprobieren und kleine nächste Schritte für diesen Moment." })
     ]);
-    const gets = ["Satzideen und nächste Schritte für die gewählte Situation", "Weitere Alltagssituationen zum Nachschauen",
+    const gets = [directMode && !directContext ? "Satzideen und nächste Schritte für schwierige Situationen" : "Satzideen und nächste Schritte für die gewählte Situation", "Weitere Alltagssituationen zum Nachschauen",
       "Ein Blatt über die Person für Helfer ausfüllen", "Wochenplan als zusätzliche Hilfe"];
     if (answers.burden?.key === "kraft") gets.splice(3, 0, "Kleine Hilfen für dich selbst");
     const faq = [
@@ -539,9 +559,10 @@
     return [
       head,
       reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
-      el("h1", { class: "start-center start-plan-title", text: "Passende Worte für euren Alltag" }),
+      el("h1", { class: "start-center start-plan-title", text: directContext ? `Hilfe bei „${directContext.title}“` : "Passende Worte für euren Alltag" }),
       el("p", { class: "start-lead", text: name ? `Persönliche Hilfe für schwierige Alltagssituationen mit ${name}.` : "Persönliche Hilfe für schwierige Alltagssituationen." }),
       preview,
+      directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       ticket(),
       table(),
       cta(),
@@ -551,10 +572,14 @@
       el("h2", { class: "start-section start-center", text: "Diese Hilfen gehören dazu" }),
       el("img", { class: "start-art", src: "../assets/zeichnungen/v-tanzen.webp", width: "600", height: "650", alt: "" }),
       el("ul", { class: "start-checks", role: "list" }, gets.map((text) => el("li", { text }))),
-      el("div", { class: "start-card" }, [
+      hasSpecificPlan ? el("div", { class: "start-card" }, [
         el("h2", { text: `Wenn „${s.quote}“ fällt` }),
         el("p", { class: "start-small", text: "Probier heute einen dieser Sätze:" }),
         el("ul", { class: "start-say", role: "list" }, s.say.map((line) => el("li", { text: `„${line}“` })))
+      ]) : el("div", { class: "start-card" }, [
+        el("h2", { text: "Für eure eigene Situation" }),
+        el("p", { text: "Beschreibe, was gerade schwierig ist, oder öffne die vorhandene Situationshilfe." }),
+        el("a", { href: directContext?.href || "/de/#translator-input", text: "Zur kostenlosen Situationshilfe" })
       ]),
       offer.trialDays > 0 ? el("div", { class: "start-risk" }, [
         el("h2", { text: "Ohne Risiko testen" }),
@@ -587,16 +612,24 @@
   }
 
   function checkout() {
-    track("quiz_checkout", "InitiateCheckout");
+    if (directMode && !validEmail(answers.email)) { go("email"); return; }
+    track(directMode ? "direct_offer_checkout" : "quiz_checkout", "InitiateCheckout");
     // Für „Mein Plan“ nach dem Kauf: bleibt in diesem Browser, wird nie gesendet.
     try {
-      localStorage.setItem(storageKey, JSON.stringify({
+      if (directMode) {
+        if (directContext) {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+          const previous = saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+          // Preserve all previous answers; add only the explicitly selected public key.
+          localStorage.setItem(storageKey, JSON.stringify({ ...previous, directSituation: directContext.key }));
+        }
+      } else localStorage.setItem(storageKey, JSON.stringify({
         name: forWho(), relation: answers.relation?.key ?? null, situation: chosen().key, burden: answers.burden?.key ?? null,
         dayTime: answers.dayTime?.key ?? null, goal: answers.goal?.key ?? null, savedAt: new Date().toISOString().slice(0, 10)
       }));
     } catch { /* privater Modus: Plan startet dann mit dem häufigsten Moment */ }
     const campaign = (params.get("utm_campaign") || "").toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
-    const src = `quiz_${source}${preset ? `_${preset.key}` : ""}`.slice(0, 40);
+    const src = directMode ? `direkt_${source}`.slice(0, 40) : `quiz_${source}${preset ? `_${preset.key}` : ""}`.slice(0, 40);
     // Kasse als Fenster auf dieser Seite (kasse.js, wie BetterMe/Yazio). Ohne das Modul wie bisher die Seite /abo/.
     const kasse = window.DemenzKasse;
     if (!kasse || !config.firebase?.apiKey) {
@@ -671,10 +704,10 @@
     $("count").hidden = done;
     // Rechtliche Links (AGB, Datenschutz, Impressum, Widerruf, Kündigen) stehen auf jedem Schritt unten, klein.
     $("footer").hidden = false;
-    restart.hidden = name === "relation";
+    restart.hidden = name === "relation" || directMode;
     window.scrollTo({ top: 0 });
     saveProgress(name);
-    if (name !== "plan") track(`quiz_${name}`);
+    if (name !== "plan") track(directMode ? "direct_offer_contact" : `quiz_${name}`);
   }
   function go(name, { replace = false } = {}) {
     if (isQuestion(current)) window.DemenzTeller?.stage("first_answer");
@@ -712,6 +745,7 @@
 
   window.addEventListener("popstate", (event) => {
     if (window.DemenzKasse?.isOpen()) { window.DemenzKasse.close(); return; }
+    if (directMode) { render("plan"); return; }
     if (current === "plan" && offer.offers?.exit && deals && !deals.exitShown() && event.state?.screen !== "plan") {
       history.pushState({ screen: "plan" }, "", location.href);
       showExitOffer();
@@ -736,8 +770,8 @@
     }).catch(() => {});
   }
 
-  const resumed = restoreProgress();
+  const resumed = directMode ? "plan" : restoreProgress();
   history.replaceState({ screen: resumed }, "", location.href);
   render(resumed);
-  track("quiz_start");
+  track(directMode ? "direct_offer_view" : "quiz_start");
 })();

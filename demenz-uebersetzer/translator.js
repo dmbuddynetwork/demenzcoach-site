@@ -233,8 +233,8 @@
   const planTitles = { ergebnis: 'Und wenn dieser Satz wiederkommt?', wieder: 'Das passiert öfter?', tipps: 'Ein Plan für euren Alltag' };
   const planCTA = (result, place = 'ergebnis') => {
     if (ui || result?.safetyOnly || result?.selfCare || result?.feeling) return null;
-    const moment = result?.key && planMoments.has(result.key) ? `&m=${result.key}` : '';
-    const link = element('a', { className: 'button', text: 'Persönliche Hilfe ansehen', attributes: { href: `/start/?src=${place}${moment}`, 'data-related-link': `plan_${place}` } });
+    const moment = result?.key ? `&s=${encodeURIComponent(result.key)}` : '';
+    const link = element('a', { className: 'button', text: 'Persönliche Hilfe ansehen', attributes: { href: `/start/?src=${place}&direkt=1${moment}`, 'data-related-link': `plan_${place}` } });
     link.addEventListener('click', () => track('plan_start_click', { place, result_key: result?.key ?? '' }));
     return element('aside', { className: `translator-plan-cta${place === 'ergebnis' ? '' : ' translator-plan-up'}` }, [
       data.planImage ? element('img', { className: 'translator-plan-art', attributes: { src: data.planImage.src, width: String(data.planImage.width), height: String(data.planImage.height), alt: '', decoding: 'async' } }) : null,

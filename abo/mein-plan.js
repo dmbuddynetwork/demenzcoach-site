@@ -77,10 +77,12 @@ function selfCareCard() {
 
 function renderPlan() {
   const saved = savedPlan();
+  const directContext = window.DemenzSituationContext?.resolve(saved.directSituation) || null;
   const who = String(saved.name || "").slice(0, 30);
   const person = who || "sie oder er";
   const moments = data.situations.filter((item) => item.say);
-  const first = moments.find((item) => item.key === saved.situation) || moments[0];
+  const selected = directContext ? moments.find(item => item.key === directContext.planKey) : moments.find(item => item.key === saved.situation);
+  const first = selected || moments[0];
   const firstWeek = [first, ...moments.filter((item) => item !== first)].slice(0, 6);
   const week = planWeek(saved);
 
@@ -88,11 +90,14 @@ function renderPlan() {
   // Übertragung freier Angaben per URL; der Link führt direkt zum vorhandenen Feld.
   const nodes = [
     el("h1", { text: "Deine persönliche Hilfe" }),
-    el("p", { class: "start-lead", text: who ? `Wobei brauchst du im Alltag mit ${who} Unterstützung?` : "Wobei brauchst du heute Unterstützung?" }),
+    el("p", { class: "start-lead", text: who && !directContext ? `Wobei brauchst du im Alltag mit ${who} Unterstützung?` : "Wobei brauchst du heute Unterstützung?" }),
     el("a", { class: "abo-button", href: "/de/#translator-input", text: "Eigene Situation beschreiben" }),
-    el("h2", { class: "start-section", text: moments.some((item) => item.key === saved.situation) ? "Deine gewählte Situation" : "Ein Beispiel für den Anfang" }),
-    el("h3", { class: "plan-today", text: `„${first.quote}“` }),
-    card(first)
+    el("h2", { class: "start-section", text: directContext || selected ? "Deine gewählte Situation" : "Ein Beispiel für den Anfang" }),
+    el("h3", { class: "plan-today", text: `„${directContext?.title || first.quote}“` }),
+    directContext && !selected ? el("div", { class: "start-card" }, [
+      el("p", { text: "Öffne die vorhandene Hilfe zu dieser Situation mit Satzideen und nächsten Schritten." }),
+      el("a", { class: "abo-button abo-button-light", href: directContext.href, text: "Hilfe zu dieser Situation öffnen" })
+    ]) : card(first)
   ];
   const weekly = [];
   if (week === 1) {
