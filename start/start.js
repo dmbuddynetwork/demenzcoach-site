@@ -114,7 +114,7 @@
   // eine lange Angebotsseite. Anzeige und Seite passen zusammen: ?m=<moment> setzt den Moment, die Frage entfällt.
   const preset = situations.find((item) => item.say && item.key === params.get("m")) || null;
   if (preset) answers.situation = preset;
-  if (directMode && directContext?.planKey) answers.situation = situations.find(item => item.key === directContext.planKey) || null;
+  if (directMode) answers.situation = directContext?.planKey ? situations.find(item => item.key === directContext.planKey) || null : null;
   // Vom Übersetzer (Angebotskarte): der zuletzt eingegebene Satz bleibt nur in diesem Tab und wird nur angezeigt.
   let typed = "";
   try { typed = String(sessionStorage.getItem("demenzCoachKiOffen") || "").slice(0, 120); } catch { /* */ }
@@ -332,13 +332,13 @@
     };
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") send(); });
     return [
-      el("h1", { text: directMode ? "E-Mail für deinen Zugang" : forWho() ? `Deine Hilfe für ${forWho()} ansehen` : "Deine persönliche Hilfe ansehen" }),
-      el("p", { class: "start-lead", text: directMode ? "An diese Adresse kommen Bestätigung und Zugang, wenn du ein Abo abschließt." : "Gib deine E-Mail-Adresse ein, um zum Angebot zu kommen." }),
+      el("h1", { text: directMode ? "E-Mail für die Vertragsbestätigung" : forWho() ? `Deine Hilfe für ${forWho()} ansehen` : "Deine persönliche Hilfe ansehen" }),
+      el("p", { class: "start-lead", text: directMode ? "An diese Adresse schicken wir die Vertragsbestätigung, wenn du ein Abo abschließt." : "Gib deine E-Mail-Adresse ein, um zum Angebot zu kommen." }),
       el("label", { for: "email", class: "sr-only", text: "E-Mail" }),
       input,
       el("button", { type: "button", class: "abo-button", text: directMode ? "Angebot prüfen" : "Zum Angebot", onclick: send }),
       status,
-      el("p", { class: "start-small" }, ["Startest du ein Abo, kommen Bestätigung und Zugang an diese Adresse. Für einen Willkommenspreis prüfen wir die Adresse. Keine Werbung ohne dein Ja. ",
+      el("p", { class: "start-small" }, ["Startest du ein Abo, schicken wir die Vertragsbestätigung an diese Adresse. Für einen Willkommenspreis prüfen wir die Adresse. Keine Werbung ohne dein Ja. ",
         el("a", { href: "/datenschutz.html", text: "Datenschutz" }), "."])
     ];
   }

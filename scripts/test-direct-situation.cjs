@@ -210,3 +210,32 @@ test('free AI response stays complete and loading/urgent output never adds a dir
     assert.deepEqual(errors,[]);
   } finally { await context.close(); }
 });
+
+for (const query of ['s=uhrzeit', 'm=wiederholt']) test(`review regression ${query}: no invented departure time or email access promise`, async () => {
+  const previous = { name:'Papa', relation:'papa', situation:'wiederholt', helperNote:'synthetic_keep' };
+  const { context, page, errors } = await setup(previous);
+  const invented = /Wir fahren nach dem Mittagessen|Um drei Uhr fahren wir los/u;
+  try {
+    await page.goto(`${base}/start/?direkt=1&src=situation&${query}`);
+    await page.locator('body[data-screen="plan"]').waitFor(); await decline(page);
+    assert.doesNotMatch(await page.locator('#screen').innerText(), invented);
+    assert.equal(await page.getByRole('link',{name:'Zur kostenlosen Situationshilfe'}).getAttribute('href'), '/de/demenz-uebersetzer/wann-gehen-wir.html');
+    await page.getByRole('button',{name:'Persönliche Hilfe starten',exact:true}).first().click();
+    assert.equal(await page.locator('#screen h1').innerText(), 'E-Mail für die Vertragsbestätigung');
+    assert.doesNotMatch(await page.locator('#screen').innerText(), /Zugang|Login|Zugangslink/u);
+    await capture(page, `kontakt-${query.startsWith('s=')?'uhrzeit':'alias'}`);
+    await page.locator('#email').fill('review@example.invalid');
+    await page.getByRole('button',{name:'Angebot prüfen',exact:true}).click();
+    await page.getByRole('button',{name:'Weiter zur Zahlung',exact:true}).first().click();
+    assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('demenzCoachPlan'))), { ...previous, directSituation:'uhrzeit' });
+    await page.goto(`${base}/abo/mein-plan.html`); await page.locator('#plan:not([hidden])').waitFor();
+    assert.equal(await page.locator('#plan h3').first().innerText(), '„Wann gehen wir?“');
+    const firstCard=page.locator('#plan > .start-card').first();
+    assert.equal(await firstCard.getByRole('link',{name:'Hilfe zu dieser Situation öffnen'}).getAttribute('href'), '/de/demenz-uebersetzer/wann-gehen-wir.html');
+    assert.equal(await firstCard.locator('.start-say').count(),0);
+    assert.doesNotMatch(await firstCard.innerText(), invented);
+    assert.doesNotMatch(await page.locator('#plan').innerText(), invented, 'The visible overview must not highlight the old time assumptions');
+    await decline(page); await capture(page, `uebersicht-${query.startsWith('s=')?'uhrzeit':'alias'}`);
+    assert.deepEqual(errors,[]);
+  } finally { await context.close(); }
+});

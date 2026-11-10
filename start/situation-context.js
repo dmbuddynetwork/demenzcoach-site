@@ -66,7 +66,7 @@
     "key": "uhrzeit",
     "title": "Wann gehen wir?",
     "href": "/de/demenz-uebersetzer/wann-gehen-wir.html",
-    "planKey": "wiederholt"
+    "planKey": null
   },
   "heim": {
     "key": "heim",
