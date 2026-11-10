@@ -1,11 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {createRequire} from 'node:module';
 import worker,{generatorRouteTarget,germanSituationTarget} from '../cloudflare-worker.js';
+const {createPreviewServer}=createRequire(import.meta.url)('./generator-preview.cjs');
 const root=new URL('../',import.meta.url),read=rel=>fs.readFileSync(new URL(rel,root),'utf8');
 const active=JSON.parse(read('content/generator-public-routes.json')).routes;
 const inventory=JSON.parse(read('content/generator-route-manifest.json')).routes;
 const origin='https://dementiacoachapp.com';
+const workerFirst=JSON.parse(read('wrangler.jsonc').match(/"run_worker_first"\s*:\s*(\[[\s\S]*?\])/)[1].replace(/^\s*\/\/.*$/gm,''));
+const legacyWorkerFirst=[
+ '/teller','/teller/','/teller/index.html','/de/','/de/index.html',
+ '/en/','/en/index.html','/en/dementia-translator/','/en/dementia-translator/index.html',
+ '/demenz-uebersetzer','/demenz-uebersetzer/*','/ratgeber','/ratgeber/*',
+ '/de/demenz-uebersetzer/','/de/demenz-uebersetzer/index.html','/de/ratgeber/','/de/ratgeber/index.html',
+ '/','/index.html','/index-en.html','/index-pl.html','/index-ro.html','/index-bg.html',
+ '/index-hr.html','/index-sk.html','/index-hu.html','/index-cs.html','/index-uk.html',
+ '/index-bs.html','/index-sr.html','/index-lt.html','/index-sl.html','/index-lv.html','/index-et.html',
+ '/index-ru.html','/index-tr.html','/index-ar.html','/index-fr.html','/index-it.html','/index-es.html',
+ '/index-pt.html','/index-nl.html','/index-el.html','/index-sq.html','/index-fa.html','/index-th.html',
+ '/index-da.html','/index-fi.html','/index-ga.html','/index-mt.html','/index-sv.html'
+];
+const generatorWorkerFirst=[
+ '/de/demenz-uebersetzer/*','/de/ratgeber/*','/de/angehoerige/*',
+ '/en/dementia-translator/*','/en/caregivers/*','/guides/dementia-caregiver-overwhelmed.html'
+];
+const matchesWorkerFirst=path=>workerFirst.some(pattern=>pattern.endsWith('*')?path.startsWith(pattern.slice(0,-1)):path===pattern);
+const routePaths=route=>[...new Set([route.path,...Object.values(route.goalPaths||{}),...(route.selectionPath?[route.selectionPath]:[])])];
 test('Public registry enables exactly88 compiled assets, not inventory-only aliases',()=>{
  assert.equal(active.length,88);for(const route of active){assert.ok(inventory.some(item=>item.path===route.path&&item.key===route.key));const html=read(route.path.slice(1));assert.ok(html.includes(`data-translator-initial-situation="${route.key}"`));assert.equal((html.match(/id="translator-form"/g)||[]).length,1);assert.equal((html.match(/<h1\b/g)||[]).length,1);assert.ok(!html.includes('class="seo-article"'));}
  const pilot=active.filter(route=>['finding-toilet','sharing-family-care'].includes(route.topicId));assert.equal(pilot.length,4);assert.equal(generatorRouteTarget(new Request(origin+'/de/demenz-uebersetzer/wo-ist-meine-mutter/verstehen/'),pilot),null);
@@ -29,8 +50,73 @@ test('Existing static assets with query and goal reload use the real worker befo
 test('Missing registered assets fail closed instead of returning the language home',async()=>{
  const route=active.find(item=>item.key==='toilettefinden');const result=await worker.fetch(new Request(origin+route.goalPaths.tipps),{ASSETS:{async fetch(){return new Response('missing',{status:404});}}});assert.equal(result.status,404);
 });
-test('Cloudflare worker-first names every actual canonical, without a full-site SPA catchall',()=>{
- const config=read('wrangler.jsonc');for(const route of active)assert.ok(config.includes(JSON.stringify(route.path)));assert.ok(!config.includes('"/*"'));
+test('Cloudflare worker-first stays within100 rules and preserves legacy routing with bounded generator groups',()=>{
+ assert.ok(workerFirst.length<=100,`${workerFirst.length} exceeds Cloudflare limit100`);
+ assert.equal(workerFirst.length,new Set(workerFirst).size,'no duplicate rules');
+ assert.deepEqual(workerFirst.slice(0,legacyWorkerFirst.length),legacyWorkerFirst,'all51 legacy rules remain in order');
+ assert.deepEqual(workerFirst.slice(legacyWorkerFirst.length),generatorWorkerFirst,'only the bounded groups and exact guide are added');
+ for(const route of active)for(const path of routePaths(route))assert.ok(matchesWorkerFirst(path),path);
+ for(const path of ['/unrelated.html','/guides/unregistered.html','/en/unregistered.html'])assert.equal(matchesWorkerFirst(path),false,path);
+});
+
+test('Actual asset-first preview serves all88 registered canonicals and goal paths through the worker, including old queries',async()=>{
+ const preview=await createPreviewServer();
+ try{
+  for(const route of active){
+   const bytes=fs.readFileSync(new URL(route.path.slice(1),root));
+   for(const path of routePaths(route))for(const method of ['GET','HEAD']){
+    const response=await fetch(preview.origin+path,{method,redirect:'manual'});
+    assert.equal(response.status,200,`${method} ${path}`);
+    assert.ok(preview.stats.worker.includes(path),'worker-first '+path);
+    if(method==='GET')assert.deepEqual(Buffer.from(await response.arrayBuffer()),bytes,path);
+   }
+   const query=new URL(route.path,preview.origin);query.searchParams.set('situation',route.key);query.searchParams.set('ziel','verstehen');query.searchParams.set('text','PRIVATE_SENTINEL');
+   const response=await fetch(query,{redirect:'manual'});
+   assert.equal(response.status,301,route.path+' query');
+   assert.equal(response.headers.get('location'),preview.origin+(route.goalPaths?.verstehen||route.path));
+  }
+ }finally{await preview.close();}
+});
+
+test('DE and EN index/hub queries still normalize to registered clean paths',async()=>{
+ const preview=await createPreviewServer();
+ try{
+  for(const language of ['de','en']){
+   const route=active.find(item=>item.language===language&&!item.selfCare);
+   const hub=language==='de'?'demenz-uebersetzer':'dementia-translator';
+   for(const path of [`/${language}/`,`/${language}/index.html`,`/${language}/${hub}/`,`/${language}/${hub}/index.html`])for(const method of ['GET','HEAD']){
+    assert.ok(matchesWorkerFirst(path),path);
+    const response=await fetch(`${preview.origin}${path}?situation=${encodeURIComponent(route.key)}&ziel=tipps&text=PRIVATE_SENTINEL`,{method,redirect:'manual'});
+    assert.equal(response.status,301,`${method} ${path}`);
+    assert.equal(response.headers.get('location'),preview.origin+(route.goalPaths?.tipps||route.path));
+   }
+  }
+ }finally{await preview.close();}
+});
+
+test('Bounded prefixes do not invent app aliases; unmapped original assets stay byte-identical',async()=>{
+ const preview=await createPreviewServer();
+ try{
+  for(const prefix of generatorWorkerFirst.filter(path=>path.endsWith('*'))){
+   for(const suffix of ['unregistered-page.html','unregistered-page/tipps/']){
+    const path=prefix.slice(0,-1)+suffix;
+    assert.equal(generatorRouteTarget(new Request(origin+path)),null,path);
+    for(const method of ['GET','HEAD']){
+     const response=await fetch(preview.origin+path,{method,redirect:'manual'});
+     assert.equal(response.status,404,`${method} ${path}`);
+    }
+   }
+  }
+  const guide='/guides/'+fs.readdirSync(new URL('guides/',root)).find(name=>name.endsWith('.html')&&!active.some(route=>route.path==='/guides/'+name));
+  assert.equal(matchesWorkerFirst(guide),false,'unmapped guide stays asset-first');
+  for(const path of [guide,'/de/ratgeber/redaktion.html']){
+   assert.equal(generatorRouteTarget(new Request(origin+path)),null,path);
+   const response=await fetch(preview.origin+path,{redirect:'manual'});
+   assert.equal(response.status,200,path);
+   assert.deepEqual(Buffer.from(await response.arrayBuffer()),fs.readFileSync(new URL(path.slice(1),root)),path);
+  }
+  assert.equal(preview.stats.worker.includes(guide),false,'unmapped guide was not intercepted');
+ }finally{await preview.close();}
 });
 
 test('Prototype and unknown goal values use only the fixed selection path',async()=>{
