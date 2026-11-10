@@ -35,7 +35,7 @@ function invalidateCheckout() {
     try { element.unmount?.(); } catch { /* Already detached. */ }
   }
   state.checkoutElements = [];
-  for (const id of ["payment-element", "express-checkout", "pay-summary", "pay-terms", "pay-summary-short"]) $(id).replaceChildren();
+  for (const id of ["payment-element", "express-checkout", "pay-summary", "pay-terms", "pay-summary-short", "pay-trial-note"]) $(id).replaceChildren();
   $("express-divider").hidden = true;
 }
 function currentAttempt(attempt) {
@@ -65,7 +65,7 @@ const track = (name, values = {}, marketing = null) => {
 };
 
 const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
-const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "numeric", month: "long", year: "numeric" }).format(date);
+const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
 
 async function api(path, { method = "GET", body, token } = {}) {
   const headers = {};
@@ -243,6 +243,8 @@ async function startCheckout(email) {
   $("email-block").hidden = true;
   $("pay-block").hidden = false;
   $("pay-button").disabled = true;
+  const receiptEmail = email || attempt.user.email;
+  if (receiptEmail) $("signed-in-as").textContent = `Bestätigung und Zugang an ${receiptEmail}`;
   try {
     const token = await attempt.user.getIdToken();
     if (!currentAttempt(attempt)) return;
@@ -280,28 +282,31 @@ async function startCheckout(email) {
   }
 }
 
-// § 312j Abs. 2 BGB und Art. 246a § 1 EGBGB: Gesamtpreis inkl. Steuern, Laufzeit und Kündigungsbedingungen stehen
-// vor den Zahlungsknöpfen und noch einmal direkt über dem Bestellknopf; mit Sonderpreis fürs erste Jahr, wenn die Kasse ihn bestätigt hat.
+// Wesentliche Preis- und Laufzeitangaben bleiben vor allen Zahlungsbuttons sichtbar.
+// Erläuterungen zur Probezeit und weiterführende Links folgen unter den Buttons.
 function renderSummary(trialDays, firstYear = null) {
   const price = state.offer?.plans?.[state.plan];
-  const priceText = price ? `${euro(price.amount, price.currency)} pro ${state.plan === "yearly" ? "Jahr" : "Monat"}` : "";
+  const period = state.plan === "yearly" ? "Jahr" : "Monat";
+  const recurring = price ? `${euro(price.amount, price.currency)}/${period}` : "";
   const deal = Number.isInteger(firstYear) && price ? euro(firstYear, price.currency) : null;
   let summary;
   if (trialDays > 0) {
-    const start = new Date(Date.now() + trialDays * 24 * 60 * 60 * 1000);
+    const start = new Date(Date.now() + trialDays * 86_400_000);
     summary = deal
-      ? `Heute 0,00 €. Ab ${dateText(start)} ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt. Kündigst du vorher, zahlst du nichts.`
-      : `Heute 0,00 €. Ab ${dateText(start)} ${priceText} inklusive MwSt. Kündigst du vorher, zahlst du nichts.`;
+      ? `Heute 0,00 €. Ab ${dateText(start)}: ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
+      : `Heute 0,00 €. Ab ${dateText(start)}: ${recurring}. Inkl. MwSt.`;
   } else {
     summary = deal
-      ? `Heute ${deal} für das erste Jahr, danach ${priceText}, jeweils inklusive MwSt.`
-      : `Heute ${priceText.replace(" pro ", " für 1 ")} inklusive MwSt. Danach ${priceText}.`;
+      ? `Heute ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
+      : `Heute ${price ? euro(price.amount, price.currency) : ""} für 1 ${period}, danach ${recurring}. Inkl. MwSt.`;
   }
   $("pay-summary").textContent = summary;
   $("pay-summary-short").textContent = summary;
   $("pay-terms").textContent = state.plan === "yearly"
-    ? "Laufzeit: 1 Jahr. Danach läuft das Abo unbefristet weiter und ist mit einer Frist von einem Monat kündbar."
-    : "Das Abo verlängert sich jeden Monat automatisch und ist jederzeit zum Monatsende kündbar.";
+    ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist."
+    : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.";
+  $("pay-trial-note").hidden = !(trialDays > 0);
+  $("pay-trial-note").textContent = trialDays > 0 ? `${trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
 }
 
 // Stripe.js erst laden, wenn jemand wirklich bezahlen will (nicht schon beim Betrachten der Angebote).
