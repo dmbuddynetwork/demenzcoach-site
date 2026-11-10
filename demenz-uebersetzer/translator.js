@@ -273,81 +273,9 @@
     ])
   ]);
 
-  // Persönliche Sätze: nur im Arbeitsspeicher dieser Seite, nie gespeichert,
-  // nie gesendet. Analytics erfährt höchstens, welche Einstellung genutzt wurde.
+  // Grundansprache ohne zusätzliche Anrede-/Namensauswahl. Der Zustand bleibt
+  // nur im Arbeitsspeicher dieser Seite und wird nicht gespeichert.
   const personal = { formal: false, callName: '', me: '', role: '' };
-  const personalTracked = new Set();
-  const trackPersonal = (setting) => {
-    if (personalTracked.has(setting)) return;
-    personalTracked.add(setting);
-    track('translator_personalize', { setting });
-  };
-  let panelCounter = 0;
-
-  const personalPanel = (repaint, { open = false } = {}) => {
-    panelCounter += 1;
-    const id = (suffix) => `translator-personal-${suffix}-${panelCounter}`;
-    const isSet = personal.formal || personal.callName || personal.me || personal.role;
-    const details = element('details', { className: 'translator-personal' });
-    if (isSet || open) details.open = true;
-    details.append(element('summary', { text: isSet ? 'Persönlich angepasst – ändern' : 'Sätze persönlich machen: Name, du oder Sie' }));
-
-    const formality = element('div', { className: 'translator-personal-toggle', attributes: { role: 'group', 'aria-label': 'Anrede' } }, [
-      element('span', { text: 'Anrede:' })
-    ]);
-    const toggles = [false, true].map((formal) => {
-      const toggle = button(formal ? 'Sie' : 'du', 'translator-chip', () => {
-        personal.formal = formal;
-        toggles.forEach((candidate, index) => candidate.setAttribute('aria-pressed', String(Boolean(index) === formal)));
-        trackPersonal('formal');
-        repaint();
-      }, { 'aria-pressed': String(personal.formal === formal) });
-      formality.append(toggle);
-      return toggle;
-    });
-
-    const field = (key, label, placeholder, setting) => {
-      const control = element('input', {
-        attributes: { id: id(key), type: 'text', maxlength: '40', autocomplete: 'off', autocapitalize: 'words', spellcheck: 'false', placeholder }
-      });
-      control.value = personal[key];
-      control.addEventListener('input', () => {
-        personal[key] = control.value;
-        trackPersonal(setting);
-        repaint();
-      });
-      return element('div', { className: 'translator-personal-field' }, [
-        element('label', { text: label, attributes: { for: id(key) } }),
-        control
-      ]);
-    };
-
-    const roleSelect = element('select', { attributes: { id: id('role') } }, [
-      element('option', { text: 'keine Angabe', attributes: { value: '' } }),
-      ...core.roles.map((role) => element('option', { text: role, attributes: { value: role } }))
-    ]);
-    roleSelect.value = personal.role;
-    roleSelect.addEventListener('change', () => {
-      personal.role = roleSelect.value;
-      trackPersonal('role');
-      repaint();
-    });
-
-    details.append(element('div', { className: 'translator-personal-body' }, [
-      // Der eigene Name zuerst: Er ersetzt den Beispielnamen „Anna“ in den Sätzen.
-      field('me', 'Dein Vorname', 'z. B. Anna', 'own_name'),
-      element('div', { className: 'translator-personal-field' }, [
-        element('label', { text: 'Du bist für die Person', attributes: { for: id('role') } }),
-        roleSelect
-      ]),
-      field('callName', 'So nennst du die Person', 'z. B. Mama, Opa, Frau Weber', 'call_name'),
-      // Englisch kennt kein du/Sie: dort keine Anrede-Wahl.
-      ui?.formality === false ? null : formality,
-      element('p', { className: 'translator-privacy', text: '🔒 Wird nicht gespeichert und nicht gesendet.' })
-    ]));
-    return details;
-  };
-
   // Ziel-Frage vor der Antwort wie in der App (Daniel, 8. Nov 16:32: „Vor der Antwort wie in der App“).
   // Drei Ziele je Situation, das erste nach der Situation benannt, eines immer praktische Tipps.
   // Die Antwort selbst bleibt die geprüfte feste Antwort; das Ziel bestimmt, was zuerst und ausführlich kommt.
@@ -1088,18 +1016,10 @@
       }
     }
     const phraseBlock = [];
-    let quickRow = null;
     const doBlock = [];
-    let panel = null;
     if (result.phrases.length) {
       phraseBlock.push(element('h3', { className: 'translator-step', text: result.phrasesTitle || 'Das kannst du sagen' }));
       const phraseList = element('div', { className: 'translator-phrases' });
-      // Anrede als kleine Zeile unten in der Karte (Daniel, 8. Nov: sichtbar, aber nicht über den Sätzen, das lenkt ab).
-      let quickToggles = [];
-      const syncQuick = () => {
-        quickToggles.forEach((toggle, index) => toggle.setAttribute('aria-pressed', String(Boolean(index) === personal.formal)));
-        panel?.querySelectorAll('.translator-personal-toggle .translator-chip').forEach((toggle, index) => toggle.setAttribute('aria-pressed', String(Boolean(index) === personal.formal)));
-      };
       const paint = () => {
         // Bei Wut, Tränen oder Angst kommt zuerst ein kurzer beruhigender Satz.
         const first = mood && mood.phrases?.length ? [{ original: mood.phrases[0], lead: moodLead[mood.id] }] : [];
@@ -1112,33 +1032,12 @@
           if (exampleHint) exampleHintShown = true;
           return element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : exampleHint ? 'translator-phrase translator-phrase-example' : 'translator-phrase' }, [
             lead ? element('span', { className: 'translator-mood-lead', text: lead }) : null,
-            exampleHint ? element('span', { className: 'translator-example-name', text: '„Anna“ ist ein Beispiel – trag unten deinen Namen ein.' }) : null,
+            exampleHint ? element('span', { className: 'translator-example-name', text: '„Anna“ ist ein Beispielname.' }) : null,
             element('q', { text }),
             element('div', { className: 'translator-phrase-actions' }, [saveButton(result, original), phraseShareButton(result, original)])
           ]);
         }));
-        syncQuick();
       };
-      const repaint = () => { paint(); retry?.refresh(); renderSaved(); };
-      if (!result.selfCare && ui?.formality !== false && !ui) {
-        const quick = element('div', { className: 'translator-quick', attributes: { role: 'group', 'aria-label': 'Anrede' } }, [element('span', { text: 'Anrede:' })]);
-        quickToggles = [false, true].map((formal) => {
-          const toggle = button(formal ? 'Sie' : 'du', 'translator-chip', () => {
-            personal.formal = formal;
-            trackPersonal('formal');
-            repaint();
-          }, { 'aria-pressed': String(personal.formal === formal) });
-          quick.append(toggle);
-          return toggle;
-        });
-        quick.append(button('Namen einsetzen', 'translator-chip translator-quick-name', () => {
-          if (!panel) return;
-          panel.open = true;
-          panel.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
-          panel.querySelector('input')?.focus({ preventScroll: true });
-        }));
-        quickRow = quick;
-      }
       paint();
       phraseBlock.push(phraseList);
       // Auf dem Handy muss der erste Satz ohne Scrollen sichtbar sein: Sätze zuerst, Anpassen und Erklärung danach.
@@ -1156,10 +1055,7 @@
         doBlock.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
         doBlock.push(element('p', { className: 'translator-meaning translator-do', text: doNow }));
       }
-      panel = result.selfCare ? null : personalPanel(repaint);
-      // Mit der Anrede-Zeile in der Karte braucht es keine zweite Zeile „Sätze persönlich machen“: Die Felder öffnen über „Namen einsetzen“.
-      if (panel && quickRow) panel.classList.add('translator-personal-quiet');
-      nodes.push(alsoWrapper, panel);
+      nodes.push(alsoWrapper);
     } else if (alsoWrapper) {
       nodes.push(alsoWrapper);
     }
@@ -1200,8 +1096,6 @@
     const order = goal === 'jetzt' ? [phraseBlock, doWithTrick, meaningBlock]
       : goal === 'tipps' ? [doWithTrick, phraseBlock, meaningBlock]
         : [meaningBlock, phraseBlock, doWithTrick];
-    // Anrede-Zeile direkt unter den Sprechblasen (Daniel, 8. Nov 16:51), nicht am Ende der Karte.
-    if (quickRow) phraseBlock.push(quickRow);
     // Unter den Sätzen dieselbe Situation, wenn es wieder ruhig ist („Danach“-Zeichnung).
     if (phraseBlock.length && !result.safetyOnly && !result.selfCare && !safetyHit) phraseBlock.push(sceneArt(result.afterImage));
     answerCard.append(...order.flat().filter(Boolean));
