@@ -37,7 +37,10 @@ const answer = {
     for (const language of ['de', 'en']) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
       const requests = [], errors = [];
-      let duplicateMode = 'identical', retryAnswerCount = 0;
+      let duplicateMode = 'identical', retryAnswerCount = 0, concernRetryCount = 0;
+      let holdFixedConcern = false, releaseFixedConcern;
+      const concernMessage = language === 'de' ? 'Allgemeiner Hinweis mit bestehenden Warnzeichen.' : 'General guidance with existing warning signs.';
+      const fixedConcern = { kind: 'safety', safetyLevel: 'concern', message: concernMessage };
       try {
         await context.addInitScript(() => {
           localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied');
@@ -58,6 +61,22 @@ const answer = {
               retryAnswerCount++;
               result = { ...answer, safetyLevel: 'urgent', safetyMessage: 'Existing urgent warning',
                 phrases: retryAnswerCount === 1 ? [] : answer.phrases };
+            }
+            if (goal && body.text === 'ConcernGoalsFixture') result = fixedConcern;
+            if (goal && body.text === 'UrgentGoalsFixture') result = { kind: 'safety', safetyLevel: 'urgent', message: 'Existing acute protection' };
+            if (!goal && body.goal?.label === 'General concern goal') result = fixedConcern;
+            if (!goal && body.goal?.label === 'Urgent custom fixture') result = { kind: 'safety', safetyLevel: 'urgent', message: 'Existing acute protection' };
+            if (!goal && body.text === 'ConcernRetryFixture') {
+              concernRetryCount++;
+              if (concernRetryCount === 1) return route.fulfill({ status: 503, headers: cors, body: '{}' });
+              result = fixedConcern;
+            }
+            if (!goal && body.text === duplicateText && duplicateMode === 'fixed-concern') {
+              if (holdFixedConcern) await new Promise(resolve => { releaseFixedConcern = resolve; });
+              result = fixedConcern;
+            }
+            if (!goal && body.text === duplicateText && duplicateMode === 'invalid-fixed-concern') {
+              result = { kind: 'safety', safetyLevel: 'concern', message: '' };
             }
             return route.fulfill({ contentType: 'application/json', headers: cors, body: JSON.stringify(result) });
           }
@@ -123,10 +142,70 @@ const answer = {
         assert.equal(await page.evaluate(() => document.activeElement.isConnected && document.activeElement.matches('.safety-urgent')), true, 'Manual retry focuses a warning that remains in the DOM');
         if (language === 'de') assert.equal(await page.locator('#translator-result .safety-urgent a[href^="tel:"]').count(), 3);
         if (evidence) await page.locator('#translator-result').screenshot({ path: path.join(evidence, `retry-warning-${language}-390.png`) });
+
+        await submit('ConcernGoalsFixture'); await page.locator('.translator-fixed-concern').waitFor();
+        assert.equal(await page.locator('.translator-fixed-concern').innerText(), concernMessage);
+        assert.equal(await page.locator('#translator-result .safety-urgent').count(), 0, 'Fixed general guidance is not an emergency warning');
+        assert.equal(await page.locator('.translator-ai-goal-choice, .translator-ai-answer, .translator-feedback').count(), 0);
+        if (evidence) await page.locator('#translator-result').screenshot({ path: path.join(evidence, `fixed-concern-${language}-390.png`) });
+        const customSafety = async label => {
+          await submit('CustomSafetyFixture'); await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+          await page.locator('.translator-ai-goals input').fill(label);
+          await page.locator('.translator-ai-goals form button').click();
+        };
+        await customSafety('General concern goal'); await page.locator('.translator-fixed-concern').waitFor();
+        assert.equal(await page.locator('#translator-result .safety-urgent').count(), 0);
+        assert.equal(requests.at(-1).body.goal.id, 'custom');
+        assert.equal(requests.at(-1).body.goal.label, 'General concern goal');
+        await submit('ConcernRetryFixture'); await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+        await page.locator('.translator-ai-goal-choice').first().click();
+        await page.locator('.translator-ai .translator-ai-button').click();
+        await page.locator('.translator-fixed-concern').waitFor();
+        assert.equal(concernRetryCount, 2);
+        assert.equal(await page.locator('#translator-result .safety-urgent').count(), 0);
+        assert.equal(await page.evaluate(() => document.activeElement.isConnected && document.activeElement.matches('.translator-fixed-concern')), true);
+        await submit('UrgentGoalsFixture'); await page.locator('#translator-result .safety-urgent').waitFor();
+        assert.equal(await page.locator('.translator-fixed-concern, .translator-ai-goal-choice').count(), 0, 'Existing urgent goal response remains protective');
+        await customSafety('Urgent custom fixture'); await page.locator('#translator-result .safety-urgent').waitFor();
+        assert.equal(await page.locator('.translator-fixed-concern').count(), 0);
+        if (language === 'de') {
+          assert.equal(await page.locator('#translator-result .safety-urgent a[href^="tel:"]').count(), 3);
+          duplicateMode = 'fixed-concern';
+          await submit(duplicateText); await page.locator('.translator-fixed-concern').waitFor();
+          assert.equal(await page.locator('[data-translator-local-safety="true"]').count(), 0, 'Valid fixed concern replaces only the provisional local warning');
+          assert.equal(await page.locator('#translator-result .safety-urgent').count(), 0);
+          holdFixedConcern = true;
+          await submit(duplicateText); await page.locator('[data-translator-local-safety="true"]').waitFor();
+          await page.locator('#translator-result').evaluate(node => {
+            const warning = document.createElement('aside'); warning.id = 'separate-protection';
+            warning.className = 'safety-note safety-urgent'; warning.textContent = 'Separate existing protective information.'; node.prepend(warning);
+          });
+          assert.equal(typeof releaseFixedConcern, 'function'); releaseFixedConcern();
+          await page.locator('.translator-fixed-concern').waitFor();
+          assert.equal(await page.locator('#separate-protection').isVisible(), true, 'Different nonprovisional protection remains');
+          assert.equal(await page.locator('#translator-result .safety-urgent').count(), 1);
+          holdFixedConcern = false; duplicateMode = 'invalid-fixed-concern';
+          await submit(duplicateText); await page.locator('.translator-ai .translator-ai-button').waitFor({ state: 'visible' });
+          assert.equal(await page.locator('[data-translator-local-safety="true"]').count(), 1, 'Malformed concern cannot remove provisional protection');
+          assert.equal(await page.locator('.translator-fixed-concern').count(), 0);
+
+          await submit('Ich nehme keine Tabletten. Ich habe Fieber.');
+          await page.locator('.translator-feedback').waitFor();
+          const oldWarning = await page.locator('[data-translator-local-safety="true"]').elementHandle();
+          assert.ok(oldWarning);
+          await page.locator('#translator-input').fill('ConcernGoalsFixture');
+          await page.locator('.translator-feedback').getByRole('button', { name: /Nein/ }).click();
+          await page.locator('.translator-ai-goal-retry').click();
+          await page.locator('.translator-fixed-concern').waitFor();
+          assert.equal(await oldWarning.evaluate(node => node.isConnected), true, 'A new feedback draft cannot erase the old result warning');
+          assert.equal(await page.locator('#translator-result .safety-urgent').count(), 1);
+          assert.equal(requests.at(-1).body.text, 'ConcernGoalsFixture');
+        }
         assert.ok(requests.every(request => request.body.share === false)); assert.deepEqual(errors, []);
         report.languages.push({ language, existingGoalContract: true, explicitGoalBound: true, narrowOverlayPrevented: true,
           deliberateChatOpen: true, closeFocusPreserved: true, warningsChecked: language === 'de', retryWarningPreserved: true,
-          retryFocusConnected: true, requestCount: requests.length, pageErrors: errors });
+          retryFocusConnected: true, fixedConcernBothPhases: true, fixedConcernRetry: true, existingUrgentBothPhases: true,
+          provisionalWarningReplacementChecked: language === 'de', requestCount: requests.length, pageErrors: errors });
       } finally { await context.close(); }
     }
     report.passed = true;

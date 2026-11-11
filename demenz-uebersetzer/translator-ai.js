@@ -9,6 +9,8 @@
   const endpoint = 'https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web';
   // Englische Seiten (<html lang="en">) bitten um eine englische Antwort. Deutsch schickt kein Sprachfeld.
   const language = typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'en' : '';
+  const validFixedSafety = value => value?.kind === 'safety' && (value.safetyLevel === 'urgent'
+    || value.safetyLevel === 'concern' && typeof value.message === 'string' && value.message.trim().length > 0);
 
   const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal } = {}) => {
     if (!requestID && root.DemenzKiFreigabe?.enabled()) requestID = root.crypto.randomUUID();
@@ -36,6 +38,7 @@
       const invalid = () => ({ kind: 'error', reason: 'unavailable', safetyLevel: result?.safetyLevel,
         safetyMessage: hasText(result?.safetyMessage) ? result.safetyMessage : '' });
       if (!result || typeof result.kind !== 'string') return invalid();
+      if (result.kind === 'safety') return validFixedSafety(result) ? result : { kind: 'error', reason: 'unavailable' };
       if (result.kind === 'answer') {
         const usable = hasText(result.meaning) && hasText(result.avoid)
           && Array.isArray(result.phrases) && result.phrases.length > 0 && result.phrases.every(hasText)
@@ -89,7 +92,7 @@
           ...(language ? { language } : {}), share: false }), signal: controller.signal });
       if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
       const value = await response.json();
-      if (value?.kind === 'safety' && value.safetyLevel === 'urgent') return value;
+      if (validFixedSafety(value)) return value;
       const ids = ['act_now','prepare_talk','rephrase','understand','organize','self_care'];
       if (value?.kind !== 'goals' || !Array.isArray(value.goals)
         || !(value.noSituation === true && value.goals.length === 0 || value.noSituation === false && value.goals.length === 3)
