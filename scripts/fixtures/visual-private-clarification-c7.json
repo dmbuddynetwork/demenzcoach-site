@@ -1,0 +1,36 @@
+{
+  "testDataOnly": true,
+  "source": "/Users/daniel/Developer/Codex-Arbeit/dementia/site-c5-final-ui-50-20261112/runs/2026-11-11T21-41-26-817Z/19-mobile.json",
+  "sourceSHA256": "4449e09f08363fdb61416a07a4b6a18da691005ffb73a6c3548e4697fdd4fdec",
+  "input": "Mein Vater nennt mich seinen Bruder.",
+  "goals": {
+    "kind": "goals",
+    "goals": [
+      {
+        "goal": "act_now",
+        "label": "Ihn an meinen Namen erinnern"
+      },
+      {
+        "goal": "understand",
+        "label": "Ruhig auf die Anrede reagieren"
+      },
+      {
+        "goal": "organize",
+        "label": "Seine Anrede besser verstehen"
+      }
+    ],
+    "noSituation": false
+  },
+  "goal": {
+    "id": "act_now",
+    "label": "Ihn an meinen Namen erinnern"
+  },
+  "clarification": {
+    "kind": "clarification",
+    "question": "Wie heißt du?",
+    "meaning": "Für einen Satz mit deinem Namen fehlt noch dein Name.",
+    "nextStep": "Schreib mir bitte deinen Namen.",
+    "safetyLevel": "standard",
+    "safetyMessage": null
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "testDataOnly": true,
+  "source": "/Users/daniel/Developer/Codex-Arbeit/dementia/site-c5-final-ui-50-20261112/runs/2026-11-11T21-41-26-817Z/02-mobile.json",
+  "sourceSHA256": "3cc79ca7ee6bf16b2f25c806af6be9b66de97e6a0aebdaee7c84dcc03210bd8e",
+  "input": "Sie will mein Eis essen. Ich möchte es selbst behalten.",
+  "goals": {
+    "kind": "goals",
+    "goals": [
+      {
+        "goal": "act_now",
+        "label": "Mein Eis für mich behalten"
+      },
+      {
+        "goal": "understand",
+        "label": "Den Umgang mit meinem Eis absprechen"
+      },
+      {
+        "goal": "organize",
+        "label": "Mit ihrer Enttäuschung umgehen"
+      }
+    ],
+    "noSituation": false
+  },
+  "answers": [
+    {
+      "goal": {
+        "id": "act_now",
+        "label": "Mein Eis für mich behalten"
+      },
+      "response": {
+        "kind": "answer",
+        "meaning": "Du darfst dein Eis für dich behalten. Ein freundliches, klares Nein kann Streit vermeiden.",
+        "phrases": [
+          "Dieses Eis möchte ich selbst essen.",
+          "Nein, das ist mein Eis. Ich behalte es."
+        ],
+        "avoid": "Jetzt sei doch nicht so gierig!",
+        "nextStep": "Nimm dein Eis zu dir.",
+        "safetyLevel": "standard",
+        "safetyMessage": null
+      }
+    },
+    {
+      "goal": {
+        "id": "understand",
+        "label": "Den Umgang mit meinem Eis absprechen"
+      },
+      "response": {
+        "kind": "answer",
+        "meaning": "Du möchtest dein Eis selbst behalten. Ein freundliches, klares Nein macht deine Grenze deutlich.",
+        "phrases": [
+          "Das Eis möchte ich selbst essen. Bitte lass es mir.",
+          "Mein Eis behalte ich für mich. Lass uns darüber sprechen."
+        ],
+        "avoid": "Du nimmst mir immer alles weg!",
+        "nextStep": "Stell dein Eis zu dir.",
+        "safetyLevel": "standard",
+        "safetyMessage": null
+      }
+    },
+    {
+      "goal": {
+        "id": "organize",
+        "label": "Mit ihrer Enttäuschung umgehen"
+      },
+      "response": {
+        "kind": "answer",
+        "meaning": "Sie könnte enttäuscht sein, wenn du dein Eis behältst. Du darfst freundlich bei deinem Nein bleiben.",
+        "phrases": [
+          "Du hättest auch gern Eis. Dieses möchte ich selbst behalten.",
+          "Ich weiß, du möchtest das Eis. Ich behalte es für mich."
+        ],
+        "avoid": "Stell dich nicht so an, das ist mein Eis!",
+        "nextStep": "Leg das Eis zu dir.",
+        "safetyLevel": "standard",
+        "safetyMessage": null
+      }
+    }
+  ]
+}

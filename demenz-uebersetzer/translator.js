@@ -1119,7 +1119,7 @@
         const previousText = requestText.normalize('NFC').trim();
         const previousOptions = { formal: options.formal, goal: options.goal, correctionOf: options.correctionOf || '' };
         const title = element('h3', { text: en ? 'A question about your situation' : 'Eine Rückfrage zu deiner Situation', attributes: { tabindex: '-1' } });
-        const field = element('textarea', { className: 'translator-clarification-detail', attributes: { rows: '3', autocomplete: 'off', placeholder: en ? 'Please add the missing detail, without names.' : 'Ergänze die fehlende Angabe bitte ohne Namen.' } });
+        const field = element('textarea', { className: 'translator-clarification-detail', attributes: { rows: '3', autocomplete: 'off', placeholder: en ? 'Add only the detail that is needed.' : 'Ergänze nur die nötige Angabe.' } });
         field.value = draftFor === previousText ? draft : '';
         field.addEventListener('input', () => { draft = field.value; draftFor = previousText; remember(); });
         const send = button(en ? 'Add your detail' : 'Antwort ergänzen', 'button', () => {});
@@ -1363,6 +1363,14 @@
       ownDetails.open = false;
       answerSlot.replaceChildren(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), onRequestState: state => requestStates.set(key, state) }));
       syncWarningHistory();
+      // Wait for the choice layout to settle; keep a warning/question's own focus.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const control = changeGoals.querySelector('summary');
+        if (!box.isConnected || selectedKey !== key || document.activeElement !== control) return;
+        const headerBottom = document.querySelector('.e-header')?.getBoundingClientRect().bottom || 0;
+        const top = heading.getBoundingClientRect().top;
+        if (top < headerBottom) window.scrollBy({ top: top - headerBottom - 12, behavior: 'instant' });
+      }));
     };
     const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'Describe what you need help with' : 'Beschreibe, wobei du Hilfe möchtest' } });
     const ownLabel = element('label', {}, [element('span', { text: en ? 'Or describe your own goal' : 'Oder beschreibe dein eigenes Ziel' }), own]);
