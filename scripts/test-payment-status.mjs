@@ -58,7 +58,7 @@ test("actual return-page code sends the owner token, hides pending access and em
   const emailModule = await readFile(new URL("../abo/email-auth.js", import.meta.url), "utf8");
   const { emailAccountURL } = await import(`data:text/javascript;base64,${Buffer.from(emailModule).toString("base64")}`);
   const hostedModule = await readFile(new URL("../abo/checkout-redirect.js", import.meta.url), "utf8");
-  const { createHostedCheckoutRedirect } = await import(`data:text/javascript;base64,${Buffer.from(hostedModule).toString("base64")}`);
+  const { createHostedCheckoutRedirect, reserveCheckoutWindow } = await import(`data:text/javascript;base64,${Buffer.from(hostedModule).toString("base64")}`);
   const code = page.replace(/^import .*email-auth.js.*;\n/mu, "").replace(/^import .*checkout-redirect.js.*;\n/mu, "");
   const split = code.indexOf('// --- Start ');
   assert.ok(split > 0);
@@ -72,7 +72,7 @@ test("actual return-page code sends the owner token, hides pending access and em
     };
     const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
     const context = createContext({
-      createPaymentStatusController, paymentStatusText, emailAccountURL, createHostedCheckoutRedirect, URLSearchParams,
+      createPaymentStatusController, paymentStatusText, emailAccountURL, createHostedCheckoutRedirect, reserveCheckoutWindow, URLSearchParams,
       location: { search: "?status=fertig&session_id=cs_synthetic", origin: "https://dementiacoachapp.com" },
       localStorage: { getItem: () => null },
       document: { getElementById: node, querySelectorAll: (selector) => selector === "[data-manage]" ? [node("payment-status-manage")] : [] },

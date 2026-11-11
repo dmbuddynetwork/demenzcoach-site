@@ -103,6 +103,9 @@ const server = http.createServer((req,res)=>{try {
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 
  async function intercept(context,{origin,plan,sessions,stripeScripts,foreign=false,hold=null}){
+  // These existing cases retain the original same-tab contract under a popup
+  // blocker. Dedicated window tests exercise real, user-activated popup callers.
+  await context.addInitScript(()=>{window.open=()=>null;});
   await context.route('**/*',async route=>{
    const request=route.request(),url=new URL(request.url());
    if(url.origin===origin)return route.continue();
