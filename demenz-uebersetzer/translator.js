@@ -957,7 +957,13 @@
     // Ohne Stufen (englische Seiten): bei jedem Sicherheitshinweis der KI derselbe feste Hinweis.
     const ungraded = ui?.gradedSafety === false && result.safetyLevel !== 'standard';
     const safetyNote = aiSafetyNote(result, ungraded);
-    if (safetyNote) nodes.push(safetyNote);
+    // A local guard may already show this exact complete warning. Keep the
+    // first warning and its call links; never collapse different safety text.
+    const safetySignature = note => JSON.stringify([note.textContent.replace(/\s+/g, ' ').trim(),
+      [...note.querySelectorAll('a[href]')].map(link => link.getAttribute('href'))]);
+    const existingSafetyNote = safetyNote && [...output.querySelectorAll('.safety-note')]
+      .find(note => safetySignature(note) === safetySignature(safetyNote));
+    if (safetyNote && !existingSafetyNote) nodes.push(safetyNote);
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
     nodes.push(element('p', { className: 'translator-ai-label', text: saved ? helpfulCopy.history : 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
     if (goal) nodes.push(element('p', { className: 'translator-chosen-ai-goal', text: `${ui?.lang === 'en' ? 'Your goal' : 'Dein Ziel'}: ${goal.label}` }));
@@ -980,7 +986,8 @@
         input.focus();
       } }));
     }
-    return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
+    return { node: element('div', { className: 'translator-ai-answer' }, nodes),
+      focus: existingSafetyNote || (nodes[0].tagName === 'ASIDE' ? nodes[0] : first), top: existingSafetyNote || nodes[0] };
   };
   // Hinweise in einer Karte: oben „Wann ein Gespräch nicht ausreicht“ (falls vorhanden), darunter die Haftungszeile.
   const notesCard = (...children) => element('div', { className: 'translator-notes', attributes: { role: 'note' } }, children.filter(Boolean));
@@ -1807,10 +1814,23 @@
     let small = document.body.dataset.translatorState !== 'input';
     let positionFrame = 0;
     const setSmall = (value) => { small = value; chat.classList.toggle('translator-chat-small', value); syncChat(); };
+    const compactCoversResult = () => {
+      if (document.body.dataset.translatorState !== 'answer' || output.hidden) return false;
+      const bounds = output.getBoundingClientRect();
+      const width = parseFloat(getComputedStyle(bubbleOnly.firstElementChild).width) || 64;
+      const right = innerWidth - (parseFloat(getComputedStyle(chat).right) || 16);
+      return bounds.height > 0 && bounds.bottom > 0 && bounds.top < innerHeight
+        && bounds.right > right - width && bounds.left < right;
+    };
     // A submitted situation leads into the goal/answer flow. Keep its text clear;
     // the user can still deliberately expand the compact chat launcher.
     form.addEventListener('submit', () => { setSmall(true); });
-    close.addEventListener('click', () => { setSmall(true); bubbleOnly.focus(); track('translator_write_chat', { step: 'closed' }); });
+    close.addEventListener('click', () => {
+      setSmall(true);
+      if (compactCoversResult()) { output.tabIndex = -1; output.focus({ preventScroll: true }); }
+      else bubbleOnly.focus();
+      track('translator_write_chat', { step: 'closed' });
+    });
     bubbleOnly.addEventListener('click', () => { setSmall(false); field.focus(); track('translator_write_chat', { step: 'opened' }); });
     chatForm.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -1837,7 +1857,7 @@
       const helpfulInUse = helpfulVisible && !chat.contains(document.activeElement);
       // Auf der Startseite stehen die Beispiele zuerst: ihr noch nicht erreichtes
       // Eingabefeld soll keinen Chat über den auswählbaren Situationen öffnen.
-      chat.hidden = inputVisible || helpfulInUse || document.body.dataset.translatorState === 'goal'
+      chat.hidden = inputVisible || helpfulInUse || (small && compactCoversResult()) || document.body.dataset.translatorState === 'goal'
         || (form.hasAttribute('data-chat-after-input') && entryRect.top >= 0);
       chat.style.bottom = '';
       chat.classList.toggle('translator-chat-small', small);

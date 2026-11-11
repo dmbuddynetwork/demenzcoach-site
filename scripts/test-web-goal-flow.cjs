@@ -92,6 +92,7 @@ const answer = {
             await page.setViewportSize({ width, height: 900 });
             await page.waitForTimeout(4000);
             assert.equal(await page.locator('.translator-chat-panel').isVisible(), false, 'Answer stays unobstructed after the chat appearance delay');
+            if (width === 390) assert.equal(await page.locator('.translator-chat-open').isVisible(), false, 'The compact launcher cannot cover the mobile answer either');
             await page.screenshot({ path: path.join(evidence, `answer-${width}.png`), fullPage: false });
           }
         }
