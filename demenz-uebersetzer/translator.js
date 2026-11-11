@@ -937,7 +937,11 @@
     element('span', { text })
   ]);
   // Ein einziger, ungestufter Hinweis: Das Tool schätzt nicht ein, wie dringend etwas ist.
-  const generalNote = (lead = '') => urgentNote(data.safetySignals.text, lead);
+  const generalNote = (lead = '') => {
+    const note = urgentNote(data.safetySignals.text, lead);
+    note.dataset.translatorLocalSafety = 'true';
+    return note;
+  };
 
   // KI für Sätze, die die feste Liste nicht kennt. Bekannte Sätze bleiben auf dem Gerät;
   // unbekannte gehen automatisch an die KI (Hinweis unter dem Eingabefeld).
@@ -951,6 +955,15 @@
       return element('aside', { className: 'safety-note', attributes: { role: 'note' } }, [element('span', { text: message })]);
     }
     return null;
+  };
+  const fixedSafetyNote = (result, localSafetyNote) => {
+    if (result.safetyLevel !== 'concern') return urgentNote(data.safetySignals.text);
+    // Only the exact provisional warning passed by this request may be replaced.
+    // A feedback request for a new draft must preserve the old result's warning.
+    if (localSafetyNote?.dataset.translatorLocalSafety === 'true') localSafetyNote.remove();
+    const note = aiSafetyNote({ safetyLevel: 'concern', safetyMessage: result.message });
+    note.classList.add('translator-fixed-concern');
+    return note;
   };
   const aiAnswer = (result, { saved = false, allowHelpful = true, goal } = {}) => {
     const nodes = [];
@@ -1058,7 +1071,7 @@
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, allowHelpful = true, goal } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     if (!goal && !localSafetyHit) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
@@ -1116,6 +1129,15 @@
         return;
       }
       if (result.kind === 'safety') {
+        if (result.safetyLevel === 'concern') {
+          const note = fixedSafetyNote(result, localSafetyNote);
+          box.replaceWith(note);
+          output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach(offer => offer.remove());
+          setFollowupOpen(false);
+          note.tabIndex = -1;
+          note.focus({ preventScroll: true });
+          return;
+        }
         const freshNote = urgentNote(data.safetySignals.text);
         const existing = [...output.querySelectorAll('.safety-urgent')].find((note) => !box.contains(note) && note.textContent === freshNote.textContent);
         const note = existing ?? freshNote;
@@ -1208,7 +1230,7 @@
       if (!box.isConnected) return;
       busy = false; box.setAttribute('aria-busy', 'false'); retry.disabled = false;
       if (result.kind === 'safety') {
-        const note = urgentNote(data.safetySignals.text);
+        const note = fixedSafetyNote(result);
         box.remove(); output.prepend(note); setViewState('answer');
         note.tabIndex = -1; note.focus({ preventScroll: true });
         note.scrollIntoView({ behavior: 'instant', block: 'start' });
@@ -1256,7 +1278,8 @@
   const renderUnknown = ({ safetyHit, typed, hint = null, contextual = false }) => {
     setViewState('answer');
     const nodes = [];
-    if (safetyHit) nodes.push(generalNote());
+    const localSafetyNote = safetyHit ? generalNote() : null;
+    if (localSafetyNote) nodes.push(localSafetyNote);
     // Gleicher Aufbau wie ein Treffer: oben der Satz, dann klar, was jetzt hilft.
     const shown = typed.length > 90 ? `${typed.slice(0, 88).trim()}…` : typed;
     const heading = element(homeHeading ? 'h1' : 'h2', { text: shown ? `„${shown}“` : 'Diesen Satz kenne ich noch nicht.', attributes: { tabindex: '-1' } });
@@ -1271,7 +1294,7 @@
     const box = aiBox(typed, contextual ? 'context' : 'unknown', () => {
       if (!contextual) { feelings.hidden = false; if (fallbackBox) fallbackBox.hidden = false; }
       setFollowupOpen(true);
-    }, { auto: true, localSafetyHit: safetyHit });
+    }, { auto: true, localSafetyHit: safetyHit, localSafetyNote });
     if (box) feelings.hidden = true;
     nodes.push(box);
     // Ähnliche Situationen zuerst: Sie führen am schnellsten zu genauen Sätzen.
