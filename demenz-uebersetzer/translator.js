@@ -486,7 +486,7 @@
   };
   // Der gehörte Satz als weiße Sprechblase mit Zeichnung daneben, wie auf den App-Store-Bildern
   // (Daniel, 8. Nov: „stell das in eine Sprechblase, als würde das gesagt werden“).
-  const fallbackIllustration = '/assets/zeichnungen/chat-helferin.webp';
+  const fallbackIllustration = '/assets/zeichnungen/chat-helferin-fragend.png';
   const saidBlock = (says, entry, heading) => {
     const art = !entry?.safetyOnly
       ? element('img', { className: 'translator-said-art', attributes: { src: entry?.image || fallbackIllustration, alt: '', width: String(entry?.imageWidth ?? (entry?.image ? 480 : 200)), height: String(entry?.imageHeight ?? (entry?.image ? 400 : 200)), decoding: 'async' } })
@@ -502,7 +502,7 @@
     }
     heading.classList.add('translator-said-bubble');
     return element('div', { className: art ? 'translator-said translator-said-with-art' : 'translator-said' }, [
-      element('div', { className: 'translator-said-text' }, [element('p', { className: 'translator-said-label', text: ui?.lang === 'en' ? 'Your input:' : ui ? tr('Du hörst:') : 'Deine Eingabe:' }), heading]),
+      element('div', { className: 'translator-said-text' }, [element('p', { className: 'translator-said-label', text: ui?.lang === 'en' ? 'The situation' : ui ? tr('Du hörst:') : 'Die Situation' }), heading]),
       art
     ].filter(Boolean));
   };
@@ -567,6 +567,7 @@
   let formMoved = false;
   // Legacy pages keep the follow-up below; prepared app pages keep the same form above the answer.
   const setFollowupOpen = (open) => {
+    if (keepInputAtTop && open) form.hidden = false;
     const details = output.querySelector('.translator-followup-question');
     if (details) details.open = open || Boolean(input.value.trim()) || form.contains(document.activeElement);
   };
@@ -581,6 +582,7 @@
   const formBelow = ({ open = false } = {}) => {
     form.hidden = false;
     if (keepInputAtTop) {
+      form.hidden = document.body.dataset.translatorState !== 'input';
       formStartParent.insertBefore(form, formStartNext?.parentNode === formStartParent ? formStartNext : null);
       form.classList.remove('translator-form-below');
       formMoved = false;
@@ -671,7 +673,7 @@
     output.hidden = false;
     document.body.classList.add('translator-has-result');
     // Keep the one top input available even while choosing a goal.
-    form.hidden = !keepInputAtTop;
+    form.hidden = true;
     if (!options.preserveViewport) {
       heading.focus({ preventScroll: true });
       output.scrollIntoView({ behavior: 'instant', block: 'start' });
@@ -976,20 +978,21 @@
     const safetySignature = note => JSON.stringify([note.textContent.replace(/\s+/g, ' ').trim(),
       [...note.querySelectorAll('a[href]')].map(link => link.getAttribute('href'))]);
     const existingSafetyNote = safetyNote && [...output.querySelectorAll('.safety-note')]
-      .find(note => !note.closest('.translator-ai') && safetySignature(note) === safetySignature(safetyNote));
+      .find(note => !note.closest('[data-goal-safety-history]') && !note.closest('.translator-ai') && safetySignature(note) === safetySignature(safetyNote));
     if (safetyNote && !existingSafetyNote) nodes.push(safetyNote);
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
     nodes.push(element('p', { className: 'translator-ai-label', text: saved ? helpfulCopy.history : 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
     if (goal) nodes.push(element('p', { className: 'translator-chosen-ai-goal', text: `${ui?.lang === 'en' ? 'Your goal' : 'Dein Ziel'}: ${goal.label}` }));
-    const first = element('h3', { className: 'translator-step', text: 'Was dahintersteckt', attributes: { tabindex: '-1' } });
-    nodes.push(first, element('p', { className: 'translator-meaning', text: result.meaning }));
-    nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
-    nodes.push(element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
+    const first = element('h3', { className: 'translator-step', text: 'Das kannst du sagen', attributes: { tabindex: '-1' } });
+    nodes.push(first, element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
+    const context = element('details', { className: 'translator-ai-context' }, [element('summary', { text: 'Was dahintersteckt' }), element('p', { className: 'translator-meaning translator-ai-meaning', text: result.meaning })]);
+    if (result.safetyLevel !== 'standard') context.open = true;
     // Runde 198: Wie in der App gibt es einen konkreten nächsten Schritt.
     if (typeof result.nextStep === 'string' && result.nextStep) {
       nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
       nodes.push(element('p', { className: 'translator-meaning translator-ai-next', text: result.nextStep }));
     }
+    nodes.push(context);
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
     nodes.push(notesCard(disclaimer(true)));
     // Anonymes Teilen gibt es vorerst nur auf Deutsch (der Server bietet es sonst auch nicht an).
@@ -1071,7 +1074,7 @@
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     if (!goal && !localSafetyHit) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
@@ -1087,7 +1090,7 @@
       status.textContent = auto ? '' : tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
-      const result = await ai.ask(text, { formal: personal.formal, correctionOf, requestID: operationID, goal });
+      const result = await (requestAnswer || ai.ask)(text, { formal: personal.formal, correctionOf, requestID: operationID, goal });
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
@@ -1139,7 +1142,7 @@
           return;
         }
         const freshNote = urgentNote(data.safetySignals.text);
-        const existing = [...output.querySelectorAll('.safety-urgent')].find((note) => !box.contains(note) && note.textContent === freshNote.textContent);
+        const existing = [...output.querySelectorAll('.safety-urgent')].find((note) => !note.closest('[data-goal-safety-history]') && !box.contains(note) && note.textContent === freshNote.textContent);
         const note = existing ?? freshNote;
         if (existing) box.remove(); else box.replaceWith(note);
         output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
@@ -1151,7 +1154,8 @@
             element('h3', { className: 'translator-step', text: 'Was genau ist passiert?' }),
             element('p', { text: iceQuestion ? 'Meinst du „Sie isst mein Eis auf“? Oder meinst du etwas anderes? Schreib bitte kurz dazu, was passiert ist.' : 'Was ist gerade passiert? Beschreibe bitte kurz die Situation.' })
           ]));
-          if (!input.value.trim()) { input.value = text; grow(); }
+          form.hidden = false;
+        if (!input.value.trim()) { input.value = text; grow(); }
           setFollowupOpen(true);
         } else {
           setFollowupOpen(false);
@@ -1204,11 +1208,71 @@
     const heading = element('h2', { text: en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?' });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status', 'aria-live': 'polite' } });
     const choices = element('div', { className: 'translator-ai-goal-choices' });
-    let busy = false;
+    const changeGoals = element('details', { className: 'translator-change-goal' }, [element('summary', { text: en ? 'Change goal' : 'Ziel ändern' })]);
+    let busy = false, selectedKey = '', selectedGoal = null;
+    const answerSlot = element('div', { className: 'translator-goal-answer' });
+    // These are received warnings for this original situation, not a severity
+    // classification of a different goal. Keep their exact nodes and call links.
+    const warningHistory = element('div', { attributes: { 'data-goal-safety-history': '', hidden: '' } });
+    const receivedWarnings = new Map();
+    const warningSignature = note => JSON.stringify([note.textContent.replace(/\s+/g, ' ').trim(),
+      [...note.querySelectorAll('a[href]')].map(link => link.getAttribute('href'))]);
+    const syncWarningHistory = () => {
+      const current = new Set([...answerSlot.querySelectorAll('.safety-note')].map(warningSignature));
+      for (const [signature, record] of receivedWarnings) record.item.hidden = current.has(signature);
+      warningHistory.hidden = ![...receivedWarnings.values()].some(record => !record.item.hidden);
+    };
+    const preserveWarnings = () => {
+      if (!selectedGoal) return;
+      for (const note of answerSlot.querySelectorAll('.safety-note')) {
+        const signature = warningSignature(note);
+        let record = receivedWarnings.get(signature);
+        if (!record) {
+          const context = element('p');
+          const item = element('section', {}, [context, note]);
+          record = { item, context, goals: new Map() };
+          receivedWarnings.set(signature, record);
+          warningHistory.append(item);
+        }
+        record.goals.set(selectedKey, selectedGoal.label);
+        // textContent through the element API: custom goal text is never HTML.
+        record.context.textContent = (en ? 'Information from previous answers. Goals: ' : 'Hinweis aus vorherigen Antworten. Ziele: ')
+          + [...record.goals.values()].map(label => `„${label}“`).join('; ');
+      }
+      syncWarningHistory();
+    };
+    new MutationObserver(syncWarningHistory).observe(answerSlot, { childList: true, subtree: true });
+
+    // This cache belongs only to this situation and address mode. Pending promises
+    // are shared when A → B → A is chosen; detached views cannot paint stale results.
+    const answers = new Map();
+    const requestAnswer = (situation, options) => {
+      const key = JSON.stringify([options.formal, options.goal]);
+      if (answers.has(key)) return answers.get(key).then(result => { const { access, ...cached } = result; return cached; });
+      if (!answers.has(key)) {
+        const pending = Promise.resolve().then(() => ai.ask(situation, options)).catch(() => ({ kind: 'error', reason: 'unavailable' }));
+        answers.set(key, pending);
+        pending.then(result => { if (!['answer', 'safety'].includes(result.kind) && answers.get(key) === pending) answers.delete(key); });
+      }
+      return answers.get(key);
+    };
     const select = (goal) => {
-      if (!box.isConnected || busy) return;
+      const key = JSON.stringify([personal.formal, goal]);
+      if (!box.isConnected || busy || key === selectedKey) return;
+      preserveWarnings();
+      selectedKey = key;
+      selectedGoal = { ...goal };
+      box.classList.add('translator-ai-goals-selected');
+      heading.textContent = `${en ? 'Your goal' : 'Dein Ziel'}: ${goal.label}`;
+      if (!changeGoals.contains(choices)) { choices.before(changeGoals); changeGoals.append(choices, ownDetails); }
+      changeGoals.querySelector('summary').focus({ preventScroll: true });
+      changeGoals.open = false;
+      status.hidden = true;
+      choices.querySelectorAll('button').forEach(choice => choice.setAttribute('aria-pressed', String(choice.dataset.goalId === goal.id && choice.textContent === goal.label)));
       setViewState('answer');
-      box.replaceWith(aiBox(text, source, onFail, { auto: true, allowHelpful, goal }));
+      ownDetails.open = false;
+      answerSlot.replaceChildren(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, requestAnswer }));
+      syncWarningHistory();
     };
     const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'Describe what you need help with' : 'Beschreibe, wobei du Hilfe möchtest' } });
     const ownLabel = element('label', {}, [element('span', { text: en ? 'Or describe your own goal' : 'Oder beschreibe dein eigenes Ziel' }), own]);
@@ -1220,14 +1284,19 @@
       if (label.length < 3) { status.textContent = en ? 'Please describe your goal a little more.' : 'Beschreibe dein Ziel bitte etwas genauer.'; own.focus(); return; }
       if (ownForm.reportValidity()) select({ id: 'custom', label });
     });
+    const ownDetails = element('details', { className: 'translator-own-goal-details' }, [element('summary', { text: en ? 'Describe your own goal' : 'Eigenes Ziel beschreiben' }), ownForm]);
+    const waiting = aiWaiting();
+    waiting.querySelector('.translator-ai-wait-title').lastChild.textContent = en ? 'Finding goals for your situation …' : 'Ziele für deine Situation finden …';
+    waiting.querySelectorAll('.translator-ai-steps li').forEach((step,index) => { step.textContent = (en ? ['Understand the situation','Find possible goals','Prepare your choices'] : ['Situation verstehen','Mögliche Ziele finden','Deine Auswahl vorbereiten'])[index]; });
     const load = async () => {
       if (busy) return;
-      busy = true; box.dataset.goalState = 'loading'; box.setAttribute('aria-busy', 'true'); retry.disabled = true; choices.replaceChildren(); ownForm.hidden = true;
+      busy = true; box.dataset.goalState = 'loading'; box.setAttribute('aria-busy', 'true'); retry.disabled = true; retry.hidden = true; choices.replaceChildren(); ownDetails.hidden = true; box.insertBefore(waiting, choices);
       status.textContent = en ? 'The AI is finding goals for your situation …' : 'Die KI formuliert Ziele für deine Situation …';
       let result;
       try { result = typeof ai.askGoals === 'function' ? await ai.askGoals(text, { formal: personal.formal }) : { kind: 'error' }; }
       catch { result = { kind: 'error' }; }
       if (!box.isConnected) return;
+      waiting.remove();
       busy = false; box.setAttribute('aria-busy', 'false'); retry.disabled = false;
       if (result.kind === 'safety') {
         const note = fixedSafetyNote(result);
@@ -1243,11 +1312,11 @@
         if (!input.value.trim()) { input.value = text; grow(); }
         return;
       }
-      ownForm.hidden = false;
+      ownDetails.hidden = false;
       if (result.kind === 'goals') {
         box.dataset.goalState = 'ready';
         status.textContent = en ? 'Choose a goal. Your answer will follow your choice.' : 'Wähle ein Ziel. Danach richtet sich deine Antwort.';
-        choices.replaceChildren(...result.goals.map(g => button(g.label, 'translator-ai-goal-choice', () => select({ id: g.goal, label: g.label }))));
+        choices.replaceChildren(...result.goals.map(g => button(g.label, 'translator-ai-goal-choice', () => select({ id: g.goal, label: g.label }), { 'aria-pressed': 'false', 'data-goal-id': g.goal })));
         retry.hidden = true;
       } else {
         box.dataset.goalState = 'unavailable';
@@ -1256,8 +1325,9 @@
       }
     };
     const retry = button(en ? 'Ask the AI for goals' : 'Ziele mit KI klären', 'button translator-ai-goal-retry', () => { void load(); });
-    box.append(heading, status, choices, ownForm, retry);
-    ownForm.hidden = true;
+    retry.hidden = auto;
+    box.append(heading, status, choices, ownDetails, retry, warningHistory, answerSlot);
+    ownDetails.hidden = true;
     if (auto) requestAnimationFrame(() => { void load(); });
     return box;
   };
@@ -1444,6 +1514,7 @@
     const chosenGoal = goals?.find((candidate) => candidate.id === goal) ?? null;
     // Gewähltes Ziel als ruhige graue Zeile oben in der Karte (wie in der App, nie wie ein Knopf).
     if (chosenGoal) answerCard.append(element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }));
+    if (goals) answerCard.append(element('details', { className: 'translator-change-goal' }, [element('summary', { text: 'Ziel ändern' }), element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.map(option => button(option.label, 'translator-ai-goal-choice', () => { setPage(result, option.id); render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id }); }, { 'aria-pressed': String(option.id === goal) })))]));
     // Die Zeichnung steht oben neben der Sprechblase (saidBlock), nicht mehr in der Karte.
     // Bausteine der Karte; die Reihenfolge richtet sich nach dem Ziel.
     const meaningBlock = [];
@@ -1637,8 +1708,8 @@
   function show(entry, source) {
     if (!keepInputAtTop && !input.value.trim()) input.value = entry.says;
     grow();
-    askGoal(entry);
-    setPage(entry);
+    render(entry, { goal: ui?.lang === 'en' ? '' : 'jetzt' });
+    setPage(entry, ui?.lang === 'en' ? '' : 'jetzt');
     track('translator_result', { result_key: entry.key, input_source: source, safety_hint: 'no' });
   }
 
@@ -1730,7 +1801,11 @@
       // Nach dem ersten Klick kann das Formular verrutschen. Ein zweiter Klick
       // derselben Mehrfachaktivierung darf dann keine fremde Kachel öffnen.
       if (event.detail > 1) { event.preventDefault(); return; }
-      if (chip.tagName === 'A') return;
+      if (chip.tagName === 'A') {
+        const route = publicByKey.get(chip.dataset.translatorKey);
+        if (route) chip.href = route.path;
+        return;
+      }
       const entry = entryByKey.get(chip.dataset.translatorKey);
       if (entry) { event.preventDefault(); show(entry, 'chip'); }
     });
@@ -1815,47 +1890,45 @@
   addEventListener('scroll', syncSticky, { passive: true });
   addEventListener('resize', syncSticky, { passive: true });
 
+
+  const headerNav = document.querySelector('.e-header nav');
+  if (headerNav) {
+    const en = ui?.lang === 'en';
+    const menu = element('details', { className: 'e-menu' });
+    const summary = element('summary', { text: en ? 'Menu' : 'Menü' });
+    const items = element('div', { className: 'e-menu-items' });
+    items.append(...headerNav.childNodes);
+    const account = element('a', { text: en ? 'Sign in / Create account' : 'Anmelden / Konto erstellen', attributes: { href: window.DemenzKiFreigabe?.signInURL || '/abo/konto.html?returnTo=' + encodeURIComponent(en ? '/en/dementia-translator/' : '/de/') } });
+    items.append(account); menu.append(summary, items); headerNav.append(menu);
+    menu.addEventListener('keydown', event => { if (event.key === 'Escape') { menu.open = false; summary.focus(); } });
+    document.addEventListener('click', event => { if (!menu.contains(event.target)) menu.open = false; });
+  }
+
   // Eingabe immer in Reichweite (Daniel, 9. Nov 03:27 und 04:09): Ist das Feld aus dem Bild gescrollt, erscheint
   // unten rechts ein kleines Chat-Fenster wie bei Support-Chats: die junge Frau aus den Zeichnungen, eine
   // Sprechblase und ein echtes Eingabefeld. Abschicken trägt den Text ins große Feld und schickt es dort ab.
   // Mit × wird es zum runden Bild; ein Tipp darauf öffnet es wieder.
   if (document.body.classList.contains('einfach') && 'IntersectionObserver' in window) {
-    const chatImage = data.chatImage ?? null;
-    const avatar = () => chatImage
-      ? element('img', { className: 'translator-chat-avatar', attributes: { src: chatImage.src, width: '56', height: '56', alt: '', decoding: 'async' } })
-      : element('span', { className: 'translator-chat-avatar' });
-    const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: 'Hier schreiben …', 'aria-label': 'Was ist passiert?' } });
-    const send = element('button', { className: 'translator-chat-send', attributes: { type: 'submit', 'aria-label': 'Senden' } });
-    send.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>';
+    const en = ui?.lang === 'en';
+    const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation', 'aria-describedby': 'translator-chat-privacy' } });
+    const send = element('button', { className: 'translator-chat-send', text: en ? 'Find an answer' : 'Antwort finden', attributes: { type: 'submit' } });
     const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
-    const close = element('button', { className: 'translator-chat-close', text: '×', attributes: { type: 'button', 'aria-label': 'Chat verkleinern' } });
-    const panel = element('div', { className: 'translator-chat-panel' }, [
-      element('div', { className: 'translator-chat-head' }, [avatar(), element('p', { className: 'translator-chat-bubble', text: 'Was ist passiert? Schreib es mir.' }), close]),
-      chatForm
-    ]);
-    const bubbleOnly = element('button', { className: 'translator-chat-open', attributes: { type: 'button', 'aria-label': 'Chat öffnen' } }, [avatar()]);
-    const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': 'Noch etwas schreiben', hidden: '' } }, [panel, bubbleOnly]);
-    let small = document.body.dataset.translatorState !== 'input';
+    const privacy = element('p', { className: 'translator-chat-privacy', attributes: { id: 'translator-chat-privacy' } });
+    // The same pre-submit terms/privacy/AI disclosure remains reachable here.
+    const originalNotice = document.getElementById('translator-privacy-note');
+    if (originalNotice) {
+      const links = originalNotice.querySelectorAll('a');
+      if (links.length >= 2) {
+        const terms = links[0].cloneNode(true), information = links[1].cloneNode(true);
+        information.textContent = en ? 'Privacy & AI' : 'Datenschutz & KI';
+        privacy.append(en ? 'By submitting you accept the ' : 'Mit Absenden akzeptierst du die ', terms, '. ', information, '.');
+      } else privacy.append(...Array.from(originalNotice.childNodes, node => node.cloneNode(true)));
+    }
+    const panel = element('div', { className: 'translator-chat-panel' }, [chatForm, privacy]);
+    const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': en ? 'Describe another situation' : 'Andere Situation beschreiben', hidden: '' } }, [panel]);
     let positionFrame = 0;
-    const setSmall = (value) => { small = value; chat.classList.toggle('translator-chat-small', value); syncChat(); };
-    const compactCoversResult = () => {
-      if (document.body.dataset.translatorState !== 'answer' || output.hidden) return false;
-      const bounds = output.getBoundingClientRect();
-      const width = parseFloat(getComputedStyle(bubbleOnly.firstElementChild).width) || 64;
-      const right = innerWidth - (parseFloat(getComputedStyle(chat).right) || 16);
-      return bounds.height > 0 && bounds.bottom > 0 && bounds.top < innerHeight
-        && bounds.right > right - width && bounds.left < right;
-    };
-    // A submitted situation leads into the goal/answer flow. Keep its text clear;
-    // the user can still deliberately expand the compact chat launcher.
-    form.addEventListener('submit', () => { setSmall(true); });
-    close.addEventListener('click', () => {
-      setSmall(true);
-      if (compactCoversResult()) { output.tabIndex = -1; output.focus({ preventScroll: true }); }
-      else bubbleOnly.focus();
-      track('translator_write_chat', { step: 'closed' });
-    });
-    bubbleOnly.addEventListener('click', () => { setSmall(false); field.focus(); track('translator_write_chat', { step: 'opened' }); });
+    // Keep an unsent draft available to the existing feedback/correction flow.
+    field.addEventListener('input', () => { input.value = field.value; grow(); });
     chatForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const value = field.value.trim();
@@ -1881,10 +1954,11 @@
       const helpfulInUse = helpfulVisible && !chat.contains(document.activeElement);
       // Auf der Startseite stehen die Beispiele zuerst: ihr noch nicht erreichtes
       // Eingabefeld soll keinen Chat über den auswählbaren Situationen öffnen.
-      chat.hidden = inputVisible || helpfulInUse || (small && compactCoversResult()) || document.body.dataset.translatorState === 'goal'
-        || (form.hasAttribute('data-chat-after-input') && entryRect.top >= 0);
+      chat.hidden = inputVisible || helpfulInUse || (document.body.dataset.translatorState === 'input' && form.hasAttribute('data-chat-after-input') && entryRect.top >= 0);
       chat.style.bottom = '';
-      chat.classList.toggle('translator-chat-small', small);
+      const viewport = window.visualViewport;
+      const keyboardInset = viewport ? Math.max(0, innerHeight - viewport.height - viewport.offsetTop) : 0;
+      if (keyboardInset) chat.style.bottom = `${keyboardInset + 8}px`;
       panel.style.maxHeight = '';
       panel.style.overflowY = '';
       if (!chat.hidden) {
@@ -1894,8 +1968,7 @@
         if (control?.height && control.top < innerHeight && control.bottom > 0
           && box.left < control.right && box.right > control.left && box.top < control.bottom && box.bottom > control.top) {
           const available = Math.max(56, control.top - 20);
-          if (box.height > available && !chat.contains(document.activeElement)) chat.classList.add('translator-chat-small');
-          else if (box.height > available) {
+          if (box.height > available) {
             panel.style.maxHeight = `${available}px`;
             panel.style.overflowY = 'auto';
           }
@@ -1908,6 +1981,8 @@
     };
     syncChat = () => { if (!positionFrame) positionFrame = requestAnimationFrame(updateChatPosition); };
     new IntersectionObserver(syncChat).observe(input);
+    window.visualViewport?.addEventListener('resize', syncChat, { passive: true });
+    window.visualViewport?.addEventListener('scroll', syncChat, { passive: true });
     addEventListener('scroll', syncChat, { passive: true });
     addEventListener('resize', syncChat, { passive: true });
     syncChat();

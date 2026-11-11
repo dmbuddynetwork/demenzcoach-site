@@ -93,7 +93,8 @@
       if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
       const value = await response.json();
       if (validFixedSafety(value)) return value;
-      const ids = ['act_now','prepare_talk','rephrase','understand','organize','self_care'];
+      // Accept both generations during the coordinated Site/API rollout.
+      const ids = ['choice_1','choice_2','choice_3','act_now','prepare_talk','rephrase','understand','organize','self_care'];
       if (value?.kind !== 'goals' || !Array.isArray(value.goals)
         || !(value.noSituation === true && value.goals.length === 0 || value.noSituation === false && value.goals.length === 3)
         || value.goals.some(g => !ids.includes(g?.goal) || typeof g.label !== 'string' || !g.label.trim() || g.label.length > 64)

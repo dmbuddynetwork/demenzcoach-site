@@ -80,7 +80,7 @@ const server = http.createServer((req, res) => {
             const topMode = document.body.dataset.translatorInputPosition === 'top';
             if (primary.length !== 1) throw Error('Expected exactly one real primary form in document');
             const isBefore = Boolean(primary[0].compareDocumentPosition(output) & Node.DOCUMENT_POSITION_FOLLOWING);
-            if (topMode ? (output.contains(primary[0]) || !isBefore || !primary[0].getBoundingClientRect().height) : !output.contains(primary[0])) throw Error('Primary form is not in its declared live position');
+            if (topMode ? (output.contains(primary[0]) || !isBefore || !primary[0].hidden) : !output.contains(primary[0])) throw Error('Primary form is not in its declared live position');
             const clone = output.cloneNode(true); clone.querySelector('#translator-form')?.remove();
             const data=JSON.parse(document.getElementById('translator-data').textContent),entry=data.entries.find(item=>item.key===key);
             if(!entry)throw Error('Expected fixed catalog key');

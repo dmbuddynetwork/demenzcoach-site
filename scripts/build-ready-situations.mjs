@@ -118,9 +118,10 @@ function renderPage(lang, e) {
   html=html.replace(/<section data-ready-situations="v1"[\s\S]*?<\/section>/g,'');
   const form=html.match(/<form\b[^>]*\bid="translator-form"[^>]*>[\s\S]*?<\/form>/)?.[0];
   if (!form) throw new Error('Missing original app form');
+  html=html.replace(form,()=>form.replace('<form ', '<form hidden '));
   const output=/<div\b[^>]*\bid="translator-result"[^>]*>\s*<\/div>/;
   if (!output.test(html)) throw new Error('Expected one empty shared result container');
-  html=html.replace(output,()=>`<div id="translator-result" class="translator-result">${staticAnswer}</div><noscript><p>${lang==='de'?'Für neue Eingaben aktiviere bitte JavaScript in deinem Browser.':'Please enable JavaScript in your browser to enter another situation.'}</p></noscript><details class="translator-sources"><summary>${ui[lang].sources}</summary><ul>${e.sources.map((href,i)=>`<li><a href="${escape(href)}">${escape(p.sourceLabels[i]||new URL(href).hostname)}</a></li>`).join('')}</ul></details>`);
+  html=html.replace(output,()=>`<div id="translator-result" class="translator-result">${staticAnswer}</div><noscript><p>${lang==='de'?'Für neue Eingaben aktiviere bitte JavaScript in deinem Browser.':'Please enable JavaScript in your browser to enter another situation.'}</p></noscript><details class="translator-sources" hidden><summary>${ui[lang].sources}</summary><ul>${e.sources.map((href,i)=>`<li><a href="${escape(href)}">${escape(p.sourceLabels[i]||new URL(href).hostname)}</a></li>`).join('')}</ul></details>`);
   const other=lang==='de'?'en':'de';
   let languageLinks=0;
   html=html.replace(new RegExp(`<a([^>]*href="/${other}/"[^>]*)>(English|Deutsch)</a>`),(_m,attrs,label)=>{
@@ -164,9 +165,6 @@ for (const lang of ['de','en']) {
     }
     return e;
   });
-  const additions = selected[lang].filter(e=>!e.page.legacySourceSHA256);
-  const examplesLabel = lang === 'de' ? 'Oder wähle ein Beispiel' : 'Or choose an example';
-  const selection = `<section data-ready-situations="v1" class="translator-ready-examples"><details><summary>${examplesLabel}</summary><ul>${additions.map(e=>`<li><a href="${e.page.path}">${escape(e.page.label)}</a></li>`).join('')}</ul></details></section>`;
   for (const rel of [`${lang}/index.html`, toolPath(lang)]) {
     const original = read(rel), data = parse(original);
     for (const e of entries) {
@@ -192,10 +190,10 @@ for (const lang of ['de','en']) {
       .replace(/<label\b[^>]*\bfor="translator-input"[^>]*>[\s\S]*?<\/label>/, () => `<label class="translator-form-label" for="translator-input">${lang === 'de' ? 'Was sagen und tun bei Demenz?' : 'What can I say and do?'}</label><p class="translator-form-intro" id="translator-form-intro">${lang === 'de' ? 'Passende Worte und praktische Tipps für deine Situation.' : 'Find the right words and practical tips for your situation.'}</p>`)
       .replace(/(<textarea\b[^>]*\bid="translator-input"[^>]*\baria-describedby=")([^"]*)(")/, (_match, before, ids, after) => before + ['translator-form-intro', ...ids.split(/\s+/).filter(id => id && id !== 'translator-form-intro')].join(' ') + after)
       .replace(/(<textarea\b[^>]*\bid="translator-input"[^>]*\brows=")[^"]*(")/, (_match, before, after) => before + '2' + after) + close);
-    if (html.includes('data-ready-situations="v1"')) html = html.replace(/<section data-ready-situations="v1"[\s\S]*?<\/section>/,()=>selection);
+    if (html.includes('data-ready-situations="v1"')) html = html.replace(/<section data-ready-situations="v1"[\s\S]*?<\/section>/,'');
     else {
       if (!/<form\b[^>]*\bid="translator-form"/.test(html)) throw new Error(`Missing form: ${rel}`);
-      html = html.replace(/(<form\b[^>]*\bid="translator-form"[^>]*>[\s\S]*?<\/form>)/, m=>m+selection);
+      // The main situation cards already provide examples; no duplicate example block.
     }
     pending.set(rel, html);
   }

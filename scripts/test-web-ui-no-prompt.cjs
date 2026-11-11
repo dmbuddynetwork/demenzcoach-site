@@ -99,16 +99,11 @@ const answer = {
         await page.locator('.translator-ai-answer').waitFor();
         assert.equal(requests.length, 2); assert.equal(requests[1].body.goal.label, labels[language][0]);
         await page.locator('.translator-ai-avoid').scrollIntoViewIfNeeded();
-        await page.locator('.translator-chat-open').waitFor({ state: 'hidden' });
-        assert.equal(await page.locator('.translator-chat-open').isVisible(), false, 'Compact avatar cannot cover mobile answer text');
+        assert.equal(await page.locator('.translator-chat-input').isVisible(), true, 'The composer is directly editable');
         if (evidence) await page.screenshot({ path: path.join(evidence, `answer-${language}-390.png`) });
         await page.setViewportSize({ width: 1280, height: 900 });
-        await page.locator('.translator-chat-open').click();
         assert.equal(await page.locator('.translator-chat-panel').isVisible(), true);
         await page.setViewportSize({ width: 390, height: 844 });
-        await page.locator('.translator-chat-close').click();
-        await page.waitForFunction(() => document.activeElement.id === 'translator-result');
-        await page.locator('.translator-chat-open').waitFor({ state: 'hidden' });
         if (language === 'de') {
           await submit(duplicateText); await page.locator('.translator-ai-answer').waitFor();
           assert.equal(await page.locator('#translator-result .safety-urgent').count(), 1, 'Identical complete warning from local and model paths shown once');
@@ -150,6 +145,7 @@ const answer = {
         if (evidence) await page.locator('#translator-result').screenshot({ path: path.join(evidence, `fixed-concern-${language}-390.png`) });
         const customSafety = async label => {
           await submit('CustomSafetyFixture'); await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+          await page.locator('.translator-own-goal-details > summary').click();
           await page.locator('.translator-ai-goals input').fill(label);
           await page.locator('.translator-ai-goals form button').click();
         };
@@ -193,7 +189,7 @@ const answer = {
           await page.locator('.translator-feedback').waitFor();
           const oldWarning = await page.locator('[data-translator-local-safety="true"]').elementHandle();
           assert.ok(oldWarning);
-          await page.locator('#translator-input').fill('ConcernGoalsFixture');
+          await page.locator('.translator-chat-input').fill('ConcernGoalsFixture');
           await page.locator('.translator-feedback').getByRole('button', { name: /Nein/ }).click();
           await page.locator('.translator-ai-goal-retry').click();
           await page.locator('.translator-fixed-concern').waitFor();
@@ -203,7 +199,7 @@ const answer = {
         }
         assert.ok(requests.every(request => request.body.share === false)); assert.deepEqual(errors, []);
         report.languages.push({ language, existingGoalContract: true, explicitGoalBound: true, narrowOverlayPrevented: true,
-          deliberateChatOpen: true, closeFocusPreserved: true, warningsChecked: language === 'de', retryWarningPreserved: true,
+          directComposer: true, visibleLegalLinks: true, warningsChecked: language === 'de', retryWarningPreserved: true,
           retryFocusConnected: true, fixedConcernBothPhases: true, fixedConcernRetry: true, existingUrgentBothPhases: true,
           provisionalWarningReplacementChecked: language === 'de', requestCount: requests.length, pageErrors: errors });
       } finally { await context.close(); }

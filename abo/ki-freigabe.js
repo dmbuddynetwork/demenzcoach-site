@@ -82,7 +82,7 @@
     card.append(node(doc, 'p', en ? 'Safety information and public guides remain free.' : 'Sicherheitshinweise und öffentliche Ratgeber bleiben kostenlos.'));
     if (signup && config.signIn?.emailLink === true) {
       import('/abo/inline-signup.js').then(({ mountInlineSignup }) => {
-        if (card.isConnected) return mountInlineSignup(card, { bonus, en, purpose: enabled() ? 'intro' : 'invitation', returnTo: returnPath(), onBegin: () => remember(sentence) });
+        if (card.isConnected) return mountInlineSignup(card, { bonus, en, purpose: enabled() ? 'intro' : 'invitation', creditActive: enabled() && access?.enabled === true && Number.isInteger(access?.registeredAdditional) && access.registeredAdditional > 0, returnTo: returnPath(), onBegin: () => remember(sentence) });
       }).catch(() => { /* The existing accessible account link remains usable. */ });
     }
     exp()?.track(signup ? 'web_signup_shown' : 'web_paywall_shown'); return card;

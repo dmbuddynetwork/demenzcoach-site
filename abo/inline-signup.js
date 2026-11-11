@@ -2,7 +2,7 @@ import { webAuth } from './web-auth.js';
 import { createEmailAccess } from './email-auth.js';
 import { createGoogleAccess } from './google-auth.js';
 import { createSignupOffer } from './signup-offer-view.js';
-export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, purpose = 'intro' }) {
+export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, purpose = 'intro', creditActive = false }) {
   const config = window.DEMENZ_ABO_CONFIG;
   if (config?.signIn?.emailLink !== true) return;
   const { auth } = await webAuth({ anonymous: false });
@@ -13,7 +13,7 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
   const email = createEmailAccess({ webAuth, config });
   const google = createGoogleAccess({ webAuth, config });
   let dismissed = false;
-  const view = createSignupOffer({ additionalAnswers: bonus, locale: en ? 'en' : 'de', googleAvailable: config.signIn?.google === true, purpose,
+  const view = createSignupOffer({ additionalAnswers: bonus, locale: en ? 'en' : 'de', googleAvailable: config.signIn?.google === true, purpose, creditActive,
     onBegin,
     async onEmail(address) { await email.begin({ email: address, returnTo, intent: 'signin' }); return { sent: true }; },
     async onGoogle() { const result = await google.begin(); if (!dismissed && view.isConnected) window.location.assign(returnTo); return result; },
