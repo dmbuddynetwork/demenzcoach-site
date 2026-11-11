@@ -1,6 +1,6 @@
-// Demenz-Übersetzer (Oberfläche). Der eingegebene Satz bleibt im Browser: Er wird
-// nicht gespeichert, nicht gesendet und nie an Analytics übergeben. Gemessen wird
-// nach Einwilligung höchstens ein fester Ergebnis-Schlüssel.
+// Demenz-Übersetzer (Oberfläche). Freitext geht zur KI-Zielklärung und nach der
+// Zielwahl zur KI-Antwort, nie an Analytics oder die öffentliche Sammlung.
+// Gemessen wird nach Einwilligung höchstens ein fester Ergebnis-Schlüssel.
 (() => {
   const dataElement = document.getElementById('translator-data');
   const form = document.getElementById('translator-form');
@@ -411,7 +411,6 @@
       question.focus({ preventScroll: true });
     };
     const saveStatus = element('span', { attributes: { role: 'status', 'aria-live': 'polite' } });
-    if (helpfulItem) wrapper.append(element('small', { className: 'translator-helpful-notice', text: helpfulCopy.notice }));
     wrapper.append(withIcon(button('', 'translator-copy', answer(true)), '👍', helpfulItem ? helpfulCopy.yes : 'Ja'), withIcon(button('', 'translator-copy', answer(false)), '👎', 'Nein'), saveStatus);
     return wrapper;
   };
@@ -487,10 +486,20 @@
   };
   // Der gehörte Satz als weiße Sprechblase mit Zeichnung daneben, wie auf den App-Store-Bildern
   // (Daniel, 8. Nov: „stell das in eine Sprechblase, als würde das gesagt werden“).
+  const fallbackIllustration = '/assets/zeichnungen/chat-helferin.webp';
   const saidBlock = (says, entry, heading) => {
-    const art = entry?.image && !entry.safetyOnly && !entry.selfCare
-      ? element('img', { className: 'translator-said-art', attributes: { src: entry.image, alt: '', width: String(entry.imageWidth ?? 480), height: String(entry.imageHeight ?? 400), decoding: 'async' } })
+    const art = !entry?.safetyOnly
+      ? element('img', { className: 'translator-said-art', attributes: { src: entry?.image || fallbackIllustration, alt: '', width: String(entry?.imageWidth ?? (entry?.image ? 480 : 200)), height: String(entry?.imageHeight ?? (entry?.image ? 400 : 200)), decoding: 'async' } })
       : null;
+    if (art) {
+      let fallbackUsed = !entry?.image;
+      art.addEventListener('error', () => {
+        if (fallbackUsed) { art.hidden = true; return; }
+        fallbackUsed = true;
+        art.src = fallbackIllustration;
+        art.width = 200; art.height = 200;
+      });
+    }
     heading.classList.add('translator-said-bubble');
     return element('div', { className: art ? 'translator-said translator-said-with-art' : 'translator-said' }, [
       element('div', { className: 'translator-said-text' }, [element('p', { className: 'translator-said-label', text: ui?.lang === 'en' ? 'Your input:' : ui ? tr('Du hörst:') : 'Deine Eingabe:' }), heading]),
@@ -943,7 +952,7 @@
     }
     return null;
   };
-  const aiAnswer = (result, { saved = false, allowHelpful = true } = {}) => {
+  const aiAnswer = (result, { saved = false, allowHelpful = true, goal } = {}) => {
     const nodes = [];
     // Ohne Stufen (englische Seiten): bei jedem Sicherheitshinweis der KI derselbe feste Hinweis.
     const ungraded = ui?.gradedSafety === false && result.safetyLevel !== 'standard';
@@ -951,6 +960,7 @@
     if (safetyNote) nodes.push(safetyNote);
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
     nodes.push(element('p', { className: 'translator-ai-label', text: saved ? helpfulCopy.history : 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
+    if (goal) nodes.push(element('p', { className: 'translator-chosen-ai-goal', text: `${ui?.lang === 'en' ? 'Your goal' : 'Dein Ziel'}: ${goal.label}` }));
     const first = element('h3', { className: 'translator-step', text: 'Was dahintersteckt', attributes: { tabindex: '-1' } });
     nodes.push(first, element('p', { className: 'translator-meaning', text: result.meaning }));
     nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du sagen' }));
@@ -963,7 +973,6 @@
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
     nodes.push(notesCard(disclaimer(true)));
     // Anonymes Teilen gibt es vorerst nur auf Deutsch (der Server bietet es sonst auch nicht an).
-    if (ui?.anonShare !== false && result.share?.sentence && result.share?.token) nodes.push(shareBox(result.share));
     if (!saved && feedbackCopy && result.safetyLevel === 'standard') {
       nodes.push(feedbackBlock({ key: 'ai', requestID: result.requestID }, null, { allowShare: false, helpfulItem: helpfulCopy && allowHelpful ? helpfulAI(result) : null, onContinue: () => {
         correctionRequestID = result.requestID || '';
@@ -1041,8 +1050,9 @@
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, allowHelpful = true } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, allowHelpful = true, goal } = {}) => {
     if (!ai || !text || text.length < 2) return null;
+    if (!goal && !localSafetyHit) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
     const waiting = aiWaiting();
@@ -1056,7 +1066,7 @@
       status.textContent = auto ? '' : tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
-      const result = await ai.ask(text, { formal: personal.formal, correctionOf, requestID: operationID });
+      const result = await ai.ask(text, { formal: personal.formal, correctionOf, requestID: operationID, goal });
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
@@ -1066,7 +1076,7 @@
       }
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
         window.DemenzKiFreigabe?.noteAnswer(result);
-        const { node, focus, top } = aiAnswer(result, { allowHelpful: allowHelpful && !localSafetyHit });
+        const { node, focus, top } = aiAnswer(result, { allowHelpful: allowHelpful && !localSafetyHit, goal });
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
         output.querySelector('.translator-near-group')?.remove();
@@ -1158,6 +1168,83 @@
 
   // hint: ein schwacher Treffer der festen Liste. Die KI antwortet passend zur Eingabe; der Treffer
   // steht als erster Vorschlag unter „Meinst du vielleicht“ und gibt der Sprechblase seine Zeichnung.
+  const aiGoalBox = (text, source, onFail, { auto = false, allowHelpful = true } = {}) => {
+    const en = ui?.lang === 'en';
+    const box = element('section', { className: 'translator-ai translator-ai-goals' });
+    const heading = element('h2', { text: en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?' });
+    const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status', 'aria-live': 'polite' } });
+    const choices = element('div', { className: 'translator-ai-goal-choices' });
+    let busy = false;
+    const select = (goal) => {
+      if (!box.isConnected || busy) return;
+      setViewState('answer');
+      box.replaceWith(aiBox(text, source, onFail, { auto: true, allowHelpful, goal }));
+    };
+    const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'Describe what you need help with' : 'Beschreibe, wobei du Hilfe möchtest' } });
+    const ownLabel = element('label', {}, [element('span', { text: en ? 'Or describe your own goal' : 'Oder beschreibe dein eigenes Ziel' }), own]);
+    const ownForm = element('form', { className: 'translator-own-goal' }, [ownLabel, button(en ? 'Answer for my goal' : 'Antwort zu meinem Ziel', 'button', () => {})]);
+    ownForm.querySelector('button').type = 'submit';
+    ownForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const label = own.value.trim();
+      if (label.length < 3) { status.textContent = en ? 'Please describe your goal a little more.' : 'Beschreibe dein Ziel bitte etwas genauer.'; own.focus(); return; }
+      if (ownForm.reportValidity()) select({ id: 'custom', label });
+    });
+    const load = async () => {
+      if (busy) return;
+      busy = true; box.dataset.goalState = 'loading'; box.setAttribute('aria-busy', 'true'); retry.disabled = true; choices.replaceChildren(); ownForm.hidden = true;
+      status.textContent = en ? 'The AI is finding goals for your situation …' : 'Die KI formuliert Ziele für deine Situation …';
+      let result;
+      try { result = typeof ai.askGoals === 'function' ? await ai.askGoals(text, { formal: personal.formal }) : { kind: 'error' }; }
+      catch { result = { kind: 'error' }; }
+      if (!box.isConnected) return;
+      busy = false; box.setAttribute('aria-busy', 'false'); retry.disabled = false;
+      if (result.kind === 'safety') {
+        const note = urgentNote(data.safetySignals.text);
+        box.remove(); output.prepend(note); setViewState('answer');
+        note.tabIndex = -1; note.focus({ preventScroll: true });
+        note.scrollIntoView({ behavior: 'instant', block: 'start' });
+        return;
+      }
+      if (result.kind === 'goals' && result.noSituation) {
+        box.dataset.goalState = 'needs-situation';
+        status.textContent = en ? 'What happened? Please briefly describe the situation first.' : 'Was ist passiert? Beschreibe bitte zuerst kurz die Situation.';
+        retry.hidden = true;
+        if (!input.value.trim()) { input.value = text; grow(); }
+        return;
+      }
+      ownForm.hidden = false;
+      if (result.kind === 'goals') {
+        box.dataset.goalState = 'ready';
+        status.textContent = en ? 'Choose a goal. Your answer will follow your choice.' : 'Wähle ein Ziel. Danach richtet sich deine Antwort.';
+        choices.replaceChildren(...result.goals.map(g => button(g.label, 'translator-ai-goal-choice', () => select({ id: g.goal, label: g.label }))));
+        retry.hidden = true;
+      } else {
+        box.dataset.goalState = 'unavailable';
+        status.textContent = en ? 'The AI goals could not be loaded. Try again or describe your goal.' : 'Die KI-Ziele konnten nicht geladen werden. Versuche es erneut oder beschreibe dein Ziel.';
+        retry.hidden = false;
+      }
+    };
+    const retry = button(en ? 'Ask the AI for goals' : 'Ziele mit KI klären', 'button translator-ai-goal-retry', () => { void load(); });
+    box.append(heading, status, choices, ownForm, retry);
+    ownForm.hidden = true;
+    if (auto) requestAnimationFrame(() => { void load(); });
+    return box;
+  };
+
+  const renderTypedGoal = (typed, hint) => {
+    activePublicRoute = null;
+    setViewState('goal');
+    const heading = element(homeHeading ? 'h1' : 'h2', { text: `„${typed}“`, attributes: { tabindex: '-1' } });
+    output.replaceChildren(saidBlock(typed, hint, heading), aiBox(typed, 'typed_goal', () => {}, { auto: true }));
+    output.hidden = false;
+    document.body.classList.add('translator-has-result');
+    document.body.classList.remove('translator-answers-seen');
+    formBelow({ open: true });
+    focusResult(heading);
+    output.scrollIntoView({ behavior: 'instant', block: 'start' });
+  };
+
   const renderUnknown = ({ safetyHit, typed, hint = null, contextual = false }) => {
     setViewState('answer');
     const nodes = [];
@@ -1547,6 +1634,17 @@
     if (keepInputAtTop) { input.value = ''; grow(); }
     typedCount += 1;
     const { entry, alternatives, safetyHit, feeling, also, mood, context, protection } = core.match(text, data);
+    // Every normal typed input gets AI goals, even when a catalog keyword matches.
+    // Deliberately opened static pages keep their reviewed fixed goal flow.
+    if (ai && !safetyHit && !entry?.safetyOnly && protection !== 'self') {
+      const imageMatch = entry && (core.normalize(entry.says) === core.normalize(text)
+        || (entry.variants ?? []).some(value => core.normalize(value) === core.normalize(text))
+        || (core.rank(text, [entry])[0]?.score ?? 0) >= strongScore) ? entry : null;
+      renderTypedGoal(text, imageMatch);
+      setHash('');
+      track('translator_result', { result_key: 'none', input_source: 'typed', safety_hint: 'no' });
+      return;
+    }
     if (protection === 'self') {
       render(entry, { safetyHit, typed: text, protection });
       setHash(entry.key);

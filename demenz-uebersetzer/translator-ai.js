@@ -10,7 +10,7 @@
   // Englische Seiten (<html lang="en">) bitten um eine englische Antwort. Deutsch schickt kein Sprachfeld.
   const language = typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'en' : '';
 
-  const ask = async (text, { formal = false, correctionOf = "", requestID = "" } = {}) => {
+  const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal } = {}) => {
     if (!requestID && root.DemenzKiFreigabe?.enabled()) requestID = root.crypto.randomUUID();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
@@ -21,9 +21,8 @@
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}) },
-        body: JSON.stringify(language === 'en'
-          ? { text: String(text).trim().slice(0, 200), formal: false, language: 'en' }
-          : { text: String(text).trim().slice(0, 200), formal: formal === true }),
+        body: JSON.stringify({ text: String(text).trim().slice(0, 200), formal: language === 'en' ? false : formal === true,
+          ...(language ? { language } : {}), ...(goal ? { goal } : {}), share: false }),
         signal: controller.signal
       });
       if (response.status === 429) return { kind: 'error', reason: 'busy' };
@@ -80,5 +79,25 @@
     }
   };
 
-  root.DemenzTranslatorAI = { ask, share, endpoint };
+  const askGoals = async (text, { formal = false } = {}) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(`${endpoint}/goals`, { method: 'POST', mode: 'cors', credentials: 'omit',
+        referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: String(text).trim().slice(0, 200), formal: language === 'en' ? false : formal === true,
+          ...(language ? { language } : {}), share: false }), signal: controller.signal });
+      if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
+      const value = await response.json();
+      if (value?.kind === 'safety' && value.safetyLevel === 'urgent') return value;
+      const ids = ['act_now','prepare_talk','rephrase','understand','organize','self_care'];
+      if (value?.kind !== 'goals' || !Array.isArray(value.goals)
+        || !(value.noSituation === true && value.goals.length === 0 || value.noSituation === false && value.goals.length === 3)
+        || value.goals.some(g => !ids.includes(g?.goal) || typeof g.label !== 'string' || !g.label.trim() || g.label.length > 64)
+        || new Set(value.goals.map(g => g.goal)).size !== value.goals.length) return { kind: 'error', reason: 'unavailable' };
+      return value;
+    } catch { return { kind: 'error', reason: 'unavailable' }; }
+    finally { clearTimeout(timer); }
+  };
+  root.DemenzTranslatorAI = { ask, askGoals, share, endpoint };
 })(typeof window !== 'undefined' ? window : globalThis);

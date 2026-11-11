@@ -705,3 +705,23 @@ body.einfach[data-translator-input-position="top"] #translator-form .translator-
   margin: -2px 0 10px !important; color: var(--e-muted) !important;
   font-size: .9375rem !important; font-weight: 400 !important; line-height: 1.4 !important;
 }
+
+/* Give the goal question and each answer section their own readable space. */
+body.einfach .translator-ai-goals { margin: 24px 0 32px; padding: 24px; background: #fff; border: 1px solid var(--e-line); border-radius: 20px; }
+body.einfach .translator-ai-goals h2 { margin: 0 0 14px !important; line-height: 1.35; }
+body.einfach .translator-ai-goals :is(.translator-own-goal, .translator-ai-goal-retry)[hidden] { display: none !important; }
+body.einfach .translator-ai-goal-choices { display: grid; gap: 12px; margin: 20px 0 24px; }
+body.einfach .translator-ai-goal-choice { width: 100%; min-height: 56px; padding: 15px 18px; text-align: left; white-space: normal; overflow-wrap: anywhere; border: 1px solid var(--e-line); border-radius: 14px; background: var(--e-lavender, #eeebf8); font: inherit; font-weight: 700; line-height: 1.45; color: var(--e-purple); cursor: pointer; }
+body.einfach .translator-ai-goal-choice:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; }
+body.einfach .translator-own-goal { display: grid; gap: 12px; padding-top: 20px; border-top: 1px solid var(--e-line); }
+body.einfach .translator-own-goal label { display: grid; gap: 10px; font-weight: 600; }
+body.einfach .translator-own-goal input { min-width: 0; width: 100%; box-sizing: border-box; padding: 14px; border: 1px solid var(--e-line); border-radius: 12px; font: inherit; }
+body.einfach .translator-ai-answer { margin: 24px 0 !important; }
+body.einfach #translator-result .translator-ai-answer > .translator-step { margin: 28px 0 12px !important; padding: 0 !important; font-size: 1.125rem !important; line-height: 1.4 !important; }
+body.einfach .translator-ai-answer > .translator-meaning { margin: 0 0 24px !important; line-height: 1.65 !important; }
+body.einfach .translator-ai-answer .translator-phrases { margin: 0 0 28px !important; }
+body.einfach .translator-ai-answer .translator-phrase { padding: 16px 18px !important; line-height: 1.6 !important; }
+body.einfach .translator-ai-answer > .translator-ai-avoid { margin: 28px 0 !important; line-height: 1.6 !important; }
+body.einfach .translator-ai-answer > .translator-notes { margin-top: 28px !important; }
+body.einfach .translator-chosen-ai-goal { margin: 16px 0 24px !important; padding: 14px 16px; background: #edf4e9; border-radius: 12px; font-weight: 700; line-height: 1.5; overflow-wrap: anywhere; }
+@media (max-width: 480px) { body.einfach .translator-ai-goals { padding: 20px 16px; } }

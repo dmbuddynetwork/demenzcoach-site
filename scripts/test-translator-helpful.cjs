@@ -49,6 +49,9 @@ const server = http.createServer((req, res) => {
         }, { helpfulKey });
         await context.route('**/*', route => {
           const request = route.request(), url = new URL(request.url());
+          if (url.pathname.endsWith('/translator-web/goals')) return route.fulfill({ json: { kind: 'goals', noSituation: false, goals: [
+            { goal: 'act_now', label: 'Respond calmly now' }, { goal: 'understand', label: 'Understand the situation' }, { goal: 'organize', label: 'Plan the next step' }
+          ] } });
           if (url.pathname.endsWith('/translator-web/feedback')) { feedback.push(request.postDataJSON()); return route.fulfill({ json: { ok: true } }); }
           if (url.pathname.endsWith('/translator-web')) {
             const body = request.postDataJSON(); sent.push(body);
@@ -72,9 +75,11 @@ const server = http.createServer((req, res) => {
       const overview = () => page.locator('.translator-helpful');
       const open = async ({ ai = false, language = 'de' } = {}) => {
         await home(language);
-        await page.locator('#translator-input').fill(ai ? language === 'en' ? 'The curtain hums like a refrigerator. QA_PRIVATE_INPUT' : 'Der Vorhang summt wie ein Kühlschrank. QA_PRIVATE_INPUT' : language === 'en' ? 'Where is my mother?' : 'Wo ist meine Mutter?');
-        await page.locator('#translator-input').press('Enter');
-        if (!ai && language === 'de') await page.locator('.translator-goal').first().click();
+        if (ai) {
+          await page.locator('#translator-input').fill(language === 'en' ? 'The curtain hums like a refrigerator. QA_PRIVATE_INPUT' : 'Der Vorhang summt wie ein Kühlschrank. QA_PRIVATE_INPUT');
+          await page.locator('#translator-input').press('Enter');
+          await page.locator('.translator-ai-goal-choice').first().click();
+        } else await page.goto(base + '/de/?situation=mutter&ziel=jetzt', { waitUntil: 'domcontentloaded' });
         await page.locator('.translator-feedback').first().waitFor();
       };
       const mark = async (language = 'de') => { await page.getByRole('button', { name: language === 'en' ? 'Yes, save' : 'Ja, merken', exact: true }).click();
@@ -85,7 +90,7 @@ const server = http.createServer((req, res) => {
       assert.equal(await store(), null); assert.equal(await overview().isVisible(), false);
       checks++;
       await open();
-      await page.getByText('„Ja, merken“ speichert die Antwort in diesem Browser, sichtbar für alle, die ihn nutzen.', { exact: true }).waitFor();
+      assert.equal(await page.locator('.translator-helpful-notice').count(), 0);
       assert.equal(await store(), null); await mark();
       const catalog = await store(); assert.deepEqual(catalog.items, [{ kind: 'catalog', language: 'de', key: 'mutter', goal: 'jetzt' }]); checks++;
       await open(); await mark(); assert.equal((await store()).items.length, 1); checks++;
@@ -190,6 +195,7 @@ const server = http.createServer((req, res) => {
         await home(); await overview().getByRole('button', { name: 'Alle hilfreichen Antworten löschen', exact: true }).click();
         for (const level of ['concern', 'urgent', 'safety']) {
           safetyLevel = level; await home(); await page.locator('#translator-input').fill('Der Vorhang summt wie ein Kühlschrank.'); await page.locator('#translator-input').press('Enter');
+          await page.locator('.translator-ai-goal-choice').first().click();
           await page.waitForFunction(() => !document.querySelector('.translator-ai'));
           assert.equal(await page.getByRole('button', { name: 'Ja, merken', exact: true }).count(), 0); assert.equal(await store(), null);
         } safetyLevel = 'standard'; checks++;
