@@ -6,7 +6,7 @@ const current=fs.readFileSync(require('node:path').join(__dirname,'../demenz-ueb
 const labels=['Meinen Anteil freundlich behalten','Verstehen, was sie gerade braucht','Eine andere gemeinsame Tätigkeit finden'];
 const slots=['choice_1','choice_2','choice_3'],legacy=['act_now','understand','organize'];
 async function check(source,ids){let payload={kind:'goals',noSituation:false,goals:ids.map((goal,i)=>({goal,label:labels[i]}))};const requests=[];
- const context=vm.createContext({AbortController,setTimeout,clearTimeout,fetch:async(url,options)=>{requests.push({url,options,body:JSON.parse(options.body)});return {ok:true,json:async()=>payload};}});
+ const context=vm.createContext({AbortController,TextEncoder,setTimeout,clearTimeout,fetch:async(url,options)=>{requests.push({url,options,body:JSON.parse(options.body)});return {ok:true,json:async()=>payload};}});
  vm.runInContext(source,context);const api=context.DemenzTranslatorAI,result=await api.askGoals('Eine persönliche Situation.');
  if(result.kind==='goals'){
   payload={kind:'answer',meaning:'Fixture only.',phrases:['Ein Satz.','Zweiter Satz.','Dritter Satz.'],avoid:'Nicht so.',nextStep:'Ein Schritt.',safetyLevel:'standard'};

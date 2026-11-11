@@ -15,17 +15,18 @@
   const normalizedText = text => String(text).normalize('NFC').trim();
   const bodyFor = (text, { formal = false, goal } = {}) => ({ text,
     formal: language === 'en' ? false : formal === true, ...(language ? { language } : {}), ...(goal ? { goal } : {}), share: false });
-  // Used before submitting an exact continuation: never clip the previous text or reply.
+  // Shared by goals and answers: transmit the complete normalized text or reject it.
   const requestIssue = (text, options = {}) => {
     const value = normalizedText(text);
     if (Array.from(value).length > 200) return 'text_too_long';
     if (new TextEncoder().encode(JSON.stringify(bodyFor(value, options))).byteLength > 2048) return 'body_too_large';
     return '';
   };
-  const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal, exactText = false } = {}) => {
+  const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal } = {}) => {
     const value = normalizedText(text);
-    if (exactText) { const issue = requestIssue(value, { formal, goal }); if (issue) return { kind: 'error', reason: issue }; }
-    const payload = bodyFor(exactText ? value : Array.from(value).slice(0, 200).join(''), { formal, goal });
+    const issue = requestIssue(value, { formal, goal });
+    if (issue) return { kind: 'error', reason: issue };
+    const payload = bodyFor(value, { formal, goal });
     if (!requestID && root.DemenzKiFreigabe?.enabled()) requestID = root.crypto.randomUUID();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
@@ -103,13 +104,15 @@
   };
 
   const askGoals = async (text, { formal = false } = {}) => {
+    const textValue = normalizedText(text);
+    const issue = requestIssue(textValue, { formal });
+    if (issue) return { kind: 'error', reason: issue };
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 15000);
     try {
       const response = await fetch(`${endpoint}/goals`, { method: 'POST', mode: 'cors', credentials: 'omit',
         referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: String(text).trim().slice(0, 200), formal: language === 'en' ? false : formal === true,
-          ...(language ? { language } : {}), share: false }), signal: controller.signal });
+        body: JSON.stringify(bodyFor(textValue, { formal })), signal: controller.signal });
       if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
       const value = await response.json();
       if (validFixedSafety(value)) return value;

@@ -17,6 +17,15 @@ const answer={kind:'answer',meaning:'Fixture context.',phrases:['Ein Satz.','Noc
  let before=requests.length;assert.equal((await api.ask('🙂'.repeat(201),{exactText:true})).reason,'text_too_long');assert.equal(requests.length,before);checks++;
  assert.equal(api.requestIssue('\u0000'.repeat(200),{goal:{id:'custom',label:'\u0000'.repeat(160)}}),'body_too_large');checks++;
  for(const value of [answer,{kind:'safety',safetyLevel:'concern',message:'Warning.'},{kind:'safety',safetyLevel:'urgent',message:'Warning.'},{kind:'off_topic'}]){response=value;assert.equal((await api.ask('Original')).kind,value.kind);checks++;}
- assert.ok(requests.every(r=>new URL(r.url).search==='?response_contract=clarification-v1'));
+ const emojiText='Neue Situation '+'🙂'.repeat(90)+'\nSie ruft neuerdings öfter nach mir.';
+ assert.equal([...emojiText].length,141);assert.equal(emojiText.length,231);
+ const goals={kind:'goals',noSituation:false,goals:[{goal:'act_now',label:'A'},{goal:'understand',label:'B'},{goal:'organize',label:'C'}]};
+ for(const fullText of [emojiText,'e\u0301'.repeat(200)]){
+  response=goals;assert.equal((await api.askGoals(fullText,{formal:true})).kind,'goals');const goalsBody=requests.at(-1).body;
+  response=answer;await api.ask(fullText,{formal:true,goal});const answerBody=requests.at(-1).body;
+  assert.equal(goalsBody.text,fullText.normalize('NFC'));assert.equal(answerBody.text,goalsBody.text);assert.equal(goalsBody.formal,language==='de');assert.equal(goalsBody.language,language.startsWith('en')?'en':undefined);checks++;
+ }
+ for(const method of ['askGoals','ask']){const before=requests.length;assert.equal((await api[method]('🙂'.repeat(201))).reason,'text_too_long');assert.equal(requests.length,before);checks++;}
+ assert.ok(requests.every(r=>new URL(r.url).pathname.endsWith('/goals')?new URL(r.url).search==='':new URL(r.url).search==='?response_contract=clarification-v1'));
  assert.ok(requests.every(r=>r.body.share===false&&r.options.credentials==='omit'&&r.options.referrerPolicy==='no-referrer'));
 }console.log(JSON.stringify({passed:true,checks,providerCalls:0}));})().catch(e=>{console.error(e);process.exitCode=1;});
