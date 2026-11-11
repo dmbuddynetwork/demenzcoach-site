@@ -2,8 +2,11 @@
 // Netzwerk nur zu unserem Backend (DEMENZ_ABO_CONFIG.endpoint), zu Firebase Auth und zu Stripe.
 import { createPaymentStatusController, paymentStatusText } from "./payment-status.js";
 import { emailAccountURL } from "./email-auth.js";
-import { createHostedCheckoutRedirect } from "./checkout-redirect.js";
-const redirectHostedCheckout = createHostedCheckoutRedirect((url) => location.assign(url));
+import { createHostedCheckoutRedirect, reserveCheckoutWindow } from "./checkout-redirect.js";
+const redirectHostedCheckout = createHostedCheckoutRedirect((url, attempt) => {
+  if (attempt?.paymentWindow) attempt.paymentWindow.navigate(url);
+  else location.assign(url);
+});
 const config = window.DEMENZ_ABO_CONFIG;
 const firebaseVersion = "12.16.0";
 const $ = (id) => document.getElementById(id);
@@ -28,6 +31,7 @@ const state = {
 
 const steps = ["plan", "account", "pay", "done", "already"];
 function invalidateCheckout() {
+  state.checkoutAttempt?.paymentWindow?.discard();
   state.checkoutGeneration += 1;
   state.checkoutAttempt = null;
   state.checkout = null;
@@ -128,15 +132,18 @@ async function loadOffer() {
   }
 }
 $("plan-next").addEventListener("click", async () => {
+  if (currentAttempt(state.checkoutAttempt)) { state.checkoutAttempt.paymentWindow?.focus(); return; }
+  const preparedWindow = state.user?.email && state.offer?.checkoutMode === "hosted" ? reserveCheckoutWindow(window) : undefined;
   track("begin_checkout", { plan: state.plan, source: state.source }, { event: "InitiateCheckout" });
-  await ensureFirebase();
-  if (state.user) return goToPay();
-  // Wie Noom und BetterMe: erst bezahlen, Konto danach. Ein stilles Gast-Konto trägt den Kauf, der E-Mail-Zugang kann danach verknüpft werden.
   try {
+    await ensureFirebase();
+    if (state.user) return goToPay(preparedWindow);
+    // Das Gast-Konto trägt den Kauf; ein E-Mail-Zugang kann danach verknüpft werden.
     state.user = (await state.firebase.signInAnonymously(state.auth)).user;
     track("sign_up", { method: "guest" });
     return goToPay();
   } catch {
+    preparedWindow?.discard();
     refreshEmailEntry(); show("account");
   }
 });
@@ -202,11 +209,17 @@ $("email-login").addEventListener("click", refreshEmailEntry);
 refreshEmailEntry();
 
 // --- Schritt 3: Bezahlen -------------------------------------------------------------------------
-function goToPay() {
+function goToPay(preparedWindow) {
+  if (currentAttempt(state.checkoutAttempt)) {
+    if (preparedWindow !== state.checkoutAttempt.paymentWindow) preparedWindow?.discard();
+    state.checkoutAttempt.paymentWindow?.focus();
+    return;
+  }
   show("pay");
   const who = state.user.isAnonymous ? "" : (state.user.email || "");
   $("signed-in-as").textContent = who ? `Angemeldet als ${who}` : "";
-  if (state.user.email) return startCheckout();
+  if (state.user.email) return startCheckout(undefined, preparedWindow);
+  preparedWindow?.discard();
   $("email-block").hidden = false;
   $("pay-block").hidden = true;
   // E-Mail aus dem Fragebogen (nur in diesem Tab gemerkt) vorausfüllen.
@@ -218,9 +231,15 @@ $("email-next").addEventListener("click", () => {
   startCheckout(email);
 });
 
-async function startCheckout(email) {
+async function startCheckout(email, preparedWindow) {
+  if (currentAttempt(state.checkoutAttempt)) {
+    if (preparedWindow !== state.checkoutAttempt.paymentWindow) preparedWindow?.discard();
+    state.checkoutAttempt.paymentWindow?.focus();
+    return;
+  }
   invalidateCheckout();
-  const attempt = { generation: state.checkoutGeneration, plan: state.plan, user: state.user };
+  const paymentWindow = preparedWindow !== undefined ? preparedWindow : state.offer?.checkoutMode === "hosted" ? reserveCheckoutWindow(window) : null;
+  const attempt = { generation: state.checkoutGeneration, plan: state.plan, user: state.user, paymentWindow };
   state.checkoutAttempt = attempt;
   $("email-block").hidden = true;
   $("pay-block").hidden = state.offer?.checkoutMode === "hosted";
@@ -230,10 +249,10 @@ async function startCheckout(email) {
   if (receiptEmail) $("signed-in-as").textContent = `Bestätigung und Zugang an ${receiptEmail}`;
   try {
     const token = await attempt.user.getIdToken();
-    if (!currentAttempt(attempt)) return;
+    if (!currentAttempt(attempt)) throw new Error("checkout_attempt_changed");
     const deal = attempt.plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
     await window.DemenzTeller?.ready;
-    if (!currentAttempt(attempt)) return;
+    if (!currentAttempt(attempt)) throw new Error("checkout_attempt_changed");
     const session = await api("/session", {
       method: "POST",
       token,
@@ -241,14 +260,43 @@ async function startCheckout(email) {
         ...window.DemenzTeller?.attribution(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
-    if (!currentAttempt(attempt)) return;
-    if (redirectHostedCheckout(session, { attempt, isCurrent: () => currentAttempt(attempt) })) return;
+    if (!currentAttempt(attempt)) throw new Error("checkout_attempt_changed");
+    if (redirectHostedCheckout(session, { attempt, isCurrent: () => currentAttempt(attempt) })) {
+      if (paymentWindow) {
+        $("hosted-checkout-status").textContent = "Die sichere Zahlung ist in einem neuen Fenster geöffnet. Den Zahlungsstatus kannst du unter Abo verwalten prüfen.";
+        const focus = $("hosted-checkout-retry");
+        focus.hidden = false;
+        focus.textContent = "Zahlungsfenster anzeigen";
+        focus.onclick = () => {
+          if (!currentAttempt(attempt)) return;
+          if (paymentWindow.focus()) return;
+          // COOP may sever the window reference even while Stripe stays open.
+          // Reuse this exact session; never create a second one just to refocus.
+          fail("Das Zahlungsfenster lässt sich hier nicht erneut anzeigen. Du kannst dieselbe Zahlung in diesem Tab öffnen oder den Status unter Abo verwalten prüfen.");
+          focus.textContent = "Zahlung in diesem Tab öffnen";
+          focus.onclick = () => { if (currentAttempt(attempt)) location.assign(session.url); };
+        };
+      }
+      return;
+    }
+    paymentWindow?.discard();
     $("hosted-checkout-status").hidden = true;
     $("pay-block").hidden = false;
     renderSummary(session.trialDays, session.firstYear);
     await mountStripe(session.clientSecret, attempt);
   } catch (error) {
-    if (!currentAttempt(attempt)) return;
+    paymentWindow?.discard();
+    if (!currentAttempt(attempt)) {
+      if (state.checkoutAttempt === attempt && state.step === "pay") {
+        invalidateCheckout();
+        fail("Dein Konto hat sich geändert. Öffne die Zahlung für dein aktuelles Konto erneut.");
+        const retry = $("hosted-checkout-retry");
+        retry.hidden = false;
+        retry.textContent = "Zahlung erneut öffnen";
+        retry.onclick = () => goToPay();
+      }
+      return;
+    }
     invalidateCheckout();
     if (error.code === "already_subscribed") return show("already");
     if (error.code === "offer_expired" || error.code === "invalid_offer") {
@@ -265,11 +313,12 @@ async function startCheckout(email) {
       return fail("Bitte gib eine gültige E-Mail-Adresse ein.");
     }
     const retry = $("hosted-checkout-retry");
+    retry.textContent = "Erneut versuchen";
     retry.hidden = false;
     retry.onclick = () => {
       if (state.user === attempt.user && state.plan === attempt.plan && state.step === "pay") startCheckout(email);
     };
-    fail("Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
+    fail(error.code === "checkout_window_closed" ? "Das Zahlungsfenster wurde geschlossen. Du kannst die Zahlung erneut öffnen." : "Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
   }
 }
 

@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const source = await readFile(new URL("../abo/checkout-redirect.js", import.meta.url), "utf8");
-const { hostedCheckoutURL, createHostedCheckoutRedirect } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
+const { hostedCheckoutURL, createHostedCheckoutRedirect, reserveCheckoutWindow } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
 const session = { checkoutMode: "hosted", url: "https://checkout.stripe.com/c/pay/cs_fixture#provider-state" };
 
 test("only the provider's HTTPS checkout origin is accepted, preserving provider state", () => {
@@ -58,4 +58,68 @@ test("a malformed hosted reply never navigates or quietly mounts an embedded che
   const redirect = createHostedCheckoutRedirect(() => { navigated = true; });
   assert.throws(() => redirect({ checkoutMode: "hosted", url: "https://evil.example/pay" }));
   assert.equal(navigated, false);
+});
+
+function windowFixture({ desktop = true, active = true, blocked = false } = {}) {
+  const calls = [], children = [];
+  const browser = {
+    matchMedia: () => ({ matches: desktop }), navigator: { userActivation: { isActive: active } },
+    screen: { availWidth: 1440, availHeight: 1080, availLeft: 0, availTop: 0 },
+    open(...args) {
+      calls.push(args); if (blocked) return null;
+      const child = { closed: false, opener: browser, focused: 0, url: null,
+        focus() { this.focused++; }, close() { this.closed = true; }, location: { replace(url) { child.url = url; } } };
+      children.push(child); return child;
+    }
+  };
+  return { browser, calls, children };
+}
+
+test("desktop reserves one centered narrow window during the click; opener is removed", () => {
+  const { browser, calls, children } = windowFixture();
+  const ticket = reserveCheckoutWindow(browser);
+  assert.equal(reserveCheckoutWindow(browser), ticket);
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0], ["/abo/checkout-opening.html", "_blank", "popup=yes,width=600,height=860,left=420,top=110,resizable=yes,scrollbars=yes"]);
+  assert.equal(children[0].opener, null);
+  ticket.navigate(session.url);
+  assert.equal(children[0].url, session.url);
+  assert.equal(ticket.handedOff, true);
+  ticket.discard();
+  assert.equal(children[0].closed, false, "never close a handed-off financial form");
+});
+
+test("mobile, inactive user gestures and blocked windows retain the existing same-tab path", () => {
+  for (const options of [{ desktop: false }, { active: false }, { blocked: true }]) {
+    const f = windowFixture(options);
+    assert.equal(reserveCheckoutWindow(f.browser), null);
+    assert.equal(f.calls.length, options.blocked ? 1 : 0);
+  }
+});
+
+test("closed preparation is a neutral cancellation, not a surprise same-tab navigation", () => {
+  const f = windowFixture(), ticket = reserveCheckoutWindow(f.browser);
+  f.children[0].closed = true;
+  assert.throws(() => ticket.navigate(session.url), { code: "checkout_window_closed" });
+  assert.equal(f.children[0].url, null);
+  assert.equal(ticket.handedOff, false);
+  assert.equal(ticket.focus(), false);
+});
+
+test("discarding a stale attempt closes only its preparation window; a retry gets a new one", () => {
+  const f = windowFixture(), ticket = reserveCheckoutWindow(f.browser);
+  ticket.discard();
+  assert.equal(f.children[0].closed, true);
+  const next = reserveCheckoutWindow(f.browser);
+  assert.notEqual(next, ticket);
+  next.navigate(session.url);
+  ticket.discard();
+  assert.equal(f.children[1].closed, false);
+});
+
+test("invalid provider URLs never leave the preparation window", () => {
+  const f = windowFixture(), ticket = reserveCheckoutWindow(f.browser);
+  assert.throws(() => ticket.navigate("https://other.example/pay"));
+  assert.equal(f.children[0].url, null);
+  ticket.discard();
 });
