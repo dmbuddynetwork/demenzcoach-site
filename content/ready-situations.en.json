@@ -113,7 +113,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -135,7 +135,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -258,7 +258,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -280,7 +280,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -404,7 +404,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -426,7 +426,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -561,7 +561,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -583,7 +583,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -703,7 +703,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -725,7 +725,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -836,7 +836,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -858,7 +858,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -972,7 +972,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -994,7 +994,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -1101,7 +1101,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -1123,7 +1123,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -1243,7 +1243,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -1265,7 +1265,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -1376,7 +1376,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -1398,7 +1398,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -1504,7 +1504,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -1526,7 +1526,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -1635,7 +1635,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -1657,7 +1657,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -1762,7 +1762,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -1784,7 +1784,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -1889,7 +1889,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -1911,7 +1911,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -2012,7 +2012,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -2034,7 +2034,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -2139,7 +2139,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -2161,7 +2161,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -2265,7 +2265,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -2287,7 +2287,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -2392,7 +2392,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -2414,7 +2414,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -2528,7 +2528,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -2550,7 +2550,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -2659,7 +2659,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -2681,7 +2681,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -2785,7 +2785,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -2807,7 +2807,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -2909,7 +2909,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -2931,7 +2931,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -3034,7 +3034,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -3056,7 +3056,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -3155,7 +3155,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -3177,7 +3177,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -3287,7 +3287,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -3309,7 +3309,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -3413,7 +3413,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -3435,7 +3435,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -3540,7 +3540,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -3562,7 +3562,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -3661,7 +3661,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -3683,7 +3683,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -3792,7 +3792,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -3814,7 +3814,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -3921,7 +3921,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -3943,7 +3943,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -4050,7 +4050,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -4072,7 +4072,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -4179,7 +4179,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -4201,7 +4201,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -4313,7 +4313,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -4335,7 +4335,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -4438,7 +4438,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -4460,7 +4460,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -4565,7 +4565,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -4587,7 +4587,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -4689,7 +4689,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -4711,7 +4711,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -4818,7 +4818,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -4840,7 +4840,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -4945,7 +4945,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -4967,7 +4967,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -5071,7 +5071,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -5093,7 +5093,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -5194,7 +5194,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -5216,7 +5216,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -5322,7 +5322,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -5344,7 +5344,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -5448,7 +5448,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -5470,7 +5470,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -5585,7 +5585,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -5607,7 +5607,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
@@ -5686,7 +5686,7 @@
       "language": "en",
       "goal": "",
       "bindings": {
-        "dataHash": "f1e2f54032e4c01ba70f26d132c81cf0657779fce79dfc06e98dd41c6465e358",
+        "dataHash": "a19835768a8f14d256c395a632c85f79f7c8ad126204bbb40c26f77a4112713f",
         "sources": {
           "abo/abo-config.js": "14f441d1e4a97d8a7eeeef709ad5c1eba22b71f78b08ef916ad5c69d36389b4c",
           "abo/email-account.js": "5b53679bd33deeca9bc5c6745b0c5198502cea45bc4fa7b9f3465f5fa02fb6d1",
@@ -5708,7 +5708,7 @@
           "demenz-uebersetzer/translator-locale.js": "414ed0ea2922cd1fe21deccba86371c562779bc8ba9aa50623730ddd80645d6e",
           "demenz-uebersetzer/translator-saved.js": "ca469561ba2cf6abf9e53ad4228d1481d6b107a1c4d68df1c3d91be80d0ec6c0",
           "demenz-uebersetzer/translator-signup.js": "b73fec38ade15d37f79eb6b0a22c9916eff91604c93906e5c4b97cac7bd251d2",
-          "demenz-uebersetzer/translator.js": "8797e90e7867b15b915369070e989249e2bac6ecfa0ae129417a3b11a12efd81",
+          "demenz-uebersetzer/translator.js": "bb0a618fe5b771da37ca209a8c6515aa376afd34bab5a24174106908bb625bfb",
           "einfach.css": "73f69a3c98dbf997b973b11a0f20d85f93eb9db2e75318aa958b0c5a012326c6",
           "lovable-home.js": "e36eeeceb427cf5428ba717a2d34af0353e703f026c5bb2d7644ce28fbe3da18",
           "start/situation-context.js": "7995e74cd6a545e7982d71b3d357f79175b6181f3865684fbe822b18adc1fe9d",
