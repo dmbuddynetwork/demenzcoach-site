@@ -1,6 +1,7 @@
 // Web-Kasse: Angebot wählen, mit demselben Firebase-Konto wie die App anmelden, über Stripe bezahlen.
 // Netzwerk nur zu unserem Backend (DEMENZ_ABO_CONFIG.endpoint), zu Firebase Auth und zu Stripe.
 import { createPaymentStatusController, paymentStatusText } from "./payment-status.js";
+import { openHostedCheckout } from "./hosted-checkout.js";
 const config = window.DEMENZ_ABO_CONFIG;
 const firebaseVersion = "12.16.0";
 const $ = (id) => document.getElementById(id);
@@ -14,12 +15,10 @@ const state = {
   auth: null,
   firebase: null,
   user: null,
-  checkout: null,
   checkoutAttempt: null,
   checkoutGeneration: 0,
-  checkoutReady: false,
-  checkoutElements: [],
-  confirming: false,
+  receiptEmail: null,
+  checkoutTimer: null,
   step: "plan"
 };
 
@@ -27,23 +26,13 @@ const steps = ["plan", "account", "pay", "done", "already"];
 function invalidateCheckout() {
   state.checkoutGeneration += 1;
   state.checkoutAttempt = null;
-  state.checkout = null;
-  state.checkoutReady = false;
-  state.confirming = false;
-  $("pay-button").disabled = true;
-  for (const element of state.checkoutElements) {
-    try { element.unmount?.(); } catch { /* Already detached. */ }
-  }
-  state.checkoutElements = [];
-  for (const id of ["payment-element", "express-checkout", "pay-summary", "pay-terms", "pay-summary-short", "pay-trial-note"]) $(id).replaceChildren();
-  $("express-divider").hidden = true;
+  clearTimeout(state.checkoutTimer);
+  state.checkoutTimer = null;
+  $("pay-retry").hidden = true;
 }
 function currentAttempt(attempt) {
   return state.checkoutAttempt === attempt && attempt?.generation === state.checkoutGeneration
     && attempt.plan === state.plan && attempt.user === state.user && state.step === "pay" && !$("step-pay").hidden;
-}
-function currentCheckout(attempt, checkout) {
-  return Boolean(checkout && currentAttempt(attempt) && state.checkout === checkout);
 }
 function show(step) {
   invalidateCheckout();
@@ -65,7 +54,6 @@ const track = (name, values = {}, marketing = null) => {
 };
 
 const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
-const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
 
 async function api(path, { method = "GET", body, token } = {}) {
   const headers = {};
@@ -242,8 +230,12 @@ async function startCheckout(email) {
   state.checkoutAttempt = attempt;
   $("email-block").hidden = true;
   $("pay-block").hidden = false;
-  $("pay-button").disabled = true;
+  $("checkout-status").textContent = "Deine sichere Zahlungsseite wird geöffnet …";
+  state.checkoutTimer = setTimeout(() => {
+    if (currentAttempt(attempt)) $("checkout-status").textContent = "Das Laden dauert länger. Du kannst zurückgehen und es erneut versuchen.";
+  }, 15_000);
   const receiptEmail = email || attempt.user.email;
+  state.receiptEmail = receiptEmail;
   if (receiptEmail) $("signed-in-as").textContent = `Bestätigung und Zugang an ${receiptEmail}`;
   try {
     const token = await attempt.user.getIdToken();
@@ -254,13 +246,14 @@ async function startCheckout(email) {
     const session = await api("/session", {
       method: "POST",
       token,
-      body: { plan: attempt.plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+      body: { checkoutUI: "hosted", plan: attempt.plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
     if (!currentAttempt(attempt)) return;
-    renderSummary(session.trialDays, session.firstYear);
-    await mountStripe(session.clientSecret, attempt);
+    clearTimeout(state.checkoutTimer);
+    track("checkout_redirect", { plan: attempt.plan, source: state.source });
+    openHostedCheckout(session.url);
   } catch (error) {
     if (!currentAttempt(attempt)) return;
     invalidateCheckout();
@@ -278,110 +271,13 @@ async function startCheckout(email) {
       $("pay-block").hidden = true;
       return fail("Bitte gib eine gültige E-Mail-Adresse ein.");
     }
+    $("checkout-status").textContent = "Die Zahlungsseite konnte nicht geöffnet werden.";
+    $("pay-retry").hidden = false;
     fail("Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
   }
 }
 
-// Wesentliche Preis- und Laufzeitangaben bleiben vor allen Zahlungsbuttons sichtbar.
-// Erläuterungen zur Probezeit und weiterführende Links folgen unter den Buttons.
-function renderSummary(trialDays, firstYear = null) {
-  const price = state.offer?.plans?.[state.plan];
-  const period = state.plan === "yearly" ? "Jahr" : "Monat";
-  const recurring = price ? `${euro(price.amount, price.currency)}/${period}` : "";
-  const deal = Number.isInteger(firstYear) && price ? euro(firstYear, price.currency) : null;
-  let summary;
-  if (trialDays > 0) {
-    const start = new Date(Date.now() + trialDays * 86_400_000);
-    summary = deal
-      ? `Heute 0,00 €. Ab ${dateText(start)}: ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
-      : `Heute 0,00 €. Ab ${dateText(start)}: ${recurring}. Inkl. MwSt.`;
-  } else {
-    summary = deal
-      ? `Heute ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
-      : `Heute ${price ? euro(price.amount, price.currency) : ""} für 1 ${period}, danach ${recurring}. Inkl. MwSt.`;
-  }
-  $("pay-summary").textContent = summary;
-  $("pay-summary-short").textContent = summary;
-  $("pay-terms").textContent = state.plan === "yearly"
-    ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist."
-    : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.";
-  $("pay-trial-note").hidden = !(trialDays > 0);
-  $("pay-trial-note").textContent = trialDays > 0 ? `${trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
-}
-
-// Stripe.js erst laden, wenn jemand wirklich bezahlen will (nicht schon beim Betrachten der Angebote).
-function loadStripe() {
-  if (window.Stripe) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "https://js.stripe.com/dahlia/stripe.js"; // gleiche Version wie die Checkout-Session (ui_mode elements), v3 kennt initCheckout nicht
-    script.onload = resolve;
-    script.onerror = () => reject(new Error("stripe.js failed"));
-    document.head.append(script);
-  });
-}
-
-async function mountStripe(clientSecret, attempt) {
-  await loadStripe();
-  if (!currentAttempt(attempt)) return;
-  const stripe = window.Stripe(state.offer.publishableKey, { locale: "de" });
-  const appearance = {
-    theme: "stripe",
-    variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" }
-  };
-  const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
-  const checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
-  if (!currentAttempt(attempt)) return;
-  state.checkout = checkout;
-  const express = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
-  express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
-    if (!currentCheckout(attempt, checkout)) return;
-    $("express-divider").hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean);
-  });
-  express.on("confirm", () => confirmPayment(attempt, checkout));
-  const payment = checkout.createPaymentElement({ layout: "tabs", wallets: { link: "never" } });
-  state.checkoutElements = [express, payment];
-  express.mount("#express-checkout");
-  payment.on("ready", () => {
-    if (!currentCheckout(attempt, checkout)) return;
-    state.checkoutReady = true;
-    $("pay-button").disabled = state.confirming;
-  });
-  payment.on("loaderror", () => {
-    if (!currentCheckout(attempt, checkout)) return;
-    state.checkoutReady = false;
-    $("pay-button").disabled = true;
-    fail("Die Zahlungsarten konnten nicht geladen werden. Wähle dein Angebot bitte erneut.");
-  });
-  payment.mount("#payment-element");
-}
-
-async function confirmPayment(attempt = state.checkoutAttempt, checkout = state.checkout) {
-  if (!currentCheckout(attempt, checkout) || !state.checkoutReady || state.confirming) return;
-  state.confirming = true;
-  $("pay-button").disabled = true;
-  try {
-    const loaded = await checkout.loadActions?.();
-    // A plan change/retry while actions load invalidates this exact session.
-    if (!currentCheckout(attempt, checkout) || !state.checkoutReady) return;
-    if (loaded?.type === "error") {
-      fail(loaded.error?.message || "Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
-      return;
-    }
-    const actions = loaded?.actions ?? checkout;
-    const result = await actions.confirm();
-    if (!currentCheckout(attempt, checkout)) return;
-    if (result?.type === "error" || result?.error) fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
-  } catch {
-    if (currentCheckout(attempt, checkout)) fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
-  } finally {
-    if (currentCheckout(attempt, checkout)) {
-      state.confirming = false;
-      $("pay-button").disabled = !state.checkoutReady;
-    }
-  }
-}
-$("pay-button").addEventListener("click", () => confirmPayment());
+$("pay-retry").addEventListener("click", () => startCheckout(state.receiptEmail));
 
 // --- Konto nach dem Kauf: Gast-Konto bekommt die Telefonnummer (UID und damit Stripe/Adapty-Zuordnung bleiben gleich) ----
 let linkConfirmation;

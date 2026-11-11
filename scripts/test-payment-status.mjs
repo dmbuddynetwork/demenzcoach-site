@@ -54,7 +54,7 @@ test("a forged return URL without a session never loads status or activates", as
 test("actual return-page code sends the owner token, hides pending access and emits no purchase", async () => {
   const { createContext, runInContext } = await import("node:vm");
   const { paymentStatusText } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
-  const page = (await readFile(new URL("../abo/abo.js", import.meta.url), "utf8")).replace(/^import .*payment-status.js.*;\n/mu, "");
+  const page = (await readFile(new URL("../abo/abo.js", import.meta.url), "utf8")).replace(/^import .*\.js.*;\n/gmu, "");
   const split = page.indexOf('// --- Start ');
   assert.ok(split > 0);
   for (const outcome of ["pending", "failed", "action_required", "paid", "trialing", "no_payment_due", "auth_error", "legacy_paid", "legacy_unpaid", "legacy_no_payment_required", "signed_out", "token_error"]) {
@@ -67,7 +67,7 @@ test("actual return-page code sends the owner token, hides pending access and em
     };
     const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
     const context = createContext({
-      createPaymentStatusController, paymentStatusText, URLSearchParams,
+      createPaymentStatusController, paymentStatusText, URLSearchParams, setTimeout, clearTimeout,
       location: { search: "?status=fertig&session_id=cs_synthetic" },
       localStorage: { getItem: () => null },
       document: { getElementById: node, querySelectorAll: (selector) => selector === "[data-manage]" ? [node("payment-status-manage")] : [] },

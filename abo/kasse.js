@@ -1,14 +1,8 @@
-// Kasse als Fenster auf derselben Seite (Daniel, 9. Nov 2026: wie BetterMe und Yazio, die Zahlung öffnet sich über der
-// Angebotsseite). Wird von /start/ geladen (window.DemenzKasse.open). Die Seite /abo/ bleibt als eigener Einstieg.
-// Ablauf wie abo.js: stilles Gast-Konto (Firebase anonym), POST /session, Stripe Checkout (Elements) mit Express-Knöpfen
-// und Zahlungsfeld. Nach der Zahlung leitet Stripe auf /abo/?status=fertig weiter (dort Danke-Seite und Konto sichern).
-// § 312j Abs. 2 BGB: Preis, Laufzeit und Kündigung stehen vor allen Zahlungsknöpfen und direkt über dem Bestellknopf,
-// der Bestellknopf heißt „Zahlungspflichtig abonnieren“. Texte gleich wie renderSummary in abo.js.
+// Der Fragebogen öffnet dieselbe gehostete Stripe-Kasse wie /abo/.
+// Ein Gastkonto erhält vor der Weiterleitung eine stabile UID für Stripe/Adapty.
+import { openHostedCheckout } from "./hosted-checkout.js";
 const config = window.DEMENZ_ABO_CONFIG || {};
 const firebaseVersion = "12.16.0";
-const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
-const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
-
 let firebase = null;
 let auth = null;
 let publicConfig = null;
@@ -21,7 +15,7 @@ function el(tag, props = {}, children = []) {
     else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
     else node.setAttribute(key, value);
   }
-  for (const child of [].concat(children)) if (child) node.append(child);
+  for (const child of children) node.append(child);
   return node;
 }
 
@@ -54,165 +48,92 @@ async function signedInUser() {
   return auth.currentUser ?? (await firebase.signInAnonymously(auth)).user;
 }
 
-function loadStripe() {
-  if (window.Stripe) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "https://js.stripe.com/dahlia/stripe.js"; // gleiche Version wie die Checkout-Session (ui_mode elements), v3 kennt initCheckout nicht
-    script.onload = resolve;
-    script.onerror = () => reject(new Error("stripe.js failed"));
-    document.head.append(script);
-  });
-}
-
-export function summaryText(plan, price, trialDays, firstYear = null) {
-  const period = plan === "yearly" ? "Jahr" : "Monat";
-  const recurring = `${euro(price.amount, price.currency)}/${period}`;
-  const deal = Number.isInteger(firstYear) ? euro(firstYear, price.currency) : null;
-  if (trialDays > 0) {
-    const start = new Date(Date.now() + trialDays * 86_400_000);
-    return deal
-      ? `Heute 0,00 €. Ab ${dateText(start)}: ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
-      : `Heute 0,00 €. Ab ${dateText(start)}: ${recurring}. Inkl. MwSt.`;
-  }
-  return deal
-    ? `Heute ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
-    : `Heute ${euro(price.amount, price.currency)} für 1 ${period}, danach ${recurring}. Inkl. MwSt.`;
-}
-export const termsText = (plan) => (plan === "yearly"
-  ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist."
-  : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.");
-
 function close() {
   if (!sheet) return;
-  sheet.node.remove();
-  document.body.classList.remove("start-noscroll");
-  sheet.onClose?.();
+  const previous = sheet;
   sheet = null;
+  previous.node.remove();
+  clearTimeout(previous.timer);
+  document.removeEventListener("keydown", previous.onKey);
+  document.body.classList.remove("start-noscroll");
+  previous.onClose?.();
+  if (previous.trigger?.isConnected) previous.trigger.focus();
 }
 
 // open({ plan, email, offer, source, campaign, onClose, onOfferExpired, track })
 export async function open(options) {
-  close();
+  if (sheet) return; // Ignore double taps while a session is being prepared.
+  const trigger = document.activeElement;
+  const title = el("h2", { id: "kasse-title", tabindex: "-1", text: "Deinen Plan erhalten" });
+  const status = el("p", { class: "kasse-loading", role: "status", text: "Deine sichere Zahlungsseite wird geöffnet …" });
   const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
-  const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
-  const loading = el("p", { class: "kasse-loading", role: "status", text: "Zahlungsarten werden geladen …" });
-  const summary = el("p");
-  const terms = el("p");
-  const trialNote = el("p", { hidden: "" });
-  let loadingTimer = null;
-  const short = el("p", { class: "kasse-short", hidden: "" });
-  const divider = el("p", { class: "abo-divider", text: "oder", hidden: "" });
-  const express = el("div", { id: "kasse-express" });
-  const payment = el("div", { id: "kasse-payment" });
-  const payButton = el("button", { type: "button", class: "abo-button", disabled: "", text: "Zahlungspflichtig abonnieren" });
-  const emailLine = el("p", { class: "abo-checkout-email", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
-  const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
-  const card = el("div", { class: "kasse-card" }, [
-    el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": "Schließen", text: "×", onclick: () => close() })]),
-    error,
-    loading, payment,
-    el("div", { class: "abo-summary", role: "group", "aria-label": "Preis und Laufzeit", hidden: "" }, [summary, terms]),
-    express, divider, short, payButton, emailLine,
-    el("div", { class: "abo-checkout-details" }, [trialNote, el("p", {}, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
-        el("a", { href: "/abo/garantie.html", target: "_blank", text: "Geld-zurück-Garantie" }), ". Es gelten die ",
-        el("a", { href: "/nutzungsbedingungen.html", target: "_blank", text: "Nutzungsbedingungen" }), ". ",
-        el("a", { href: "/abo/widerruf.html", target: "_blank", text: "Widerrufsbelehrung" }), ". ",
-        el("a", { href: "/datenschutz.html", target: "_blank", text: "Datenschutz" }), "."])])
-  ]);
-  const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title",
-    onclick: (event) => { if (event.target === node) close(); } }, card);
-  const onKey = (event) => { if (event.key === "Escape") close(); };
+  const retry = el("button", { class: "abo-button", type: "button", text: "Erneut versuchen", hidden: "" });
+  const closeButton = el("button", { class: "kasse-close", type: "button", "aria-label": "Schließen", text: "×", onclick: close });
+  const card = el("div", { class: "kasse-card", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title" }, [closeButton, title, status, error, retry]);
+  const node = el("div", { class: "kasse", onclick: (event) => { if (event.target === node) close(); } }, [card]);
+  const onKey = (event) => {
+    if (event.key === "Escape") close();
+    if (event.key === "Tab") {
+      const buttons = [...card.querySelectorAll("button:not([disabled]), a[href]")].filter((item) => !item.hidden);
+      const first = buttons[0], last = buttons.at(-1);
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === title)) {
+        event.preventDefault(); last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || document.activeElement === title)) {
+        event.preventDefault(); first.focus();
+      }
+    }
+  };
+  const attempt = { node, onKey, trigger, onClose: options.onClose, timer: null };
+  sheet = attempt;
   document.addEventListener("keydown", onKey);
-  sheet = { node, onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
   document.body.append(node);
   document.body.classList.add("start-noscroll");
   title.focus();
-  loadingTimer = setTimeout(() => {
-    if (sheet?.node === node && !loading.hidden) loading.textContent = "Das Laden dauert länger. Du kannst die Kasse schließen und erneut öffnen.";
+  attempt.timer = setTimeout(() => {
+    if (sheet === attempt) status.textContent = "Das Laden dauert länger. Du kannst zurückgehen und es erneut versuchen.";
   }, 15_000);
-
-  let checkout = null;
-  const confirm = async () => {
-    payButton.disabled = true;
-    error.hidden = true;
-    try {
-      const loaded = await checkout.loadActions?.();
-      const result = await (loaded?.actions ?? checkout).confirm();
-      if (result?.type === "error" || result?.error) {
-        fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
-        payButton.disabled = false;
-      }
-    } catch {
-      fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
-      payButton.disabled = false;
-    }
-  };
-  payButton.addEventListener("click", confirm);
-
+  const current = () => sheet === attempt;
+  retry.addEventListener("click", () => {
+    if (!current()) return;
+    attempt.onClose = null; // Internal retry must not trigger the funnel browser-back callback.
+    close(); open(options);
+  });
   try {
-    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser(), loadStripe()]);
+    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+    if (!current()) return;
     publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
+    if (!current()) return;
+    const token = await user.getIdToken();
+    if (!current()) return;
     const session = await api("/session", {
-      method: "POST",
-      token: await user.getIdToken(),
-      body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
-        ...window.DemenzTeller?.attribution(),
+      method: "POST", token,
+      body: { checkoutUI: "hosted", plan: options.plan, termsVersion: publicConfig.textVersions?.terms,
+        source: options.source, campaign: options.campaign, ...window.DemenzTeller?.attribution(),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
-    const price = publicConfig.plans[options.plan];
-    const text = summaryText(options.plan, price, session.trialDays, session.firstYear);
-    summary.textContent = text;
-    short.textContent = text;
-    terms.textContent = termsText(options.plan);
-    trialNote.hidden = !(session.trialDays > 0);
-    trialNote.textContent = session.trialDays > 0 ? `${session.trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
-    summary.parentElement.hidden = false;
-    const stripe = window.Stripe(publicConfig.publishableKey, { locale: "de" });
-    const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" } };
-    const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
-    checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
-    if (!sheet || sheet.node !== node) return;
-    const expressElement = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
-    expressElement.on("availablepaymentmethodschange", ({ paymentMethods }) => { divider.hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean); });
-    expressElement.on("confirm", () => confirm());
-    expressElement.mount(express);
-    const paymentElement = checkout.createPaymentElement({ layout: "tabs", wallets: { link: "never" } });
-    paymentElement.on("ready", () => {
-      if (!sheet || sheet.node !== node) return;
-      clearTimeout(loadingTimer);
-      loading.hidden = true;
-      payButton.disabled = false;
-      options.track?.("checkout_sheet_ready");
-    });
-    paymentElement.on("loaderror", () => {
-      if (!sheet || sheet.node !== node) return;
-      clearTimeout(loadingTimer);
-      loading.hidden = true;
-      payButton.disabled = true;
-      fail("Die Zahlungsarten konnten nicht geladen werden. Schließe die Kasse und öffne sie erneut.");
-    });
-    paymentElement.mount(payment);
+    if (!current()) return;
+    clearTimeout(attempt.timer);
+    try { options.track?.("checkout_redirect"); } catch { /* Analytics must not block checkout. */ }
+    openHostedCheckout(session.url);
   } catch (problem) {
-    clearTimeout(loadingTimer);
-    loading.hidden = true;
-    if (!sheet || sheet.node !== node) return;
+    if (!current()) return;
+    clearTimeout(attempt.timer);
+    status.hidden = true;
     if (problem.code === "already_subscribed") {
-      summary.textContent = "Du hast schon ein Abo. Dein Plan ist freigeschaltet.";
-      summary.parentElement.hidden = false;
-      payButton.replaceWith(el("a", { class: "abo-button", href: "/abo/mein-plan.html", text: "Zu deinem Plan" }));
+      error.replaceWith(el("p", { text: "Du hast bereits ein Abo. Prüfe deinen Zahlungsstatus in der Abo-Verwaltung." }));
+      retry.replaceWith(el("a", { class: "abo-button", href: "/abo/", text: "Abo verwalten" }));
       return;
     }
     if (problem.code === "offer_expired" || problem.code === "invalid_offer") {
-      close();
-      return options.onOfferExpired?.();
+      close(); options.onOfferExpired?.(); return;
     }
-    if (problem.code === "email_required") return fail("Bitte gib deine E-Mail-Adresse ein. Geh dafür einen Schritt zurück.");
-    if (problem.code === "terms_outdated") return fail("Die Seite ist nicht mehr aktuell. Bitte lade sie neu.");
-    fail("Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
+    error.textContent = problem.code === "email_required" ? "Bitte geh zurück und gib deine E-Mail-Adresse ein."
+      : problem.code === "terms_outdated" ? "Bitte lade die Seite neu."
+      : "Die Zahlungsseite konnte nicht geöffnet werden. Bitte versuch es erneut.";
+    error.hidden = false;
+    retry.hidden = false;
   }
 }
-
 export const isOpen = () => Boolean(sheet);
 window.DemenzKasse = Object.freeze({ open, close, isOpen });

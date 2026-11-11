@@ -46,19 +46,13 @@ export const getRedirectResult=async()=>null; export const signInAnonymously=asy
         if (url.pathname.endsWith('/config')) return route.fulfill({ json: config, headers: { 'Access-Control-Allow-Origin': '*' } });
         if (url.pathname.endsWith('/session')) {
           bodies.push(req.postDataJSON());
-          return route.fulfill({ json: { clientSecret: 'fixture', trialDays: 7 }, headers: { 'Access-Control-Allow-Origin': '*' } });
+          return route.fulfill({ json: { url: 'https://checkout.stripe.com/c/pay/teller_fixture', trialDays: 7 }, headers: { 'Access-Control-Allow-Origin': '*' } });
         }
         return route.fulfill({ json: {}, headers: { 'Access-Control-Allow-Origin': '*' } });
       }
+      if (url.hostname === 'checkout.stripe.com') return route.fulfill({ contentType: 'text/html', body: '<h1>Hosted checkout fixture</h1>' });
       if (url.hostname === 'www.googletagmanager.com') return route.fulfill({ contentType: 'text/javascript', body: '' });
       return route.abort();
-    });
-    await context.addInitScript(() => {
-      window.Stripe = () => ({ initCheckoutElementsSdk: async () => ({
-        createExpressCheckoutElement: () => ({ on() {}, mount() {} }),
-        createPaymentElement: () => ({ mount() {} }),
-        loadActions: async () => ({ confirm: async () => { throw Error('No payments in this test'); } })
-      }) });
     });
     const page = await context.newPage();
     page.setDefaultTimeout(8000);
@@ -75,7 +69,7 @@ export const getRedirectResult=async()=>null; export const signInAnonymously=asy
     assert.equal(await page.evaluate(() => Object.keys(DemenzTeller.attribution()).length), 0);
     // Fix both arms explicitly as synthetic inputs; the randomized Worker is tested separately.
     for (const arm of ['website', 'funnel']) {
-      await page.evaluate(() => localStorage.clear()); await context.clearCookies();
+      await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await context.clearCookies();
       await page.goto(origin + (arm === 'website' ? '/de/' : '/start/') + '?teller=' + arm);
       await page.locator('.consent-accept').click();
       await page.evaluate(() => DemenzTeller.ready);
@@ -102,7 +96,7 @@ export const getRedirectResult=async()=>null; export const signInAnonymously=asy
       for (let i=0; i<30; i++) {
         const screen = await page.locator('body').getAttribute('data-screen');
         if (screen === 'result') break;
-        if (screen === 'building') { await page.waitForFunction(() => document.body.dataset.screen !== 'building'); continue; }
+        if (screen === 'building') { await page.getByRole('button', { name: 'Weiter', exact: true }).click(); await page.waitForFunction(() => document.body.dataset.screen !== 'building'); continue; }
         if (screen === 'email') { await page.locator('#email').fill('fixture@example.invalid'); }
         if (screen === 'newsletter') await page.getByRole('button', { name: 'Kein Interesse', exact: true }).click();
         else if (await page.locator('.start-option:not(.start-multi)').count()) await page.locator('.start-option:not(.start-multi)').first().click();
@@ -111,25 +105,27 @@ export const getRedirectResult=async()=>null; export const signInAnonymously=asy
       }
       assert.equal(await page.locator('body').getAttribute('data-screen'), 'result');
       await page.waitForFunction(name => (window.dataLayer || []).some(e => e[0] === 'event' && e[1] === name), `teller_${arm}_complete`);
-      // Exercise actual embedded checkout request builder with synthetic auth and payment SDK.
-      await page.evaluate(() => DemenzKasse.open({ plan:'yearly',email:'fixture@example.invalid',source:'quiz_home',campaign:'original' }));
-      await page.waitForFunction(() => document.querySelector('.kasse button.abo-button')?.disabled === false);
+      // Exercise hosted checkout request builders with synthetic auth and an intercepted destination.
+      await page.evaluate(() => { DemenzKasse.open({ plan:'yearly',email:'fixture@example.invalid',source:'quiz_home',campaign:'original' }); });
+      await page.waitForURL('https://checkout.stripe.com/**');
       assert.equal(bodies.at(-1).source, 'teller_' + arm); assert.equal(bodies.at(-1).campaign, 'teller_v1');
       assert.equal(bodies.at(-1).variant, arm === 'website' ? 'a' : 'b');
       await page.goto(origin + '/abo/');
       await page.locator('#plan-next').click();
-      await page.waitForFunction(() => document.querySelector('#pay-button')?.disabled === false);
+      await page.waitForURL('https://checkout.stripe.com/**');
       assert.equal(bodies.at(-1).source, 'teller_' + arm); assert.equal(bodies.at(-1).variant, arm === 'website' ? 'a' : 'b');
+      await page.goto(origin + '/abo/');
       await page.locator('.consent-settings').click(); await page.locator('.consent-decline').click();
       assert.equal(await page.evaluate(() => localStorage.getItem('demenzcoach.teller.v1')), null);
       assert.equal((await context.cookies()).some(c => c.name === 'dc_teller_v1'), false);
       await page.goto(origin + '/abo/'); await page.locator('#plan-next').click();
-      await page.waitForFunction(() => document.querySelector('#pay-button')?.disabled === false);
+      await page.waitForURL('https://checkout.stripe.com/**');
       assert.equal(bodies.at(-1).variant, undefined); assert.notEqual(bodies.at(-1).campaign, 'teller_v1');
+      await page.goto(origin + '/abo/');
       assert.equal(JSON.stringify(await page.evaluate(() => window.dataLayer || [])).includes('fixture@example.invalid'), false);
     }
     // Real Web Locks coordinate two already-open tabs, including simultaneous answers.
-    await page.evaluate(() => localStorage.clear()); await context.clearCookies();
+    await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); }); await context.clearCookies();
     await page.goto(origin + '/start/?teller=funnel');
     await page.locator('.consent-accept').click(); await page.evaluate(() => DemenzTeller.ready);
     const second = await context.newPage(); second.on('pageerror', e => errors.push(e.message));

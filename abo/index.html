@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="abo.css">
   <script src="abo-config.js"></script>
   <script src="angebot.js"></script>
-  <script type="module" src="abo.js"></script>
+  <script type="module" src="abo.js?v=hosted-20261110"></script>
 </head>
 <body data-marketing-pixels>
   <main class="abo-page">
@@ -50,7 +50,7 @@
       </div>
       <p class="abo-muted">Alle Preise inklusive gesetzlicher Umsatzsteuer (MwSt.).</p>
       <p class="abo-muted" id="trial-note" hidden></p>
-      <button class="abo-button" type="button" id="plan-next">Weiter</button>
+      <button class="abo-button" type="button" id="plan-next">Meinen Plan erhalten</button>
     </section>
 
     <!-- Schritt 2: Konto, damit die App das Abo erkennt -->
@@ -74,10 +74,10 @@
       <button class="abo-link-button" type="button" data-back="plan">Zurück</button>
     </section>
 
-    <!-- Schritt 3: Bezahlen mit Preis- und Laufzeitangaben vor den Zahlungsbuttons. -->
+    <!-- Stripe übernimmt Preisübersicht, Zahlungsarten und verbindlichen Abschluss. -->
     <section id="step-pay" aria-labelledby="pay-title" hidden>
       <p class="abo-steps">Letzter Schritt</p>
-      <h1 id="pay-title">Zahlungsart</h1>
+      <h1 id="pay-title">Deinen Plan erhalten</h1>
       <div id="email-block" hidden>
         <label for="email">Deine E-Mail-Adresse</label>
         <input id="email" type="email" autocomplete="email" inputmode="email">
@@ -86,21 +86,9 @@
         <button class="abo-link-button" type="button" id="have-account">Ich habe schon ein App-Konto</button>
       </div>
       <div id="pay-block" hidden>
-        <!-- Zahlungsfelder zuerst; Preis/Laufzeit bleiben vor sämtlichen auslösenden Zahlungsknöpfen. -->
-        <div id="payment-element"></div>
-        <div class="abo-summary" role="group" aria-label="Preis und Laufzeit">
-          <p id="pay-summary"></p>
-          <p id="pay-terms"></p>
-        </div>
-        <div id="express-checkout"></div>
-        <p class="abo-divider" id="express-divider" hidden>oder</p>
-        <p id="pay-summary-short" hidden></p>
-        <button class="abo-button" type="button" id="pay-button" disabled>Zahlungspflichtig abonnieren</button>
+        <p id="checkout-status" role="status" aria-live="polite">Deine sichere Zahlungsseite wird geöffnet …</p>
+        <button class="abo-button" type="button" id="pay-retry" hidden>Erneut versuchen</button>
         <p class="abo-checkout-email" id="signed-in-as"></p>
-        <div class="abo-checkout-details">
-          <p id="pay-trial-note" hidden></p>
-          <p>Online kündbar, ohne Anmeldung (<a href="kuendigen.html">Verträge hier kündigen</a>). 30 Tage <a href="garantie.html">Geld-zurück-Garantie</a>. Es gelten die <a href="/nutzungsbedingungen.html">Nutzungsbedingungen</a>. <a href="widerruf.html">Widerrufsbelehrung</a>. <a href="/datenschutz.html">Datenschutz</a>.</p>
-        </div>
       </div>
       <button class="abo-link-button" type="button" data-back="plan">Anderes Angebot wählen</button>
     </section>
