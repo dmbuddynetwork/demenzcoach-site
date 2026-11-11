@@ -958,8 +958,21 @@
     }
     return null;
   };
+  const withFixedGuardLead = (note, result) => {
+    if (result.kind !== 'safety' || result.safetyLevel !== 'urgent'
+      || typeof result.message !== 'string' || !result.message.trim()) return note;
+    const messageKey = value => value.replace(/\s+/gu, ' ').trim();
+    const key = messageKey(result.message);
+    if (key === messageKey(data.safetySignals.text)
+      || [...note.querySelectorAll('[data-fixed-guard-message]')].some(item => messageKey(item.textContent) === key)) return note;
+    const lead = element('p', { className: 'safety-lead', text: result.message, attributes: { 'data-fixed-guard-message': '' } });
+    const calls = note.querySelector('.translator-calls');
+    const generic = note.querySelector(':scope > span');
+    if (calls) calls.after(lead); else if (generic) generic.before(lead); else note.append(lead);
+    return note;
+  };
   const fixedSafetyNote = (result, localSafetyNote) => {
-    if (result.safetyLevel !== 'concern') return urgentNote(data.safetySignals.text);
+    if (result.safetyLevel !== 'concern') return withFixedGuardLead(urgentNote(data.safetySignals.text), result);
     // Only the exact provisional warning passed by this request may be replaced.
     // A feedback request for a new draft must preserve the old result's warning.
     if (localSafetyNote?.dataset.translatorLocalSafety === 'true') localSafetyNote.remove();
@@ -1220,8 +1233,14 @@
           return;
         }
         const freshNote = urgentNote(data.safetySignals.text);
-        const existing = [...output.querySelectorAll('.safety-urgent')].find((note) => !note.closest('[data-goal-safety-history]') && !box.contains(note) && note.textContent === freshNote.textContent);
+        const fixedMessage = typeof result.message === 'string' && result.message.trim() ? result.message : '';
+        // Only this request's explicit provisional node may receive a guard lead.
+        const ownLocal = localSafetyNote?.dataset.translatorLocalSafety === 'true' && localSafetyNote.isConnected
+          && output.contains(localSafetyNote) && !localSafetyNote.closest('[data-goal-safety-history]') ? localSafetyNote : null;
+        const existing = ownLocal ?? (!fixedMessage ? [...output.querySelectorAll('.safety-urgent')].find((note) =>
+          !note.closest('[data-goal-safety-history]') && !box.contains(note) && note.textContent === freshNote.textContent) : null);
         const note = existing ?? freshNote;
+        withFixedGuardLead(note, result);
         if (existing) box.remove(); else box.replaceWith(note);
         output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
         // Der Dienst liefert hier keine Formulierung. Die Sicherheitsinformation bleibt
@@ -1834,6 +1853,14 @@
     if (keepInputAtTop) { input.value = ''; grow(); }
     typedCount += 1;
     const { entry, alternatives, safetyHit, feeling, also, mood, context, protection } = core.match(text, data);
+    // A locally recognized hazard keeps its immediate warning and direct answer
+    // path. Ordinary catalog matches or role questions must not delay that help.
+    if (safetyHit && !entry?.safetyOnly && protection !== 'self') {
+      renderUnknown({ safetyHit: true, typed: text, contextual: true });
+      setHash('');
+      track('translator_result', { result_key: 'none', input_source: 'typed', safety_hint: 'yes' });
+      return;
+    }
     // Every normal typed input gets AI goals, even when a catalog keyword matches.
     // Deliberately opened static pages keep their reviewed fixed goal flow.
     if (ai && !safetyHit && !entry?.safetyOnly && protection !== 'self') {

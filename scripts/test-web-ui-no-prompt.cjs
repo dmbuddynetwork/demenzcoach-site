@@ -38,7 +38,7 @@ const answer = {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
       const requests = [], errors = [];
       let duplicateMode = 'identical', retryAnswerCount = 0, concernRetryCount = 0;
-      let holdFixedConcern = false, releaseFixedConcern;
+      let holdFixedConcern = false, releaseFixedConcern, fixedConcernStarted;
       const concernMessage = language === 'de' ? 'Allgemeiner Hinweis mit bestehenden Warnzeichen.' : 'General guidance with existing warning signs.';
       const fixedConcern = { kind: 'safety', safetyLevel: 'concern', message: concernMessage };
       try {
@@ -72,7 +72,7 @@ const answer = {
               result = fixedConcern;
             }
             if (!goal && body.text === duplicateText && duplicateMode === 'fixed-concern') {
-              if (holdFixedConcern) await new Promise(resolve => { releaseFixedConcern = resolve; });
+              if (holdFixedConcern) await new Promise(resolve => { releaseFixedConcern = resolve; fixedConcernStarted?.(); });
               result = fixedConcern;
             }
             if (!goal && body.text === duplicateText && duplicateMode === 'invalid-fixed-concern') {
@@ -171,11 +171,13 @@ const answer = {
           assert.equal(await page.locator('[data-translator-local-safety="true"]').count(), 0, 'Valid fixed concern replaces only the provisional local warning');
           assert.equal(await page.locator('#translator-result .safety-urgent').count(), 0);
           holdFixedConcern = true;
+          const heldRequestStarted = new Promise(resolve => { fixedConcernStarted = resolve; });
           await submit(duplicateText); await page.locator('[data-translator-local-safety="true"]').waitFor();
           await page.locator('#translator-result').evaluate(node => {
             const warning = document.createElement('aside'); warning.id = 'separate-protection';
             warning.className = 'safety-note safety-urgent'; warning.textContent = 'Separate existing protective information.'; node.prepend(warning);
           });
+          await heldRequestStarted;
           assert.equal(typeof releaseFixedConcern, 'function'); releaseFixedConcern();
           await page.locator('.translator-fixed-concern').waitFor();
           assert.equal(await page.locator('#separate-protection').isVisible(), true, 'Different nonprovisional protection remains');
@@ -191,10 +193,16 @@ const answer = {
           assert.ok(oldWarning);
           await page.locator('.translator-chat-input').fill('ConcernGoalsFixture');
           await page.locator('.translator-feedback').getByRole('button', { name: /Nein/ }).click();
-          await page.locator('.translator-ai-goal-retry').click();
-          await page.locator('.translator-fixed-concern').waitFor();
-          assert.equal(await oldWarning.evaluate(node => node.isConnected), true, 'A new feedback draft cannot erase the old result warning');
+          // This positive input now uses the authorized AI direct-answer path,
+          // whose feedback continues through the existing reason/skip form.
+          await page.locator('.translator-feedback').getByRole('button', { name: 'Ohne Auswahl weiter', exact: true }).click();
+          assert.equal(await oldWarning.evaluate(node => node.isConnected), true, 'Feedback alone cannot erase the old result warning');
           assert.equal(await page.locator('#translator-result .safety-urgent').count(), 1);
+          assert.equal(await page.locator('#translator-input').inputValue(), 'ConcernGoalsFixture');
+          await page.locator('#translator-form [type=submit]').click();
+          await page.locator('.translator-fixed-concern').waitFor();
+          assert.equal(await oldWarning.evaluate(node => node.isConnected), false, 'Only an explicitly submitted new original resets its warning context');
+          assert.equal(await page.locator('#translator-result .safety-urgent').count(), 0);
           assert.equal(requests.at(-1).body.text, 'ConcernGoalsFixture');
         }
         assert.ok(requests.every(request => request.body.share === false)); assert.deepEqual(errors, []);
