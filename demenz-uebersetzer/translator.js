@@ -957,7 +957,13 @@
     // Ohne Stufen (englische Seiten): bei jedem Sicherheitshinweis der KI derselbe feste Hinweis.
     const ungraded = ui?.gradedSafety === false && result.safetyLevel !== 'standard';
     const safetyNote = aiSafetyNote(result, ungraded);
-    if (safetyNote) nodes.push(safetyNote);
+    // A local guard may already show this exact complete warning. Keep the
+    // first warning and its call links; never collapse different safety text.
+    const safetySignature = note => JSON.stringify([note.textContent.replace(/\s+/g, ' ').trim(),
+      [...note.querySelectorAll('a[href]')].map(link => link.getAttribute('href'))]);
+    const existingSafetyNote = safetyNote && [...output.querySelectorAll('.safety-note')]
+      .find(note => safetySignature(note) === safetySignature(safetyNote));
+    if (safetyNote && !existingSafetyNote) nodes.push(safetyNote);
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
     nodes.push(element('p', { className: 'translator-ai-label', text: saved ? helpfulCopy.history : 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
     if (goal) nodes.push(element('p', { className: 'translator-chosen-ai-goal', text: `${ui?.lang === 'en' ? 'Your goal' : 'Dein Ziel'}: ${goal.label}` }));
@@ -980,7 +986,8 @@
         input.focus();
       } }));
     }
-    return { node: element('div', { className: 'translator-ai-answer' }, nodes), focus: nodes[0].tagName === 'ASIDE' ? nodes[0] : first, top: nodes[0] };
+    return { node: element('div', { className: 'translator-ai-answer' }, nodes),
+      focus: existingSafetyNote || (nodes[0].tagName === 'ASIDE' ? nodes[0] : first), top: existingSafetyNote || nodes[0] };
   };
   // Hinweise in einer Karte: oben „Wann ein Gespräch nicht ausreicht“ (falls vorhanden), darunter die Haftungszeile.
   const notesCard = (...children) => element('div', { className: 'translator-notes', attributes: { role: 'note' } }, children.filter(Boolean));
@@ -1050,7 +1057,7 @@
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, allowHelpful = true, goal } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, allowHelpful = true, goal, goalSafety } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     if (!goal && !localSafetyHit) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
@@ -1066,7 +1073,12 @@
       status.textContent = auto ? '' : tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
-      const result = await ai.ask(text, { formal: personal.formal, correctionOf, requestID: operationID, goal });
+      let result = await ai.ask(text, { formal: personal.formal, correctionOf, requestID: operationID, goal });
+      // A later ordinary answer cannot silently remove an earlier applicable
+      // concern warning, or turn that answer into a saveable standard snapshot.
+      if (goalSafety?.safetyLevel === 'concern' && result.kind === 'answer' && result.safetyLevel === 'standard') {
+        result = { ...result, safetyLevel: 'concern', safetyMessage: goalSafety.safetyMessage };
+      }
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
@@ -1075,6 +1087,7 @@
         return;
       }
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
+        output.querySelectorAll('.translator-goal-safety').forEach(note => note.remove());
         window.DemenzKiFreigabe?.noteAnswer(result);
         const { node, focus, top } = aiAnswer(result, { allowHelpful: allowHelpful && !localSafetyHit, goal });
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
@@ -1108,6 +1121,7 @@
         return;
       }
       if (result.kind === 'safety') {
+        output.querySelectorAll('.translator-goal-safety').forEach(note => note.remove());
         const freshNote = urgentNote(data.safetySignals.text);
         const existing = [...output.querySelectorAll('.safety-urgent')].find((note) => !box.contains(note) && note.textContent === freshNote.textContent);
         const note = existing ?? freshNote;
@@ -1175,10 +1189,11 @@
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status', 'aria-live': 'polite' } });
     const choices = element('div', { className: 'translator-ai-goal-choices' });
     let busy = false;
+    let goalSafety = null;
     const select = (goal) => {
       if (!box.isConnected || busy) return;
       setViewState('answer');
-      box.replaceWith(aiBox(text, source, onFail, { auto: true, allowHelpful, goal }));
+      box.replaceWith(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, goalSafety }));
     };
     const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'Describe what you need help with' : 'Beschreibe, wobei du Hilfe möchtest' } });
     const ownLabel = element('label', {}, [element('span', { text: en ? 'Or describe your own goal' : 'Oder beschreibe dein eigenes Ziel' }), own]);
@@ -1206,9 +1221,17 @@
         note.scrollIntoView({ behavior: 'instant', block: 'start' });
         return;
       }
+      if (result.kind === 'goals' && result.safetyLevel === 'concern') {
+        goalSafety = { safetyLevel: 'concern', safetyMessage: result.safetyMessage };
+        const note = aiSafetyNote(result, ui?.gradedSafety === false);
+        note.classList.add('translator-goal-safety');
+        note.setAttribute('role', 'alert');
+        box.before(note);
+      }
       if (result.kind === 'goals' && result.noSituation) {
         box.dataset.goalState = 'needs-situation';
-        status.textContent = en ? 'What happened? Please briefly describe the situation first.' : 'Was ist passiert? Beschreibe bitte zuerst kurz die Situation.';
+        heading.textContent = en ? 'A quick question first' : 'Eine kurze Rückfrage';
+        status.textContent = result.clarificationQuestion || (en ? 'What happened? Please briefly describe the situation first.' : 'Was ist passiert? Beschreibe bitte zuerst kurz die Situation.');
         retry.hidden = true;
         if (!input.value.trim()) { input.value = text; grow(); }
         return;
@@ -1305,7 +1328,9 @@
       presence: 'Ist gerade eine Person im Zimmer, oder erzählt die Person mit Demenz davon?',
       repetition: 'Was wiederholt sich – eine Frage, ein Satz oder etwas anderes?',
       speaker: 'Wer fühlt sich wie ein Kind behandelt – du oder die Person, die du begleitest?',
-      protection: 'Wer hat Angst, und wer ist gerade betroffen? Beschreibe bitte kurz, was passiert ist.'
+      protection: ui?.lang === 'en'
+        ? 'What is happening now? Are you safe at the moment and able to keep your distance?'
+        : 'Was passiert gerade? Bist du im Moment sicher und kannst Abstand halten?'
     };
     const heading = element(homeHeading ? 'h1' : 'h2', { text: 'Was genau ist passiert?', attributes: { tabindex: '-1' } });
     output.replaceChildren(...[
@@ -1807,10 +1832,23 @@
     let small = document.body.dataset.translatorState !== 'input';
     let positionFrame = 0;
     const setSmall = (value) => { small = value; chat.classList.toggle('translator-chat-small', value); syncChat(); };
+    const compactCoversResult = () => {
+      if (document.body.dataset.translatorState !== 'answer' || output.hidden) return false;
+      const bounds = output.getBoundingClientRect();
+      const width = parseFloat(getComputedStyle(bubbleOnly.firstElementChild).width) || 64;
+      const right = innerWidth - (parseFloat(getComputedStyle(chat).right) || 16);
+      return bounds.height > 0 && bounds.bottom > 0 && bounds.top < innerHeight
+        && bounds.right > right - width && bounds.left < right;
+    };
     // A submitted situation leads into the goal/answer flow. Keep its text clear;
     // the user can still deliberately expand the compact chat launcher.
     form.addEventListener('submit', () => { setSmall(true); });
-    close.addEventListener('click', () => { setSmall(true); bubbleOnly.focus(); track('translator_write_chat', { step: 'closed' }); });
+    close.addEventListener('click', () => {
+      setSmall(true);
+      if (compactCoversResult()) { output.tabIndex = -1; output.focus({ preventScroll: true }); }
+      else bubbleOnly.focus();
+      track('translator_write_chat', { step: 'closed' });
+    });
     bubbleOnly.addEventListener('click', () => { setSmall(false); field.focus(); track('translator_write_chat', { step: 'opened' }); });
     chatForm.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -1837,7 +1875,7 @@
       const helpfulInUse = helpfulVisible && !chat.contains(document.activeElement);
       // Auf der Startseite stehen die Beispiele zuerst: ihr noch nicht erreichtes
       // Eingabefeld soll keinen Chat über den auswählbaren Situationen öffnen.
-      chat.hidden = inputVisible || helpfulInUse || document.body.dataset.translatorState === 'goal'
+      chat.hidden = inputVisible || helpfulInUse || (small && compactCoversResult()) || document.body.dataset.translatorState === 'goal'
         || (form.hasAttribute('data-chat-after-input') && entryRect.top >= 0);
       chat.style.bottom = '';
       chat.classList.toggle('translator-chat-small', small);

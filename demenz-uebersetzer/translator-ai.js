@@ -95,6 +95,15 @@
         || !(value.noSituation === true && value.goals.length === 0 || value.noSituation === false && value.goals.length === 3)
         || value.goals.some(g => !ids.includes(g?.goal) || typeof g.label !== 'string' || !g.label.trim() || g.label.length > 64)
         || new Set(value.goals.map(g => g.goal)).size !== value.goals.length) return { kind: 'error', reason: 'unavailable' };
+      // Older API versions have no context metadata. When present, it must be
+      // complete: dropping a malformed warning would hide it until goal choice.
+      if (['safetyLevel', 'safetyMessage', 'clarificationQuestion'].some(key => Object.prototype.hasOwnProperty.call(value, key))) {
+        if (!['standard', 'concern'].includes(value.safetyLevel)
+          || (value.safetyLevel === 'standard' ? value.safetyMessage !== null
+            : typeof value.safetyMessage !== 'string' || value.safetyMessage.trim().length < 8 || value.safetyMessage.length > 360)
+          || (value.noSituation ? typeof value.clarificationQuestion !== 'string' || value.clarificationQuestion.trim().length < 8 || value.clarificationQuestion.length > 240
+            : value.clarificationQuestion !== null)) return { kind: 'error', reason: 'unavailable' };
+      }
       return value;
     } catch { return { kind: 'error', reason: 'unavailable' }; }
     finally { clearTimeout(timer); }

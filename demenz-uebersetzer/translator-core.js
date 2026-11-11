@@ -175,7 +175,13 @@
 
     const hasSafetySignal = (text, keywords) => {
       const normalized = normalize(text);
-      return keywords.some((keyword) => normalized.includes(` ${keyword}`));
+      return keywords.some((keyword) => {
+        if (keyword === 'luftnot') {
+          return [...normalized.matchAll(/ luftnot/g)].some(match =>
+            !/(?:^|\s)(?:kein|keine|keinen|nicht|ohne)\s*$/.test(normalized.slice(0, match.index)));
+        }
+        return normalized.includes(` ${keyword}${keyword === 'keine luft' ? ' ' : ''}`);
+      });
     };
 
     const moodIds = P.moodIds ?? ['wut', 'trauer', 'angst'];
