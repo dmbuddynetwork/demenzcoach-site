@@ -1804,9 +1804,12 @@
     ]);
     const bubbleOnly = element('button', { className: 'translator-chat-open', attributes: { type: 'button', 'aria-label': 'Chat öffnen' } }, [avatar()]);
     const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': 'Noch etwas schreiben', hidden: '' } }, [panel, bubbleOnly]);
-    let small = false;
+    let small = document.body.dataset.translatorState !== 'input';
     let positionFrame = 0;
     const setSmall = (value) => { small = value; chat.classList.toggle('translator-chat-small', value); syncChat(); };
+    // A submitted situation leads into the goal/answer flow. Keep its text clear;
+    // the user can still deliberately expand the compact chat launcher.
+    form.addEventListener('submit', () => { setSmall(true); });
     close.addEventListener('click', () => { setSmall(true); bubbleOnly.focus(); track('translator_write_chat', { step: 'closed' }); });
     bubbleOnly.addEventListener('click', () => { setSmall(false); field.focus(); track('translator_write_chat', { step: 'opened' }); });
     chatForm.addEventListener('submit', (event) => {

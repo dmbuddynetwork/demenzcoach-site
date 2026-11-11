@@ -67,6 +67,7 @@ const answer = {
         assert.equal(await page.locator('.translator-ai-answer').count(), 0, 'No advice before the explicit goal choice');
         assert.equal(await page.locator('.translator-ai-goal-choice').count(), 3);
         assert.equal(await page.locator('.translator-ai-goal-retry').isVisible(), false, 'Retry is only visible after a goal-loading error');
+        assert.equal(await page.locator('.translator-chat-panel').isVisible(), false, 'The goal flow has no unsolicited chat panel');
         assert.ok((await page.locator('.translator-said-art').getAttribute('src')).endsWith('/chat-helferin.webp'));
         if (evidence && language === 'de') {
           for (const width of [390, 1280]) {
@@ -89,13 +90,21 @@ const answer = {
         if (evidence && language === 'de') {
           for (const width of [390, 1280]) {
             await page.setViewportSize({ width, height: 900 });
+            await page.waitForTimeout(4000);
+            assert.equal(await page.locator('.translator-chat-panel').isVisible(), false, 'Answer stays unobstructed after the chat appearance delay');
             await page.screenshot({ path: path.join(evidence, `answer-${width}.png`), fullPage: false });
           }
         }
         if (language === 'de') {
+          await page.locator('.translator-chat-open').click();
+          assert.equal(await page.locator('.translator-chat-panel').isVisible(), true, 'Deliberate chat opening still works');
+          await page.locator('.translator-chat-close').click();
           await page.getByRole('button', { name: 'Ja, merken', exact: true }).click();
           await page.getByText('Antwort gemerkt.', { exact: true }).waitFor();
-          await submit('Ich muss zur Arbeit.'); await ready();
+          await page.locator('.translator-chat-open').click();
+          await page.locator('.translator-chat-input').fill('Ich muss zur Arbeit.');
+          await page.locator('.translator-chat-send').click(); await ready();
+          assert.equal(await page.locator('.translator-chat-panel').isVisible(), false, 'Submitting through the chat also leaves the goal flow unobstructed');
           assert.equal(requests.length, 3, 'A library keyword still requests AI goals');
           assert.equal(await page.locator('.translator-ai-answer').count(), 0);
           await page.waitForFunction(() => document.querySelector('.translator-said-art')?.src.endsWith('/chat-helferin.webp')).catch(async error => {
