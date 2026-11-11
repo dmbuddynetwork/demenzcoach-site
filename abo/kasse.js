@@ -1,7 +1,9 @@
 // Kasse als Fenster auf derselben Seite (Daniel, 9. Nov 2026: wie BetterMe und Yazio, die Zahlung öffnet sich über der
 // Angebotsseite). Wird von /start/ geladen (window.DemenzKasse.open). Die Seite /abo/ bleibt als eigener Einstieg.
-// Ablauf wie abo.js: stilles Gast-Konto (Firebase anonym), POST /session, Stripe Checkout (Elements) mit Express-Knöpfen
-// und Zahlungsfeld. Nach der Zahlung leitet Stripe auf /abo/?status=fertig weiter (dort Danke-Seite und Konto sichern).
+// Neue Sitzungen wechseln zum Stripe Hosted Checkout. Bereits geladene ältere
+// Kassen und die gestufte Veröffentlichung behalten den Elements-Fallback.
+import { createHostedCheckoutRedirect } from "./checkout-redirect.js";
+const redirectHostedCheckout = createHostedCheckoutRedirect((url) => location.assign(url));
 // § 312j Abs. 2 BGB: Preis, Laufzeit und Kündigung stehen vor allen Zahlungsknöpfen und direkt über dem Bestellknopf,
 // der Bestellknopf heißt „Zahlungspflichtig abonnieren“. Texte gleich wie renderSummary in abo.js.
 const config = window.DEMENZ_ABO_CONFIG || {};
@@ -96,7 +98,7 @@ export async function open(options) {
   close();
   const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
   const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
-  const loading = el("p", { class: "kasse-loading", role: "status", text: "Zahlungsarten werden geladen …" });
+  const loading = el("p", { class: "kasse-loading", role: "status", text: "Die sichere Zahlung wird geöffnet …" });
   const summary = el("p");
   const terms = el("p");
   const trialNote = el("p", { hidden: "" });
@@ -105,7 +107,7 @@ export async function open(options) {
   const divider = el("p", { class: "abo-divider", text: "oder", hidden: "" });
   const express = el("div", { id: "kasse-express" });
   const payment = el("div", { id: "kasse-payment" });
-  const payButton = el("button", { type: "button", class: "abo-button", disabled: "", text: "Zahlungspflichtig abonnieren" });
+  const payButton = el("button", { type: "button", class: "abo-button", disabled: "", hidden: "", text: "Zahlungspflichtig abonnieren" });
   const emailLine = el("p", { class: "abo-checkout-email", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
   const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
   const card = el("div", { class: "kasse-card" }, [
@@ -151,16 +153,21 @@ export async function open(options) {
   payButton.addEventListener("click", confirm);
 
   try {
-    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser(), loadStripe()]);
+    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
     publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
     const session = await api("/session", {
       method: "POST",
       token: await user.getIdToken(),
-      body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
+      body: { plan: options.plan, checkoutMode: "hosted", termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
+    if (!sheet || sheet.node !== node) return;
+    if (redirectHostedCheckout(session, { attempt: node, isCurrent: () => sheet?.node === node })) return;
+    loading.textContent = "Zahlungsarten werden geladen …";
+    await loadStripe();
+    if (!sheet || sheet.node !== node) return;
     const price = publicConfig.plans[options.plan];
     const text = summaryText(options.plan, price, session.trialDays, session.firstYear);
     summary.textContent = text;
@@ -183,6 +190,7 @@ export async function open(options) {
       if (!sheet || sheet.node !== node) return;
       clearTimeout(loadingTimer);
       loading.hidden = true;
+      payButton.hidden = false;
       payButton.disabled = false;
       options.track?.("checkout_sheet_ready");
     });

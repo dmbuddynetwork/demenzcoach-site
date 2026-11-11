@@ -2,6 +2,8 @@
 // Netzwerk nur zu unserem Backend (DEMENZ_ABO_CONFIG.endpoint), zu Firebase Auth und zu Stripe.
 import { createPaymentStatusController, paymentStatusText } from "./payment-status.js";
 import { emailAccountURL } from "./email-auth.js";
+import { createHostedCheckoutRedirect } from "./checkout-redirect.js";
+const redirectHostedCheckout = createHostedCheckoutRedirect((url) => location.assign(url));
 const config = window.DEMENZ_ABO_CONFIG;
 const firebaseVersion = "12.16.0";
 const $ = (id) => document.getElementById(id);
@@ -30,6 +32,8 @@ function invalidateCheckout() {
   state.checkoutAttempt = null;
   state.checkout = null;
   state.checkoutReady = false;
+  $("hosted-checkout-status").hidden = true;
+  $("hosted-checkout-retry").hidden = true;
   state.confirming = false;
   $("pay-button").disabled = true;
   for (const element of state.checkoutElements) {
@@ -219,7 +223,8 @@ async function startCheckout(email) {
   const attempt = { generation: state.checkoutGeneration, plan: state.plan, user: state.user };
   state.checkoutAttempt = attempt;
   $("email-block").hidden = true;
-  $("pay-block").hidden = false;
+  $("pay-block").hidden = state.offer?.checkoutMode === "hosted";
+  $("hosted-checkout-status").hidden = state.offer?.checkoutMode !== "hosted";
   $("pay-button").disabled = true;
   const receiptEmail = email || attempt.user.email;
   if (receiptEmail) $("signed-in-as").textContent = `Bestätigung und Zugang an ${receiptEmail}`;
@@ -232,11 +237,14 @@ async function startCheckout(email) {
     const session = await api("/session", {
       method: "POST",
       token,
-      body: { plan: attempt.plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+      body: { plan: attempt.plan, checkoutMode: "hosted", termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
     if (!currentAttempt(attempt)) return;
+    if (redirectHostedCheckout(session, { attempt, isCurrent: () => currentAttempt(attempt) })) return;
+    $("hosted-checkout-status").hidden = true;
+    $("pay-block").hidden = false;
     renderSummary(session.trialDays, session.firstYear);
     await mountStripe(session.clientSecret, attempt);
   } catch (error) {
@@ -256,6 +264,11 @@ async function startCheckout(email) {
       $("pay-block").hidden = true;
       return fail("Bitte gib eine gültige E-Mail-Adresse ein.");
     }
+    const retry = $("hosted-checkout-retry");
+    retry.hidden = false;
+    retry.onclick = () => {
+      if (state.user === attempt.user && state.plan === attempt.plan && state.step === "pay") startCheckout(email);
+    };
     fail("Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
   }
 }
