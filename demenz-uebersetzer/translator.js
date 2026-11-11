@@ -958,11 +958,12 @@
     const ungraded = ui?.gradedSafety === false && result.safetyLevel !== 'standard';
     const safetyNote = aiSafetyNote(result, ungraded);
     // A local guard may already show this exact complete warning. Keep the
-    // first warning and its call links; never collapse different safety text.
+    // first stable warning and its call links; retry containers are replaced.
+    // Never collapse different safety text or reuse a soon-detached warning.
     const safetySignature = note => JSON.stringify([note.textContent.replace(/\s+/g, ' ').trim(),
       [...note.querySelectorAll('a[href]')].map(link => link.getAttribute('href'))]);
     const existingSafetyNote = safetyNote && [...output.querySelectorAll('.safety-note')]
-      .find(note => safetySignature(note) === safetySignature(safetyNote));
+      .find(note => !note.closest('.translator-ai') && safetySignature(note) === safetySignature(safetyNote));
     if (safetyNote && !existingSafetyNote) nodes.push(safetyNote);
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
     nodes.push(element('p', { className: 'translator-ai-label', text: saved ? helpfulCopy.history : 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));

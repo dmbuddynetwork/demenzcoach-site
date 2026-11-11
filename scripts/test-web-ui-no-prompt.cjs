@@ -37,7 +37,7 @@ const answer = {
     for (const language of ['de', 'en']) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
       const requests = [], errors = [];
-      let duplicateMode = 'identical';
+      let duplicateMode = 'identical', retryAnswerCount = 0;
       try {
         await context.addInitScript(() => {
           localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied');
@@ -49,11 +49,16 @@ const answer = {
           if (url.hostname.endsWith('cloudfunctions.net') && url.pathname.includes('/translator-web')) {
             if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
             const body = request.postDataJSON(), goal = url.pathname.endsWith('/goals'); requests.push({ body, goal });
-            const result = goal
+            let result = goal
               ? { kind: 'goals', noSituation: false, goals: ['act_now', 'understand', 'organize'].map((id, i) => ({ goal: id, label: labels[language][i] })) }
               : body.text === duplicateText
                 ? { ...answer, safetyLevel: duplicateMode === 'identical' ? 'urgent' : 'concern', safetyMessage: 'Ein zusätzlicher, anderer Schutzhinweis bleibt erhalten.' }
                 : answer;
+            if (!goal && body.text === 'RetryFixture') {
+              retryAnswerCount++;
+              result = { ...answer, safetyLevel: 'urgent', safetyMessage: 'Existing urgent warning',
+                phrases: retryAnswerCount === 1 ? [] : answer.phrases };
+            }
             return route.fulfill({ contentType: 'application/json', headers: cors, body: JSON.stringify(result) });
           }
           if (url.pathname === '/abo/web-auth.js') return route.fulfill({ contentType: 'text/javascript', body: 'export async function webAuth(){return {auth:{currentUser:null},sdk:{}}}' });
@@ -102,9 +107,26 @@ const answer = {
           assert.equal(await page.locator('#translator-result .safety-note').count(), 2, 'Different warnings are never removed');
           assert.ok((await page.locator('#translator-result').innerText()).includes('Ein zusätzlicher, anderer Schutzhinweis bleibt erhalten.'));
         }
+        await page.setViewportSize({ width: 390, height: 844 });
+        await submit('RetryFixture');
+        await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+        await page.locator('.translator-ai-goal-choice').first().click();
+        const retry = page.locator('.translator-ai .translator-ai-button');
+        await retry.waitFor({ state: 'visible' });
+        assert.equal(await page.locator('.translator-ai > .safety-urgent').count(), 1, 'Invalid urgent response keeps a warning inside the retry container');
+        assert.equal(await page.locator('.translator-ai-answer').count(), 0);
+        await retry.click(); await page.locator('.translator-ai-answer').waitFor();
+        assert.equal(retryAnswerCount, 2);
+        assert.equal(await page.locator('#translator-result .safety-urgent').count(), 1, 'Replacing the retry container cannot discard its only complete warning');
+        assert.equal(await page.locator('.translator-ai-answer .safety-urgent').count(), 1, 'Retried answer owns a connected replacement warning');
+        assert.equal(await page.locator('.translator-feedback').count(), 0);
+        assert.equal(await page.evaluate(() => document.activeElement.isConnected && document.activeElement.matches('.safety-urgent')), true, 'Manual retry focuses a warning that remains in the DOM');
+        if (language === 'de') assert.equal(await page.locator('#translator-result .safety-urgent a[href^="tel:"]').count(), 3);
+        if (evidence) await page.locator('#translator-result').screenshot({ path: path.join(evidence, `retry-warning-${language}-390.png`) });
         assert.ok(requests.every(request => request.body.share === false)); assert.deepEqual(errors, []);
         report.languages.push({ language, existingGoalContract: true, explicitGoalBound: true, narrowOverlayPrevented: true,
-          deliberateChatOpen: true, closeFocusPreserved: true, warningsChecked: language === 'de', requestCount: requests.length, pageErrors: errors });
+          deliberateChatOpen: true, closeFocusPreserved: true, warningsChecked: language === 'de', retryWarningPreserved: true,
+          retryFocusConnected: true, requestCount: requests.length, pageErrors: errors });
       } finally { await context.close(); }
     }
     report.passed = true;
