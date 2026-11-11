@@ -978,7 +978,7 @@
     const safetySignature = note => JSON.stringify([note.textContent.replace(/\s+/g, ' ').trim(),
       [...note.querySelectorAll('a[href]')].map(link => link.getAttribute('href'))]);
     const existingSafetyNote = safetyNote && [...output.querySelectorAll('.safety-note')]
-      .find(note => !note.closest('.translator-ai') && safetySignature(note) === safetySignature(safetyNote));
+      .find(note => !note.closest('[data-goal-safety-history]') && !note.closest('.translator-ai') && safetySignature(note) === safetySignature(safetyNote));
     if (safetyNote && !existingSafetyNote) nodes.push(safetyNote);
     // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
     nodes.push(element('p', { className: 'translator-ai-label', text: saved ? helpfulCopy.history : 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
@@ -1142,7 +1142,7 @@
           return;
         }
         const freshNote = urgentNote(data.safetySignals.text);
-        const existing = [...output.querySelectorAll('.safety-urgent')].find((note) => !box.contains(note) && note.textContent === freshNote.textContent);
+        const existing = [...output.querySelectorAll('.safety-urgent')].find((note) => !note.closest('[data-goal-safety-history]') && !box.contains(note) && note.textContent === freshNote.textContent);
         const note = existing ?? freshNote;
         if (existing) box.remove(); else box.replaceWith(note);
         output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
@@ -1209,8 +1209,40 @@
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status', 'aria-live': 'polite' } });
     const choices = element('div', { className: 'translator-ai-goal-choices' });
     const changeGoals = element('details', { className: 'translator-change-goal' }, [element('summary', { text: en ? 'Change goal' : 'Ziel ändern' })]);
-    let busy = false, selectedKey = '';
+    let busy = false, selectedKey = '', selectedGoal = null;
     const answerSlot = element('div', { className: 'translator-goal-answer' });
+    // These are received warnings for this original situation, not a severity
+    // classification of a different goal. Keep their exact nodes and call links.
+    const warningHistory = element('div', { attributes: { 'data-goal-safety-history': '', hidden: '' } });
+    const receivedWarnings = new Map();
+    const warningSignature = note => JSON.stringify([note.textContent.replace(/\s+/g, ' ').trim(),
+      [...note.querySelectorAll('a[href]')].map(link => link.getAttribute('href'))]);
+    const syncWarningHistory = () => {
+      const current = new Set([...answerSlot.querySelectorAll('.safety-note')].map(warningSignature));
+      for (const [signature, record] of receivedWarnings) record.item.hidden = current.has(signature);
+      warningHistory.hidden = ![...receivedWarnings.values()].some(record => !record.item.hidden);
+    };
+    const preserveWarnings = () => {
+      if (!selectedGoal) return;
+      for (const note of answerSlot.querySelectorAll('.safety-note')) {
+        const signature = warningSignature(note);
+        let record = receivedWarnings.get(signature);
+        if (!record) {
+          const context = element('p');
+          const item = element('section', {}, [context, note]);
+          record = { item, context, goals: new Map() };
+          receivedWarnings.set(signature, record);
+          warningHistory.append(item);
+        }
+        record.goals.set(selectedKey, selectedGoal.label);
+        // textContent through the element API: custom goal text is never HTML.
+        record.context.textContent = (en ? 'Information from previous answers. Goals: ' : 'Hinweis aus vorherigen Antworten. Ziele: ')
+          + [...record.goals.values()].map(label => `„${label}“`).join('; ');
+      }
+      syncWarningHistory();
+    };
+    new MutationObserver(syncWarningHistory).observe(answerSlot, { childList: true, subtree: true });
+
     // This cache belongs only to this situation and address mode. Pending promises
     // are shared when A → B → A is chosen; detached views cannot paint stale results.
     const answers = new Map();
@@ -1227,7 +1259,9 @@
     const select = (goal) => {
       const key = JSON.stringify([personal.formal, goal]);
       if (!box.isConnected || busy || key === selectedKey) return;
+      preserveWarnings();
       selectedKey = key;
+      selectedGoal = { ...goal };
       box.classList.add('translator-ai-goals-selected');
       heading.textContent = `${en ? 'Your goal' : 'Dein Ziel'}: ${goal.label}`;
       if (!changeGoals.contains(choices)) { choices.before(changeGoals); changeGoals.append(choices, ownDetails); }
@@ -1238,6 +1272,7 @@
       setViewState('answer');
       ownDetails.open = false;
       answerSlot.replaceChildren(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, requestAnswer }));
+      syncWarningHistory();
     };
     const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'Describe what you need help with' : 'Beschreibe, wobei du Hilfe möchtest' } });
     const ownLabel = element('label', {}, [element('span', { text: en ? 'Or describe your own goal' : 'Oder beschreibe dein eigenes Ziel' }), own]);
@@ -1291,7 +1326,7 @@
     };
     const retry = button(en ? 'Ask the AI for goals' : 'Ziele mit KI klären', 'button translator-ai-goal-retry', () => { void load(); });
     retry.hidden = auto;
-    box.append(heading, status, choices, ownDetails, retry, answerSlot);
+    box.append(heading, status, choices, ownDetails, retry, warningHistory, answerSlot);
     ownDetails.hidden = true;
     if (auto) requestAnimationFrame(() => { void load(); });
     return box;

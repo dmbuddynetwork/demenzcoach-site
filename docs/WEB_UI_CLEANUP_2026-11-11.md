@@ -64,3 +64,24 @@ Chrome profile Daniel: opened the existing production `/abo/` flow and its actua
 - Private reusable situation URLs await the user’s device-only vs account decision. No new persistence, public sharing, database endpoint or care text in URLs was introduced.
 - Saved answers are currently browser-local, not account cloud storage. Older saved answers may contain one phrase; opening them does not invent or regenerate more.
 - No new real Firebase/OAuth account or email link was created. Actual mobile OS keyboard, VoiceOver and physical-device behavior remain unverified; browser reduced-motion, text size, keyboard focus and visualViewport behavior were checked to the stated extent.
+
+## Safety review delta — 12 November 2026
+
+Independent Safety found P2 on reviewed candidate `b54a669`: changing a goal replaced the entire answer slot, removing the only warning before the next answer arrived. Publication was not approved. The coordinator authorized only this UI correction and its relevant regressions/bindings.
+
+The fix keeps actual warning nodes and their call links in an ephemeral region belonging to the same original situation. Each retained warning lists the actual preceding goal label(s), keyed by the full goal ID/label and address mode. This is previous-answer information, not a new clinical classification of the currently selected goal. Custom labels use text content. A new original creates a new empty region.
+
+Deduplication compares exact normalized warning text and link destinations only with warnings actually present in this panel's current answer slot. Identical current warnings temporarily suppress the historical duplicate; genuinely different warnings coexist. The fixed urgent renderer cannot reuse a historical node as if it belonged to a new request. No severity latch, relevance classifier, prompt, medical text, stylesheet, account or production flag changed.
+
+Evidence: `/Users/daniel/Developer/Codex-Arbeit/demenzcoach/web-goal-first-20261111/goal-warning-fix/`.
+
+- `RED.log`: the exact original failure, zero visible warnings while B is pending.
+- `green/RESULT.json`: 26 green targeted cases — DE/EN fixed/model concern/urgent, B pending/error/standard/identical warning, A→B→A cache, focus/call links/new original and custom-label contexts.
+- `extended/RESULT.json`: 10 further green cases — eight genuinely different B-warning combinations plus two same-ID/different-label custom goals containing HTML-looking text. No inserted image nodes.
+- `screens/`: versioned B-pending/B-standard/A-return screenshots for concern and urgent. These are mocked UI evidence, not live advice.
+- `SAFETY34.log`: all existing 34 DE/EN safety mock requests pass unchanged.
+- `export/`: 88 unchanged rendered catalog views rebound from 176 fresh contexts, zero providers; source-bound SEO guard 13 cases passes.
+
+Two extended-fixture mistakes were corrected only in tests: a different historical B warning correctly remains alongside current A (two distinct warnings), and a fixed B concern must be awaited as a warning rather than as a model answer. The first 26 green cases remain valid because the product source did not change between the green runs. The normal full regression combines the cases; the extended run isolates only the newly added combinations.
+
+The previous b54 technical/visual/auth/payment results remain historical evidence; unrelated suites were not repeated. This delta still requires independent Safety and technical after-review, then the existing sole Publisher. No merge or production deployment is authorized by this source handoff.
