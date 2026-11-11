@@ -59,7 +59,7 @@ const answer = {
         page.on('pageerror', e => report.errors.push(e.message));
         await page.goto(preview.origin + '/' + language + '/', { waitUntil: 'networkidle' });
         const input = page.locator('#translator-input');
-        const submit = async text => { await input.fill(text); await page.locator('#translator-form [type="submit"]').click(); };
+        const submit = async text => { if (await input.isVisible()) { await input.fill(text); await page.locator('#translator-form [type="submit"]').click(); } else { await page.locator('.translator-chat-input').fill(text); await page.locator('.translator-chat-send').click(); } };
         const ready = () => page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
         await submit('sie ist mein eis weg'); await ready();
         assert.equal(requests.length, 1); assert.ok(requests[0].path.endsWith('/goals'));
@@ -67,8 +67,8 @@ const answer = {
         assert.equal(await page.locator('.translator-ai-answer').count(), 0, 'No advice before the explicit goal choice');
         assert.equal(await page.locator('.translator-ai-goal-choice').count(), 3);
         assert.equal(await page.locator('.translator-ai-goal-retry').isVisible(), false, 'Retry is only visible after a goal-loading error');
-        assert.equal(await page.locator('.translator-chat-panel').isVisible(), false, 'The goal flow has no unsolicited chat panel');
-        assert.ok((await page.locator('.translator-said-art').getAttribute('src')).endsWith('/chat-helferin.webp'));
+        assert.equal(await page.locator('.translator-chat-input').isVisible(), true, 'A different situation can be entered directly');
+        assert.ok((await page.locator('.translator-said-art').getAttribute('src')).endsWith('/chat-helferin-fragend.png'));
         if (evidence && language === 'de') {
           for (const width of [390, 1280]) {
             await page.setViewportSize({ width, height: 900 });
@@ -79,36 +79,33 @@ const answer = {
         await page.locator('.translator-ai-answer').waitFor();
         assert.equal(requests.length, 2); assert.equal(requests[1].body.share, false);
         assert.deepEqual(requests[1].body.goal, { id: goals[language][0].goal, label: goals[language][0].label });
-        assert.ok((await page.locator('.translator-chosen-ai-goal').innerText()).includes(goals[language][0].label));
+        assert.ok((await page.locator('.translator-ai-goals-selected > h2').innerText()).includes(goals[language][0].label));
         const resultText = await page.locator('#translator-result').innerText();
         assert.doesNotMatch(resultText, /Zur Verbesserung des Übersetzers|Nicht speichern|sichtbar für alle|visible to anyone/);
         const spacing = await page.locator('.translator-ai-answer').evaluate(node => {
-          const meaning = node.querySelector('.translator-meaning'), headings = node.querySelectorAll('.translator-step');
-          return headings[1].getBoundingClientRect().top - meaning.getBoundingClientRect().bottom;
+          const phrases = node.querySelector('.translator-phrases'), headings = node.querySelectorAll('.translator-step');
+          return headings[1].getBoundingClientRect().top - phrases.getBoundingClientRect().bottom;
         });
         assert.ok(spacing >= 20, 'Readable space between the answer sections');
         if (evidence && language === 'de') {
           for (const width of [390, 1280]) {
             await page.setViewportSize({ width, height: 900 });
             await page.waitForTimeout(4000);
-            assert.equal(await page.locator('.translator-chat-panel').isVisible(), false, 'Answer stays unobstructed after the chat appearance delay');
+            assert.equal(await page.locator('.translator-chat-input').isVisible(), true, 'The directly editable composer stays available');
             if (width === 390) assert.equal(await page.locator('.translator-chat-open').isVisible(), false, 'The compact launcher cannot cover the mobile answer either');
             await page.screenshot({ path: path.join(evidence, `answer-${width}.png`), fullPage: false });
           }
         }
         if (language === 'de') {
-          await page.locator('.translator-chat-open').click();
           assert.equal(await page.locator('.translator-chat-panel').isVisible(), true, 'Deliberate chat opening still works');
-          await page.locator('.translator-chat-close').click();
           await page.getByRole('button', { name: 'Ja, merken', exact: true }).click();
           await page.getByText('Antwort gemerkt.', { exact: true }).waitFor();
-          await page.locator('.translator-chat-open').click();
           await page.locator('.translator-chat-input').fill('Ich muss zur Arbeit.');
           await page.locator('.translator-chat-send').click(); await ready();
-          assert.equal(await page.locator('.translator-chat-panel').isVisible(), false, 'Submitting through the chat also leaves the goal flow unobstructed');
+          assert.equal(await page.locator('.translator-chat-input').isVisible(), true, 'The composer stays available during goal selection');
           assert.equal(requests.length, 3, 'A library keyword still requests AI goals');
           assert.equal(await page.locator('.translator-ai-answer').count(), 0);
-          await page.waitForFunction(() => document.querySelector('.translator-said-art')?.src.endsWith('/chat-helferin.webp')).catch(async error => {
+          await page.waitForFunction(() => document.querySelector('.translator-said-art')?.src.endsWith('/chat-helferin-fragend.png')).catch(async error => {
             console.error(JSON.stringify({ workImageFailures, image: await page.locator('.translator-said-art').evaluate(n => ({ src: n.src, complete: n.complete, width: n.naturalWidth })) }));
             throw error;
           });
@@ -116,6 +113,7 @@ const answer = {
           const image = page.locator('.translator-said-art');
           await image.evaluate(node => node.dispatchEvent(new Event('error')));
           assert.equal(await image.isVisible(), false, 'A failed fallback does not cause a retry loop');
+          await page.locator('.translator-own-goal-details > summary').click();
           await page.getByLabel('Oder beschreibe dein eigenes Ziel', { exact: true }).fill('Ich möchte erst verstehen, was sie meint');
           await page.getByRole('button', { name: 'Antwort zu meinem Ziel', exact: true }).click();
           await page.locator('.translator-ai-answer').waitFor();

@@ -8,7 +8,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '..');
 const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.json':'application/json', '.svg':'image/svg+xml', '.webp':'image/webp', '.png':'image/png', '.woff2':'font/woff2' };
 const config = { plans:{yearly:{amount:6999,currency:'eur'},monthly:{amount:1299,currency:'eur'}}, trialDays:7, publishableKey:'pk_test_fixture',textVersions:{terms:'fixture'} };
-const auth = `const user={email:'fixture@example.invalid',isAnonymous:true,getIdToken:async()=>'fixture-owner'};
+const auth = `const user={uid:'fixture-owner',email:'fixture@example.invalid',isAnonymous:true,getIdToken:async()=>'fixture-owner'};
 export const getAuth=()=>({currentUser:user}); export const getRedirectResult=async()=>null;
 export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(user),0);return ()=>{}};`;
 const server = http.createServer((req,res)=>{try{let p=new URL(req.url,'http://localhost').pathname;if(p.endsWith('/'))p+='index.html';const file=path.resolve(root,'.'+p);if(!file.startsWith(root+path.sep))throw Error();res.writeHead(200,{'Content-Type':types[path.extname(file)]||'application/octet-stream'});res.end(fs.readFileSync(file));}catch{res.writeHead(404);res.end();}});
@@ -108,6 +108,7 @@ const server = http.createServer((req,res)=>{try{let p=new URL(req.url,'http://l
           assert.equal(sessions.length,4);assert.deepEqual(errors,[]);cases++;
           console.log(JSON.stringify({mode,width,scenario,oldSessionsConfirmed:0,currentSessionRetriesVerified:true}));continue;
         }
+        if(mode==='modal'){assert.equal(sessions.length,1,'The real UID guard permits exactly one fixture session before mounting payments');const message=await page.locator('.kasse-card [role=alert]').textContent();if(scenario==='loaderror')assert.match(message,/Zahlungsarten konnten nicht geladen werden/);else assert.equal(message?.trim()||'','','No unexpected checkout error before the payment fixture');}
         await page.waitForFunction(()=>Boolean(window.__fixturePayment));
         const payControl=page.locator(mode==='page'?'#pay-button':'.kasse-card .abo-button');
         if(scenario==='loaderror') {
