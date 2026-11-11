@@ -68,7 +68,7 @@ const answer = {
         assert.equal(await page.locator('.translator-ai-goal-choice').count(), 3);
         assert.equal(await page.locator('.translator-ai-goal-retry').isVisible(), false, 'Retry is only visible after a goal-loading error');
         assert.equal(await page.locator('.translator-chat-input').isVisible(), true, 'A different situation can be entered directly');
-        assert.ok((await page.locator('.translator-said-art').getAttribute('src')).endsWith('/chat-helferin-fragend.png'));
+        assert.ok((await page.locator('.translator-said-art').getAttribute('src')).endsWith('/chat-helferin-fragend-lossless.png'));
         if (evidence && language === 'de') {
           for (const width of [390, 1280]) {
             await page.setViewportSize({ width, height: 900 });
@@ -105,7 +105,7 @@ const answer = {
           assert.equal(await page.locator('.translator-chat-input').isVisible(), true, 'The composer stays available during goal selection');
           assert.equal(requests.length, 3, 'A library keyword still requests AI goals');
           assert.equal(await page.locator('.translator-ai-answer').count(), 0);
-          await page.waitForFunction(() => document.querySelector('.translator-said-art')?.src.endsWith('/chat-helferin-fragend.png')).catch(async error => {
+          await page.waitForFunction(() => document.querySelector('.translator-said-art')?.src.endsWith('/chat-helferin-fragend-lossless.png')).catch(async error => {
             console.error(JSON.stringify({ workImageFailures, image: await page.locator('.translator-said-art').evaluate(n => ({ src: n.src, complete: n.complete, width: n.naturalWidth })) }));
             throw error;
           });

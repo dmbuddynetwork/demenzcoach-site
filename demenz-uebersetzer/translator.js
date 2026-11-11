@@ -486,7 +486,7 @@
   };
   // Der gehörte Satz als weiße Sprechblase mit Zeichnung daneben, wie auf den App-Store-Bildern
   // (Daniel, 8. Nov: „stell das in eine Sprechblase, als würde das gesagt werden“).
-  const fallbackIllustration = '/assets/zeichnungen/chat-helferin-fragend.png';
+  const fallbackIllustration = '/assets/zeichnungen/chat-helferin-fragend-lossless.png';
   const saidBlock = (says, entry, heading) => {
     const art = !entry?.safetyOnly
       ? element('img', { className: 'translator-said-art', attributes: { src: entry?.image || fallbackIllustration, alt: '', width: String(entry?.imageWidth ?? (entry?.image ? 480 : 200)), height: String(entry?.imageHeight ?? (entry?.image ? 400 : 200)), decoding: 'async' } })
