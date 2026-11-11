@@ -35,7 +35,7 @@ const answer={kind:'answer',meaning:'Fixture context.',phrases:['Ein Satz.','Zwe
    assert.doesNotMatch(await status.innerText(),/nicht erreichbar|not available|unavailable/i);assert.equal(requests.length,2);assert.equal(new URL(requests[1].url).search,'');
    report.cases.push({language,legacy:true,requests:requests.length,status:await status.innerText(),patientPhrase:false,alarm:false,retry:false});
   }else{
-   const form=()=>page.locator('.translator-clarification-form');const field=()=>form().locator('textarea');const send=()=>form().locator('button');
+   const form=()=>page.locator('.translator-clarification-form');const field=()=>form().locator('.translator-clarification-detail');const send=()=>form().locator('button');
    await form().waitFor();assert.equal(await page.locator('.translator-goal-answer q,.translator-goal-answer .translator-phrase,.translator-goal-answer .translator-helpful,.translator-goal-answer .translator-save,.translator-goal-answer .translator-phrase-share').count(),0);
    assert.equal(await page.locator('.translator-clarification-question img').count(),0);assert.equal(await page.evaluate(()=>window.badQuestion),undefined);clarification.question='Was genau möchtest du ändern?';
    assert.match(await page.locator('.translator-ai-clarification').innerText(),/Eine Rückfrage|A question about/);
@@ -44,7 +44,7 @@ const answer={kind:'answer',meaning:'Fixture context.',phrases:['Ein Satz.','Zwe
    const long='🙂'.repeat(200);await field().fill(long);await send().click();assert.equal(await field().inputValue(),long);assert.equal(requests.length,2);assert.match(await page.locator('.translator-ai-clarification [role=status]').innerText(),/200/);
    const supplement='Cafe\u0301';await field().fill(supplement);fail=true;await send().click();await page.locator('.translator-ai-button:visible').waitFor();assert.equal(await field().inputValue(),supplement);
    const failed=requests.at(-1);assert.equal(failed.body.text,original+'\nCafé');assert.equal(failed.body.goal.label,goals[0].label);assert.equal(failed.body.share,false);assert.equal(failed.body.language,language==='en'?'en':undefined);assert.equal(new URL(failed.url).search,'?response_contract=clarification-v1');
-   await page.locator('.translator-ai-button:visible').click();await page.waitForFunction(()=>document.querySelector('.translator-clarification-form textarea')?.value==='');assert.equal(requests.at(-1).headers['x-translator-request-id'],failed.headers['x-translator-request-id']);
+   await page.locator('.translator-ai-button:visible').click();await page.waitForFunction(()=>document.querySelector('.translator-clarification-detail')?.value==='');assert.equal(requests.at(-1).headers['x-translator-request-id'],failed.headers['x-translator-request-id']);
    assert.equal(requests.at(-1).headers['x-translator-correction-of'],undefined);
    // Re-select goal A after another goal: latest combined input/result is reused, no repeated answer request.
    await page.locator('.translator-change-goal>summary').click();await page.locator('.translator-ai-goal-choice').nth(1).click();await form().waitFor();await field().fill('Entwurf bleibt lokal');const beforeReturn=requests.length;

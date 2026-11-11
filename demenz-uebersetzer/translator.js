@@ -1087,6 +1087,7 @@
     let continuation = requestState?.options || null;
     let exactText = requestState?.exactText === true;
     let draft = requestState?.draft || '', draftFor = requestState?.draftFor || '';
+    let editDraft = requestState?.editDraft || '', editFor = requestState?.editFor || '';
     let requestPending = false;
     const run = async (manual = false) => {
       if (requestPending) return;
@@ -1100,7 +1101,7 @@
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
       const options = { ...(continuation || { formal: personal.formal, correctionOf, goal }), requestID: operationID, exactText };
-      const remember = () => onRequestState({ text: requestText, options: { formal: options.formal, correctionOf: options.correctionOf || '', goal: options.goal }, exactText, operationID, draft, draftFor });
+      const remember = () => onRequestState({ text: requestText, options: { formal: options.formal, correctionOf: options.correctionOf || '', goal: options.goal }, exactText, operationID, draft, draftFor, editDraft, editFor });
       remember();
       const result = await (requestAnswer || ai.ask)(requestText, options);
       requestPending = false;
@@ -1118,13 +1119,25 @@
         const previousText = requestText.normalize('NFC').trim();
         const previousOptions = { formal: options.formal, goal: options.goal, correctionOf: options.correctionOf || '' };
         const title = element('h3', { text: en ? 'A question about your situation' : 'Eine Rückfrage zu deiner Situation', attributes: { tabindex: '-1' } });
-        const field = element('textarea', { attributes: { rows: '3', autocomplete: 'off', placeholder: en ? 'Please add the missing detail, without names.' : 'Ergänze die fehlende Angabe bitte ohne Namen.' } });
+        const field = element('textarea', { className: 'translator-clarification-detail', attributes: { rows: '3', autocomplete: 'off', placeholder: en ? 'Please add the missing detail, without names.' : 'Ergänze die fehlende Angabe bitte ohne Namen.' } });
         field.value = draftFor === previousText ? draft : '';
         field.addEventListener('input', () => { draft = field.value; draftFor = previousText; remember(); });
         const send = button(en ? 'Add your detail' : 'Antwort ergänzen', 'button', () => {});
         send.type = 'submit';
+        const original = element('textarea', { className: 'translator-clarification-original', attributes: { rows: '3', autocomplete: 'off' } });
+        original.value = editFor === previousText ? editDraft : previousText;
+        const updateSubmit = () => { send.textContent = original.value.normalize('NFC').trim() !== previousText
+          ? (en ? 'Restart with this situation' : 'Mit dieser Situation neu starten')
+          : (en ? 'Add your detail' : 'Antwort ergänzen'); };
+        original.addEventListener('input', () => { editDraft = original.value; editFor = previousText; remember(); updateSubmit(); });
+        updateSubmit();
+        const edit = element('details', { className: 'translator-clarification-edit' }, [
+          element('summary', { text: en ? 'Edit situation' : 'Situation bearbeiten' }),
+          element('label', {}, [element('span', { text: en ? 'Your situation' : 'Deine Situation' }), original]),
+          element('p', { text: en ? 'If you change the situation, you choose your goal again. Your additional detail will be included.' : 'Wenn du die Situation änderst, wählst du dein Ziel erneut. Deine Ergänzung wird übernommen.' })
+        ]);
         const form = element('form', { className: 'translator-clarification-form' }, [
-          element('label', {}, [element('span', { text: en ? 'Your additional detail' : 'Deine Ergänzung' }), field]), send
+          edit, element('label', {}, [element('span', { text: en ? 'Your additional detail' : 'Deine Ergänzung' }), field]), send
         ]);
         let submitting = false;
         form.addEventListener('submit', async event => {
@@ -1132,13 +1145,23 @@
           if (submitting || requestPending) return;
           const reply = field.value.normalize('NFC').trim();
           if (!reply) { status.textContent = en ? 'Please add the missing detail first.' : 'Ergänze bitte zuerst die fehlende Angabe.'; field.focus(); return; }
-          const combined = `${previousText}\n${reply}`;
+          const situation = original.value.normalize('NFC').trim();
+          if (!situation) { status.textContent = en ? 'Please describe the situation first.' : 'Beschreibe bitte zuerst die Situation.'; edit.open = true; original.focus(); return; }
+          const combined = `${situation}\n${reply}`;
           const issue = ai.requestIssue(combined, previousOptions);
           if (issue) {
             status.textContent = issue === 'text_too_long'
-              ? (en ? 'The situation and your detail can contain up to 200 characters together. Please shorten your detail or describe the situation again in the input below. Your draft stays here.' : 'Situation und Ergänzung dürfen zusammen höchstens 200 Zeichen enthalten. Kürze bitte deine Ergänzung oder beschreibe die Situation im Eingabefeld unten erneut. Dein Entwurf bleibt hier erhalten.')
+              ? (en ? 'The situation and your detail can contain up to 200 characters together. Shorten your detail or use “Edit situation” to shorten the situation. Both drafts stay here.' : 'Situation und Ergänzung dürfen zusammen höchstens 200 Zeichen enthalten. Kürze deine Ergänzung oder die Situation über „Situation bearbeiten“. Beide Entwürfe bleiben hier erhalten.')
               : (en ? 'This detail is too long to send. Please shorten it. Your draft stays here.' : 'Diese Ergänzung ist zu lang zum Senden. Bitte kürze sie. Dein Entwurf bleibt hier erhalten.');
             field.focus(); return;
+          }
+          if (situation !== previousText) {
+            // Explicit restart uses the normal original-input safety/goal path.
+            // Merely opening/editing leaves the received warnings in place.
+            const otherDraft = input.value;
+            input.value = combined;
+            try { input.form.requestSubmit(); } finally { input.value = otherDraft; grow(); }
+            return;
           }
           requestText = combined; continuation = previousOptions; exactText = true;
           operationID = window.DemenzKiFreigabe?.enabled() ? window.crypto.randomUUID() : '';

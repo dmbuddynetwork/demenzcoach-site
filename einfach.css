@@ -800,3 +800,5 @@ body.einfach .translator-clarification-form textarea { display:block; width:100%
 
 /* While answering the AI question, keep one primary input and retain its context. */
 body.einfach:has(.translator-clarification-form) > .translator-chat { display:none!important; }
+
+body.einfach .translator-clarification-edit > summary { min-height:44px; padding:10px 0; cursor:pointer; }
