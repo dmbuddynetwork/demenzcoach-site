@@ -28,4 +28,15 @@ const answer={kind:'answer',meaning:'Fixture context.',phrases:['Ein Satz.','Noc
  for(const method of ['askGoals','ask']){const before=requests.length;assert.equal((await api[method]('🙂'.repeat(201))).reason,'text_too_long');assert.equal(requests.length,before);checks++;}
  assert.ok(requests.every(r=>new URL(r.url).pathname.endsWith('/goals')?new URL(r.url).search==='':new URL(r.url).search==='?response_contract=clarification-v1'));
  assert.ok(requests.every(r=>r.body.share===false&&r.options.credentials==='omit'&&r.options.referrerPolicy==='no-referrer'));
-}console.log(JSON.stringify({passed:true,checks,providerCalls:0}));})().catch(e=>{console.error(e);process.exitCode=1;});
+ }
+ for(const method of ['askGoals','ask']){
+  let callback,timeoutDelay,cleared=false,signal;
+  const box={AbortController,TextEncoder,document:{documentElement:{lang:'de'}},
+   setTimeout:(fn,delay)=>{callback=fn;timeoutDelay=delay;return 17;},clearTimeout:id=>{assert.equal(id,17);cleared=true;},
+   fetch:async(url,options)=>new Promise((resolve,reject)=>{signal=options.signal;signal.addEventListener('abort',()=>reject(new Error('Synthetic abort')),{once:true});})};
+  vm.createContext(box);vm.runInContext(code,box);const pending=box.DemenzTranslatorAI[method]('Original');
+  for(let i=0;i<4&&!signal;i++)await Promise.resolve();
+  assert.ok(signal);assert.equal(timeoutDelay,30000);assert.equal(signal.aborted,false);callback();assert.equal(signal.aborted,true);
+  assert.equal((await pending).kind,'error');assert.equal(cleared,true);checks++;
+ }
+ console.log(JSON.stringify({passed:true,checks,deadlineChecks:2,goalAndAnswerTimeoutMS:30000,fakeTime:true,providerCalls:0}));})().catch(e=>{console.error(e);process.exitCode=1;});

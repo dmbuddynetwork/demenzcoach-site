@@ -108,7 +108,7 @@
     const issue = requestIssue(textValue, { formal });
     if (issue) return { kind: 'error', reason: issue };
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
+    const timer = setTimeout(() => controller.abort(), 30000);
     try {
       const response = await fetch(`${endpoint}/goals`, { method: 'POST', mode: 'cors', credentials: 'omit',
         referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json' },
