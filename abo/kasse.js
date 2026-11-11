@@ -135,11 +135,20 @@ export async function open(options) {
   }, 15_000);
 
   let checkout = null;
+  let checkoutUID = null;
+  const currentAttempt = () => sheet?.node === node && checkoutUID && auth?.currentUser?.uid === checkoutUID;
+  const requireCurrentAccount = () => {
+    if (!sheet || sheet.node !== node) return false;
+    if (!currentAttempt()) throw Object.assign(new Error("checkout_account_changed"), { code: "checkout_account_changed" });
+    return true;
+  };
   const confirm = async () => {
     payButton.disabled = true;
     error.hidden = true;
     try {
+      if (!requireCurrentAccount()) return;
       const loaded = await checkout.loadActions?.();
+      if (!requireCurrentAccount()) return;
       const result = await (loaded?.actions ?? checkout).confirm();
       if (result?.type === "error" || result?.error) {
         fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
@@ -154,20 +163,24 @@ export async function open(options) {
 
   try {
     const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+    checkoutUID = user.uid;
+    if (!requireCurrentAccount()) return;
     publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
+    const token = await user.getIdToken();
+    if (!requireCurrentAccount()) return;
     const session = await api("/session", {
       method: "POST",
-      token: await user.getIdToken(),
+      token,
       body: { plan: options.plan, checkoutMode: "hosted", termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
-    if (!sheet || sheet.node !== node) return;
-    if (redirectHostedCheckout(session, { attempt: node, isCurrent: () => sheet?.node === node })) return;
+    if (!requireCurrentAccount()) return;
+    if (redirectHostedCheckout(session, { attempt: node, isCurrent: currentAttempt })) return;
     loading.textContent = "Zahlungsarten werden geladen …";
     await loadStripe();
-    if (!sheet || sheet.node !== node) return;
+    if (!requireCurrentAccount()) return;
     const price = publicConfig.plans[options.plan];
     const text = summaryText(options.plan, price, session.trialDays, session.firstYear);
     summary.textContent = text;
@@ -180,7 +193,7 @@ export async function open(options) {
     const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" } };
     const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
     checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
-    if (!sheet || sheet.node !== node) return;
+    if (!requireCurrentAccount()) return;
     const expressElement = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
     expressElement.on("availablepaymentmethodschange", ({ paymentMethods }) => { divider.hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean); });
     expressElement.on("confirm", () => confirm());
@@ -206,6 +219,12 @@ export async function open(options) {
     clearTimeout(loadingTimer);
     loading.hidden = true;
     if (!sheet || sheet.node !== node) return;
+    if (problem.code === "checkout_account_changed") {
+      fail("Dein Konto hat sich geändert. Öffne die Zahlung für dein aktuelles Konto erneut.");
+      card.append(el("button", { type: "button", class: "abo-button", text: "Erneut versuchen",
+        onclick: () => { if (sheet?.node === node) open({ ...options, email: auth?.currentUser?.email || undefined }); } }));
+      return;
+    }
     if (problem.code === "already_subscribed") {
       summary.textContent = "Du hast schon ein Abo. Dein Plan ist freigeschaltet.";
       summary.parentElement.hidden = false;

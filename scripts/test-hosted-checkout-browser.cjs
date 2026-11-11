@@ -7,9 +7,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '..');
 const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.json':'application/json', '.svg':'image/svg+xml', '.webp':'image/webp', '.png':'image/png', '.woff2':'font/woff2' };
 const config = { checkoutMode:'hosted', plans:{yearly:{amount:6999,currency:'eur'},monthly:{amount:1299,currency:'eur'}}, trialDays:7, publishableKey:'pk_test_fixture',textVersions:{terms:'fixture'} };
-const auth = `const user={email:'fixture@example.invalid',emailVerified:true,isAnonymous:false,getIdToken:async()=>'fixture-owner'};
-export const getAuth=()=>({currentUser:user}); export const getRedirectResult=async()=>null;
-export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(user),0);return ()=>{}};`;
+const auth = `const user={uid:'fixture-A',email:'fixture@example.invalid',emailVerified:true,isAnonymous:false,getIdToken:async()=>'fixture-owner'};
+const auth={currentUser:user};export const getAuth=()=>auth; export const getRedirectResult=async()=>null;
+export const setFixtureUser=(uid)=>{auth.currentUser={...user,uid,email:uid==='fixture-B'?'fixture-b@example.invalid':user.email,getIdToken:async()=>uid==='fixture-B'?'fixture-owner-B':'fixture-owner'};};
+export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(a.currentUser),0);return ()=>{}};`;
 const server = http.createServer((req,res)=>{try {
  let name=new URL(req.url,'http://localhost').pathname;if(name.endsWith('/'))name+='index.html';
  const file=path.resolve(root,'.'+name);if(!file.startsWith(root+path.sep))throw Error();
@@ -73,7 +74,32 @@ const server = http.createServer((req,res)=>{try {
     assert.deepEqual(stripeScripts,[]);cases++;
    }finally{release();await context.close();}
   }
-  console.log(JSON.stringify({ok:true,cases,providerCalls:0,realAccountsOrPurchases:false,scope:'both hosted entry points, Cancel, foreign URLs, stale closed sheet'}));
+  for(const uid of ['fixture-A','fixture-B']){
+   const context=await browser.newContext(),page=await context.newPage(),sessions=[],stripeScripts=[];
+   let release;const hold=new Promise(resolve=>{release=resolve;});
+   await intercept(context,{origin,plan:'monthly',sessions,stripeScripts,hold});
+   try{
+    const request=page.waitForRequest(request=>new URL(request.url()).pathname.endsWith('/session'));
+    await open(page,origin,'modal','monthly');await request;
+    await page.evaluate(async(uid)=>{const auth=await import('https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js');auth.setFixtureUser(uid);},uid);
+    const response=page.waitForResponse(result=>new URL(result.url()).pathname.endsWith('/session'));
+    release();await response;
+    if(uid==='fixture-B'){
+     await page.getByRole('alert').filter({hasText:'Dein Konto hat sich geändert'}).waitFor();
+     assert.equal(new URL(page.url()).origin,origin,'UID-A checkout must never redirect the active UID-B');
+     assert.equal(sessions.length,1);assert.equal(sessions[0].token,'Bearer fixture-owner');
+     await page.getByRole('dialog').getByRole('button',{name:'Erneut versuchen',exact:true}).click();
+     await page.waitForURL('https://checkout.stripe.com/**');
+     assert.equal(sessions.length,2);assert.equal(sessions[1].token,'Bearer fixture-owner-B');
+     assert.equal(sessions[1].body.email,'fixture-b@example.invalid');
+    }else{
+     await page.waitForURL('https://checkout.stripe.com/**');
+     assert.equal(sessions.length,1,'a refreshed user object with the same UID must remain usable');
+    }
+    assert.deepEqual(stripeScripts,[]);cases++;
+   }finally{release();await context.close();}
+  }
+  console.log(JSON.stringify({ok:true,cases,providerCalls:0,realAccountsOrPurchases:false,scope:'both hosted entry points, Cancel, foreign URLs, stale closed sheet, pending-session UID switch and retry'}));
  }finally{await browser?.close();await new Promise(resolve=>server.close(resolve));}
 
  async function intercept(context,{origin,plan,sessions,stripeScripts,foreign=false,hold=null}){
