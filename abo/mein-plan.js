@@ -109,11 +109,11 @@ function renderPlan() {
     );
     firstWeek.slice(1).forEach((moment, index) => weekly.push(dayDetails(`Tag ${index + 2}`, `„${moment.quote}“`, card(moment))));
     weekly.push(dayDetails("Tag 7", data.selfCare.title, selfCareCard()));
-    weekly.push(el("p", { class: "start-small abo-muted", text: "Ab nächster Woche kommt jede Woche ein neuer Moment dazu." }));
+    weekly.push(el("p", { class: "start-small abo-muted", text: "Ab nächster Woche begleiten euch wöchentliche Impulse für euren Alltag." }));
   } else {
     const current = weekMoment(week);
     weekly.push(
-      el("p", { class: "start-lead", text: "Jede Woche ein neuer Moment, mit Sätzen zum Sagen und einem kleinen Schritt." }),
+      el("p", { class: "start-lead", text: "Wöchentliche Impulse für euren Alltag – mit passenden Worten und einem kleinen Schritt zum Ausprobieren." }),
       el("h2", { class: "plan-today", text: `Woche ${week}: Wenn ${person} sagt „${current.quote}“` }),
       card(current),
       el("h2", { class: "start-section", text: "Deine bisherigen Momente" })
@@ -144,8 +144,8 @@ function renderPlan() {
     ]),
     el("p", { class: "start-small abo-muted", text: "Dein Name und die Auswahl aus dem Fragebogen bleiben in diesem Browser. Sie werden nicht mit der App synchronisiert." }),
     el("div", { class: "start-card" }, [
-      el("p", {}, el("strong", { text: "Auf dem iPhone" })),
-      el("p", { class: "abo-muted", text: "Lade Demenz Coach und melde dich in den Einstellungen mit demselben Konto an. Dein Abo gilt dort auch." }),
+      el("p", {}, el("strong", { text: "Auch für das iPhone" })),
+      el("p", { class: "abo-muted", text: "Deinen Plan und passende Alltagshilfen nutzt du hier im Browser. Demenz Coach gibt es auch als iPhone-App." }),
       el("a", { class: "abo-button abo-button-light", href: config.appStoreURL, text: "Demenz Coach laden" })
     ]),
     el("p", { class: "start-small" }, el("a", { href: "./", text: "Abo verwalten" }))

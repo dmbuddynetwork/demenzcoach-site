@@ -1074,28 +1074,83 @@
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, onRequestState = () => {} } = {}) => {
     if (!ai || !text || text.length < 2) return null;
-    if (!goal && !localSafetyHit) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
+    if (!goal && !localSafetyHit && !requestState) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
     const waiting = aiWaiting();
-    let operationID = window.DemenzKiFreigabe?.enabled() ? window.crypto.randomUUID() : '';
-    const correctionOf = correctionRequestID;
-    correctionRequestID = '';
+    let operationID = requestState?.operationID || (window.DemenzKiFreigabe?.enabled() ? window.crypto.randomUUID() : '');
+    const correctionOf = requestState ? (requestState.options.correctionOf || '') : correctionRequestID;
+    if (!requestState) correctionRequestID = '';
+    let requestText = requestState?.text || text;
+    let continuation = requestState?.options || null;
+    let exactText = requestState?.exactText === true;
+    let draft = requestState?.draft || '', draftFor = requestState?.draftFor || '';
+    let requestPending = false;
     const run = async (manual = false) => {
+      if (requestPending) return;
+      requestPending = true;
+      const replyControls = box.querySelectorAll('.translator-clarification-form textarea, .translator-clarification-form button');
+      replyControls.forEach(control => { control.disabled = true; });
       ask.disabled = true;
       ask.hidden = auto;
       // Automatisch: Die Warte-Ansicht sagt schon, dass die Antwort geschrieben wird (kein doppelter Text).
       status.textContent = auto ? '' : tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
-      const result = await (requestAnswer || ai.ask)(text, { formal: personal.formal, correctionOf, requestID: operationID, goal });
+      const options = { ...(continuation || { formal: personal.formal, correctionOf, goal }), requestID: operationID, exactText };
+      const remember = () => onRequestState({ text: requestText, options: { formal: options.formal, correctionOf: options.correctionOf || '', goal: options.goal }, exactText, operationID, draft, draftFor });
+      remember();
+      const result = await (requestAnswer || ai.ask)(requestText, options);
+      requestPending = false;
+      replyControls.forEach(control => { if (control.isConnected) control.disabled = false; });
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
       if (result.kind === 'access') {
-        box.replaceChildren(window.DemenzKiFreigabe.offerCard({ sentence: text, reason: result.reason, value: result.access, onRetry: () => { if (result.reason === 'answer_recovery_credit') operationID = window.crypto.randomUUID(); box.replaceChildren(ask, status); void run(true); } }));
+        box.replaceChildren(window.DemenzKiFreigabe.offerCard({ sentence: requestText, reason: result.reason, value: result.access, onRetry: () => { if (result.reason === 'answer_recovery_credit') operationID = window.crypto.randomUUID(); box.replaceChildren(ask, status); void run(true); } }));
+        return;
+      }
+      if (result.kind === 'clarification') {
+        const en = ui?.lang === 'en';
+        window.DemenzKiFreigabe?.accept(result.access);
+        const previousText = requestText.normalize('NFC').trim();
+        const previousOptions = { formal: options.formal, goal: options.goal, correctionOf: options.correctionOf || '' };
+        const title = element('h3', { text: en ? 'A question about your situation' : 'Eine Rückfrage zu deiner Situation', attributes: { tabindex: '-1' } });
+        const field = element('textarea', { attributes: { rows: '3', autocomplete: 'off', placeholder: en ? 'Please add the missing detail, without names.' : 'Ergänze die fehlende Angabe bitte ohne Namen.' } });
+        field.value = draftFor === previousText ? draft : '';
+        field.addEventListener('input', () => { draft = field.value; draftFor = previousText; remember(); });
+        const send = button(en ? 'Add your detail' : 'Antwort ergänzen', 'button', () => {});
+        send.type = 'submit';
+        const form = element('form', { className: 'translator-clarification-form' }, [
+          element('label', {}, [element('span', { text: en ? 'Your additional detail' : 'Deine Ergänzung' }), field]), send
+        ]);
+        let submitting = false;
+        form.addEventListener('submit', async event => {
+          event.preventDefault();
+          if (submitting || requestPending) return;
+          const reply = field.value.normalize('NFC').trim();
+          if (!reply) { status.textContent = en ? 'Please add the missing detail first.' : 'Ergänze bitte zuerst die fehlende Angabe.'; field.focus(); return; }
+          const combined = `${previousText}\n${reply}`;
+          const issue = ai.requestIssue(combined, previousOptions);
+          if (issue) {
+            status.textContent = issue === 'text_too_long'
+              ? (en ? 'The situation and your detail can contain up to 200 characters together. Please shorten your detail or describe the situation again in the input below. Your draft stays here.' : 'Situation und Ergänzung dürfen zusammen höchstens 200 Zeichen enthalten. Kürze bitte deine Ergänzung oder beschreibe die Situation im Eingabefeld unten erneut. Dein Entwurf bleibt hier erhalten.')
+              : (en ? 'This detail is too long to send. Please shorten it. Your draft stays here.' : 'Diese Ergänzung ist zu lang zum Senden. Bitte kürze sie. Dein Entwurf bleibt hier erhalten.');
+            field.focus(); return;
+          }
+          requestText = combined; continuation = previousOptions; exactText = true;
+          operationID = window.DemenzKiFreigabe?.enabled() ? window.crypto.randomUUID() : '';
+          submitting = true; field.disabled = true; send.disabled = true;
+          try { await run(true); } finally { submitting = false; if (form.isConnected) { field.disabled = false; send.disabled = false; } }
+        });
+        box.classList.add('translator-ai-clarification');
+        status.textContent = ''; ask.hidden = true;
+        box.replaceChildren(title,
+          element('p', { className: 'translator-clarification-question', text: result.question }),
+          element('p', { text: result.meaning }), element('p', { text: result.nextStep }), form, status, ask);
+        title.focus({ preventScroll: true });
         return;
       }
       if (result.kind === 'answer' && Array.isArray(result.phrases)) {
@@ -1222,23 +1277,24 @@
       for (const [signature, record] of receivedWarnings) record.item.hidden = current.has(signature);
       warningHistory.hidden = ![...receivedWarnings.values()].some(record => !record.item.hidden);
     };
+    const rememberWarning = (note, key, goal) => {
+      const signature = warningSignature(note);
+      let record = receivedWarnings.get(signature);
+      if (!record) {
+        const context = element('p');
+        const item = element('section', {}, [context, note]);
+        record = { item, context, goals: new Map() };
+        receivedWarnings.set(signature, record);
+        warningHistory.append(item);
+      }
+      record.goals.set(key, goal.label);
+      record.context.textContent = (en ? 'Information from previous answers. Goals: ' : 'Hinweis aus vorherigen Antworten. Ziele: ')
+        + [...record.goals.values()].map(label => `„${label}“`).join('; ');
+      syncWarningHistory();
+    };
     const preserveWarnings = () => {
       if (!selectedGoal) return;
-      for (const note of answerSlot.querySelectorAll('.safety-note')) {
-        const signature = warningSignature(note);
-        let record = receivedWarnings.get(signature);
-        if (!record) {
-          const context = element('p');
-          const item = element('section', {}, [context, note]);
-          record = { item, context, goals: new Map() };
-          receivedWarnings.set(signature, record);
-          warningHistory.append(item);
-        }
-        record.goals.set(selectedKey, selectedGoal.label);
-        // textContent through the element API: custom goal text is never HTML.
-        record.context.textContent = (en ? 'Information from previous answers. Goals: ' : 'Hinweis aus vorherigen Antworten. Ziele: ')
-          + [...record.goals.values()].map(label => `„${label}“`).join('; ');
-      }
+      for (const note of answerSlot.querySelectorAll('.safety-note')) rememberWarning(note, selectedKey, selectedGoal);
       syncWarningHistory();
     };
     new MutationObserver(syncWarningHistory).observe(answerSlot, { childList: true, subtree: true });
@@ -1246,13 +1302,24 @@
     // This cache belongs only to this situation and address mode. Pending promises
     // are shared when A → B → A is chosen; detached views cannot paint stale results.
     const answers = new Map();
+    const requestStates = new Map();
     const requestAnswer = (situation, options) => {
-      const key = JSON.stringify([options.formal, options.goal]);
+      const key = JSON.stringify([situation.normalize('NFC').trim(), options.formal, options.goal, options.correctionOf || '']);
       if (answers.has(key)) return answers.get(key).then(result => { const { access, ...cached } = result; return cached; });
       if (!answers.has(key)) {
         const pending = Promise.resolve().then(() => ai.ask(situation, options)).catch(() => ({ kind: 'error', reason: 'unavailable' }));
         answers.set(key, pending);
-        pending.then(result => { if (!['answer', 'safety'].includes(result.kind) && answers.get(key) === pending) answers.delete(key); });
+        const capturedGoal = { ...options.goal };
+        const capturedKey = JSON.stringify([options.formal, capturedGoal]);
+        pending.then(result => {
+          if (!['answer', 'safety', 'clarification'].includes(result.kind) && answers.get(key) === pending) answers.delete(key);
+          // This exact goal section identifies the original flow, even when a new
+          // flow later has identical text. A detached response cannot affect it.
+          if (!box.isConnected || capturedKey === selectedKey) return;
+          const note = result.kind === 'safety' ? fixedSafetyNote(result)
+            : aiSafetyNote(result, ui?.gradedSafety === false && result.safetyLevel === 'concern');
+          if (note) rememberWarning(note, capturedKey, capturedGoal);
+        });
       }
       return answers.get(key);
     };
@@ -1271,7 +1338,7 @@
       choices.querySelectorAll('button').forEach(choice => choice.setAttribute('aria-pressed', String(choice.dataset.goalId === goal.id && choice.textContent === goal.label)));
       setViewState('answer');
       ownDetails.open = false;
-      answerSlot.replaceChildren(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, requestAnswer }));
+      answerSlot.replaceChildren(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), onRequestState: state => requestStates.set(key, state) }));
       syncWarningHistory();
     };
     const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'Describe what you need help with' : 'Beschreibe, wobei du Hilfe möchtest' } });
