@@ -57,7 +57,9 @@ test("actual return-page code sends the owner token, hides pending access and em
   const page = (await readFile(new URL("../abo/abo.js", import.meta.url), "utf8")).replace(/^import .*payment-status.js.*;\n/mu, "");
   const emailModule = await readFile(new URL("../abo/email-auth.js", import.meta.url), "utf8");
   const { emailAccountURL } = await import(`data:text/javascript;base64,${Buffer.from(emailModule).toString("base64")}`);
-  const code = page.replace(/^import .*email-auth.js.*;\n/mu, "");
+  const hostedModule = await readFile(new URL("../abo/checkout-redirect.js", import.meta.url), "utf8");
+  const { createHostedCheckoutRedirect } = await import(`data:text/javascript;base64,${Buffer.from(hostedModule).toString("base64")}`);
+  const code = page.replace(/^import .*email-auth.js.*;\n/mu, "").replace(/^import .*checkout-redirect.js.*;\n/mu, "");
   const split = code.indexOf('// --- Start ');
   assert.ok(split > 0);
   for (const outcome of ["pending", "failed", "action_required", "paid", "trialing", "no_payment_due", "auth_error", "legacy_paid", "legacy_unpaid", "legacy_no_payment_required", "signed_out", "token_error"]) {
@@ -70,7 +72,7 @@ test("actual return-page code sends the owner token, hides pending access and em
     };
     const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
     const context = createContext({
-      createPaymentStatusController, paymentStatusText, emailAccountURL, URLSearchParams,
+      createPaymentStatusController, paymentStatusText, emailAccountURL, createHostedCheckoutRedirect, URLSearchParams,
       location: { search: "?status=fertig&session_id=cs_synthetic", origin: "https://dementiacoachapp.com" },
       localStorage: { getItem: () => null },
       document: { getElementById: node, querySelectorAll: (selector) => selector === "[data-manage]" ? [node("payment-status-manage")] : [] },
@@ -128,8 +130,9 @@ test("isolated actual page supports legacy recovery and strict rich states", { s
       if (pathname.endsWith("/")) pathname += "index.html";
       const file = resolve(root, "." + pathname);
       if (!file.startsWith(root.endsWith(sep) ? root : root + sep)) throw new Error("outside fixture root");
+      const body = await readFile(file);
       response.writeHead(200, { "Content-Type": mime[extname(file)] || "application/octet-stream" });
-      response.end(await readFile(file));
+      response.end(body);
     } catch { response.writeHead(404); response.end(); }
   });
   await new Promise((done) => server.listen(0, "127.0.0.1", done));
