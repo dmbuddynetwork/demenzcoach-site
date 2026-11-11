@@ -8,23 +8,36 @@
 (function (root) {
   const endpoint = 'https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web';
   // Englische Seiten (<html lang="en">) bitten um eine englische Antwort. Deutsch schickt kein Sprachfeld.
-  const language = typeof document !== 'undefined' && document.documentElement?.lang === 'en' ? 'en' : '';
+  const language = typeof document !== 'undefined' && /^en(?:-|$)/i.test(document.documentElement?.lang || '') ? 'en' : '';
   const validFixedSafety = value => value?.kind === 'safety' && (value.safetyLevel === 'urgent'
     || value.safetyLevel === 'concern' && typeof value.message === 'string' && value.message.trim().length > 0);
 
+  const normalizedText = text => String(text).normalize('NFC').trim();
+  const bodyFor = (text, { formal = false, goal } = {}) => ({ text,
+    formal: language === 'en' ? false : formal === true, ...(language ? { language } : {}), ...(goal ? { goal } : {}), share: false });
+  // Shared by goals and answers: transmit the complete normalized text or reject it.
+  const requestIssue = (text, options = {}) => {
+    const value = normalizedText(text);
+    if (Array.from(value).length > 200) return 'text_too_long';
+    if (new TextEncoder().encode(JSON.stringify(bodyFor(value, options))).byteLength > 2048) return 'body_too_large';
+    return '';
+  };
   const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal } = {}) => {
+    const value = normalizedText(text);
+    const issue = requestIssue(value, { formal, goal });
+    if (issue) return { kind: 'error', reason: issue };
+    const payload = bodyFor(value, { formal, goal });
     if (!requestID && root.DemenzKiFreigabe?.enabled()) requestID = root.crypto.randomUUID();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch(endpoint + '?response_contract=clarification-v1', {
         method: 'POST',
         mode: 'cors',
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
         headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}) },
-        body: JSON.stringify({ text: String(text).trim().slice(0, 200), formal: language === 'en' ? false : formal === true,
-          ...(language ? { language } : {}), ...(goal ? { goal } : {}), share: false }),
+        body: JSON.stringify(payload),
         signal: controller.signal
       });
       if (response.status === 429) return { kind: 'error', reason: 'busy' };
@@ -39,6 +52,14 @@
         safetyMessage: hasText(result?.safetyMessage) ? result.safetyMessage : '' });
       if (!result || typeof result.kind !== 'string') return invalid();
       if (result.kind === 'safety') return validFixedSafety(result) ? result : { kind: 'error', reason: 'unavailable' };
+      if (result.kind === 'clarification') {
+        const within = (value, min, max) => hasText(value) && Array.from(value.normalize('NFC').trim()).length >= min && Array.from(value.normalize('NFC').trim()).length <= max;
+        if (!within(result.question, 3, 180) || !result.question.trim().endsWith('?')
+          || !within(result.meaning, 12, 420) || !within(result.nextStep, 8, 300)
+          || result.safetyLevel !== 'standard' || result.safetyMessage !== null
+          || ['phrases', 'avoid', 'share', 'publicSentence', 'requestID'].some(key => Object.hasOwn(result, key))) return invalid();
+        return { ...result, question: normalizedText(result.question), meaning: normalizedText(result.meaning), nextStep: normalizedText(result.nextStep) };
+      }
       if (result.kind === 'answer') {
         const usable = hasText(result.meaning) && hasText(result.avoid)
           && Array.isArray(result.phrases) && result.phrases.length > 0 && result.phrases.every(hasText)
@@ -83,13 +104,15 @@
   };
 
   const askGoals = async (text, { formal = false } = {}) => {
+    const textValue = normalizedText(text);
+    const issue = requestIssue(textValue, { formal });
+    if (issue) return { kind: 'error', reason: issue };
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
+    const timer = setTimeout(() => controller.abort(), 30000);
     try {
       const response = await fetch(`${endpoint}/goals`, { method: 'POST', mode: 'cors', credentials: 'omit',
         referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: String(text).trim().slice(0, 200), formal: language === 'en' ? false : formal === true,
-          ...(language ? { language } : {}), share: false }), signal: controller.signal });
+        body: JSON.stringify(bodyFor(textValue, { formal })), signal: controller.signal });
       if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
       const value = await response.json();
       if (validFixedSafety(value)) return value;
@@ -103,5 +126,5 @@
     } catch { return { kind: 'error', reason: 'unavailable' }; }
     finally { clearTimeout(timer); }
   };
-  root.DemenzTranslatorAI = { ask, askGoals, share, endpoint };
+  root.DemenzTranslatorAI = { ask, askGoals, share, requestIssue, endpoint };
 })(typeof window !== 'undefined' ? window : globalThis);

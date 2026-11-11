@@ -793,3 +793,12 @@ body.einfach .translator-chat-privacy { font-size:10.5px!important; line-height:
 body.einfach .translator-chat-privacy a { color:inherit!important; font-weight:400!important; text-decoration:none!important; min-height:24px; }
 body.einfach .translator-chat-privacy a:hover { text-decoration:underline!important; }
 body.einfach .translator-chat-privacy a:focus-visible { outline:2px solid #47408c; outline-offset:2px; text-decoration:underline!important; }
+/* The user answers a clarification here; these are not patient phrase cards. */
+body.einfach .translator-clarification-form { display:grid; gap:12px; min-width:0; }
+body.einfach .translator-clarification-form label { display:grid; gap:8px; min-width:0; }
+body.einfach .translator-clarification-form textarea { display:block; width:100%; max-width:100%; min-width:0; min-height:100px; padding:12px; border:1px solid var(--e-line); border-radius:12px; background:var(--e-card); color:inherit; }
+
+/* While answering the AI question, keep one primary input and retain its context. */
+body.einfach:has(.translator-clarification-form) > .translator-chat { display:none!important; }
+
+body.einfach .translator-clarification-edit > summary { min-height:44px; padding:10px 0; cursor:pointer; }
