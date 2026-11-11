@@ -1,6 +1,82 @@
 // Satzerkennung des Demenz-Übersetzers. Läuft im Browser und in Node-Tests.
 // Kein Netzwerk, kein Speichern: reine Funktion von Text → Ergebnis-Schlüssel.
 (function (root) {
+  // BEGIN frozen web-only absence adapter: backend 98527b6, module SHA256 806f04ed233e7f0a3d9b13e6960e1385994e8abc543a1673ba107d15b5483ab3
+// Web-only polarity adapter for explicit present-tense absence statements.
+// It is not a clinical assessment. Questions about the medical state, bare
+// uncertainty, reported text and positive cues stay unmasked for shared guards.
+const questionStart = /\b(?:was|wie|warum|wieso|weshalb|wann|wo|wohin|woher|wer|wen|wem|wessen|welch\p{L}*|woran|womit|wozu|wobei|ob|stimmt\s+(?:das|dies|es)|stimmt['’]s|what|how|why|when|where|who|whom|whose|which|whether|(?:kann|könnte|koennte|soll|sollte|darf|dürfte|duerfte|muss|müsste|muesste|ist|bist|bin|seid|sind|war|warst|wart|waren|hat|hast|habt|haben)\s+(?:ich|du|er|sie|wir|ihr|man|das|dies|es|die person)|(?:can|could|should|may|must|is|are|was|were|has|have|do|does|did|isn['’]?t|aren['’]?t|wasn['’]?t|weren['’]?t)\s+(?:i|you|he|she|we|they|it|this|that|the person))\b/iu;
+const statementDoubt = /\b(?:vielleicht|womöglich|womoeglich|falls|wenn|ob|glaub\w*|denk\w*|vermut\w*|schein\w*|oder doch|nicht sicher|unsicher|unklar|fraglich|ungewiss|geraten|unbestätigt|unbestaetigt|maybe|perhaps|if|whether|think|unsure|uncertain|unclear|guess\w*|not confirmed|not sure|don['’]?t know|do not know|cannot tell|can['’]?t tell)\b|\b(?:wei(?:ß|ss)|wissen)(?=\s|[.!?,;]|$)/iu;
+// A question can refer back to the medical assertion without repeating its cue.
+const questionDoubt = /\b(?:unklar|unsicher|fraglich|ungewiss|vielleicht|glaub\w*|denk\w*|vermut\w*|unsure|uncertain|unclear|maybe|perhaps|guess\w*|not sure|stimmt)\b|\b(?:bist|sind|ist|bin)\b.{0,20}\b(?:sicher|gewiss)\b|\b(?:are|is|am|aren['’]?t|isn['’]?t)\b.{0,20}\bsure\b|\b(?:ist|war|wäre|waere)\s+(?:das|dies|es)\s+(?:(?:wirklich|ganz)\s+)?(?:so|richtig|falsch|sicher|klar|zutreffend)\b|\b(?:is|was|could|can)\s+(?:that|this|it)\s+(?:be\s+)?(?:(?:really|actually)\s+)?(?:true|right|wrong|correct|so)\b|\b(?:das|dies|es)\b.{0,25}\b(?:erkenn|seh|merk|feststell|prüf|pruef|beurteil|einschätz|einschaetz|ausschließ|ausschliess|bestätig|bestaetig)\w*|\b(?:erkenn|seh|merk|feststell|prüf|pruef|beurteil|einschätz|einschaetz|ausschließ|ausschliess|bestätig|bestaetig)\w*\b.{0,25}\b(?:das|dies|es)\b|\b(?:confirm|assess|rule out)\b.{0,20}\b(?:that|this|it)\b|^\s*how\s+(?:can|could|do)\s+(?:i|we|you)\s+tell\s*[?!.]*$|^\s*(?:ist|war|sind|is|are|was|were|isn['’]?t|aren['’]?t|wasn['’]?t|weren['’]?t)\s+(?:er|sie|es|das|dies|he|she|they|it|this|that)\s*(?:das|es|wirklich|really|though|actually)?\s*[?!.]*$|^\s*(?:was|wie|what|how)\s*(?:bitte)?\s*[?!.]*$/iu;
+const uncertaintyIntro = /^\s*(?:(?:ich|wir)\s+(?:wei(?:ß|ss)|wissen)\s+(?:(?:es|das|gerade|noch|genau|wirklich)\s+)*nicht|(?:ich|wir)\s+(?:bin|sind)\s+unsicher|(?:i|we)\s+(?:do not|don['’]?t)\s+know|(?:i am|i['’]?m|we are|we['’]?re)\s+(?:not sure|unsure))\s*[,:]?\s*$/iu;
+const confirmationTag = /^\s*(?:oder(?: doch)?|richtig|stimmt(?: das)?|wirklich|sicher|really|right|correct|sure)\s*[!?.,;]*\s*$/iu;
+// Disputed truth is not evidence of absence, including across sentences.
+const disputedAssertion = /\b(?:falsch|unwahr|unrichtig|unzutreffend|gelogen|bestreit\w*|widersprech\w*|false|untrue|incorrect|denies|denied|contradict\w*)\b|\b(?:nicht\s+(?:wahr|richtig|korrekt|zutreffend|bestätigt|bestaetigt|so)|not\s+(?:true|right|correct|confirmed|the case)|stimmt\s+nicht|don['’]?t\s+believe|do\s+not\s+believe)\b/iu;
+const clausePattern = /[^.!?;\n]+[.!?;\n]?/gu;
+
+// Each match is one direct finite predicate. Only a following coordinated
+// predicate with the same implicit subject can extend the validated span.
+const deAbsence = /^(?:(?:ist|bin|bist|sind|seid)\s+(?:(?:jetzt|gerade|aktuell)\s+)?nicht\s+(bewusstlos)|(?:hat|habe|hast|haben|habt)\s+(?:(?:jetzt|gerade|aktuell)\s+)?keine\s+(atemnot))\b/iu;
+const enAbsence = /^(?:(?:(?:is|am|are)\s+(?:currently\s+)?not|isn['’]?t|aren['’]?t)\s+(unconscious)|(?:(?:has|have)\s+(?:currently\s+)?no|(?:does|do)\s+not\s+have|(?:doesn['’]?t|don['’]?t)\s+have)\s+(shortness\s+of\s+breath))\b/iu;
+const deBoundary = /^\s*(?:[.!;\n]|$|,|\bund\b|\baber\b|\bsondern\b|\b(?:er|sie|ich|du|wir|ihr)\s+\p{L}{2,}\b)/iu;
+const enBoundary = /^\s*(?:[.!;\n]|$|,|\band\b|\bbut\b|\b(?:he|she|i|you|we|they)\s+\p{L}{2,}\b)/iu;
+
+function maskAssertedAbsence(clause) {
+  // Anchor at the first finite predicate. Never search later nested statements
+  // or perform replacements outside the exact validated predicate matches.
+  // Intentionally bounded syntax: a pronoun or one determiner + known noun.
+  // Arbitrary words before a later verb are never treated as a subject. Unknown
+  // introductions/names remain raw for the unchanged shared guard.
+  const first = /^\s*(?:ich|du|er|sie|es|wir|ihr|i|you|he|she|it|we|they|(?:meine?|unsere?|der|die|das)\s+(?:mutter|vater|frau|mann|partnerin|partner|bruder|schwester|oma|opa|person)|(?:my|our|the)\s+(?:mother|mom|mum|father|dad|wife|husband|partner|brother|sister|grandmother|grandfather|person))\s+(?=(?:ist|bin|bist|sind|seid|hat|habe|hast|haben|habt|is|am|are|has|have|does|do|isn['’]?t|aren['’]?t|doesn['’]?t|don['’]?t)\b\s+)/iu.exec(clause);
+  if (!first) return clause;
+  const start = first[0].length;
+  const pattern = deAbsence.test(clause.slice(start)) ? deAbsence : enAbsence;
+  const boundary = pattern === deAbsence ? deBoundary : enBoundary;
+  const connector = pattern === deAbsence ? /^\s+und\s+/iu : /^\s+and\s+/iu;
+  const spans = [];
+  let offset = start;
+  for (let count = 0; count < 2; count++) {
+    const match = pattern.exec(clause.slice(offset));
+    if (!match || !boundary.test(clause.slice(offset + match[0].length))) break;
+    const cue = match[1] || match[2];
+    spans.push({ start: offset + match[0].length - cue.length, end: offset + match[0].length });
+    const end = offset + match[0].length;
+    const join = connector.exec(clause.slice(end));
+    if (!join) break;
+    offset = end + join[0].length;
+  }
+  let result = clause;
+  for (const span of spans.reverse()) result = result.slice(0, span.start) + "[negated cue]" + result.slice(span.end);
+  return result;
+}
+
+function webSafetyInput(value) {
+  const text = String(value), parts = new Map();
+  if (disputedAssertion.test(text)) return text;
+  let uncertain = false;
+  text.replace(clausePattern, (clause, offset) => {
+    const index = clause.search(questionStart);
+    const statement = index < 0 ? clause : clause.slice(0, index);
+    const question = index < 0 ? "" : clause.slice(index);
+    if (confirmationTag.test(clause)
+      || (statementDoubt.test(statement) && !(question && uncertaintyIntro.test(statement)))
+      || ((question || clause.includes("?")) && questionDoubt.test(question || clause))) uncertain = true;
+    parts.set(offset, { index, statement, question });
+    return clause;
+  });
+  if (uncertain) return text;
+  return text.replace(clausePattern, (clause, offset) => {
+    const { index, statement, question } = parts.get(offset);
+    // An unseparated question is not a confirmed absence statement.
+    if (index < 0) return clause.includes("?") ? clause : maskAssertedAbsence(clause);
+    return maskAssertedAbsence(statement) + question;
+  });
+}
+  // END frozen web-only absence adapter
+  // Existing backend medical cue, frozen 98527b6 server.mjs:452 (iu); no new cue vocabulary.
+  const existingRespiratoryCue = new RegExp("kaum luft\\b", "iu");
+
   // Sprachprofil P: Ohne Angabe gilt Deutsch. Jede Sprache kann Normalisierung, Füllwörter,
   // Sonderschlüssel und Anrede selbst mitbringen; der Abgleich selbst ist für alle gleich.
   const create = (P = {}) => {
@@ -174,7 +250,10 @@
     };
 
     const hasSafetySignal = (text, keywords) => {
-      const normalized = normalize(text);
+      // Mask validated absence spans only for this lookup; ranking/rendering/API keep the raw input.
+      const lookup = webSafetyInput(text);
+      if (existingRespiratoryCue.test(lookup.normalize("NFC").trim().replace(/\s+/gu, " "))) return true;
+      const normalized = normalize(lookup);
       return keywords.some((keyword) => {
         if (keyword === 'luftnot') {
           return [...normalized.matchAll(/ luftnot/g)].some(match =>

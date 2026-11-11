@@ -1,0 +1,10 @@
+{
+  "sourceCommit": "98527b6e11667161e11d71e9112c3b4bc8cf7b02",
+  "sourceFile": "backend/server.mjs",
+  "sourceSHA256": "d2d6e15fe0ea94f01eed625aa978c3235d44c6f45709f2b033d55ced81c721f1",
+  "rule": "defaultSafetyRules.medical",
+  "pattern": "kaum luft\\b",
+  "flags": "iu",
+  "normalization": "normalizeNFC\u2192trim\u2192collapseWhitespace",
+  "rootDispositionSHA256": "8ed28b2390c6042538c77df27d77b117876e981c5934b210b1e99fa460c62135"
+}

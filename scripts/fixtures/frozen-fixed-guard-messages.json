@@ -1,0 +1,14 @@
+{
+  "testDataOnly": true,
+  "donorCommit": "82c2fe9a9ec3286fefc85acf4372ced3875afd99",
+  "moduleSHA256": "806f04ed233e7f0a3d9b13e6960e1385994e8abc543a1673ba107d15b5483ab3",
+  "equalTo985": true,
+  "missingPerson": {
+    "de": "Wenn du die Person vermisst und nicht finden kannst, ruf sofort die örtliche Polizei. Falls eine Demenzdiagnose bekannt ist, teile sie mit. Halte ein aktuelles Foto bereit.",
+    "en": "If the person is missing and you cannot find them, contact the local police immediately. If a dementia diagnosis is known, tell the police. Have a recent photo ready."
+  },
+  "selfHarm": {
+    "de": "Bitte hole jetzt örtliche professionelle Notfall- oder Krisenhilfe. Wenn es um dich geht, bitte eine vertraute Person, bei dir zu bleiben. Wenn du jemanden begleitest, bleib bei der Person, sofern das für dich sicher ist.",
+    "en": "Please get local professional emergency or crisis support now. If this is about you, ask someone you trust to stay with you. If you are supporting someone else, stay with them if it is safe for you to do so."
+  }
+}

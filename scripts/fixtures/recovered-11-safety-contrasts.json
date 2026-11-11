@@ -1,0 +1,72 @@
+{
+  "createdUTC": "2026-11-11T22:29:41.516684+00:00",
+  "status": "EXACT_RECONSTRUCTION_FROM_REVIEWER_RETAINED_TOOLCALL_NOT_NEW_EXECUTION",
+  "sourceReview": "webapp_safety53a8ccebguardclosure;reusedunchanged98527b6",
+  "provenance": "ReviewerreturnedverbatimretainedinlineNodeHeredocconstcases;nohistoricalfile/receiptpathwaspresent;thisisnewRootrecordofrecoveredarray",
+  "cases": [
+    {
+      "id": "old-outer-DE",
+      "text": "Es ist nicht wahr: Er ist nicht bewusstlos.",
+      "language": "de"
+    },
+    {
+      "id": "old-outer-EN",
+      "text": "It is not true that she is not unconscious.",
+      "language": "en"
+    },
+    {
+      "id": "old-following-DE",
+      "text": "Er ist nicht bewusstlos, aber ich bezweifle, sie ist nicht bewusstlos.",
+      "language": "de"
+    },
+    {
+      "id": "old-following-EN",
+      "text": "He is not unconscious, but I doubt that she is not unconscious.",
+      "language": "en"
+    },
+    {
+      "id": "leading-DE",
+      "text": "Ich bezweifle sie ist nicht bewusstlos.",
+      "language": "de"
+    },
+    {
+      "id": "leading-EN",
+      "text": "I doubt she is not unconscious.",
+      "language": "en"
+    },
+    {
+      "id": "leading-report",
+      "text": "Someone told me she is not unconscious.",
+      "language": "en"
+    },
+    {
+      "id": "other-person",
+      "text": "Our mother is not unconscious and has no shortness of breath, but my father is unconscious.",
+      "language": "en"
+    },
+    {
+      "id": "air",
+      "text": "Sie ist nicht bewusstlos, aber mein Vater bekommt kaum Luft.",
+      "language": "de"
+    },
+    {
+      "id": "overdose",
+      "text": "Er hat keine Atemnot und hat zu viele Schlaftabletten genommen.",
+      "language": "de"
+    },
+    {
+      "id": "self-harm",
+      "text": "Er ist nicht bewusstlos. Ich will mir etwas antun.",
+      "language": "de"
+    }
+  ],
+  "historicalPaths": [
+    "/v1/translator-web/goals",
+    "/v1/translator-web"
+  ],
+  "historicalBody": "{text,language,share:false}",
+  "historicalExpectedAndReported": "All22HTTP200/kindsafety/safetyLevelurgent/0outgoing;XSafetyRulemedicalexcepteoverdosemedication_overdose/self-harmself_harm",
+  "newWebsiteUse": "11actualfrozeninputsonnewcore;doNOTrelabelas22newAPI-handlerchecks;originaldisplay/APItextunchanged;backendclassificationnotclaimedfrombrowsercore",
+  "rootRecordSHA256": "43359f6c92679a57fa6067ed59562c2ab3dceadbbb4c6a45240c0f8bfd8ef1cc",
+  "rootRecordPath": "/Users/daniel/Developer/system/work-projects/dementia-coach/outputs/RECOVERED_11_SAFETY_CONTRAST_INPUTS_20261112.json"
+}

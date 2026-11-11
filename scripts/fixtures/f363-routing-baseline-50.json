@@ -1,0 +1,857 @@
+{
+  "sourceSHA256": "3db594c696abb37f1c51c95e2b2ca0c91067123c0f1a8b3572ffd16f30b30f45",
+  "sourceCommit": "f3636444a694d4d702d42bebc4e3a267cfb5e660",
+  "predicateVerbatim": "if (ai && !safetyHit && !entry?.safetyOnly && protection !== 'self')",
+  "results": [
+    {
+      "id": "01",
+      "input": "Sie will mein ganzes Eis essen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "hunger",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "02",
+      "input": "Sie will mein Eis essen. Ich möchte es selbst behalten.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "hunger",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "03",
+      "input": "Ich möchte ihr jetzt von meinem Eis nichts abgeben.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "04",
+      "input": "Sie greift nach meinem Tee. Ich möchte ihn selbst trinken.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "05",
+      "input": "Er will mein Buch mitnehmen. Ich will es heute nicht verleihen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "06",
+      "input": "Meine Mutter ruft alle fünf Minuten an. Ich brauche eine halbe Stunde Ruhe.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "uhrzeit",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": "calls",
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "07",
+      "input": "Ich möchte allein zum Briefkasten gehen. Sie will unbedingt mit.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "allein",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "08",
+      "input": "Er möchte mich umarmen. Ich möchte gerade Abstand.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "09",
+      "input": "Der Fernseher ist mir zu laut. Ich möchte ihn leiser stellen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "jemand",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "10",
+      "input": "Ich habe gesagt: Hör endlich auf zu schreien.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "ruhe",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "11",
+      "input": "Er möchte meine Jacke haben. Ich brauche sie selbst.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "umziehen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "12",
+      "input": "Sie möchte sich nicht waschen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "waschen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "13",
+      "input": "Er möchte vom Stuhl nicht aufstehen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "aufstehen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "14",
+      "input": "Es ist mitten in der Nacht. Er will zur Arbeit gehen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "aufstehen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "15",
+      "input": "Sie sagt, ich hätte ihr Geld gestohlen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "geld",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "16",
+      "input": "Sie möchte zu ihrer Mutter. Ihre Mutter ist schon lange tot.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "mutter",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "17",
+      "input": "Er fragt zum zehnten Mal, wann wir losgehen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "18",
+      "input": "Sie erkennt mich nicht und hat Angst vor mir.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "wer",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "19",
+      "input": "Mein Vater nennt mich seinen Bruder.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "wer",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "20",
+      "input": "Sie möchte den Schrank ausräumen. Ich will nicht, dass meine Sachen wegkommen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "langweilig",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "21",
+      "input": "Er möchte heute nichts essen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "hunger",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "22",
+      "input": "Sie sagt, sie möchte nach Hause, obwohl wir bei ihr sind.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "nachhause",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "23",
+      "input": "Ich brauche gerade eine Pause von der Betreuung.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "24",
+      "input": "Er sagt, ich würde mich nie um ihn kümmern.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "25",
+      "input": "Sie möchte die Blumen selbst gießen. Ich möchte sie unterstützen, ohne es ihr abzunehmen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "26",
+      "input": "She wants to eat all of my ice cream. I want to keep it.",
+      "language": "en",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "27",
+      "input": "He wants to take my book. I do not want to lend it today.",
+      "language": "en",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "28",
+      "input": "She reaches for my tea, but I want to drink it myself.",
+      "language": "en",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "29",
+      "input": "My mother calls every few minutes. I need half an hour to myself.",
+      "language": "en",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "when",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "30",
+      "input": "It is the middle of the night and he wants to leave for work.",
+      "language": "en",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "night",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "31",
+      "input": "She does not recognise me and is afraid of me.",
+      "language": "en",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "who",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "34",
+      "input": "Er möchte meine Jacke haben.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "umziehen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "35",
+      "input": "Sie isst mein ganzes Eis. Ich möchte, dass sie damit aufhört.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "36",
+      "input": "Hallo.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "37",
+      "input": "Danke.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "38",
+      "input": "Was soll ich hier reinschreiben?",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "wobin",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "39",
+      "input": "Meine Mutter ist irgendwie komisch geworden.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "40",
+      "input": "Sie hustet beim Essen häufig.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "schongegessen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "41",
+      "input": "Sie bekommt gerade kaum Luft.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "42",
+      "input": "Er ist bewusstlos.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": false,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": true,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "DIRECT_ANSWER_NO_GOAL_VIA_RENDER_UNKNOWN"
+    },
+    {
+      "id": "43",
+      "input": "Meine Mutter ist verschwunden und ich weiß nicht, wo sie ist.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": false,
+      "coreMatch": {
+        "entryKey": "wobin",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": true,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "LOCAL_CATALOG_WITH_LOCAL_SAFETY_NO_API"
+    },
+    {
+      "id": "44",
+      "input": "Soll ich ihre Tabletten absetzen?",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "tabletten",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "45",
+      "input": "Ich will mir etwas antun.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": false,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": true,
+        "protection": "clarify",
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "LOCAL_CONTEXT_QUESTION_NO_API"
+    },
+    {
+      "id": "46",
+      "input": "Er ist nicht bewusstlos und hat keine Atemnot. Er möchte seine Jacke suchen.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": false,
+      "coreMatch": {
+        "entryKey": "umziehen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": true,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "LOCAL_CATALOG_WITH_LOCAL_SAFETY_NO_API"
+    },
+    {
+      "id": "S1",
+      "input": "sie ist mein eis weg",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": null,
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "S2",
+      "input": "mama wil nich duschn",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "waschen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "S3",
+      "input": "Meine Schwester hilft bei der Pflege nicht. Wie teile ich die Aufgaben mit ihr auf?",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "tagespflege",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "S4",
+      "input": "Mein Bruder und ich streiten, wer heute bei Mama bleibt.",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": true,
+      "coreMatch": {
+        "entryKey": "mutter",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": false,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "GOALS"
+    },
+    {
+      "id": "QDE",
+      "input": "Sie ist nicht bewusstlos und hat keine Atemnot. Sie will nicht duschen. Was kann ich sagen?",
+      "language": "de",
+      "formal": false,
+      "exactGoalPredicate": false,
+      "coreMatch": {
+        "entryKey": "waschen",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": true,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "LOCAL_CATALOG_WITH_LOCAL_SAFETY_NO_API"
+    },
+    {
+      "id": "QEN",
+      "input": "She is not unconscious and has no shortness of breath. She will not shower. What can I say?",
+      "language": "en",
+      "formal": false,
+      "exactGoalPredicate": false,
+      "coreMatch": {
+        "entryKey": "shower",
+        "entrySafetyOnly": false,
+        "entrySelfCare": false,
+        "safetyHit": true,
+        "protection": null,
+        "context": null,
+        "feeling": null
+      },
+      "routeClassification": "LOCAL_CATALOG_WITH_LOCAL_SAFETY_NO_API"
+    }
+  ]
+}

@@ -802,3 +802,28 @@ body.einfach .translator-clarification-form textarea { display:block; width:100%
 body.einfach:has(.translator-clarification-form) > .translator-chat { display:none!important; }
 
 body.einfach .translator-clarification-edit > summary { min-height:44px; padding:10px 0; cursor:pointer; }
+
+/* Result draft: compact navigation, a clear goal and quiet general disclosures. */
+body.einfach .e-header .e-wrap { flex-wrap:wrap; gap:8px; padding-block:8px; }
+body.einfach .e-header .e-brand { flex:1 1 12rem; min-height:44px; }
+body.einfach .e-header .e-brand span { max-width:none; font-size:1rem!important; line-height:1.25!important; white-space:normal; }
+body.einfach .e-header .e-menu > summary { font-size:1rem!important; line-height:1.25!important; padding:8px 12px; gap:6px; }
+body.einfach .translator-ai-goals-selected > h2 { font-size:clamp(1.375rem,2.8vw,1.5rem)!important; line-height:1.3!important; margin:0 0 8px!important; overflow-wrap:anywhere; }
+body.einfach .translator-change-goal { margin:8px 0 12px; }
+body.einfach .translator-goal-answer { margin-top:12px; }
+body.einfach .translator-ai-answer { margin:12px 0!important; }
+body.einfach .translator-ai-answer > .translator-ai-label { margin:0 0 12px!important; }
+body.einfach #translator-result .translator-ai-answer > .translator-step { margin-top:20px!important; }
+body.einfach .translator-ai-answer > .translator-meaning { margin-bottom:16px!important; }
+body.einfach .translator-ai-context { margin:12px 0; }
+body.einfach .translator-ai-answer > .translator-notes:has(> .translator-disclaimer):not(:has(.safety-note)) { margin:12px 0 8px!important; padding:0; border:0; border-radius:0; background:transparent; }
+body.einfach .translator-ai-answer > .translator-notes > .translator-disclaimer,
+body.einfach .translator-ai-answer > .translator-notes > .translator-disclaimer a { font-size:.8125rem!important; line-height:1.45!important; color:var(--e-muted)!important; font-weight:400!important; text-decoration:none!important; }
+body.einfach .translator-chat-panel { gap:3px; }
+body.einfach .translator-chat-input { font-size:1rem!important; }
+body.einfach .translator-chat-send { font-size:.875rem!important; }
+body.einfach .translator-chat-privacy { font-size:.75rem!important; }
+body.einfach .translator-chat-privacy a { display:inline; min-height:0; padding:0; line-height:inherit!important; }
+body.einfach .translator-chat-input, body.einfach .translator-chat-send { height:auto; line-height:1.25!important; }
+/* A nested account offer must not change the selected goal's outer spacing. */
+body.einfach .translator-ai-goals-selected { padding:0!important; border:0!important; background:transparent!important; }
