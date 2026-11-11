@@ -1,7 +1,9 @@
 // Kasse als Fenster auf derselben Seite (Daniel, 9. Nov 2026: wie BetterMe und Yazio, die Zahlung öffnet sich über der
 // Angebotsseite). Wird von /start/ geladen (window.DemenzKasse.open). Die Seite /abo/ bleibt als eigener Einstieg.
-// Ablauf wie abo.js: stilles Gast-Konto (Firebase anonym), POST /session, Stripe Checkout (Elements) mit Express-Knöpfen
-// und Zahlungsfeld. Nach der Zahlung leitet Stripe auf /abo/?status=fertig weiter (dort Danke-Seite und Konto sichern).
+// Neue Sitzungen wechseln zum Stripe Hosted Checkout. Bereits geladene ältere
+// Kassen und die gestufte Veröffentlichung behalten den Elements-Fallback.
+import { createHostedCheckoutRedirect } from "./checkout-redirect.js";
+const redirectHostedCheckout = createHostedCheckoutRedirect((url) => location.assign(url));
 // § 312j Abs. 2 BGB: Preis, Laufzeit und Kündigung stehen vor allen Zahlungsknöpfen und direkt über dem Bestellknopf,
 // der Bestellknopf heißt „Zahlungspflichtig abonnieren“. Texte gleich wie renderSummary in abo.js.
 const config = window.DEMENZ_ABO_CONFIG || {};
@@ -96,7 +98,7 @@ export async function open(options) {
   close();
   const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
   const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
-  const loading = el("p", { class: "kasse-loading", role: "status", text: "Zahlungsarten werden geladen …" });
+  const loading = el("p", { class: "kasse-loading", role: "status", text: "Die sichere Zahlung wird geöffnet …" });
   const summary = el("p");
   const terms = el("p");
   const trialNote = el("p", { hidden: "" });
@@ -105,7 +107,7 @@ export async function open(options) {
   const divider = el("p", { class: "abo-divider", text: "oder", hidden: "" });
   const express = el("div", { id: "kasse-express" });
   const payment = el("div", { id: "kasse-payment" });
-  const payButton = el("button", { type: "button", class: "abo-button", disabled: "", text: "Zahlungspflichtig abonnieren" });
+  const payButton = el("button", { type: "button", class: "abo-button", disabled: "", hidden: "", text: "Zahlungspflichtig abonnieren" });
   const emailLine = el("p", { class: "abo-checkout-email", text: options.email ? `Bestätigung und Zugang an ${options.email}` : "" });
   const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
   const card = el("div", { class: "kasse-card" }, [
@@ -133,11 +135,20 @@ export async function open(options) {
   }, 15_000);
 
   let checkout = null;
+  let checkoutUID = null;
+  const currentAttempt = () => sheet?.node === node && checkoutUID && auth?.currentUser?.uid === checkoutUID;
+  const requireCurrentAccount = () => {
+    if (!sheet || sheet.node !== node) return false;
+    if (!currentAttempt()) throw Object.assign(new Error("checkout_account_changed"), { code: "checkout_account_changed" });
+    return true;
+  };
   const confirm = async () => {
     payButton.disabled = true;
     error.hidden = true;
     try {
+      if (!requireCurrentAccount()) return;
       const loaded = await checkout.loadActions?.();
+      if (!requireCurrentAccount()) return;
       const result = await (loaded?.actions ?? checkout).confirm();
       if (result?.type === "error" || result?.error) {
         fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
@@ -151,16 +162,25 @@ export async function open(options) {
   payButton.addEventListener("click", confirm);
 
   try {
-    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser(), loadStripe()]);
+    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+    checkoutUID = user.uid;
+    if (!requireCurrentAccount()) return;
     publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
+    const token = await user.getIdToken();
+    if (!requireCurrentAccount()) return;
     const session = await api("/session", {
       method: "POST",
-      token: await user.getIdToken(),
-      body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
+      token,
+      body: { plan: options.plan, checkoutMode: "hosted", termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
+    if (!requireCurrentAccount()) return;
+    if (redirectHostedCheckout(session, { attempt: node, isCurrent: currentAttempt })) return;
+    loading.textContent = "Zahlungsarten werden geladen …";
+    await loadStripe();
+    if (!requireCurrentAccount()) return;
     const price = publicConfig.plans[options.plan];
     const text = summaryText(options.plan, price, session.trialDays, session.firstYear);
     summary.textContent = text;
@@ -173,7 +193,7 @@ export async function open(options) {
     const appearance = { theme: "stripe", variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" } };
     const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
     checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
-    if (!sheet || sheet.node !== node) return;
+    if (!requireCurrentAccount()) return;
     const expressElement = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
     expressElement.on("availablepaymentmethodschange", ({ paymentMethods }) => { divider.hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean); });
     expressElement.on("confirm", () => confirm());
@@ -183,6 +203,7 @@ export async function open(options) {
       if (!sheet || sheet.node !== node) return;
       clearTimeout(loadingTimer);
       loading.hidden = true;
+      payButton.hidden = false;
       payButton.disabled = false;
       options.track?.("checkout_sheet_ready");
     });
@@ -198,6 +219,12 @@ export async function open(options) {
     clearTimeout(loadingTimer);
     loading.hidden = true;
     if (!sheet || sheet.node !== node) return;
+    if (problem.code === "checkout_account_changed") {
+      fail("Dein Konto hat sich geändert. Öffne die Zahlung für dein aktuelles Konto erneut.");
+      card.append(el("button", { type: "button", class: "abo-button", text: "Erneut versuchen",
+        onclick: () => { if (sheet?.node === node) open({ ...options, email: auth?.currentUser?.email || undefined }); } }));
+      return;
+    }
     if (problem.code === "already_subscribed") {
       summary.textContent = "Du hast schon ein Abo. Dein Plan ist freigeschaltet.";
       summary.parentElement.hidden = false;
