@@ -10,9 +10,12 @@ export async function webAuth({ anonymous = true } = {}) {
     ]);
     const auth = sdk.getAuth(app.getApps().find((value) => value.options.projectId === config.firebase.projectId) || app.initializeApp(config.firebase));
     await auth.authStateReady();
-    let signature = `${auth.currentUser?.uid || ''}:${auth.currentUser?.isAnonymous}:${auth.currentUser?.emailVerified}`;
+    // A successful same-account reauthentication changes lastSignInTime too.
+    // Ordinary token refreshes must not look like a newly completed sign-in.
+    const identity = user => `${user?.uid || ''}:${user?.isAnonymous}:${user?.emailVerified}:${user?.metadata?.lastSignInTime || ''}`;
+    let signature = identity(auth.currentUser);
     sdk.onIdTokenChanged(auth, (user) => {
-      const next = `${user?.uid || ''}:${user?.isAnonymous}:${user?.emailVerified}`;
+      const next = identity(user);
       if (next !== signature) { signature = next; window.dispatchEvent(new Event('demenz-auth-changed')); }
     });
     return { sdk, auth };
