@@ -39,10 +39,10 @@ export async function webAuth(){if(localStorage.getItem('test.auth.hang'))await 
   let checks = 0;
   globalThis.fetch = async (_, options) => {
     const call = JSON.parse(options.body);
-    if (call.text?.format?.name === 'translator_web_goals') return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({hasSituation:true,goals:[{goal:'act_now',label:'Ruhig mit der Situation umgehen'},{goal:'understand',label:'Das Verhalten besser verstehen'},{goal:'organize',label:'Den Alltag leichter gestalten'}]})}]}]}));
+    if (call.text?.format?.name === 'translator_web_goals') return new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({hasSituation:true,sourceWish:'',goals:[{goal:'choice_1',intentToPreserve:'',label:'Ruhig mit der Situation umgehen'},{goal:'choice_2',intentToPreserve:'',label:'Das Verhalten besser verstehen'},{goal:'choice_3',intentToPreserve:'',label:'Den Alltag leichter gestalten'}]})}]}]}));
     const english = call.input[1].content.startsWith('Language: English');
-    const response = { sayNow: english ? 'I am here with you.' : 'Ich bin bei dir.', avoidSaying: english ? 'That is not true.' : 'Das stimmt nicht.', explanation: english ? 'She may need something familiar.' : 'Vielleicht sucht sie etwas Vertrautes.', nextStep: english ? 'Sit with her for a moment.' : 'Setz dich kurz dazu.', whatToCheck: null, fallbackStep: null, sharedClosing: null, safetyLevel: 'standard', emergencyMessage: null };
-    return new Response(JSON.stringify({ status: 'completed', output: [{ content: [{ type: 'output_text', text: JSON.stringify({ topic: 'dementia_care', response }) }] }] }));
+    const response = { answerMode: 'communication', phrases: english ? ['I am here with you.', 'Would you like me to sit beside you?'] : ['Ich bin bei dir.', 'Soll ich mich kurz zu dir setzen?'], avoidSaying: english ? 'That is not true.' : 'Das stimmt nicht.', explanation: english ? 'She may need something familiar.' : 'Vielleicht sucht sie etwas Vertrautes.', nextStep: english ? 'Sit with her for a moment.' : 'Setz dich kurz dazu.', whatToCheck: null, fallbackStep: null, sharedClosing: null, safetyLevel: 'standard', emergencyMessage: null };
+    return new Response(JSON.stringify({ status: 'completed', output: [{ content: [{ type: 'output_text', text: JSON.stringify({ topic: 'dementia_care', factPlan: { speakerIdentityQuote: '', activityOrReasonQuote: '', contextQuotes: [] }, response }) }] }] }));
   };
   try {
     for (const width of [390, 1280]) {
@@ -100,7 +100,8 @@ export async function webAuth(){if(localStorage.getItem('test.auth.hang'))await 
       assert.equal(repository.records.get('browser-user').used, 1); checks++;
 
       await page.locator('.dc-signup input[type=email]').waitFor();
-      assert.match(await page.locator('.dc-signup h3').innerText(), /3 weitere KI-Antworten kostenlos/,'An actual enabled server credit contract reaches the intro presentation');
+      assert.equal(await page.locator('.dc-signup h3').innerText(), 'Was sage ich jetzt am besten?');
+      assert.match(await page.locator('.dc-signup .lead').innerText(), /3 weitere KI-Antworten kostenlos/,'An actual enabled server credit contract reaches the intro presentation');
       assert.equal(repository.records.get('browser-user').used, 1); checks++;
       await page.locator('.translator-feedback').first().getByRole('button', { name: /Ja, merken/ }).click();
       assert.equal(await page.locator('.ki-supporter').count(), 0); checks++;

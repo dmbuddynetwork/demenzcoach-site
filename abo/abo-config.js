@@ -15,7 +15,7 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
   // Server-side normal-answer introduction. Enable only after backend/auth readiness checks.
   // GrowthBook is evaluated on the backend, never trusted for browser entitlements.
   translatorGate: Object.freeze({
-    enabled: false,
+    enabled: true,
     endpoint: "https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web",
     supporter: Object.freeze({ enabled: false, reviewed: false, kind: "one-time", url: "" })
   }),
