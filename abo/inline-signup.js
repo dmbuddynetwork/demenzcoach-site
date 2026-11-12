@@ -1,7 +1,7 @@
 import { webAuth } from './web-auth.js';
 import { createEmailAccess } from './email-auth.js';
 import { createGoogleAccess } from './google-auth.js';
-import { createSignupOffer } from './signup-offer-view.js';
+import { createSignupOffer, mayOfferSignupSetup } from './signup-offer-view.js';
 import { openSignupSheet } from './signup-sheet.js';
 let stylesReady;
 function signupStyles() {
@@ -25,6 +25,8 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
   // Recheck after lazy resources: stale status never creates a new-credit promise.
   creditActive = creditActive === true && card.dataset.signupCreditOffer === 'true';
   if (purpose === 'invitation' && auth.currentUser?.emailVerified) { card.remove(); return; }
+  const entry = { uid: auth.currentUser?.uid || null, anonymous: auth.currentUser?.isAnonymous === true };
+  const setupAllowed = access => mayOfferSignupSetup({ purpose, creditActive, entry, user: auth.currentUser, access });
   const email = createEmailAccess({ webAuth, config });
   const google = createGoogleAccess({ webAuth, config });
   const hasSituation = purpose !== 'account' && Boolean(card.closest('.translator-goal-answer, .translator-ai-goals'));
@@ -32,10 +34,11 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
   const dispose = () => { dismissed = true; exposureObserver?.disconnect(); view.disposeSignup?.(); window.removeEventListener('demenz-auth-changed', authChanged); };
   const finishInPlace = async address => {
     if (dismissed || !view.isConnected) return;
-    try { await window.DemenzKiFreigabe?.refresh(); } catch { /* Actual sign-in is independent of optional status refresh. */ }
+    let access;
+    try { access = await window.DemenzKiFreigabe?.refresh(); } catch { /* Actual sign-in is independent of optional status refresh. */ }
     if (dismissed || !view.isConnected) return;
     if (hasSituation) window.DemenzKiFreigabe?.takePending();
-    view.showSignupSuccess(address);
+    view.showSignupSuccess(address, { offerSetup: setupAllowed(access) });
   };
   const authChanged = async () => {
     const requested = view.requestedEmail?.(); if (!requested || dismissed) return;
@@ -53,7 +56,7 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     sheet?.close('dismiss');
   };
   const view = createSignupOffer({ additionalAnswers: bonus, locale: en ? 'en' : 'de', googleAvailable: config.signIn?.google === true, purpose, creditActive,
-    signupCopy: window.DemenzWebExperiments?.signupCopyVariant(signupCopy) || 'variant_1', returnToSituation: hasSituation,
+    signupCopy: window.DemenzWebExperiments?.signupCopyVariant(signupCopy) || 'variant_1', presentation: purpose === 'account' ? 'inline' : 'sheet', returnToSituation: hasSituation,
     getRetryAt: () => (email.attempt()?.createdAt || 0) + 60000,
     onBegin() { expose(); onBegin?.(); },
     async onEmail(address) { await email.begin({ email: address, returnTo, intent: 'signin' }); return { sent: true }; },
@@ -61,8 +64,10 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
       const result = await google.begin();
       if (result?.signedIn === true) {
         if (creditActive === true && purpose === 'intro') window.DemenzWebExperiments?.queueSignupCompletion();
-        try { await window.DemenzKiFreigabe?.refresh(); } catch { /* No new care request on sign-in. */ }
+        let access;
+        try { access = await window.DemenzKiFreigabe?.refresh(); } catch { /* No new care request on sign-in. */ }
         if (hasSituation) window.DemenzKiFreigabe?.takePending();
+        return { ...result, offerSetup: setupAllowed(access) };
       }
       return result;
     },

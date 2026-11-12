@@ -51,7 +51,7 @@ const evidence = process.env.SIGNUP_COPY_EVIDENCE;
           await page.waitForFunction(() => window.__calls.length === 1);
           assert.deepEqual(await page.evaluate(() => window.__calls[0]), ['email', 'caregiver@example.test']);
           assert.equal(await page.locator('.signup-address').innerText(), 'caregiver@example.test');
-          assert.equal(await page.getByRole('heading', { name: locale === 'en' ? 'Open your email inbox now' : 'Öffne jetzt dein E-Mail-Postfach', exact: true }).count(), 1);
+          assert.equal(await page.getByRole('heading', { name: locale === 'en' ? 'Confirm your email' : 'Bestätige kurz deine E-Mail', exact: true }).count(), 1);
           await page.getByRole('button', { name: locale === 'en' ? 'Change email address' : 'Adresse ändern', exact: true }).click();
           await page.locator('.google').click(); await page.waitForFunction(() => window.__calls.length === 2);
           assert.deepEqual(await page.evaluate(() => window.__calls[1]), ['google']);

@@ -57,9 +57,45 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
     }
     const shot = async (page, name) => { if (evidence) await page.screenshot({ path: path.join(evidence, name), animations: 'disabled' }); };
     const actionLink = async page => { const link = await page.evaluate(() => window.__requestedLink); const url = new URL(link); url.searchParams.set('mode', 'signIn'); url.searchParams.set('oobCode', 'controlled-test-code'); return url.href; };
-    for (const width of [390, 1280]) {
+    for (const width of (process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? [390] : [390, 1280])) {
       const { context, page, counters } = await fixture(width);
       try {
+        if (process.env.SIGNUP_SHEET_FOCUS_COPY === '1') {
+          if (width !== 390) continue;
+          const dialog = page.getByRole('dialog');
+          assert.equal(await dialog.getByRole('heading', { name: '3 weitere Antworten kostenlos', exact: true }).count(), 1);
+          assert.equal(await dialog.locator('.lead').innerText(), 'Passende Worte und Tipps von der KI.');
+          assert.equal(await dialog.locator('.separator').innerText(), 'oder');
+          assert.equal(await dialog.locator('.micro').innerText(), 'Ohne Passwort · Ohne Zahlungsdaten');
+          assert.equal(await dialog.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).isVisible(), true);
+          assert.equal(await dialog.getByRole('button', { name: 'Kostenlose Inhalte ansehen', exact: true }).count(), 0);
+          assert.equal(await dialog.locator('.details').isVisible(), false);
+          assert.equal(await dialog.getByRole('link', { name: 'Nutzungsbedingungen (neuer Tab)', exact: true }).isVisible(), true);
+          assert.equal(await dialog.getByRole('link', { name: 'Datenschutz & KI (neuer Tab)', exact: true }).isVisible(), true);
+          assert.equal(await dialog.getByRole('button', { name: 'Anmeldung schließen', exact: true }).isVisible(), true);
+          await shot(page, 'SHEET-COMPACT-390.png');
+          assert.equal(await dialog.getByRole('link', { name: 'Persönliche Alltagshilfe einrichten', exact: true }).count(), 0);
+          await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('caregiver@example.test');
+          await page.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).click();
+          await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).waitFor();
+          assert.equal(await dialog.locator('.signup-guidance').innerText(), 'Öffne unsere E-Mail und tippe auf den Anmeldelink.');
+          assert.equal(await dialog.locator('.signup-address').innerText(), 'caregiver@example.test');
+          assert.equal(await dialog.getByRole('link', { name: 'Persönliche Alltagshilfe einrichten', exact: true }).count(), 0);
+          await shot(page, 'SENT-COMPACT-390.png');
+          await page.getByRole('button', { name: 'Adresse ändern', exact: true }).click();
+          const before = { ...counters }, original = await page.locator('.translator-ai-answer').innerText();
+          await page.getByRole('button', { name: 'Mit Google fortfahren', exact: true }).click();
+          await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
+          const setup = page.getByRole('link', { name: 'Persönliche Alltagshilfe einrichten', exact: true });
+          assert.equal(await setup.getAttribute('href'), '/start/');
+          assert.equal(await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).isVisible(), true);
+          assert.equal(new URL(page.url()).pathname, '/de/', 'No automatic funnel redirect');
+          await shot(page, 'VERIFIED-COMPACT-390.png');
+          await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click(); await dialog.waitFor({ state: 'detached' });
+          assert.deepEqual(counters, before); assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
+          report.profiles.push({ width, checks: ['Human-selected compact Signup and Sent copy; legal and close retained', 'Funnel absent before verification; after fresh verified unpaid sameUID intro: optional static /start/ action plus clear direct continuation, no redirect or extra care debit'], ...counters });
+          continue;
+        }
         const checks = [];
         const dialog = page.getByRole('dialog');
         if (process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1') {
@@ -67,8 +103,8 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           assert.equal(linkStyle.weight, '400'); assert.equal(linkStyle.decoration, 'none');
           await shot(page, `SHEET-${width}.png`);
           await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('caregiver@example.test');
-          await page.getByRole('button', { name: '3 Antworten kostenlos freischalten', exact: true }).click();
-          await page.getByRole('heading', { name: 'Öffne jetzt dein E-Mail-Postfach', exact: true }).waitFor();
+          await page.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).click();
+          await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).waitFor();
           await shot(page, `SENT-${width}.png`);
           const before = { ...counters }, original = await page.locator('.translator-ai-answer').innerText();
           const callback = await context.newPage(); callback.setDefaultTimeout(10000); callback.on('pageerror', error => report.errors.push(error.message));
@@ -84,7 +120,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
           assert.deepEqual(counters, before);
           await shot(page, `ORIGINAL-SUCCESS-${width}.png`); await shot(callback, `CALLBACK-SUCCESS-${width}.png`);
-          await page.getByRole('button', { name: 'Zurück zu deiner Situation', exact: true }).click(); await dialog.waitFor({ state: 'detached' });
+          await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click(); await dialog.waitFor({ state: 'detached' });
           assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
           await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.locator('.translator-chat').waitFor({ state: 'visible' });
           await shot(page, `COMPOSER-${width}.png`);
@@ -122,15 +158,15 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         await shot(page, `SHEET-${width}.png`);
         await page.evaluate(() => { window.__holdMail = true; });
         await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('caregiver@example.test');
-        await page.getByRole('button', { name: '3 Antworten kostenlos freischalten', exact: true }).click();
+        await page.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).click();
         await page.waitForFunction(() => typeof window.__releaseMail === 'function');
         assert.equal(await dialog.getAttribute('aria-modal'), 'true');
         assert.equal(await page.locator('.dc-signup').getAttribute('aria-busy'), 'true');
         assert.equal(await page.getByRole('button', { name: 'Link wird angefordert …', exact: true }).isEnabled(), false);
         await page.evaluate(() => window.__releaseMail());
-        await page.getByRole('heading', { name: 'Öffne jetzt dein E-Mail-Postfach', exact: true }).waitFor();
+        await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).waitFor();
         assert.equal(await page.locator('.signup-address').innerText(), 'caregiver@example.test');
-        assert.match(await page.locator('.signup-guidance').innerText(), /Anmeldelink angefordert/);
+        assert.equal(await page.locator('.signup-guidance').innerText(), 'Öffne unsere E-Mail und tippe auf den Anmeldelink.');
         assert.equal(await page.locator('.signup-resend').isVisible(), false);
         assert.equal(await page.locator('.signup-resend-wait').isVisible(), true);
         assert.equal(await dialog.getByRole('link', { name: 'Nutzungsbedingungen (neuer Tab)', exact: true }).isVisible(), true);
@@ -143,8 +179,8 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('corrected@example.test');
         await page.evaluate(() => { localStorage.setItem('__clockOffset', '61000'); window.__holdMail = false; });
         await page.waitForFunction(() => !document.querySelector('.offer-body .primary').disabled);
-        await page.getByRole('button', { name: '3 Antworten kostenlos freischalten', exact: true }).click();
-        await page.getByRole('heading', { name: 'Öffne jetzt dein E-Mail-Postfach', exact: true }).waitFor();
+        await page.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).click();
+        await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).waitFor();
         assert.equal(await page.evaluate(() => window.__sent), 2);
         assert.equal(await page.locator('.signup-address').innerText(), 'corrected@example.test');
         checks.push('Google cancellation, immediate pending state, real typed address, explicit sent screen, correction and60second resend boundary');
@@ -158,7 +194,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         assert.deepEqual(counters, before, 'Mail callback and original-tab continuation never request another care answer');
         assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
         await shot(page, `ORIGINAL-SUCCESS-${width}.png`); await shot(callback, `CALLBACK-SUCCESS-${width}.png`);
-        await page.getByRole('button', { name: 'Zurück zu deiner Situation', exact: true }).click();
+        await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click();
         await page.getByRole('dialog').waitFor({ state: 'detached' });
         assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
         assert.equal(await page.evaluate(() => sessionStorage.getItem('demenzCoachKiOffen')), null);
@@ -174,13 +210,13 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         console.error(JSON.stringify({ controlledFixtureDiagnostics: diagnostics })); throw error;
       } finally { await context.close(); }
     }
-    if (process.env.SIGNUP_SHEET_FOCUS_SUCCESS !== '1') {
+    if (process.env.SIGNUP_SHEET_FOCUS_SUCCESS !== '1' && process.env.SIGNUP_SHEET_FOCUS_COPY !== '1') {
     // Original tab closed before the link opens: honest generic continuation, no hidden care replay.
     {
       const { context, page, counters } = await fixture(390);
       try {
-        await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('caregiver@example.test'); await page.getByRole('button', { name: '3 Antworten kostenlos freischalten', exact: true }).click();
-        await page.getByRole('heading', { name: 'Öffne jetzt dein E-Mail-Postfach', exact: true }).waitFor();
+        await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('caregiver@example.test'); await page.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).click();
+        await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).waitFor();
         const link = await actionLink(page), before = { ...counters }; await page.close();
         const callback = await context.newPage(); await callback.goto(link); await callback.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
         assert.equal(await callback.locator('#account-continue').innerText(), 'Weiter'); assert.deepEqual(counters, before);
@@ -193,19 +229,19 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         const before = { ...counters }, original = await page.locator('.translator-ai-answer').innerText();
         await page.evaluate(() => { window.__mailFailure = true; });
         await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('failed@example.test');
-        await page.getByRole('button', { name: '3 Antworten kostenlos freischalten', exact: true }).click();
+        await page.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).click();
         await page.getByText('Die E-Mail-Anforderung konnte nicht bestätigt werden. Prüfe dein Postfach oder versuche es erneut. Du kannst auch Google nutzen.', { exact: true }).waitFor();
-        assert.equal(await page.getByRole('heading', { name: 'Öffne jetzt dein E-Mail-Postfach', exact: true }).count(), 0);
+        assert.equal(await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).count(), 0);
         assert.equal(await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).inputValue(), 'failed@example.test');
         await page.getByRole('button', { name: 'Mit Google fortfahren', exact: true }).click(); await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
-        await page.getByRole('button', { name: 'Zurück zu deiner Situation', exact: true }).click(); await page.getByRole('dialog').waitFor({ state: 'detached' });
+        await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click(); await page.getByRole('dialog').waitFor({ state: 'detached' });
         assert.deepEqual(counters, before); assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
         report.googleSameTab = 'PASS controlled Google success keeps the original answer without reload or care debit';
       } finally { await context.close(); }
     }
     }
     assert.deepEqual(report.errors, []); report.passed = true;
-    if (evidence) fs.writeFileSync(path.join(evidence, process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1' ? 'SUCCESS-REPORT.json' : 'FLOW-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
+    if (evidence) fs.writeFileSync(path.join(evidence, process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? 'COPY-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1' ? 'SUCCESS-REPORT.json' : 'FLOW-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
     console.log(JSON.stringify(report));
   } finally { if (browser) await browser.close(); if (preview) await preview.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

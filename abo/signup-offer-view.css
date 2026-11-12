@@ -38,3 +38,6 @@
 .dc-signup-sheet-close::after{content:none!important}
 
 .dc-signup .signup-legal a:hover,.dc-signup .signup-legal a:focus-visible{text-decoration:underline}
+
+.dc-signup .signup-setup{text-decoration:none!important;text-align:center}
+.dc-signup .signup-state .signup-direct{background:#fff;color:#47408c;border-color:#a59bb8}

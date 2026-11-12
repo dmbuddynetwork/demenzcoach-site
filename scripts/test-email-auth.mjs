@@ -176,3 +176,11 @@ for (const [locale, expected] of [['de', 'de'], ['en-US', 'en'], ['', 'de']]) te
   assert.equal(f.calls.filter(call => call.kind === 'send').length, 1);
   assert.equal(f.auth.currentUser.uid, 'guest-one');
 });
+
+const viewSource = await readFile(new URL('../abo/signup-offer-view.js', import.meta.url), 'utf8');
+const { mayOfferSignupSetup } = await import(`data:text/javascript;base64,${Buffer.from(viewSource).toString('base64')}`);
+test('setup offer is voluntary fresh-intro presentation, excluding account, paid and returning identities', () => {
+  const fresh = { purpose: 'intro', creditActive: true, entry: { uid: 'guest-one', anonymous: true }, user: { uid: 'guest-one', emailVerified: true }, access: { enabled: true, verified: true, paid: false } };
+  assert.equal(mayOfferSignupSetup(fresh), true);
+  for (const override of [{ purpose: 'account' }, { purpose: 'invitation' }, { creditActive: false }, { entry: { uid: 'guest-one', anonymous: false } }, { user: { uid: 'existing-returning-account', emailVerified: true } }, { user: { uid: 'guest-one', emailVerified: false } }, { access: { enabled: true, verified: true, paid: true } }, { access: undefined }]) assert.equal(mayOfferSignupSetup({ ...fresh, ...override }), false);
+});
