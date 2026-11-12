@@ -303,8 +303,16 @@
   };
   const helpfulCatalog = (entry) => entry && entryByKey.get(entry.key) === entry && !entry.safetyOnly
     && !entry.safety && !entry.urgentLead && !(entry.safetyFirst?.length);
+  const generalInfoTitle = () => ui?.lang === 'en' ? 'General information about swallowing' : 'Allgemeine Hinweise zum Schlucken';
+  // Keep the established v1 record readable in older tabs: its plain meaning
+  // includes the complete approved information. New clients restore the separate
+  // neutral panel only for this exact canonical suffix; no schema migration.
+  const helpfulMeaning = result => {
+    const info = window.DemenzTranslatorAI?.generalSafetyInfo?.(result.generalSafetyInfo);
+    return result.meaning + (info ? `\n\n${generalInfoTitle()}\n${info.text}` : '');
+  };
   const helpfulAI = (result) => result.safetyLevel === 'standard' && !result.safetyMessage ? normalizeHelpful({
-    kind: 'ai', language: helpfulLanguage, answer: { meaning: result.meaning, phrases: result.phrases,
+    kind: 'ai', language: helpfulLanguage, answer: { meaning: helpfulMeaning(result), phrases: result.phrases,
       avoid: result.avoid, nextStep: result.nextStep ?? '', safetyLevel: result.safetyLevel }
   }) : null;
   let renderHelpful = () => {};
@@ -980,8 +988,42 @@
     note.classList.add('translator-fixed-concern');
     return note;
   };
+  // The existing endpoint accepts 200 Unicode characters for original+newline+detail.
+  // Show that shared budget before sending; never truncate either draft.
+  const clarificationBudget = (situation, detail, canEdit = false) => {
+    const en = ui?.lang === 'en', original = situation.normalize('NFC').trim(), reply = detail.normalize('NFC').trim();
+    const room = Math.max(0, 199 - Array.from(original).length);
+    const total = Array.from(original + (reply ? `\n${reply}` : '')).length;
+    const base = en ? `Your additional detail can use up to ${room} characters. Situation and detail share a 200-character limit.`
+      : `Für deine Ergänzung bleiben bis zu ${room} Zeichen. Situation und Ergänzung dürfen zusammen höchstens 200 Zeichen enthalten.`;
+    const edit = canEdit ? (en ? ' Use “Edit situation” to shorten the original if needed.' : ' Bei Bedarf kannst du die ursprüngliche Situation über „Situation bearbeiten“ kürzen.')
+      : (en ? ' Shorten the original situation in the input and start again if needed.' : ' Kürze bei Bedarf die ursprüngliche Situation im Eingabefeld und starte neu.');
+    return (total > 200 ? (en ? `${total - 200} characters too long. ` : `${total - 200} Zeichen zu lang. `) : '') + base + (room === 0 || total > 200 ? edit : '');
+  };
+  const generalInfoNote = result => {
+    const info = ai?.generalSafetyInfo?.(result.generalSafetyInfo);
+    return info ? element('section', { className: 'translator-general-safety-info', attributes: { role: 'note' } }, [
+      element('h3', { className: 'translator-step', text: generalInfoTitle() }), element('p', { className: 'translator-meaning', text: info.text })
+    ]) : null;
+  };
+  // Care display metadata belongs to one original situation/address/goal flow,
+  // including its retries and cached answers. Store no account, access or quota
+  // objects here: those keep their original request-generation bindings.
+  const generalInfoMemory = () => {
+    let info = null;
+    return result => {
+      info = ai?.generalSafetyInfo?.(result.generalSafetyInfo) || info;
+      return info ? { ...result, generalSafetyInfo: info } : result;
+    };
+  };
   const aiAnswer = (result, { saved = false, allowHelpful = true, goal } = {}) => {
+    if (saved && !result.generalSafetyInfo) {
+      const marker = `\n\n${generalInfoTitle()}\n`, at = result.meaning.lastIndexOf(marker);
+      const info = at >= 0 && ai?.generalSafetyInfo?.({ topic: 'swallowing', text: result.meaning.slice(at + marker.length) });
+      if (info) result = { ...result, meaning: result.meaning.slice(0, at), generalSafetyInfo: info };
+    }
     const nodes = [];
+    const selfSupport = result.kind === 'self_support';
     // Ohne Stufen (englische Seiten): bei jedem Sicherheitshinweis der KI derselbe feste Hinweis.
     const ungraded = ui?.gradedSafety === false && result.safetyLevel !== 'standard';
     const safetyNote = aiSafetyNote(result, ungraded);
@@ -993,28 +1035,34 @@
     const existingSafetyNote = safetyNote && [...output.querySelectorAll('.safety-note')]
       .find(note => !note.closest('[data-goal-safety-history]') && !note.closest('.translator-ai') && safetySignature(note) === safetySignature(safetyNote));
     if (safetyNote && !existingSafetyNote) nodes.push(safetyNote);
+    const generalNote = generalInfoNote(result);
+    if (generalNote) nodes.push(generalNote);
     if (saved) nodes.push(element('p', { className: 'translator-ai-label', text: helpfulCopy.history }));
     if (goal) nodes.push(element('p', { className: 'translator-chosen-ai-goal', text: `${ui?.lang === 'en' ? 'Your goal' : 'Dein Ziel'}: ${goal.label}` }));
-    const first = element('h3', { className: 'translator-step', text: 'Das kannst du sagen', attributes: { tabindex: '-1' } });
-    nodes.push(first, element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
+    const first = element('h3', { className: 'translator-step', text: selfSupport
+      ? (ui?.lang === 'en' ? 'What can help you now' : 'Das kann dir jetzt helfen') : 'Das kannst du sagen', attributes: { tabindex: '-1' } });
+    nodes.push(first, selfSupport
+      ? element('ol', { className: 'translator-self-support-steps' }, result.steps.map(text => element('li', { className: 'translator-meaning', text })))
+      : element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
     const context = [element('h3', { className: 'translator-step', text: 'Was dahintersteckt' }), element('p', { className: 'translator-meaning translator-ai-meaning', text: result.meaning })];
-    // Runde 198: Wie in der App gibt es einen konkreten nächsten Schritt.
-    if (typeof result.nextStep === 'string' && result.nextStep) {
+    // Communication answers keep their next step; self-support already has its concrete steps.
+    if (!selfSupport && typeof result.nextStep === 'string' && result.nextStep) {
       nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
       nodes.push(element('p', { className: 'translator-meaning translator-ai-next', text: result.nextStep }));
     }
     nodes.push(...context);
-    nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
+    nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: selfSupport
+      ? (ui?.lang === 'en' ? 'This does not help you: ' : 'Das hilft dir nicht: ') : 'Besser nicht: ' }), selfSupport ? result.avoid : `„${result.avoid}“`]));
     nodes.push(notesCard(disclaimer(true)));
     // Anonymes Teilen gibt es vorerst nur auf Deutsch (der Server bietet es sonst auch nicht an).
     if (!saved && feedbackCopy && result.safetyLevel === 'standard') {
-      nodes.push(feedbackBlock({ key: 'ai', requestID: result.requestID }, null, { allowShare: false, helpfulItem: helpfulCopy && allowHelpful ? helpfulAI(result) : null, onContinue: () => {
+      nodes.push(feedbackBlock({ key: 'ai', requestID: result.requestID }, null, { allowShare: false, helpfulItem: !selfSupport && helpfulCopy && allowHelpful ? helpfulAI(result) : null, onContinue: () => {
         correctionRequestID = result.requestID || '';
         setFollowupOpen(true);
         input.focus();
       } }));
     }
-    return { node: element('div', { className: 'translator-ai-answer' }, nodes),
+    return { node: element('div', { className: `translator-ai-answer${selfSupport ? ' translator-ai-self-support' : ''}` }, nodes),
       focus: existingSafetyNote || (nodes[0].tagName === 'ASIDE' ? nodes[0] : first), top: existingSafetyNote || nodes[0] };
   };
   // Hinweise in einer Karte: oben „Wann ein Gespräch nicht ausreicht“ (falls vorhanden), darunter die Haftungszeile.
@@ -1076,20 +1124,21 @@
     element('span', { className: 'translator-ai-wait-bar', attributes: { 'aria-hidden': 'true' } }),
     sceneArt(data.waitImage),
     element('ol', { className: 'translator-ai-steps', attributes: { 'aria-hidden': 'true' } }, [
-      element('li', { text: 'Satz verstehen' }),
-      element('li', { text: 'Gefühl dahinter erkennen' }),
-      element('li', { text: 'Passende Sätze finden' })
+      element('li', { text: ui?.lang === 'en' ? 'Understand the situation' : 'Situation einordnen' }),
+      element('li', { text: ui?.lang === 'en' ? 'Consider your goal' : 'Dein Anliegen berücksichtigen' }),
+      element('li', { text: ui?.lang === 'en' ? 'Prepare helpful guidance' : 'Passende Hilfe formulieren' })
     ])
   ]);
   // Runde 198 (Daniels Wahl „Automatisch“): Unbekannte Sätze gehen ohne Knopf an die KI.
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, onRequestState = () => {}, onAnswerRendered = () => {} } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, displayResult = generalInfoMemory(), onRequestState = () => {}, onAnswerRendered = () => {} } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     if (!goal && !localSafetyHit && !requestState) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
+    const replaceContent = (...nodes) => box.replaceChildren(...[generalInfoNote(displayResult({}))].filter(Boolean), ...nodes);
     const waiting = aiWaiting();
     let operationID = requestState?.operationID || (window.DemenzKiFreigabe?.enabled() ? window.crypto.randomUUID() : '');
     const correctionOf = requestState ? (requestState.options.correctionOf || '') : correctionRequestID;
@@ -1120,8 +1169,11 @@
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
+      // Only the display copy receives retained care metadata. Auth/quota consumers
+      // below always receive the original, request-bound result.
+      const viewResult = displayResult(result);
       if (result.kind === 'access') {
-        box.replaceChildren(window.DemenzKiFreigabe.offerCard({ sentence: requestText, reason: result.reason, value: result.access, onRetry: () => { if (result.reason === 'answer_recovery_credit') operationID = window.crypto.randomUUID(); box.replaceChildren(ask, status); void run(true); } }));
+        replaceContent(window.DemenzKiFreigabe.offerCard({ sentence: requestText, reason: result.reason, value: result.access, onRetry: () => { if (result.reason === 'answer_recovery_credit') operationID = window.crypto.randomUUID(); replaceContent(ask, status); void run(true); } }));
         return;
       }
       if (result.kind === 'clarification') {
@@ -1142,13 +1194,16 @@
           : (en ? 'Add your detail' : 'Antwort ergänzen'); };
         original.addEventListener('input', () => { editDraft = original.value; editFor = previousText; remember(); updateSubmit(); });
         updateSubmit();
+        const budget = element('p', { className: 'translator-clarification-budget', attributes: { role: 'status', 'aria-live': 'polite' } });
+        const updateBudget = () => { budget.textContent = clarificationBudget(original.value, field.value, true); };
+        field.addEventListener('input', updateBudget); original.addEventListener('input', updateBudget); updateBudget();
         const edit = element('details', { className: 'translator-clarification-edit' }, [
           element('summary', { text: en ? 'Edit situation' : 'Situation bearbeiten' }),
           element('label', {}, [element('span', { text: en ? 'Your situation' : 'Deine Situation' }), original]),
           element('p', { text: en ? 'If you change the situation, you choose your goal again. Your additional detail will be included.' : 'Wenn du die Situation änderst, wählst du dein Ziel erneut. Deine Ergänzung wird übernommen.' })
         ]);
         const form = element('form', { className: 'translator-clarification-form' }, [
-          edit, element('label', {}, [element('span', { text: en ? 'Your additional detail' : 'Deine Ergänzung' }), field]), send
+          edit, element('label', {}, [element('span', { text: en ? 'Your additional detail' : 'Deine Ergänzung' }), field]), budget, send
         ]);
         let submitting = false;
         form.addEventListener('submit', async event => {
@@ -1181,15 +1236,15 @@
         });
         box.classList.add('translator-ai-clarification');
         status.textContent = ''; ask.hidden = true;
-        box.replaceChildren(title,
+        replaceContent(title,
           element('p', { className: 'translator-clarification-question', text: result.question }),
           element('p', { text: result.meaning }), element('p', { text: result.nextStep }), form, status, ask);
         title.focus({ preventScroll: true });
         return;
       }
-      if (result.kind === 'answer' && Array.isArray(result.phrases)) {
+      if ((result.kind === 'answer' && Array.isArray(result.phrases)) || (result.kind === 'self_support' && Array.isArray(result.steps))) {
         window.DemenzKiFreigabe?.noteAnswer(result);
-        const { node, focus, top } = aiAnswer(result, { allowHelpful: allowHelpful && !localSafetyHit, goal });
+        const { node, focus, top } = aiAnswer(viewResult, { allowHelpful: allowHelpful && !localSafetyHit, goal });
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
         output.querySelector('.translator-near-group')?.remove();
@@ -1225,6 +1280,7 @@
         if (result.safetyLevel === 'concern') {
           const note = fixedSafetyNote(result, localSafetyNote);
           box.replaceWith(note);
+          const receivedNote = generalInfoNote(viewResult); if (receivedNote) note.after(receivedNote);
           output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach(offer => offer.remove());
           setFollowupOpen(false);
           note.tabIndex = -1;
@@ -1241,6 +1297,7 @@
         const note = existing ?? freshNote;
         withFixedGuardLead(note, result);
         if (existing) box.remove(); else box.replaceWith(note);
+        const receivedNote = generalInfoNote(viewResult); if (receivedNote) note.after(receivedNote);
         output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
         // Der Dienst liefert hier keine Formulierung. Die Sicherheitsinformation bleibt
         // zuerst stehen; bei einer unbekannten Eingabe braucht es auch einen nächsten Schritt.
@@ -1267,6 +1324,8 @@
         box.querySelector('.safety-note')?.remove();
         box.prepend(safetyNote);
       }
+      const generalNote = generalInfoNote(viewResult);
+      if (generalNote && !box.querySelector('.translator-general-safety-info')) box.append(generalNote);
       if (result.kind === 'off_topic') {
         status.textContent = ui ? tr('Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.')
           : 'Dazu kann der Übersetzer nicht helfen. Beschreibe eine Situation im Alltag mit Demenz oder eine Frage als pflegende Person.';
@@ -1305,7 +1364,7 @@
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status', 'aria-live': 'polite' } });
     const choices = element('div', { className: 'translator-ai-goal-choices' });
     const changeGoals = element('section', { className: 'translator-other-goals' }, [element('h3', { className: 'translator-step', text: en ? 'Try another goal' : 'Ein anderes Ziel ausprobieren' })]);
-    let busy = false, selectedKey = '', selectedGoal = null;
+    let busy = false, selectedKey = '', selectedGoal = null, planningText = text;
     const answerSlot = element('div', { className: 'translator-goal-answer' });
     // These are received warnings for this original situation, not a severity
     // classification of a different goal. Keep their exact nodes and call links.
@@ -1314,7 +1373,7 @@
     const warningSignature = note => JSON.stringify([note.textContent.replace(/\s+/g, ' ').trim(),
       [...note.querySelectorAll('a[href]')].map(link => link.getAttribute('href'))]);
     const syncWarningHistory = () => {
-      const current = new Set([...answerSlot.querySelectorAll('.safety-note')].map(warningSignature));
+      const current = new Set([...answerSlot.querySelectorAll('.safety-note, .translator-general-safety-info')].map(warningSignature));
       for (const [signature, record] of receivedWarnings) record.item.hidden = current.has(signature);
       warningHistory.hidden = ![...receivedWarnings.values()].some(record => !record.item.hidden);
     };
@@ -1328,14 +1387,15 @@
         receivedWarnings.set(signature, record);
         warningHistory.append(item);
       }
-      record.goals.set(key, goal.label);
-      record.context.textContent = (en ? 'Information from previous answers. Goals: ' : 'Hinweis aus vorherigen Antworten. Ziele: ')
-        + [...record.goals.values()].map(label => `„${label}“`).join('; ');
+      if (goal?.label) record.goals.set(key, goal.label);
+      record.context.textContent = record.goals.size ? (en ? 'Information from previous answers. Goals: ' : 'Hinweis aus vorherigen Antworten. Ziele: ')
+        + [...record.goals.values()].map(label => `„${label}“`).join('; ')
+        : (en ? 'General information for this situation.' : 'Allgemeine Hinweise zu dieser Situation.');
       syncWarningHistory();
     };
     const preserveWarnings = () => {
       if (!selectedGoal) return;
-      for (const note of answerSlot.querySelectorAll('.safety-note')) rememberWarning(note, selectedKey, selectedGoal);
+      for (const note of answerSlot.querySelectorAll('.safety-note, .translator-general-safety-info')) rememberWarning(note, selectedKey, selectedGoal);
       syncWarningHistory();
     };
     new MutationObserver(syncWarningHistory).observe(answerSlot, { childList: true, subtree: true });
@@ -1343,7 +1403,11 @@
     // This cache belongs only to this situation and address mode. Pending promises
     // are shared when A → B → A is chosen; detached views cannot paint stale results.
     const answers = new Map();
-    const requestStates = new Map();
+    const requestStates = new Map(), displayStates = new Map();
+    const displayFor = key => {
+      if (!displayStates.has(key)) displayStates.set(key, generalInfoMemory());
+      return displayStates.get(key);
+    };
     const requestAnswer = (situation, options) => {
       const key = JSON.stringify([situation.normalize('NFC').trim(), options.formal, options.goal, options.correctionOf || '']);
       if (answers.has(key)) return answers.get(key).then(result => { const { access, ...cached } = result; return cached; });
@@ -1353,13 +1417,16 @@
         const capturedGoal = { ...options.goal };
         const capturedKey = JSON.stringify([options.formal, capturedGoal]);
         pending.then(result => {
-          if (!['answer', 'safety', 'clarification'].includes(result.kind) && answers.get(key) === pending) answers.delete(key);
+          if (box.isConnected) displayFor(capturedKey)(result);
+          if (!['answer', 'self_support', 'safety', 'clarification'].includes(result.kind) && answers.get(key) === pending) answers.delete(key);
           // This exact goal section identifies the original flow, even when a new
           // flow later has identical text. A detached response cannot affect it.
           if (!box.isConnected || capturedKey === selectedKey) return;
           const note = result.kind === 'safety' ? fixedSafetyNote(result)
             : aiSafetyNote(result, ui?.gradedSafety === false && result.safetyLevel === 'concern');
           if (note) rememberWarning(note, capturedKey, capturedGoal);
+          const generalNote = generalInfoNote(result);
+          if (generalNote) rememberWarning(generalNote, capturedKey, capturedGoal);
         });
       }
       return answers.get(key);
@@ -1384,7 +1451,7 @@
       });
       setViewState('answer');
       ownDetails.open = false;
-      answerSlot.replaceChildren(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
+      answerSlot.replaceChildren(aiBox(planningText, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), displayResult: displayFor(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
         if (node.isConnected && selectedKey === key) node.after(changeGoals);
       } }));
       // Keep the controls connected while this goal loads, asks a question or warns.
@@ -1417,11 +1484,13 @@
       busy = true; box.dataset.goalState = 'loading'; box.setAttribute('aria-busy', 'true'); retry.disabled = true; retry.hidden = true; choices.replaceChildren(); ownDetails.hidden = true; box.insertBefore(waiting, choices);
       status.textContent = en ? 'The AI is finding goals for your situation …' : 'Die KI formuliert Ziele für deine Situation …';
       let result;
-      try { result = typeof ai.askGoals === 'function' ? await ai.askGoals(text, { formal: personal.formal }) : { kind: 'error' }; }
+      try { result = typeof ai.askGoals === 'function' ? await ai.askGoals(planningText, { formal: personal.formal }) : { kind: 'error' }; }
       catch { result = { kind: 'error' }; }
       if (!box.isConnected) return;
       waiting.remove();
       busy = false; box.setAttribute('aria-busy', 'false'); retry.disabled = false;
+      const planningInfo = generalInfoNote(result);
+      if (planningInfo) rememberWarning(planningInfo, 'planning', null);
       if (result.kind === 'safety') {
         const note = fixedSafetyNote(result);
         box.remove(); output.prepend(note); setViewState('answer');
@@ -1429,7 +1498,56 @@
         note.scrollIntoView({ behavior: 'instant', block: 'start' });
         return;
       }
-      if (result.kind === 'goals' && result.noSituation) {
+      if (result.kind === 'goal_clarification') {
+        box.dataset.goalState = 'clarification';
+        heading.textContent = en ? 'A question about your situation' : 'Eine Rückfrage zu deiner Situation';
+        status.textContent = result.question;
+        const detail = element('textarea', { className: 'translator-clarification-detail', attributes: { rows: '3', autocomplete: 'off', required: '' } });
+        const submit = button(en ? 'Clarify my goal' : 'Anliegen klären', 'button', () => {}); submit.type = 'submit';
+        const original = element('textarea', { className: 'translator-clarification-original', attributes: { rows: '3', autocomplete: 'off' } });
+        original.value = planningText;
+        const budget = element('p', { className: 'translator-clarification-budget', attributes: { role: 'status', 'aria-live': 'polite' } });
+        const updateBudget = () => {
+          budget.textContent = clarificationBudget(original.value, detail.value, true);
+          submit.textContent = original.value.normalize('NFC').trim() !== planningText
+            ? (en ? 'Restart with this situation' : 'Mit dieser Situation neu starten') : (en ? 'Clarify my goal' : 'Anliegen klären');
+        };
+        detail.addEventListener('input', updateBudget); original.addEventListener('input', updateBudget); updateBudget();
+        const edit = element('details', { className: 'translator-clarification-edit' }, [
+          element('summary', { text: en ? 'Edit situation' : 'Situation bearbeiten' }),
+          element('label', {}, [element('span', { text: en ? 'Your situation' : 'Deine Situation' }), original]),
+          element('p', { text: en ? 'If you change the situation, you choose your goal again. Your additional detail will be included.' : 'Wenn du die Situation änderst, wählst du dein Ziel erneut. Deine Ergänzung wird übernommen.' })
+        ]);
+        const clarification = element('form', { className: 'translator-clarification-form translator-goal-clarification' }, [
+          edit, element('label', {}, [element('span', { text: en ? 'Your detail' : 'Deine Ergänzung' }), detail]), budget, submit
+        ]);
+        clarification.addEventListener('submit', event => {
+          event.preventDefault();
+          const reply = detail.value.normalize('NFC').trim();
+          if (!reply) { detail.focus(); return; }
+          const situation = original.value.normalize('NFC').trim();
+          if (!situation) { edit.open = true; original.focus(); return; }
+          const combined = `${situation}\n${reply}`;
+          const issue = ai.requestIssue(combined, { formal: personal.formal });
+          if (issue) {
+            status.textContent = clarificationBudget(original.value, detail.value, true) + (en ? ' Your draft stays here.' : ' Dein Entwurf bleibt hier erhalten.');
+            detail.focus(); return;
+          }
+          if (situation !== planningText) {
+            // Only an explicit valid submit replaces the original situation.
+            const otherDraft = input.value;
+            input.value = combined;
+            try { input.form.requestSubmit(); } finally { input.value = otherDraft; grow(); }
+            return;
+          }
+          planningText = combined;
+          void load();
+        });
+        choices.replaceChildren(clarification); retry.hidden = true;
+        detail.focus({ preventScroll: true });
+        return;
+      }
+      if (result.kind === 'off_topic' || result.kind === 'goals' && result.noSituation) {
         box.dataset.goalState = 'needs-situation';
         status.textContent = en ? 'What happened? Please briefly describe the situation first.' : 'Was ist passiert? Beschreibe bitte zuerst kurz die Situation.';
         retry.hidden = true;
@@ -1439,9 +1557,15 @@
       ownDetails.hidden = false;
       if (result.kind === 'goals') {
         box.dataset.goalState = 'ready';
+        box.dataset.selectionMode = result.selectionMode || 'guessed';
+        heading.textContent = en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?';
         status.textContent = en ? 'Choose a goal. Your answer will follow your choice.' : 'Wähle ein Ziel. Danach richtet sich deine Antwort.';
         choices.replaceChildren(...result.goals.map(g => button(g.label, 'translator-ai-goal-choice', () => select({ id: g.goal, label: g.label }), { 'aria-pressed': 'false', 'data-goal-id': g.goal })));
         retry.hidden = true;
+        if (result.selectionMode === 'explicit') {
+          ownDetails.querySelector('summary').textContent = en ? 'Change your goal' : 'Dein Anliegen ändern';
+          select({ id: result.goals[0].goal, label: result.goals[0].label });
+        }
       } else {
         box.dataset.goalState = 'unavailable';
         status.textContent = en ? 'The AI goals could not be loaded. Try again or describe your goal.' : 'Die KI-Ziele konnten nicht geladen werden. Versuche es erneut oder beschreibe dein Ziel.';

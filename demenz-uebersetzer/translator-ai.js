@@ -1,5 +1,5 @@
-// KI-Antwort für Sätze, die der Übersetzer nicht kennt.
-// Wird nur für Sätze aufgerufen, die die feste Liste nicht kennt (automatisch, Hinweis unter dem Feld). Gesendet wird
+// KI-Zielklärung und Antwort für eingetippte Situationen. Bewusst geöffnete
+// vorbereitete Situationsseiten bleiben lokal. Gesendet wird
 // der eingegebene Satz (höchstens 200 Zeichen) und Sprache/Anrede. Bei aktiviertem
 // Web-Zugang prüft der Server zusätzlich das Firebase-Konto und das Antwortkontingent.
 // Teilen schickt allein die bereinigte Fassung der KI (mit Sprachkürzel außer Deutsch) zurück.
@@ -7,8 +7,18 @@
 // Speicherung (store: false) und gibt nur geprüfte, kurze Antworten zurück.
 (function (root) {
   const endpoint = 'https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web';
+  const outcomesContract = 'outcomes-v1';
   // Englische Seiten (<html lang="en">) bitten um eine englische Antwort. Deutsch schickt kein Sprachfeld.
   const language = typeof document !== 'undefined' && /^en(?:-|$)/i.test(document.documentElement?.lang || '') ? 'en' : '';
+  // Exact server templates approved independently; arbitrary medical text is not
+  // promoted to a trusted general-information panel.
+  const generalSafetyTexts = Object.freeze({
+    de: 'Allgemeine Warnzeichen bei Schluckproblemen sind Husten oder Verschlucken beim Essen oder Trinken sowie eine feucht oder gurgelnd klingende Stimme oder Atemprobleme nach dem Essen oder Trinken. Schluckprobleme gehören ärztlich oder durch entsprechend qualifiziertes Fachpersonal abgeklärt. Bei schwerer Atemnot, fehlender Atmung oder Bewusstlosigkeit ruf sofort den örtlichen Notruf.',
+    en: 'General warning signs of swallowing difficulties include coughing or choking when eating or drinking, or a wet or gurgly voice or breathing problems after eating or drinking. Swallowing difficulties need assessment by a doctor or appropriately qualified professional. If the person has severe trouble breathing, is not breathing or becomes unconscious, call the local emergency number immediately.'
+  });
+  const generalSafetyInfo = value => value && typeof value === 'object' && !Array.isArray(value)
+    && Object.keys(value).sort().join(',') === 'text,topic' && value.topic === 'swallowing'
+    && value.text === generalSafetyTexts[language || 'de'] ? { topic: 'swallowing', text: value.text } : null;
   const validFixedSafety = value => value?.kind === 'safety' && (value.safetyLevel === 'urgent'
     || value.safetyLevel === 'concern' && typeof value.message === 'string' && value.message.trim().length > 0);
 
@@ -33,7 +43,7 @@
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await fetch(endpoint + '?response_contract=clarification-v1', {
+      const response = await fetch(endpoint + '?response_contract=clarification-v1&goal_contract=' + outcomesContract, {
         method: 'POST',
         mode: 'cors',
         credentials: 'omit',
@@ -50,10 +60,13 @@
       }
       const result = await response.json();
       const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
+      const receivedGeneralInfo = generalSafetyInfo(result?.generalSafetyInfo);
       const invalid = () => ({ kind: 'error', reason: 'unavailable', safetyLevel: result?.safetyLevel,
-        safetyMessage: hasText(result?.safetyMessage) ? result.safetyMessage : '' });
+        safetyMessage: hasText(result?.safetyMessage) ? result.safetyMessage : '',
+        ...(receivedGeneralInfo ? { generalSafetyInfo: receivedGeneralInfo } : {}) });
       if (!result || typeof result.kind !== 'string') return invalid();
       if (result.kind === 'safety') return validFixedSafety(result) ? result : { kind: 'error', reason: 'unavailable' };
+      if (Object.hasOwn(result, 'generalSafetyInfo') && !generalSafetyInfo(result.generalSafetyInfo)) return invalid();
       if (result.kind === 'clarification') {
         const within = (value, min, max) => hasText(value) && Array.from(value.normalize('NFC').trim()).length >= min && Array.from(value.normalize('NFC').trim()).length <= max;
         if (!within(result.question, 3, 180) || !result.question.trim().endsWith('?')
@@ -61,6 +74,12 @@
           || result.safetyLevel !== 'standard' || result.safetyMessage !== null
           || ['phrases', 'avoid', 'share', 'publicSentence', 'requestID'].some(key => Object.hasOwn(result, key))) return invalid();
         return finish({ ...result, question: normalizedText(result.question), meaning: normalizedText(result.meaning), nextStep: normalizedText(result.nextStep) });
+      }
+      if (result.kind === 'self_support') {
+        if (!hasText(result.meaning) || !hasText(result.avoid) || !hasText(result.nextStep)
+          || !Array.isArray(result.steps) || result.steps.length < 1 || result.steps.length > 3 || !result.steps.every(hasText)
+          || Object.hasOwn(result, 'phrases') || result.safetyLevel !== 'standard' || result.safetyMessage !== null) return invalid();
+        return finish(result);
       }
       if (result.kind === 'answer') {
         const usable = hasText(result.meaning) && hasText(result.avoid)
@@ -112,14 +131,28 @@
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await fetch(`${endpoint}/goals`, { method: 'POST', mode: 'cors', credentials: 'omit',
+      const response = await fetch(`${endpoint}/goals?goal_contract=${outcomesContract}`, { method: 'POST', mode: 'cors', credentials: 'omit',
         referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bodyFor(textValue, { formal })), signal: controller.signal });
       if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
       const value = await response.json();
       if (validFixedSafety(value)) return value;
+      if (value && Object.hasOwn(value, 'generalSafetyInfo') && !generalSafetyInfo(value.generalSafetyInfo)) return { kind: 'error', reason: 'unavailable' };
       // Accept both generations during the coordinated Site/API rollout.
       const ids = ['choice_1','choice_2','choice_3','act_now','prepare_talk','rephrase','understand','organize','self_care'];
+      if (value?.contract === outcomesContract) {
+        if (value.kind === 'off_topic') return value;
+        if (value.kind === 'goal_clarification') return typeof value.question === 'string' && value.question.trim().endsWith('?')
+          && Array.from(value.question.normalize('NFC').trim()).length >= 3 && Array.from(value.question.normalize('NFC').trim()).length <= 200 && Array.isArray(value.goals) && value.goals.length === 0
+          ? value : { kind: 'error', reason: 'unavailable' };
+        if (value.kind !== 'goals' || !['explicit','guessed'].includes(value.selectionMode) || !Array.isArray(value.goals)
+          || value.goals.length < 1 || value.goals.length > (value.selectionMode === 'explicit' ? 1 : 3)
+          || value.goals.some(g => !ids.includes(g?.goal) || typeof g.label !== 'string' || !g.label.trim() || Array.from(g.label.normalize('NFC').trim()).length > 64)
+          || new Set(value.goals.map(g => g.goal)).size !== value.goals.length
+          || new Set(value.goals.map(g => g.label.normalize('NFC').trim().toLocaleLowerCase())).size !== value.goals.length) return { kind: 'error', reason: 'unavailable' };
+        return value;
+      }
+      if (value?.contract != null) return { kind: 'error', reason: 'unavailable' };
       if (value?.kind !== 'goals' || !Array.isArray(value.goals)
         || !(value.noSituation === true && value.goals.length === 0 || value.noSituation === false && value.goals.length === 3)
         || value.goals.some(g => !ids.includes(g?.goal) || typeof g.label !== 'string' || !g.label.trim() || g.label.length > 64)
@@ -128,5 +161,5 @@
     } catch { return { kind: 'error', reason: 'unavailable' }; }
     finally { clearTimeout(timer); }
   };
-  root.DemenzTranslatorAI = { ask, askGoals, share, requestIssue, endpoint };
+  root.DemenzTranslatorAI = { ask, askGoals, share, requestIssue, generalSafetyInfo, endpoint };
 })(typeof window !== 'undefined' ? window : globalThis);
