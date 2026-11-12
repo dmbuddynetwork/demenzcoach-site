@@ -23,6 +23,8 @@
     return '';
   };
   const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal } = {}) => {
+    const accessContext = root.DemenzKiFreigabe?.createAccessContext?.();
+    const finish = result => root.DemenzKiFreigabe?.bindAccessResult?.(result, accessContext) || result;
     const value = normalizedText(text);
     const issue = requestIssue(value, { formal, goal });
     if (issue) return { kind: 'error', reason: issue };
@@ -36,14 +38,14 @@
         mode: 'cors',
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
-        headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}) },
+        headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID, accessContext }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}) },
         body: JSON.stringify(payload),
         signal: controller.signal
       });
       if (response.status === 429) return { kind: 'error', reason: 'busy' };
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        if ([401, 402, 409, 410, 503].includes(response.status) && ['signup_required', 'payment_required', 'authentication_required', 'access_unavailable', 'request_in_progress', 'request_completed', 'correction_unavailable', 'answer_recovery_credit', 'answer_unavailable'].includes(error.code)) return { kind: 'access', reason: error.code, access: error.access };
+        if ([401, 402, 409, 410, 503].includes(response.status) && ['signup_required', 'payment_required', 'authentication_required', 'access_unavailable', 'request_in_progress', 'request_completed', 'correction_unavailable', 'answer_recovery_credit', 'answer_unavailable'].includes(error.code)) return finish({ kind: 'access', reason: error.code, access: error.access });
         return { kind: 'error', reason: 'unavailable' };
       }
       const result = await response.json();
@@ -58,7 +60,7 @@
           || !within(result.meaning, 12, 420) || !within(result.nextStep, 8, 300)
           || result.safetyLevel !== 'standard' || result.safetyMessage !== null
           || ['phrases', 'avoid', 'share', 'publicSentence', 'requestID'].some(key => Object.hasOwn(result, key))) return invalid();
-        return { ...result, question: normalizedText(result.question), meaning: normalizedText(result.meaning), nextStep: normalizedText(result.nextStep) };
+        return finish({ ...result, question: normalizedText(result.question), meaning: normalizedText(result.meaning), nextStep: normalizedText(result.nextStep) });
       }
       if (result.kind === 'answer') {
         const usable = hasText(result.meaning) && hasText(result.avoid)
@@ -72,7 +74,7 @@
       }
       // Alle Antworttypen benutzen denselben Textvertrag, auch error/off_topic
       // oder unbekannte Typen mit einem bereits empfangenen Sicherheitssignal.
-      return { ...result, safetyMessage: hasText(result.safetyMessage) ? result.safetyMessage : '' };
+      return finish({ ...result, safetyMessage: hasText(result.safetyMessage) ? result.safetyMessage : '' });
     } catch {
       return { kind: 'error', reason: 'unavailable' };
     } finally {

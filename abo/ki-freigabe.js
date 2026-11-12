@@ -7,6 +7,8 @@
   const pendingKey = 'demenzCoachKiOffen';
   const en = /^en(?:-|$)/i.test(root.document?.documentElement?.lang || '');
   let access, signupCopyStatus, accessContractReady = false, headerPromise, authModule, mountGeneration = 0, invitationShown = false;
+  let authGeneration = 0, observedAuth, observedIdentity;
+  const requestGenerations = new WeakMap(), resultGenerations = new WeakMap(), accessGenerations = new WeakMap();
   const exp = () => root.DemenzWebExperiments;
   const node = (doc, tag, text = '') => { const item = doc.createElement(tag); item.textContent = text; return item; };
   const returnPath = () => en ? '/en/dementia-translator/' : '/de/';
@@ -27,8 +29,46 @@
       view.querySelector('p').textContent = en ? 'Checking your access …' : 'Dein Zugang wird geprüft …';
     }
   }
+  const identityOf = auth => {
+    const user = auth?.currentUser;
+    return user ? `${user.uid}:${user.isAnonymous}:${user.emailVerified}` : '';
+  };
+  function observeAuth(auth) {
+    observedAuth = auth;
+    const identity = identityOf(auth);
+    if (observedIdentity !== undefined && identity !== observedIdentity) {
+      authGeneration++;
+      access = undefined; signupCopyStatus = undefined; accessContractReady = false; headerPromise = null;
+      clearCreditOffers();
+      const notice = root.document?.getElementById?.('web-access-notice');
+      if (notice) notice.textContent = en ? 'Checking your access …' : 'Dein Zugang wird geprüft …';
+    }
+    observedIdentity = identity;
+    return authGeneration;
+  }
+  const currentGeneration = () => observedAuth ? observeAuth(observedAuth) : authGeneration;
+  function createAccessContext() {
+    const context = Object.freeze({});
+    requestGenerations.set(context, currentGeneration());
+    return context;
+  }
+  function bindAccessResult(result, context) {
+    const generation = requestGenerations.get(context);
+    if (!result || typeof result !== 'object' || generation === undefined) return result;
+    resultGenerations.set(result, generation);
+    if (result.access && typeof result.access === 'object') accessGenerations.set(result.access, generation);
+    if (generation === currentGeneration()) return result;
+    // Preserve all care/question/warning fields; only stale optional account
+    // metadata is withheld. No provenance or identity is put in the wire DTO.
+    const { access: ignored, ...care } = result;
+    if (care.kind === 'access') care.reason = 'access_unavailable';
+    resultGenerations.set(care, generation);
+    return care;
+  }
+  const currentAccess = value => value && accessGenerations.get(value) === currentGeneration();
   function accept(value, fromStatus = false) {
     if (!validAccess(value)) return;
+    if (!fromStatus && !currentAccess(value)) return;
     if (fromStatus) {
       accessContractReady = value.contract === 'signup-bonus-v1';
       signupCopyStatus = accessContractReady ? value.signupCopy : undefined;
@@ -40,21 +80,33 @@
     if (typeof exp()?.acceptAccess === 'function') exp().acceptAccess(access);
     else exp()?.accept(value.exposure);
   }
-  async function requestContext({ requestID, anonymous = true } = {}) {
+  async function requestContext({ requestID, anonymous = true, accessContext } = {}) {
     if (!enabled()) return {};
     // Always negotiate the new contract, even if authentication is temporarily
     // unavailable. Omitting it would silently select the legacy free path.
     const operation = { 'X-Translator-Access-Contract': 'signup-bonus-v1', ...(requestID ? { 'X-Translator-Request-ID': requestID } : {}) };
+    const origin = requestGenerations.get(accessContext) ?? currentGeneration();
     try {
       const readHeaders = async () => {
         authModule ||= await import('/abo/web-auth.js');
-        const { auth } = await authModule.webAuth({ anonymous });
-        const user = auth.currentUser;
-        if (!user) return {};
-        const signature = `${user?.uid}:${user?.isAnonymous}:${user?.emailVerified}`;
+        const { auth } = await authModule.webAuth({ anonymous: false });
+        observeAuth(auth);
+        if (origin !== authGeneration) throw new Error('auth_changed');
+        let user = auth.currentUser;
+        if (!user && anonymous) {
+          await authModule.webAuth({ anonymous: true });
+          observeAuth(auth); user = auth.currentUser;
+          // An initial shared anonymous session may be established by this
+          // lookup. A concurrently signed-in account must never be adopted.
+          if (!user?.isAnonymous || user.emailVerified) throw new Error('auth_changed');
+        }
+        const generation = authGeneration;
+        if (!user) return { headers: {}, origin, generation };
+        const signature = identityOf(auth);
         const token = await user.getIdToken();
-        if (`${auth.currentUser?.uid}:${auth.currentUser?.isAnonymous}:${auth.currentUser?.emailVerified}` !== signature) throw new Error('auth_changed');
-        return { Authorization: `Bearer ${token}` };
+        observeAuth(auth);
+        if (identityOf(auth) !== signature || generation !== authGeneration) throw new Error('auth_changed');
+        return { headers: { Authorization: `Bearer ${token}` }, origin, generation };
       };
       let pending;
       if (anonymous) {
@@ -62,18 +114,21 @@
         pending = headerPromise;
       } else pending = readHeaders();
       let timer;
-      const headers = await Promise.race([pending, new Promise((resolve) => { timer = setTimeout(() => resolve(null), 1500); })]).finally(() => clearTimeout(timer));
-      if (!headers) { if (headerPromise === pending) headerPromise = null; return operation; }
-      return { ...headers, ...exp()?.headers(), ...operation };
+      const resolved = await Promise.race([pending, new Promise((resolve) => { timer = setTimeout(() => resolve(null), 1500); })]).finally(() => clearTimeout(timer));
+      if (!resolved) { if (headerPromise === pending) headerPromise = null; return operation; }
+      if (resolved.origin !== origin || resolved.generation !== currentGeneration()) throw new Error('auth_changed');
+      if (accessContext && requestGenerations.has(accessContext)) requestGenerations.set(accessContext, resolved.generation);
+      return { ...resolved.headers, ...exp()?.headers(), ...operation };
     } catch { return operation; } // Still call the server, so its free safety path runs.
   }
   async function refresh() {
     if (!enabled()) return null;
     const generation = mountGeneration;
-    const response = await root.fetch(`${endpoint}/access`, { headers: await requestContext({ anonymous: false }), credentials: 'omit', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(10000) });
+    const context = createAccessContext();
+    const response = await root.fetch(`${endpoint}/access`, { headers: await requestContext({ anonymous: false, accessContext: context }), credentials: 'omit', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(10000) });
     if (!response.ok) throw new Error('access_unavailable');
     const value = await response.json();
-    if (generation !== mountGeneration) throw new Error('access_superseded');
+    if (generation !== mountGeneration || requestGenerations.get(context) !== currentGeneration()) throw new Error('access_superseded');
     if (value.enabled !== true || value.needsSession === true || value.contract !== 'signup-bonus-v1') {
       access = undefined; signupCopyStatus = undefined; accessContractReady = false; clearCreditOffers();
       return value.enabled === true && value.needsSession === true && value.contract === 'signup-bonus-v1'
@@ -95,6 +150,7 @@
     } catch { return ''; }
   }
   function offerCard({ sentence = '', reason = 'payment_required', doc = root.document, value, onRetry } = {}) {
+    if (value && !currentAccess(value)) { value = undefined; reason = 'access_unavailable'; }
     accept(value);
     const card = node(doc, 'section'); card.className = 'ki-angebot';
     card.setAttribute('aria-label', en ? 'Continue using DemenzCoach' : 'DemenzCoach weiter nutzen');
@@ -147,6 +203,8 @@
       card.querySelector('a').textContent = en ? 'Create or sign in to an account' : 'Kostenloses Konto einrichten';
       return card;
     }
+    if (resultGenerations.has(result) && resultGenerations.get(result) !== currentGeneration()
+      || result.access && !currentAccess(result.access)) return null;
     accept(result.access);
     if (!access || result.safetyLevel !== 'standard' || result.safetyMessage) return null;
     exp()?.track('web_answer_completed');
@@ -184,11 +242,15 @@
         : value.verified ? (en ? `${value.remaining} introductory answers left, then paid membership.` : `Noch ${value.remaining} Antworten zum Ausprobieren, danach kostenpflichtige Mitgliedschaft.`)
         : (en ? `${value.remaining} introductory answer(s) remaining without an account. ${value.registeredAdditional} more with a verified account, then paid membership.` : `${value.remaining} Antwort(en) noch ohne Konto ausprobieren. ${value.registeredAdditional} weitere mit verifiziertem Konto, danach kostenpflichtige Mitgliedschaft.`);
       exp()?.track('web_access_viewed');
-    } catch { notice.textContent = en ? 'Access is temporarily unavailable. Safety information remains available.' : 'Der Zugang ist gerade nicht verfügbar. Sicherheitshinweise bleiben erreichbar.'; }
+    } catch {
+      if (generation !== mountGeneration) return;
+      notice.textContent = en ? 'Access is temporarily unavailable. Safety information remains available.' : 'Der Zugang ist gerade nicht verfügbar. Sicherheitshinweise bleiben erreichbar.';
+    }
   }
-  root.DemenzKiFreigabe = Object.freeze({ enabled, requestContext, refresh, accept, afterAnswer, supporterCard, offerCard, takePending, mount, accountURL,
+  root.DemenzKiFreigabe = Object.freeze({ enabled, createAccessContext, bindAccessResult, requestContext, refresh, accept, afterAnswer, supporterCard, offerCard, takePending, mount, accountURL,
     check: async () => ({ allowed: true, reason: 'server_enforced' }), noteAnswer(result) { accept(result?.access); }, returnPath, offerURL, signInURL: accountURL() });
   root.addEventListener?.('demenz-auth-changed', () => {
+    if (observedAuth) observeAuth(observedAuth); else authGeneration++;
     mountGeneration++;
     access = undefined; signupCopyStatus = undefined; accessContractReady = false; headerPromise = null;
     clearCreditOffers(); void mount();
