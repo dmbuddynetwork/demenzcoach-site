@@ -24,7 +24,7 @@ const answer={kind:'answer',meaning:'Fixture context.',phrases:['Ein Satz.','Zwe
    if(url.pathname==='/abo/web-auth.js')return route.fulfill({contentType:'text/javascript',body:'export async function webAuth(){return {auth:{currentUser:null},sdk:{}}}'});
    return url.origin===preview.origin?route.continue():route.abort();
   });
-  const page=await context.newPage();page.setDefaultTimeout(10000);page.on('pageerror',e=>report.errors.push(e.message));
+  const page=await context.newPage();const changeGoal=async()=>{if(legacy)await page.locator('.translator-change-goal>summary').click();};page.setDefaultTimeout(10000);page.on('pageerror',e=>report.errors.push(e.message));
   await page.goto(preview.origin+'/'+language+'/',{waitUntil:'networkidle'});
   if(!legacy)await page.evaluate(()=>{window.DemenzKiFreigabe={enabled:()=>true,requestContext:async({requestID})=>({'X-Translator-Request-ID':requestID}),accept:()=>{},noteAnswer:()=>{},afterAnswer:()=>null};});
   const original='Eine normale Situation als Fixture.';
@@ -47,11 +47,11 @@ const answer={kind:'answer',meaning:'Fixture context.',phrases:['Ein Satz.','Zwe
    await page.locator('.translator-ai-button:visible').click();await page.waitForFunction(()=>document.querySelector('.translator-clarification-detail')?.value==='');assert.equal(requests.at(-1).headers['x-translator-request-id'],failed.headers['x-translator-request-id']);
    assert.equal(requests.at(-1).headers['x-translator-correction-of'],undefined);
    // Re-select goal A after another goal: latest combined input/result is reused, no repeated answer request.
-   await page.locator('.translator-change-goal>summary').click();await page.locator('.translator-ai-goal-choice').nth(1).click();await form().waitFor();await field().fill('Entwurf bleibt lokal');const beforeReturn=requests.length;
-   await page.locator('.translator-change-goal>summary').click();await page.locator('.translator-ai-goal-choice').first().click();await form().waitFor();assert.equal(requests.length,beforeReturn);await page.locator('.translator-change-goal>summary').click();await page.locator('.translator-ai-goal-choice').nth(1).click();await form().waitFor();assert.equal(await field().inputValue(),'Entwurf bleibt lokal');await page.locator('.translator-change-goal>summary').click();await page.locator('.translator-ai-goal-choice').first().click();await form().waitFor();
+   await changeGoal();await page.locator('.translator-ai-goal-choice').nth(1).click();await form().waitFor();await field().fill('Entwurf bleibt lokal');const beforeReturn=requests.length;
+   await changeGoal();await page.locator('.translator-ai-goal-choice').first().click();await form().waitFor();assert.equal(requests.length,beforeReturn);await changeGoal();await page.locator('.translator-ai-goal-choice').nth(1).click();await form().waitFor();assert.equal(await field().inputValue(),'Entwurf bleibt lokal');await changeGoal();await page.locator('.translator-ai-goal-choice').first().click();await form().waitFor();
    // Received warning survives selecting a clarification goal.
-   await page.locator('.translator-change-goal>summary').click();await page.locator('.translator-ai-goal-choice').nth(2).click();await page.locator('.safety-note:visible').waitFor();
-   await page.locator('.translator-change-goal>summary').click();await page.locator('.translator-ai-goal-choice').first().click();await form().waitFor();assert.equal(await page.locator('.safety-note:visible').count(),1);
+   await changeGoal();await page.locator('.translator-ai-goal-choice').nth(2).click();await page.locator('.safety-note:visible').waitFor();
+   await changeGoal();await page.locator('.translator-ai-goal-choice').first().click();await form().waitFor();assert.equal(await page.locator('.safety-note:visible').count(),1);
    assert.equal(await page.locator('.translator-chat:visible').count(),0);
    await page.setViewportSize({width:390,height:460});await field().focus();assert.equal(await page.locator('.translator-chat:visible').count(),0);
    for(const width of [390,1280])for(const scale of [1,2.25]){await page.setViewportSize({width,height:1000});await page.evaluate(scale=>{document.documentElement.style.fontSize=16*scale+'px';},scale);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'No horizontal overflow '+width+'/'+scale);if(evidence&&language==='de')await page.screenshot({path:path.join(evidence,`clarification-${width}-${scale}.png`),fullPage:true});}

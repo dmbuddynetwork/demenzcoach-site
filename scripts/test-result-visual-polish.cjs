@@ -23,7 +23,7 @@ for(const width of [390,1280])for(const baseline of [true,false]){
  report.cases.push({width,baseline,metrics});
  if(!baseline&&out){await page.setViewportSize({width,height:width===390?844:1000});await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));await page.screenshot({path:path.join(out,`DRAFT-${width}-initial-test-replay.png`)});}
  if(!baseline){
-  await page.locator('.translator-change-goal>summary').click();assert.equal(await page.locator('.translator-ai-goal-choice:visible').count(),3);await page.locator('.translator-change-goal>summary').click();
+  assert.equal(await page.locator('.translator-other-goals .translator-ai-goal-choice:visible').count(),2);
   await page.locator('.translator-disclaimer a').focus();assert.ok(await page.locator('.translator-disclaimer a').evaluate(n=>parseFloat(getComputedStyle(n).outlineWidth)>=2),'Legal link retains visible keyboard focus');
   const collision=await page.evaluate(()=>{const f=document.querySelector('.translator-feedback');f?.scrollIntoView({block:'center'});return !!f;});
   if(collision){await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));report.cases.at(-1).feedbackCollision=await page.evaluate(()=>{const a=document.querySelector('.translator-feedback').getBoundingClientRect(),n=document.querySelector('.translator-chat'),b=n.getBoundingClientRect();return !n.hidden&&getComputedStyle(n).display!=='none'&&a.left<b.right&&a.right>b.left&&a.top<b.bottom&&a.bottom>b.top;});}

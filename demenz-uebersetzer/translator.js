@@ -993,19 +993,17 @@
     const existingSafetyNote = safetyNote && [...output.querySelectorAll('.safety-note')]
       .find(note => !note.closest('[data-goal-safety-history]') && !note.closest('.translator-ai') && safetySignature(note) === safetySignature(safetyNote));
     if (safetyNote && !existingSafetyNote) nodes.push(safetyNote);
-    // Gleich oben sagen, dass das von der KI kommt – nicht erst nach den Sätzen.
-    nodes.push(element('p', { className: 'translator-ai-label', text: saved ? helpfulCopy.history : 'Antwort der KI. Prüfe, ob sie zu euch passt.' }));
+    if (saved) nodes.push(element('p', { className: 'translator-ai-label', text: helpfulCopy.history }));
     if (goal) nodes.push(element('p', { className: 'translator-chosen-ai-goal', text: `${ui?.lang === 'en' ? 'Your goal' : 'Dein Ziel'}: ${goal.label}` }));
     const first = element('h3', { className: 'translator-step', text: 'Das kannst du sagen', attributes: { tabindex: '-1' } });
     nodes.push(first, element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
-    const context = element('details', { className: 'translator-ai-context' }, [element('summary', { text: 'Was dahintersteckt' }), element('p', { className: 'translator-meaning translator-ai-meaning', text: result.meaning })]);
-    if (result.safetyLevel !== 'standard') context.open = true;
+    const context = [element('h3', { className: 'translator-step', text: 'Was dahintersteckt' }), element('p', { className: 'translator-meaning translator-ai-meaning', text: result.meaning })];
     // Runde 198: Wie in der App gibt es einen konkreten nächsten Schritt.
     if (typeof result.nextStep === 'string' && result.nextStep) {
       nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
       nodes.push(element('p', { className: 'translator-meaning translator-ai-next', text: result.nextStep }));
     }
-    nodes.push(context);
+    nodes.push(...context);
     nodes.push(element('p', { className: 'translator-ai-avoid' }, [element('strong', { text: 'Besser nicht: ' }), `„${result.avoid}“`]));
     nodes.push(notesCard(disclaimer(true)));
     // Anonymes Teilen gibt es vorerst nur auf Deutsch (der Server bietet es sonst auch nicht an).
@@ -1087,7 +1085,7 @@
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, onRequestState = () => {} } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, onRequestState = () => {}, onAnswerRendered = () => {} } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     if (!goal && !localSafetyHit && !requestState) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
@@ -1201,6 +1199,7 @@
         box.replaceWith(node);
         const accessCard = window.DemenzKiFreigabe?.afterAnswer(result);
         if (accessCard) node.after(accessCard);
+        onAnswerRendered(node);
         if (window.DemenzKiFreigabe?.enabled() && result.safetyLevel === 'standard') {
           output.querySelectorAll('.translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
         }
@@ -1305,7 +1304,7 @@
     const heading = element('h2', { text: en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?' });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status', 'aria-live': 'polite' } });
     const choices = element('div', { className: 'translator-ai-goal-choices' });
-    const changeGoals = element('details', { className: 'translator-change-goal' }, [element('summary', { text: en ? 'Change goal' : 'Ziel ändern' })]);
+    const changeGoals = element('section', { className: 'translator-other-goals' }, [element('h3', { className: 'translator-step', text: en ? 'Try another goal' : 'Ein anderes Ziel ausprobieren' })]);
     let busy = false, selectedKey = '', selectedGoal = null;
     const answerSlot = element('div', { className: 'translator-goal-answer' });
     // These are received warnings for this original situation, not a severity
@@ -1373,19 +1372,27 @@
       selectedGoal = { ...goal };
       box.classList.add('translator-ai-goals-selected');
       heading.textContent = `${en ? 'Your goal' : 'Dein Ziel'}: ${goal.label}`;
-      if (!changeGoals.contains(choices)) { choices.before(changeGoals); changeGoals.append(choices, ownDetails); }
-      changeGoals.querySelector('summary').focus({ preventScroll: true });
-      changeGoals.open = false;
+      heading.classList.add('translator-selected-goal');
+      heading.tabIndex = -1;
+      if (!changeGoals.contains(choices)) { changeGoals.append(choices, ownDetails); box.append(changeGoals); }
+      heading.focus({ preventScroll: true });
       status.hidden = true;
-      choices.querySelectorAll('button').forEach(choice => choice.setAttribute('aria-pressed', String(choice.dataset.goalId === goal.id && choice.textContent === goal.label)));
+      choices.querySelectorAll('button').forEach(choice => {
+        const selected = choice.dataset.goalId === goal.id && choice.textContent === goal.label;
+        choice.setAttribute('aria-pressed', String(selected));
+        choice.hidden = selected;
+      });
       setViewState('answer');
       ownDetails.open = false;
-      answerSlot.replaceChildren(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), onRequestState: state => requestStates.set(key, state) }));
+      answerSlot.replaceChildren(aiBox(text, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
+        if (node.isConnected && selectedKey === key) node.after(changeGoals);
+      } }));
+      // Keep the controls connected while this goal loads, asks a question or warns.
+      box.append(changeGoals);
       syncWarningHistory();
       // Wait for the choice layout to settle; keep a warning/question's own focus.
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        const control = changeGoals.querySelector('summary');
-        if (!box.isConnected || selectedKey !== key || document.activeElement !== control) return;
+        if (!box.isConnected || selectedKey !== key || document.activeElement !== heading) return;
         const headerBottom = document.querySelector('.e-header')?.getBoundingClientRect().bottom || 0;
         const top = heading.getBoundingClientRect().top;
         if (top < headerBottom) window.scrollBy({ top: top - headerBottom - 12, behavior: 'instant' });

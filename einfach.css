@@ -827,3 +827,17 @@ body.einfach .translator-chat-privacy a { display:inline; min-height:0; padding:
 body.einfach .translator-chat-input, body.einfach .translator-chat-send { height:auto; line-height:1.25!important; }
 /* A nested account offer must not change the selected goal's outer spacing. */
 body.einfach .translator-ai-goals-selected { padding:0!important; border:0!important; background:transparent!important; }
+body.einfach .translator-ai-goals-selected > .translator-selected-goal {
+  display:flex; align-items:flex-start; gap:10px; width:fit-content; max-width:100%;
+  box-sizing:border-box; padding:14px 16px; border-radius:18px;
+  background:#e7f4ea; color:#1d5e33!important;
+}
+body.einfach .translator-selected-goal::before {
+  content:""; flex:0 0 26px; width:26px; height:26px; margin-top:2px; border-radius:50%;
+  background:#2e7d4a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12.5 4 4 8-9'/%3E%3C/svg%3E") center / 16px no-repeat;
+}
+body.einfach .translator-other-goals { margin:28px 0 12px; padding-top:20px; border-top:1px solid var(--e-line); }
+body.einfach .translator-other-goals > .translator-ai-goal-choices { margin:14px 0 16px; }
+body.einfach .translator-other-goals .translator-ai-goal-choice[hidden] { display:none!important; }
+body.einfach .translator-goal-answer > .translator-ai,
+body.einfach .translator-ai-clarification { padding:0!important; border:0!important; background:transparent!important; }
