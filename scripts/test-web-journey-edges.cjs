@@ -38,7 +38,7 @@ const evidence=process.env.EDGE_UI_EVIDENCE;
   await page.locator('.translator-ai-goals[data-goal-state=ready]').waitFor();await page.locator('.translator-ai-goal-choice').first().click();await page.locator('.translator-ai-answer').waitFor();
   assert.equal(calls,2);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,'320px result with 200% text has no overflow');
-  await page.locator('.translator-change-goal > summary').click();await page.locator('.translator-own-goal-details > summary').click();
+  await page.locator('.translator-own-goal-details > summary').click();
   const custom=page.locator('.translator-own-goal input');await custom.fill('Ein eigenes Ziel mit ruhiger klarer Grenze');await page.locator('.translator-own-goal button').click();
   await page.locator('.translator-ai-answer').waitFor();assert.equal(calls,3);
   assert.equal(await page.evaluate(()=>document.activeElement.closest('[hidden],details:not([open]) > :not(summary)')!==null),false,'Focus does not stay in collapsed goal controls');

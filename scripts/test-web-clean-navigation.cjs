@@ -53,7 +53,7 @@ const evidence = process.env.CLEAN_UI_EVIDENCE;
     await page.locator('.translator-ai-answer').waitFor();
     assert.equal(await choices.count(),3);assert.equal(await choices.nth(0).getAttribute('aria-pressed'),'true');
     assert.equal(await page.locator('.translator-ai-answer .translator-phrase').count(),3);
-    await page.locator('.translator-change-goal > summary').click();await choices.nth(1).click();await page.locator('.translator-change-goal > summary').click();await choices.nth(0).click();
+    await choices.nth(1).click();await choices.nth(0).click();
     await page.locator('.translator-ai-answer').waitFor();await page.waitForTimeout(350);
     assert.equal(await page.locator('.translator-ai-answer .translator-ai-meaning').first().textContent(),goals[0].label);
     assert.equal(report.mockedRequests.filter(r=>r.body?.goal?.id==='choice_1' && r.body.text==='Sie will mein ganzes Eis essen.').length,language==='de'?1:2,'A is requested once per independent situation, including A → B → A');

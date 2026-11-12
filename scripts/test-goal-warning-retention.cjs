@@ -26,7 +26,7 @@ const warning=(kind,level)=>kind==='fixed'?{kind:'safety',safetyLevel:level,mess
    await page.locator('.translator-ai-goals[data-goal-state=ready]').waitFor();await page.locator('.translator-ai-goal-choice').nth(0).click();await page.locator('.translator-goal-answer .safety-note').waitFor();
    const original=await page.locator('.translator-goal-answer .safety-note').elementHandle();
    const links=await page.locator('.safety-note:visible a[href]').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('href')).sort());
-   await page.locator('.translator-change-goal > summary').click();await page.locator('.translator-ai-goal-choice').nth(1).click();await page.locator('.translator-goal-answer .translator-ai-wait').waitFor();
+   await page.locator('.translator-ai-goal-choice').nth(1).click();await page.locator('.translator-goal-answer .translator-ai-wait').waitFor();
    assert.equal(await page.locator('.safety-note:visible').count(),1,'Pending B must retain the received warning for A');
    assert.equal(await original.evaluate(n=>n.isConnected),true);
    assert.match(await page.locator('[data-goal-safety-history]:visible').innerText(),new RegExp(goals[0].label));
@@ -40,7 +40,7 @@ const warning=(kind,level)=>kind==='fixed'?{kind:'safety',safetyLevel:level,mess
    if(!['warning','different-warning'].includes(next))assert.equal(await page.locator('.translator-goal-answer .safety-note').count(),0,'Historic warning is not assigned to B');
    if(evidence&&process.env.WARNING_CAPTURE_ONLY)await page.screenshot({path:path.join(evidence,level+'-B-standard.png')});
    assert.equal(await page.evaluate(()=>document.activeElement.isConnected&&!document.activeElement.closest('[hidden]')),true);
-   await page.locator('.translator-change-goal > summary').click();await page.locator('.translator-ai-goal-choice').nth(0).click();await page.locator('.translator-goal-answer .safety-note').waitFor();
+   await page.locator('.translator-ai-goal-choice').nth(0).click();await page.locator('.translator-goal-answer .safety-note').waitFor();
    assert.equal(await page.locator('.safety-note:visible').count(),next==='different-warning'?2:1,'A current warning and a genuinely different previous B warning both remain');assert.equal(requests,2,'Returning to A reuses its exact response');
    if(next==='different-warning')assert.match(await page.locator('[data-goal-safety-history]:visible').innerText(),new RegExp(goals[1].label));
    if(evidence&&language==='de'&&kind==='fixed'&&next==='standard'){fs.mkdirSync(evidence,{recursive:true});await page.screenshot({path:path.join(evidence,level+'-return-A.png')});}
@@ -56,7 +56,7 @@ const warning=(kind,level)=>kind==='fixed'?{kind:'safety',safetyLevel:level,mess
    await context.addInitScript(()=>{localStorage.setItem('demenzcoach.analyticsConsent.v1','denied');localStorage.setItem('demenzcoach.marketingConsent.v1','denied');});
    await context.route('**/*',route=>{const url=new URL(route.request().url());if(url.pathname.includes('/v1/translator-web')){if(url.pathname.endsWith('/goals'))return route.fulfill({json:{kind:'goals',noSituation:false,goals}});const body=route.request().postDataJSON();return route.fulfill({json:body.goal.label==='Mein erstes <img src=x> Ziel'?warning('fixed','urgent'):standard});}return url.origin===preview.origin?route.continue():route.abort();});
    const page=await context.newPage();await page.goto(preview.origin+'/'+language+'/',{waitUntil:'networkidle'});await page.locator('#translator-input').fill('Eine normale Fixture Situation.');await page.locator('#translator-form [type=submit]').click();await page.locator('.translator-ai-goals[data-goal-state=ready]').waitFor();
-   const custom=async(label,changed)=>{if(changed)await page.locator('.translator-change-goal > summary').click();await page.locator('.translator-own-goal-details > summary').click();await page.locator('.translator-own-goal input').fill(label);await page.locator('.translator-own-goal button').click();};
+   const custom=async(label,changed)=>{await page.locator('.translator-own-goal-details > summary').click();await page.locator('.translator-own-goal input').fill(label);await page.locator('.translator-own-goal button').click();};
    await custom('Mein erstes <img src=x> Ziel',false);await page.locator('.translator-goal-answer .safety-note').waitFor();await custom('Ein anderes eigenes Ziel',true);await page.locator('.translator-goal-answer .translator-ai-answer').waitFor();
    const history=page.locator('[data-goal-safety-history]:visible');assert.match(await history.innerText(),/Mein erstes <img src=x> Ziel/);assert.doesNotMatch(await history.innerText(),/Ein anderes eigenes Ziel/);assert.equal(await page.locator('.safety-note:visible').count(),1);assert.equal(await history.locator('img').count(),0);
    report.cases.push({language,sameIDdifferentLabel:true,customContext:true});
