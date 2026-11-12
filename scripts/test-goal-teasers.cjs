@@ -77,6 +77,7 @@ const evidence = process.env.GOAL_TEASER_EVIDENCE;
         await alternatives.scrollIntoViewIfNeeded();
         if(evidence)await page.screenshot({path:path.join(evidence,`GOALS-BELOW-ANSWER-${width}.png`)});
         if(evidence){await page.evaluate(()=>scrollTo(0,0));await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await page.screenshot({path:path.join(evidence,`ACTUAL-GOAL-FLOW-${width}.png`),fullPage:true});}
+        if(evidence){await page.locator('.translator-ai-answer').evaluate(el=>scrollTo(0,scrollY+el.getBoundingClientRect().bottom-300));await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));await page.screenshot({path:path.join(evidence,`END-ANSWER-CUSTOM-${width}.png`)});}
       }
       await page.setViewportSize({width:390,height:450});
       await custom.fill(customDraft); await page.locator('.translator-own-goal').evaluate(el=>el.scrollIntoView({block:'end'}));
