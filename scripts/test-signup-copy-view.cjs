@@ -13,6 +13,7 @@ const evidence = process.env.SIGNUP_COPY_EVIDENCE;
     preview = await createPreviewServer();
     browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH });
     for (const locale of ['de', 'en']) for (const width of [390, 1280]) {
+      if (process.env.SIGNUP_VIEW_PROFILE && process.env.SIGNUP_VIEW_PROFILE !== `${locale}-${width}`) continue;
       const context = await browser.newContext({ viewport: { width, height: 950 }, reducedMotion: 'reduce' });
       try {
         await context.route('**/*', route => {
@@ -37,18 +38,21 @@ const evidence = process.env.SIGNUP_COPY_EVIDENCE;
           const expected = locale === 'de'
             ? signupCopy === 'variant_1' ? 'Was sage ich jetzt am besten?' : 'Ein Satz zum Sagen. Ein Schritt zum Ausprobieren.'
             : signupCopy === 'variant_1' ? 'What can I say right now?' : 'Words to say. A step to try.';
-          assert.equal(await page.locator('h3').innerText(), expected);
+          assert.equal(await page.getByRole('heading', { level: 3 }).innerText(), expected);
           assert.match(await page.locator('.lead').innerText(), locale === 'de' ? /3 weitere KI-Antworten kostenlos/ : /3 more AI answers for free/);
-          assert.equal(await page.locator('.primary').innerText(), locale === 'de' ? '3 Antworten kostenlos freischalten' : 'Unlock 3 free answers');
+          assert.equal(await page.locator('.offer-body .primary').innerText(), locale === 'de' ? '3 Antworten kostenlos freischalten' : 'Unlock 3 free answers');
           assert.equal(await page.locator('input[type=email]').isVisible(), true);
           assert.equal(await page.locator('.google').isVisible(), true);
           assert.match(await page.locator('.details').innerText(), locale === 'de' ? /Keine automatische Newsletter-Anmeldung/ : /No automatic newsletter signup/);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
           assert.deepEqual(await page.evaluate(() => window.__calls), []);
-          await page.locator('.primary').click(); assert.deepEqual(await page.evaluate(() => window.__calls), []);
-          await page.locator('input').fill('caregiver@example.test'); await page.locator('.primary').click();
+          await page.locator('.offer-body .primary').click(); assert.deepEqual(await page.evaluate(() => window.__calls), []);
+          await page.locator('input').fill('caregiver@example.test'); await page.locator('.offer-body .primary').click();
           await page.waitForFunction(() => window.__calls.length === 1);
           assert.deepEqual(await page.evaluate(() => window.__calls[0]), ['email', 'caregiver@example.test']);
+          assert.equal(await page.locator('.signup-address').innerText(), 'caregiver@example.test');
+          assert.equal(await page.getByRole('heading', { name: locale === 'en' ? 'Confirm your email' : 'Bestätige kurz deine E-Mail', exact: true }).count(), 1);
+          await page.getByRole('button', { name: locale === 'en' ? 'Change email address' : 'Adresse ändern', exact: true }).click();
           await page.locator('.google').click(); await page.waitForFunction(() => window.__calls.length === 2);
           assert.deepEqual(await page.evaluate(() => window.__calls[1]), ['google']);
           if (evidence && signupCopy === 'variant_1' && locale === 'de') {

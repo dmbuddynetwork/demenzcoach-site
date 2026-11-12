@@ -1252,7 +1252,7 @@
         output.querySelector('.translator-notes')?.remove();
         if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
-        const accessCard = window.DemenzKiFreigabe?.afterAnswer(result);
+        const accessCard = window.DemenzKiFreigabe?.afterAnswer(result, document, { sentence: requestText });
         if (accessCard) node.after(accessCard);
         onAnswerRendered(node);
         if (window.DemenzKiFreigabe?.enabled() && result.safetyLevel === 'standard') {
@@ -1441,7 +1441,8 @@
       heading.textContent = `${en ? 'Your goal' : 'Dein Ziel'}: ${goal.label}`;
       heading.classList.add('translator-selected-goal');
       heading.tabIndex = -1;
-      if (!changeGoals.contains(choices)) { changeGoals.append(choices, ownDetails); box.append(changeGoals); }
+      if (!changeGoals.contains(choices)) changeGoals.append(choices, ownDetails);
+      box.insertBefore(changeGoals, answerSlot);
       heading.focus({ preventScroll: true });
       status.hidden = true;
       choices.querySelectorAll('button').forEach(choice => {
@@ -1449,13 +1450,15 @@
         choice.setAttribute('aria-pressed', String(selected));
         choice.hidden = selected;
       });
+      const otherCount = [...choices.querySelectorAll('button')].filter(choice => !choice.hidden).length;
+      changeGoals.querySelector('h3').textContent = otherCount ? (en ? 'Try another goal' : 'Ein anderes Ziel ausprobieren') : (en ? 'Adjust your goal' : 'Dein Ziel anpassen');
       setViewState('answer');
       ownDetails.open = false;
       answerSlot.replaceChildren(aiBox(planningText, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), displayResult: displayFor(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
-        if (node.isConnected && selectedKey === key) node.after(changeGoals);
+        if (node.isConnected && selectedKey === key) box.insertBefore(changeGoals, answerSlot);
       } }));
       // Keep the controls connected while this goal loads, asks a question or warns.
-      box.append(changeGoals);
+      box.insertBefore(changeGoals, answerSlot);
       syncWarningHistory();
       // Wait for the choice layout to settle; keep a warning/question's own focus.
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1760,9 +1763,16 @@
     nodes.push(answerCard);
     const goals = goal ? goalsFor(result) : null;
     const chosenGoal = goals?.find((candidate) => candidate.id === goal) ?? null;
-    // Gewähltes Ziel als ruhige graue Zeile oben in der Karte (wie in der App, nie wie ein Knopf).
+    // Selected goal remains green; genuine offered alternatives stay visible at the result start.
     if (chosenGoal) answerCard.append(element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }));
-    if (goals) answerCard.append(element('details', { className: 'translator-change-goal' }, [element('summary', { text: 'Ziel ändern' }), element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.map(option => button(option.label, 'translator-ai-goal-choice', () => { setPage(result, option.id); render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id }); }, { 'aria-pressed': String(option.id === goal) })))]));
+    if (chosenGoal) answerCard.append(element('section', { className: 'translator-other-goals translator-preset-other-goals' }, [
+      element('h3', { className: 'translator-step', text: 'Ein anderes Ziel ausprobieren' }),
+      element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.filter(option => option.id !== goal).map(option => button(option.label, 'translator-ai-goal-choice', () => {
+        track('translator_goal', { goal: option.id, result_key: result.key, step: 'switch' });
+        setPage(result, option.id, false);
+        render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id, preserveViewport: true });
+      }, { 'aria-pressed': 'false' })))
+    ]));
     // Die Zeichnung steht oben neben der Sprechblase (saidBlock), nicht mehr in der Karte.
     // Bausteine der Karte; die Reihenfolge richtet sich nach dem Ziel.
     const meaningBlock = [];
@@ -1863,11 +1873,7 @@
     const planUp = planPlace ? planCTA(result, planPlace) : null;
     // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
     // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
-    const nextRows = chosenGoal ? goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {
-      track('translator_goal', { goal: candidate.id, result_key: result.key, step: 'switch' });
-      setPage(result, candidate.id, false);
-      render(result, { safetyHit, alternatives, also, typed, mood, goal: candidate.id });
-    })) : [];
+    const nextRows = [];
     // Runde 199 (schlankes Layout): Ratgeber- und Übungs-Link stehen im Aufklappbereich „Mehr dazu“,
     // unter der Antwort bleibt nur „Neuen Satz übersetzen“.
     const deeper = [
@@ -2115,12 +2121,15 @@
   renderSaved();
   renderHelpful();
 
-  // Zurück von Kasse oder Anmeldung: den gemerkten Satz (nur sessionStorage dieses Tabs) gleich übersetzen.
+  // A confirmed email return can restore the original draft without silently
+  // requesting or charging for the same answer again. Checkout return is unchanged.
+  let signupDraftReturn = false;
+  try { signupDraftReturn = sessionStorage.getItem('demenzcoach.signupDraftReturn.v1') === '1'; sessionStorage.removeItem('demenzcoach.signupDraftReturn.v1'); } catch {}
   const pendingSentence = window.DemenzKiFreigabe?.takePending();
   if (pendingSentence) {
     input.value = pendingSentence;
     grow();
-    form.requestSubmit();
+    if (signupDraftReturn) input.focus({ preventScroll: true }); else form.requestSubmit();
   }
 
   // Beim Drucken alle aufklappbaren Abschnitte zeigen.
@@ -2166,21 +2175,10 @@
   // Mit × wird es zum runden Bild; ein Tipp darauf öffnet es wieder.
   if (document.body.classList.contains('einfach') && 'IntersectionObserver' in window) {
     const en = ui?.lang === 'en';
-    const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation', 'aria-describedby': 'translator-chat-privacy' } });
+    const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation' } });
     const send = element('button', { className: 'translator-chat-send', text: en ? 'Find an answer' : 'Antwort finden', attributes: { type: 'submit' } });
     const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
-    const privacy = element('p', { className: 'translator-chat-privacy', attributes: { id: 'translator-chat-privacy' } });
-    // The same pre-submit terms/privacy/AI disclosure remains reachable here.
-    const originalNotice = document.getElementById('translator-privacy-note');
-    if (originalNotice) {
-      const links = originalNotice.querySelectorAll('a');
-      if (links.length >= 2) {
-        const terms = links[0].cloneNode(true), information = links[1].cloneNode(true);
-        information.textContent = en ? 'Privacy & AI' : 'Datenschutz & KI';
-        privacy.append(en ? 'By submitting you accept the ' : 'Mit Absenden akzeptierst du die ', terms, '. ', information, '.');
-      } else privacy.append(...Array.from(originalNotice.childNodes, node => node.cloneNode(true)));
-    }
-    const panel = element('div', { className: 'translator-chat-panel' }, [chatForm, privacy]);
+    const panel = element('div', { className: 'translator-chat-panel' }, [chatForm]);
     const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': en ? 'Describe another situation' : 'Andere Situation beschreiben', hidden: '' } }, [panel]);
     let positionFrame = 0;
     // Keep an unsent draft available to the existing feedback/correction flow.
@@ -2214,7 +2212,7 @@
       chat.style.bottom = '';
       const viewport = window.visualViewport;
       const keyboardInset = viewport ? Math.max(0, innerHeight - viewport.height - viewport.offsetTop) : 0;
-      if (keyboardInset) chat.style.bottom = `${keyboardInset + 8}px`;
+      if (keyboardInset) chat.style.bottom = `${keyboardInset}px`;
       panel.style.maxHeight = '';
       panel.style.overflowY = '';
       if (!chat.hidden) {

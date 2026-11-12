@@ -16,9 +16,9 @@ function fixture(t,reviewed=true) {
   const copy=rel=>{fs.mkdirSync(path.dirname(path.join(dir,rel)),{recursive:true});fs.copyFileSync(path.join(root,rel),path.join(dir,rel));};
   for(const rel of [...pages,'sitemap.xml','content/generator-route-manifest.json','de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html','de/ratgeber/pflegende-angehoerige-ueberfordert.html','en/dementia-translator/i-dont-need-the-bathroom.html','guides/dementia-caregiver-overwhelmed.html','demenz-uebersetzer/translator.js','demenz-uebersetzer/translator-core.js','demenz-uebersetzer/translator-core-en.js','demenz-uebersetzer/translator-locale.js'])copy(rel);
   // The app shell is the renderer/helper dependency manifest.
-  const js=new Set(['start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css']);
+  const js=new Set(['start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css','abo/signup-sheet.js']);
   for(const lang of ['de','en'])for(const m of fs.readFileSync(path.join(root,lang+'/index.html'),'utf8').matchAll(/<script\b[^>]*src="([^"]+)"[^>]*>/g)){const u=new URL(m[1],'https://dementiacoachapp.com/'+lang+'/');if(u.origin==='https://dementiacoachapp.com')js.add(u.pathname.slice(1));}
-  for(const rel of ['abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css'])js.add(rel);
+  for(const rel of ['abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css','abo/signup-sheet.js'])js.add(rel);
   for(const lang of ['de','en'])for(const m of fs.readFileSync(path.join(root,lang+'/index.html'),'utf8').matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>/g)){const u=new URL(m[1],'https://dementiacoachapp.com/'+lang+'/');if(u.origin==='https://dementiacoachapp.com')js.add(u.pathname.slice(1));}
   for(const rel of js)copy(rel);
   for(const lang of ['de','en']) {
@@ -116,7 +116,7 @@ test('A new topic requires a fresh actual generator export instead of manufactur
   assert.notEqual(r.status,0);assert.match(r.stderr,/Missing\/stale actual app view/);assert.deepEqual(contents(dir),before);
 });
 test('Changed renderer or locale causes fail-closed stale-view rejection before writes',t=>{
-  for(const rel of ['demenz-uebersetzer/translator.js','demenz-uebersetzer/translator-locale.js','demenz-uebersetzer/translator-signup.js','start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css']) {
+  for(const rel of ['demenz-uebersetzer/translator.js','demenz-uebersetzer/translator-locale.js','demenz-uebersetzer/translator-signup.js','start/situation-context.js','abo/web-auth.js','abo/email-auth.js','abo/email-account.js','abo/email-link-bootstrap.js','abo/google-auth.js','abo/inline-signup.js','abo/signup-offer-view.js','abo/signup-offer-view.css','abo/signup-sheet.js']) {
     const dir=fixture(t),before=contents(dir);fs.appendFileSync(path.join(dir,rel),'\n// synthetic change\n');const r=build(dir);assert.notEqual(r.status,0);assert.match(r.stderr,/Missing\/stale actual app view/);assert.deepEqual(contents(dir),before);
   }
 });

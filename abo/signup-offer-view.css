@@ -10,3 +10,36 @@
 .dc-signup .micro{margin:10px 0 0;text-align:center;font-size:12px!important;line-height:1.5!important;color:#6c6677}.dc-signup .details{padding:14px 20px;border-top:1px solid #eeebf1;background:#fbfafc}.dc-signup .details p{font-size:12px!important;line-height:1.5!important;color:#635e6b;margin:0}.dc-signup .links{display:flex;justify-content:center;align-items:center;gap:7px;margin:12px 0 0}.dc-signup .links button{background:none;border:0;color:#47408c;text-decoration:underline;font-size:13px!important;padding:2px}.dc-signup .links span{font-size:13px!important}.dc-signup .demo-status{font-size:14px!important;line-height:1.5!important;color:#47408c;margin:12px 0 0}.dc-signup .demo-status:empty{display:none}
 
 .account-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* Accessible bottom sheet: existing provider/bonus rules decide when it opens. */
+.dc-signup-sheet{position:fixed;inset:auto 0 var(--dc-sheet-bottom,0px);margin:0 auto;width:min(100%,540px);max-width:none;max-height:calc(var(--dc-sheet-height,100dvh) - 12px);padding:0;border:0;border-radius:24px 24px 0 0;box-shadow:0 -12px 60px #19142d38;background:#fff;color:#1c1b1f;overflow:auto;overscroll-behavior:contain;animation:dc-signup-rise .24s ease-out}
+.dc-signup-sheet::backdrop{background:#16112099}
+.dc-signup-sheet-tools{position:sticky;top:0;display:flex;justify-content:flex-end;padding:8px 12px 0;background:#fff;z-index:2}
+.dc-signup-sheet-close{width:44px;height:44px;border:0;border-radius:50%;font-size:30px;line-height:1;background:#f2eff6;color:#373045;cursor:pointer}
+.dc-signup-sheet .dc-signup{border:0;border-radius:0;max-width:none;overflow:visible;padding-bottom:env(safe-area-inset-bottom,0px)}
+.dc-signup-sheet .dc-signup .offer-body{padding-top:8px;background:#fff}
+.dc-signup-sheet .dc-signup .lead{font-size:17px!important;line-height:1.45!important}
+.dc-signup-sheet .dc-signup input,.dc-signup-sheet .dc-signup .primary,.dc-signup-sheet .dc-signup .google{font-size:17px!important;min-height:50px}
+.dc-signup-sheet-open .translator-chat{display:none!important}
+.dc-signup .signup-state{padding:8px 22px 24px;display:grid;gap:16px}
+.dc-signup .signup-state h3{margin:0!important;line-height:1.2!important}
+.dc-signup .signup-address{margin:0;font-size:18px!important;overflow-wrap:anywhere}
+.dc-signup .signup-address strong{font-size:18px!important}
+.dc-signup .signup-guidance{margin:0;font-size:17px!important;line-height:1.5!important;color:#504958}
+.dc-signup .signup-state .demo-status{margin:0}
+.dc-signup .signup-change{min-height:44px;padding:10px;border:0;background:transparent;text-decoration:underline;font-size:16px;color:#47408c;cursor:pointer}
+.dc-signup-sheet :focus-visible{outline:3px solid #7c65d3;outline-offset:3px}
+@keyframes dc-signup-rise{from{transform:translateY(100%);opacity:.6}to{transform:translateY(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){.dc-signup-sheet{animation:none}}
+
+.dc-signup .signup-resend{min-height:44px;padding:10px;border:1px solid #bdb6c9;border-radius:10px;background:#fff;color:#47408c;font:inherit;font-size:16px;cursor:pointer}
+.dc-signup .signup-resend-wait{margin:0;font-size:14px!important;line-height:1.5!important;color:#6c6677}
+.dc-signup .signup-legal{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;padding:0 18px 12px}
+.dc-signup .signup-legal a{display:inline-flex;align-items:center;min-height:44px;color:#5b5267;font-size:13px!important;font-weight:400;text-decoration:none}
+.dc-signup-sheet-close::after{content:none!important}
+
+.dc-signup .signup-legal a:hover,.dc-signup .signup-legal a:focus-visible{text-decoration:underline}
+
+.dc-signup .signup-setup{text-decoration:none!important;text-align:center}
+.dc-signup .signup-state .signup-direct{background:#fff;color:#47408c;border-color:#a59bb8}
+
+@media(min-width:768px){.dc-signup-sheet{inset:0;margin:auto;height:fit-content;max-height:calc(var(--dc-sheet-height,100dvh) - 48px);border-radius:24px}}

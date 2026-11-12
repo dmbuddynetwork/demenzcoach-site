@@ -193,11 +193,11 @@
     }
     exp()?.track(signup ? 'web_signup_shown' : 'web_paywall_shown'); return card;
   }
-  function afterAnswer(result, doc = root.document) {
+  function afterAnswer(result, doc = root.document, { sentence = '' } = {}) {
     if (!enabled()) {
       if (config.signIn?.offerAfterAnswer !== true || config.signIn?.emailLink !== true || invitationShown || result?.safetyLevel !== 'standard' || result?.safetyMessage) return null;
       invitationShown = true;
-      const card = offerCard({ reason: 'signup_required', doc });
+      const card = offerCard({ reason: 'signup_required', doc, sentence });
       card.querySelector('h3').textContent = en ? 'Your free account' : 'Dein kostenloser Zugang';
       card.querySelector('p').textContent = en ? 'Continue with Google or email. No password or payment details required.' : 'Mit Google oder E-Mail weiter. Ohne Passwort und ohne Zahlungsdaten.';
       card.querySelector('a').textContent = en ? 'Create or sign in to an account' : 'Kostenloses Konto einrichten';
@@ -208,7 +208,7 @@
     accept(result.access);
     if (!access || result.safetyLevel !== 'standard' || result.safetyMessage) return null;
     exp()?.track('web_answer_completed');
-    if (!access.verified && !access.paid && access.registeredAdditional > 0 && (access.signupPlacement === 'after-first' || !access.remaining)) return offerCard({ reason: 'signup_required', doc });
+    if (!access.verified && !access.paid && access.registeredAdditional > 0 && (access.signupPlacement === 'after-first' || !access.remaining)) return offerCard({ reason: 'signup_required', doc, sentence });
     if (!access.paid && !access.remaining) return offerCard({ reason: 'payment_required', doc });
     const notice = node(doc, 'p', access.paid ? (en ? 'Your membership is active.' : 'Deine Mitgliedschaft ist aktiv.') : (en ? `${access.remaining} introductory answers remaining.` : `Noch ${access.remaining} Antworten zum Ausprobieren.`)); notice.className = 'ki-angebot-klein'; return notice;
   }
