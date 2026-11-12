@@ -145,7 +145,7 @@ const answer = {
         if (evidence) await page.locator('#translator-result').screenshot({ path: path.join(evidence, `fixed-concern-${language}-390.png`) });
         const customSafety = async label => {
           await submit('CustomSafetyFixture'); await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
-          await page.locator('.translator-own-goal-details > summary').click();
+          assert.equal(await page.locator('.translator-own-goal input').isVisible(), true, 'Custom goal is directly visible without expanding a disclosure');
           await page.locator('.translator-ai-goals input').fill(label);
           await page.locator('.translator-ai-goals form button').click();
         };

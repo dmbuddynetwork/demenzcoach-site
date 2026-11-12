@@ -143,7 +143,7 @@ const english = {
           profile.cases.push('actual G01 guessed single requires confirmation; two phrases');
           await submit(caseByID('G03')); await answer();
           assert.ok(await page.locator('.translator-selected-goal').isVisible());
-          assert.ok(await page.locator('.translator-own-goal-details summary').isVisible());
+          assert.ok(await page.locator('.translator-own-goal input').isVisible());
           profile.cases.push('actual G03 explicit goal directly answered with correction control');
           await submit(caseByID('G11'));
           await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();

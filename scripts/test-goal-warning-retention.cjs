@@ -14,7 +14,7 @@ const warning=(kind,level)=>kind==='fixed'?{kind:'safety',safetyLevel:level,mess
   const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});let release,requests=0;
   try{
    await context.addInitScript(()=>{localStorage.setItem('demenzcoach.analyticsConsent.v1','denied');localStorage.setItem('demenzcoach.marketingConsent.v1','denied');});
-   await context.route('**/*',async route=>{const url=new URL(route.request().url());if(url.pathname.includes('/v1/translator-web')){
+   await context.route('**/*',async route=>{const url=new URL(route.request().url());if(url.pathname.includes('/v1/translator-web')){if(route.request().method()==='OPTIONS')return route.fulfill({status:204});if(url.pathname.endsWith('/access'))return route.fulfill({json:{enabled:false,mode:'controlled-warning-fixture'}});
     if(url.pathname.endsWith('/goals'))return route.fulfill({json:{kind:'goals',noSituation:false,goals}});
     const body=route.request().postDataJSON();requests++;
     if(body.goal.label===goals[0].label)return route.fulfill({json:warning(kind,level)});
@@ -54,9 +54,9 @@ const warning=(kind,level)=>kind==='fixed'?{kind:'safety',safetyLevel:level,mess
   const context=await browser.newContext({viewport:{width:390,height:844}});
   try{
    await context.addInitScript(()=>{localStorage.setItem('demenzcoach.analyticsConsent.v1','denied');localStorage.setItem('demenzcoach.marketingConsent.v1','denied');});
-   await context.route('**/*',route=>{const url=new URL(route.request().url());if(url.pathname.includes('/v1/translator-web')){if(url.pathname.endsWith('/goals'))return route.fulfill({json:{kind:'goals',noSituation:false,goals}});const body=route.request().postDataJSON();return route.fulfill({json:body.goal.label==='Mein erstes <img src=x> Ziel'?warning('fixed','urgent'):standard});}return url.origin===preview.origin?route.continue():route.abort();});
+   await context.route('**/*',route=>{const url=new URL(route.request().url());if(url.pathname.includes('/v1/translator-web')){if(route.request().method()==='OPTIONS')return route.fulfill({status:204});if(url.pathname.endsWith('/access'))return route.fulfill({json:{enabled:false,mode:'controlled-warning-fixture'}});if(url.pathname.endsWith('/goals'))return route.fulfill({json:{kind:'goals',noSituation:false,goals}});const body=route.request().postDataJSON();return route.fulfill({json:body.goal.label==='Mein erstes <img src=x> Ziel'?warning('fixed','urgent'):standard});}return url.origin===preview.origin?route.continue():route.abort();});
    const page=await context.newPage();await page.goto(preview.origin+'/'+language+'/',{waitUntil:'networkidle'});await page.locator('#translator-input').fill('Eine normale Fixture Situation.');await page.locator('#translator-form [type=submit]').click();await page.locator('.translator-ai-goals[data-goal-state=ready]').waitFor();
-   const custom=async(label,changed)=>{await page.locator('.translator-own-goal-details > summary').click();await page.locator('.translator-own-goal input').fill(label);await page.locator('.translator-own-goal button').click();};
+   const custom=async(label,changed)=>{assert.equal(await page.locator('.translator-own-goal input').isVisible(),true,'Custom goal needs no disclosure click');await page.locator('.translator-own-goal input').fill(label);await page.locator('.translator-own-goal button').click();};
    await custom('Mein erstes <img src=x> Ziel',false);await page.locator('.translator-goal-answer .safety-note').waitFor();await custom('Ein anderes eigenes Ziel',true);await page.locator('.translator-goal-answer .translator-ai-answer').waitFor();
    const history=page.locator('[data-goal-safety-history]:visible');assert.match(await history.innerText(),/Mein erstes <img src=x> Ziel/);assert.doesNotMatch(await history.innerText(),/Ein anderes eigenes Ziel/);assert.equal(await page.locator('.safety-note:visible').count(),1);assert.equal(await history.locator('img').count(),0);
    report.cases.push({language,sameIDdifferentLabel:true,customContext:true});
