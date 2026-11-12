@@ -850,3 +850,7 @@ body.einfach .translator-chat-send{min-height:48px;min-width:108px;border-radius
 body.einfach:has(> .translator-chat:not([hidden])){padding-bottom:104px}
 html:has(body.einfach .translator-chat){scroll-padding-bottom:104px}
 body.dc-signup-sheet-open .translator-chat{display:none!important}
+
+/* Goal alternatives are exposed at the result start, not behind an accordion or footer. */
+body.einfach .translator-other-goals{margin:12px 0 20px;padding-top:0;border-top:0}
+body.einfach .translator-other-goals > .translator-ai-goal-choices{margin:8px 0 10px}

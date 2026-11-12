@@ -32,19 +32,26 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
   const hasSituation = purpose !== 'account' && Boolean(card.closest('.translator-goal-answer, .translator-ai-goals'));
   let dismissed = false, exposureObserver, sheet;
   const dispose = () => { dismissed = true; exposureObserver?.disconnect(); view.disposeSignup?.(); window.removeEventListener('demenz-auth-changed', authChanged); };
-  const finishInPlace = async address => {
-    if (dismissed || !view.isConnected) return;
+  const confirmed = user => user?.uid && user.emailVerified === true && user.isAnonymous !== true && typeof user.email === 'string'
+    ? { uid: user.uid, email: user.email, normalizedEmail: user.email.toLowerCase() } : null;
+  const matches = (expected, currentAuth) => {
+    const current = confirmed(currentAuth.currentUser);
+    return Boolean(expected && current && expected.uid === current.uid && expected.normalizedEmail === current.normalizedEmail);
+  };
+  const finishInPlace = async (expected, currentAuth) => {
+    if (dismissed || !view.isConnected || !matches(expected, currentAuth)) return;
     let access;
     try { access = await window.DemenzKiFreigabe?.refresh(); } catch { /* Actual sign-in is independent of optional status refresh. */ }
-    if (dismissed || !view.isConnected) return;
+    if (dismissed || !view.isConnected || !matches(expected, currentAuth)) return;
     if (hasSituation) window.DemenzKiFreigabe?.takePending();
-    view.showSignupSuccess(address, { offerSetup: setupAllowed(access) });
+    view.showSignupSuccess(expected.email, { offerSetup: setupAllowed(access) });
   };
   const authChanged = async () => {
     const requested = view.requestedEmail?.(); if (!requested || dismissed) return;
     try {
       const latest = await webAuth({ anonymous: false });
-      if (latest.auth.currentUser?.emailVerified === true && latest.auth.currentUser.email?.toLowerCase() === requested.toLowerCase()) await finishInPlace(latest.auth.currentUser.email);
+      const expected = confirmed(latest.auth.currentUser);
+      if (expected?.normalizedEmail === requested.toLowerCase()) await finishInPlace(expected, latest.auth);
     } catch { /* Keep the pending-email screen; never assert success without verified state. */ }
   };
   const expose = () => {
@@ -63,11 +70,14 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     async onGoogle() {
       const result = await google.begin();
       if (result?.signedIn === true) {
-        if (creditActive === true && purpose === 'intro') window.DemenzWebExperiments?.queueSignupCompletion();
+        const expected = confirmed(auth.currentUser);
+        if (!matches(expected, auth)) return { signedIn: false };
         let access;
         try { access = await window.DemenzKiFreigabe?.refresh(); } catch { /* No new care request on sign-in. */ }
+        if (dismissed || !view.isConnected || !matches(expected, auth)) return { signedIn: false };
+        if (creditActive === true && purpose === 'intro') window.DemenzWebExperiments?.queueSignupCompletion();
         if (hasSituation) window.DemenzKiFreigabe?.takePending();
-        return { ...result, offerSetup: setupAllowed(access) };
+        return { ...result, email: expected.email, offerSetup: setupAllowed(access) };
       }
       return result;
     },

@@ -8,8 +8,8 @@ const recording = JSON.parse(fs.readFileSync(process.env.OUTCOMES_REPLAY_FILE, '
 const care = recording.cases.find(item => item.id === 'G03');
 const evidence = process.env.SIGNUP_SHEET_EVIDENCE;
 const authModule = `
-const read=()=>JSON.parse(localStorage.getItem('__fixtureUser')||'null')||{uid:'controlled-guest',email:null,emailVerified:false,isAnonymous:true};
-const user=()=>({...read(),providerData:read().email?[{providerId:'password'}]:[],getIdToken:async()=>read().emailVerified?'signed-fixture-token':'guest-fixture-token'});
+const read=()=>{const raw=localStorage.getItem('__fixtureUser');return raw===null?{uid:'controlled-guest',email:null,emailVerified:false,isAnonymous:true}:JSON.parse(raw)};
+const user=()=>read()?({...read(),providerData:read().email?[{providerId:'password'}]:[],getIdToken:async()=>read()?.emailVerified?'signed-fixture-token':'guest-fixture-token'}):null;
 const auth={get currentUser(){return user()}};
 const set=credential=>{localStorage.setItem('__fixtureUser',JSON.stringify({uid:read().uid,email:credential.email,emailVerified:true,isAnonymous:false}));window.dispatchEvent(new Event('demenz-auth-changed'));};
 addEventListener('storage',e=>{if(e.key==='__fixtureUser')window.dispatchEvent(new Event('demenz-auth-changed'));});
@@ -29,6 +29,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
     async function fixture(width) {
       const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
       const counters = { care: 0, goals: 0 };
+      let holdAccess = false; const gates = [];
       await context.addInitScript(() => {
         localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied'); localStorage.setItem('demenzcoach.marketingConsent.v1', 'denied');
         const actualNow = Date.now.bind(Date); Date.now = () => actualNow() + Number(localStorage.getItem('__clockOffset') || 0);
@@ -41,7 +42,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           if (req.method() === 'OPTIONS') return route.fulfill({ status: 204 });
           const signed = (req.headers().authorization || '').includes('signed-fixture');
           const access = { enabled: true, verified: signed, paid: false, used: counters.care, remaining: Math.max(0, (signed ? 4 : 1) - counters.care), anonymousAnswers: 1, registeredAdditional: 3, signupPlacement: 'after-first' };
-          if (url.pathname.endsWith('/access')) return route.fulfill({ json: { ...access, contract: 'signup-bonus-v1', signupCopy: { variant: 'variant_1' } } });
+          if (url.pathname.endsWith('/access')) { if (holdAccess && signed) await new Promise(resolve => gates.push(resolve)); return route.fulfill({ json: { ...access, contract: 'signup-bonus-v1', signupCopy: { variant: 'variant_1' } } }); }
           if (url.pathname.includes('account-binding')) return route.fulfill({ json: { hasCustomer: false } });
           if (url.pathname.endsWith('/goals')) { counters.goals++; return route.fulfill({ json: care.requests[0].response }); }
           if (url.pathname.endsWith('/translator-web')) { counters.care++; return route.fulfill({ json: { ...care.requests[1].response, access: { ...access, used: counters.care, remaining: Math.max(0, (signed ? 4 : 1) - counters.care) } } }); }
@@ -53,13 +54,66 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
       await page.goto(preview.origin + '/de/');
       await page.locator('#translator-input').fill(care.input.text); await page.locator('#translator-form').evaluate(form => form.requestSubmit());
       await page.getByRole('dialog').waitFor();
-      return { context, page, counters };
+      return { context, page, counters, gates, holdStatus() { holdAccess = true; }, releaseStatus() { holdAccess = false; gates.splice(0).forEach(resolve => resolve()); } };
     }
     const shot = async (page, name) => { if (evidence) await page.screenshot({ path: path.join(evidence, name), animations: 'disabled' }); };
     const actionLink = async page => { const link = await page.evaluate(() => window.__requestedLink); const url = new URL(link); url.searchParams.set('mode', 'signIn'); url.searchParams.set('oobCode', 'controlled-test-code'); return url.href; };
-    for (const width of (process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? [390] : [390, 1280])) {
+    if (process.env.SIGNUP_SHEET_FOCUS_RACES === '1') {
+      report.races = [];
+      for (const method of ['email', 'google']) for (const transition of ['other-account', 'signed-out', 'unverified']) {
+        const f = await fixture(390), { page } = f;
+        try {
+          if (method === 'email') {
+            await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('caregiver@example.test');
+            await page.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).click();
+            await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).waitFor();
+          }
+          await page.evaluate(() => {
+            const gate = window.DemenzKiFreigabe, refresh = gate.refresh;
+            window.__controllerRefreshFinished = 0;
+            window.DemenzKiFreigabe = { ...gate, refresh: async () => { try { return await refresh(); } finally { window.__controllerRefreshFinished++; } } };
+          });
+          f.holdStatus();
+          if (method === 'email') await page.evaluate(() => { localStorage.setItem('__fixtureUser', JSON.stringify({ uid: 'controlled-guest', email: 'caregiver@example.test', emailVerified: true, isAnonymous: false })); window.dispatchEvent(new Event('demenz-auth-changed')); });
+          else await page.getByRole('button', { name: 'Mit Google fortfahren', exact: true }).click();
+          for (let n = 0; n < 100 && f.gates.length < 2; n++) await new Promise(resolve => setTimeout(resolve, 20));
+          assert.ok(f.gates.length >= 2, 'Both the status mount and controller refresh are actually held');
+          const pending = await page.evaluate(() => sessionStorage.getItem('demenzCoachKiOffen'));
+          const changed = transition === 'signed-out' ? null : { uid: transition === 'other-account' ? 'controlled-other-user' : 'controlled-guest', email: method === 'email' ? 'caregiver@example.test' : 'google@example.test', emailVerified: transition !== 'unverified', isAnonymous: false };
+          await page.evaluate(value => { localStorage.setItem('__fixtureUser', JSON.stringify(value)); }, changed);
+          f.releaseStatus();
+          await page.waitForFunction(() => window.__controllerRefreshFinished > 0);
+          assert.equal(await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).count(), 0);
+          assert.equal(await page.evaluate(() => sessionStorage.getItem('demenzCoachKiOffen')), pending, 'A stale success must not clear the original context');
+          assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('__fixtureUser'))), changed, 'Controller neither replaces identity nor logs it out');
+          report.races.push({ method, transition, passed: true });
+        } finally { f.releaseStatus(); await f.context.close(); }
+      }
+      assert.deepEqual(report.errors, []); report.passed = true;
+      if (evidence) fs.writeFileSync(path.join(evidence, 'RACE-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
+      console.log(JSON.stringify(report)); return;
+    }
+    for (const width of (process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1' ? [1280] : process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? [390] : [390, 1280])) {
       const { context, page, counters } = await fixture(width);
       try {
+        if (process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1') {
+          const dialog = page.getByRole('dialog');
+          const geometry = await dialog.evaluate(node => { const r = node.getBoundingClientRect(); return { width: r.width, height: r.height, centerX: r.left + r.width / 2, centerY: r.top + r.height / 2, vw: innerWidth, vh: innerHeight, overflow: document.documentElement.scrollWidth > innerWidth + 1 }; });
+          assert.ok(geometry.width <= 540 && geometry.height < geometry.vh);
+          assert.ok(Math.abs(geometry.centerX - geometry.vw / 2) <= 1 && Math.abs(geometry.centerY - geometry.vh / 2) <= 1);
+          assert.equal(geometry.overflow, false);
+          assert.equal(await page.locator('.translator-ai-goal-choice:not([hidden])').count(), 0, 'A single explicit goal never invents alternatives');
+          for (let n = 0; n < 9; n++) { await page.keyboard.press('Tab'); assert.equal(await page.evaluate(() => Boolean(document.activeElement.closest('dialog'))), true); }
+          await shot(page, 'DESKTOP-CENTERED-1280.png');
+          const before = { ...counters };
+          await page.getByRole('button', { name: 'Mit Google fortfahren', exact: true }).click();
+          await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
+          assert.equal(await page.getByRole('link', { name: 'Persönliche Alltagshilfe einrichten', exact: true }).getAttribute('href'), '/start/');
+          await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click(); await dialog.waitFor({ state: 'detached' });
+          assert.deepEqual(counters, before); assert.notEqual(await page.evaluate(() => getComputedStyle(document.body).overflow), 'hidden');
+          report.profiles.push({ width, checks: ['centered compact desktop dialog with bounded width/no overflow/keyboard trap', 'explicit single goal has no fake alternatives', 'stable verified Google flow still succeeds after race fix; direct continuation keeps original care without another request'], ...counters });
+          continue;
+        }
         if (process.env.SIGNUP_SHEET_FOCUS_COPY === '1') {
           if (width !== 390) continue;
           const dialog = page.getByRole('dialog');
@@ -210,7 +264,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         console.error(JSON.stringify({ controlledFixtureDiagnostics: diagnostics })); throw error;
       } finally { await context.close(); }
     }
-    if (process.env.SIGNUP_SHEET_FOCUS_SUCCESS !== '1' && process.env.SIGNUP_SHEET_FOCUS_COPY !== '1') {
+    if (process.env.SIGNUP_SHEET_FOCUS_SUCCESS !== '1' && process.env.SIGNUP_SHEET_FOCUS_COPY !== '1' && process.env.SIGNUP_SHEET_FOCUS_DESKTOP !== '1') {
     // Original tab closed before the link opens: honest generic continuation, no hidden care replay.
     {
       const { context, page, counters } = await fixture(390);
@@ -241,7 +295,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
     }
     }
     assert.deepEqual(report.errors, []); report.passed = true;
-    if (evidence) fs.writeFileSync(path.join(evidence, process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? 'COPY-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1' ? 'SUCCESS-REPORT.json' : 'FLOW-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
+    if (evidence) fs.writeFileSync(path.join(evidence, process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1' ? 'DESKTOP-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? 'COPY-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1' ? 'SUCCESS-REPORT.json' : 'FLOW-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
     console.log(JSON.stringify(report));
   } finally { if (browser) await browser.close(); if (preview) await preview.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -1441,7 +1441,8 @@
       heading.textContent = `${en ? 'Your goal' : 'Dein Ziel'}: ${goal.label}`;
       heading.classList.add('translator-selected-goal');
       heading.tabIndex = -1;
-      if (!changeGoals.contains(choices)) { changeGoals.append(choices, ownDetails); box.append(changeGoals); }
+      if (!changeGoals.contains(choices)) changeGoals.append(choices, ownDetails);
+      box.insertBefore(changeGoals, answerSlot);
       heading.focus({ preventScroll: true });
       status.hidden = true;
       choices.querySelectorAll('button').forEach(choice => {
@@ -1449,13 +1450,15 @@
         choice.setAttribute('aria-pressed', String(selected));
         choice.hidden = selected;
       });
+      const otherCount = [...choices.querySelectorAll('button')].filter(choice => !choice.hidden).length;
+      changeGoals.querySelector('h3').textContent = otherCount ? (en ? 'Try another goal' : 'Ein anderes Ziel ausprobieren') : (en ? 'Adjust your goal' : 'Dein Ziel anpassen');
       setViewState('answer');
       ownDetails.open = false;
       answerSlot.replaceChildren(aiBox(planningText, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), displayResult: displayFor(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
-        if (node.isConnected && selectedKey === key) node.after(changeGoals);
+        if (node.isConnected && selectedKey === key) box.insertBefore(changeGoals, answerSlot);
       } }));
       // Keep the controls connected while this goal loads, asks a question or warns.
-      box.append(changeGoals);
+      box.insertBefore(changeGoals, answerSlot);
       syncWarningHistory();
       // Wait for the choice layout to settle; keep a warning/question's own focus.
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1760,9 +1763,16 @@
     nodes.push(answerCard);
     const goals = goal ? goalsFor(result) : null;
     const chosenGoal = goals?.find((candidate) => candidate.id === goal) ?? null;
-    // Gewähltes Ziel als ruhige graue Zeile oben in der Karte (wie in der App, nie wie ein Knopf).
+    // Selected goal remains green; genuine offered alternatives stay visible at the result start.
     if (chosenGoal) answerCard.append(element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }));
-    if (goals) answerCard.append(element('details', { className: 'translator-change-goal' }, [element('summary', { text: 'Ziel ändern' }), element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.map(option => button(option.label, 'translator-ai-goal-choice', () => { setPage(result, option.id); render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id }); }, { 'aria-pressed': String(option.id === goal) })))]));
+    if (chosenGoal) answerCard.append(element('section', { className: 'translator-other-goals translator-preset-other-goals' }, [
+      element('h3', { className: 'translator-step', text: 'Ein anderes Ziel ausprobieren' }),
+      element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.filter(option => option.id !== goal).map(option => button(option.label, 'translator-ai-goal-choice', () => {
+        track('translator_goal', { goal: option.id, result_key: result.key, step: 'switch' });
+        setPage(result, option.id, false);
+        render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id, preserveViewport: true });
+      }, { 'aria-pressed': 'false' })))
+    ]));
     // Die Zeichnung steht oben neben der Sprechblase (saidBlock), nicht mehr in der Karte.
     // Bausteine der Karte; die Reihenfolge richtet sich nach dem Ziel.
     const meaningBlock = [];
@@ -1863,11 +1873,7 @@
     const planUp = planPlace ? planCTA(result, planPlace) : null;
     // Die anderen Ziele und „Zweiter Versuch“ stehen unter der Antwort als EINE ruhige Liste
     // (Daniel, 8. Nov: drei große lila Knöpfe untereinander waren zu laut).
-    const nextRows = chosenGoal ? goals.filter((candidate) => candidate !== chosenGoal).map((candidate) => button(candidate.label, 'translator-copy', () => {
-      track('translator_goal', { goal: candidate.id, result_key: result.key, step: 'switch' });
-      setPage(result, candidate.id, false);
-      render(result, { safetyHit, alternatives, also, typed, mood, goal: candidate.id });
-    })) : [];
+    const nextRows = [];
     // Runde 199 (schlankes Layout): Ratgeber- und Übungs-Link stehen im Aufklappbereich „Mehr dazu“,
     // unter der Antwort bleibt nur „Neuen Satz übersetzen“.
     const deeper = [

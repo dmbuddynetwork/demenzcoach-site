@@ -41,3 +41,5 @@
 
 .dc-signup .signup-setup{text-decoration:none!important;text-align:center}
 .dc-signup .signup-state .signup-direct{background:#fff;color:#47408c;border-color:#a59bb8}
+
+@media(min-width:768px){.dc-signup-sheet{inset:0;margin:auto;height:fit-content;max-height:calc(var(--dc-sheet-height,100dvh) - 48px);border-radius:24px}}
