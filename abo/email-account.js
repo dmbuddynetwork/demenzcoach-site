@@ -33,10 +33,32 @@ $('account-help-link').href = en ? '/contact-en.html' : '/kontakt.html';
 const status = (text) => { $('account-status').textContent = text; };
 function complete(result) {
   target = result?.target || target;
-  $('web-account-form').hidden = true; $('account-existing').hidden = true; $('account-new-link').hidden = true; $('account-continue').href = target; $('account-continue').hidden = false;
-  status(copy.success); $('account-continue').focus(); callbackURL = '';
+  let ownSituation = false;
+  if (['/de/', '/en/dementia-translator/'].includes(target)) {
+    try { const pending = JSON.parse(sessionStorage.getItem('demenzCoachKiOffen') || 'null'); ownSituation = typeof pending?.text === 'string' && Boolean(pending.text.trim()) && pending.until > Date.now(); } catch {}
+  }
+  $('account-title').classList.remove('account-sr-only');
+  $('account-title').textContent = en ? 'You are signed in' : 'Du bist angemeldet';
+  const icon = document.createElement('span'); icon.className = 'account-success-icon'; icon.setAttribute('aria-hidden', 'true'); icon.textContent = '✓'; $('account-title').prepend(icon);
+  $('account-description').hidden = false;
+  $('account-description').textContent = ownSituation
+    ? (en ? 'Your situation is ready in the input field. No new answer is requested automatically.' : 'Deine Situation wartet im Eingabefeld. Eine neue Antwort wird nicht automatisch angefordert.')
+    : (en ? 'Your sign-in is complete. If your situation is open in another tab, you can continue there.' : 'Deine Anmeldung ist abgeschlossen. Wenn deine Situation in einem anderen Tab geöffnet ist, kannst du dort weitermachen.');
+  $('web-account-form').hidden = true; $('account-existing').hidden = true; $('account-new-link').hidden = true;
+  $('account-continue').href = target; $('account-continue').hidden = false;
+  $('account-continue').textContent = ownSituation ? (en ? 'Back to your situation' : 'Zurück zu deiner Situation') : copy.next;
+  $('account-continue').addEventListener('click', () => { if (ownSituation) { try { sessionStorage.setItem('demenzcoach.signupDraftReturn.v1', '1'); } catch {} } }, { once: true });
+  document.querySelector('.web-account').dataset.accountState = 'success';
+  document.querySelector('.web-account > a').textContent = 'Demenz Coach App';
+  for (const id of ['account-back', 'account-privacy', 'account-safety']) $(id).hidden = true;
+  if ($('account-back').nextSibling?.nodeType === Node.TEXT_NODE) $('account-back').nextSibling.textContent = '';
+  $('account-status').hidden = false;
+  status(result?.user?.email || (en ? 'Sign-in confirmed.' : 'Anmeldung bestätigt.'));
+  $('account-continue').focus(); callbackURL = '';
 }
 function failure(error) {
+  $('account-title').classList.remove('account-sr-only');
+  $('account-title').textContent = en ? 'Finish signing in' : 'Anmeldung abschließen';
   $('account-status').hidden = false;
   let code = error?.code;
   if (['auth/operation-not-allowed', 'auth/unauthorized-domain'].includes(code)) code = 'not_enabled';
@@ -48,10 +70,19 @@ function failure(error) {
   $('account-new-link').hidden = !callbackURL;
 }
 
+
+async function accountOffer(sentEmail = '') {
+  const placeholder = document.createElement('div'); $('web-account-form').before(placeholder);
+  $('account-title').classList.add('account-sr-only');
+  for (const id of ['account-description','account-privacy','account-status','web-account-form','account-existing']) $(id).hidden = true;
+  await mountInlineSignup(placeholder, { bonus: 3, en, purpose: 'account', onBegin() {}, returnTo: target, sentEmail });
+}
 try {
   if (window.DEMENZ_ABO_CONFIG.signIn?.emailLink !== true) throw { code: 'not_enabled' };
   const inspected = await access.inspect(callbackURL, input.state);
   if (inspected.callback) {
+    $('account-title').textContent = en ? 'Confirming your sign-in …' : 'Deine Anmeldung wird bestätigt …';
+    $('account-description').textContent = en ? 'Please keep this page open for a moment.' : 'Lass diese Seite bitte kurz geöffnet.';
     $('account-send').textContent = copy.verify;
     if (inspected.pending) {
       $('account-email').value = inspected.pending.email;
@@ -59,13 +90,8 @@ try {
     } else { status(copy.cross); $('web-account-form').hidden = false; $('account-email').focus(); }
   } else {
     callbackURL = '';
-    if (inspected.user?.emailVerified && input.intent !== 'signin') complete({ target });
-    else {
-      const placeholder = document.createElement('div'); $('web-account-form').before(placeholder);
-      $('account-title').classList.add('account-sr-only');
-      for (const id of ['account-description','account-privacy','account-status','web-account-form','account-existing']) $(id).hidden = true;
-      await mountInlineSignup(placeholder, { bonus: 3, en, purpose: 'account', onBegin() {}, returnTo: target });
-    }
+    if (inspected.user?.emailVerified && input.intent !== 'signin') complete({ target, user: inspected.user });
+    else await accountOffer();
   }
 } catch (error) { failure(error); }
 $('web-account-form').addEventListener('submit', async (event) => {
@@ -74,7 +100,7 @@ $('web-account-form').addEventListener('submit', async (event) => {
     if (callbackURL) complete(await access.finish({ email: $('account-email').value, url: callbackURL, state: input.state, returnTo: target }));
     else {
       await access.begin({ email: $('account-email').value, returnTo: target, intent });
-      status(copy.sent);
+      await accountOffer($('account-email').value.trim());
     }
   } catch (error) { failure(error); }
   finally { $('account-send').disabled = false; }

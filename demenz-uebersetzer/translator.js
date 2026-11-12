@@ -1252,7 +1252,7 @@
         output.querySelector('.translator-notes')?.remove();
         if (box.previousElementSibling?.classList.contains('translator-unknown-note')) box.previousElementSibling.remove();
         box.replaceWith(node);
-        const accessCard = window.DemenzKiFreigabe?.afterAnswer(result);
+        const accessCard = window.DemenzKiFreigabe?.afterAnswer(result, document, { sentence: requestText });
         if (accessCard) node.after(accessCard);
         onAnswerRendered(node);
         if (window.DemenzKiFreigabe?.enabled() && result.safetyLevel === 'standard') {
@@ -2115,12 +2115,15 @@
   renderSaved();
   renderHelpful();
 
-  // Zurück von Kasse oder Anmeldung: den gemerkten Satz (nur sessionStorage dieses Tabs) gleich übersetzen.
+  // A confirmed email return can restore the original draft without silently
+  // requesting or charging for the same answer again. Checkout return is unchanged.
+  let signupDraftReturn = false;
+  try { signupDraftReturn = sessionStorage.getItem('demenzcoach.signupDraftReturn.v1') === '1'; sessionStorage.removeItem('demenzcoach.signupDraftReturn.v1'); } catch {}
   const pendingSentence = window.DemenzKiFreigabe?.takePending();
   if (pendingSentence) {
     input.value = pendingSentence;
     grow();
-    form.requestSubmit();
+    if (signupDraftReturn) input.focus({ preventScroll: true }); else form.requestSubmit();
   }
 
   // Beim Drucken alle aufklappbaren Abschnitte zeigen.
@@ -2166,21 +2169,10 @@
   // Mit × wird es zum runden Bild; ein Tipp darauf öffnet es wieder.
   if (document.body.classList.contains('einfach') && 'IntersectionObserver' in window) {
     const en = ui?.lang === 'en';
-    const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation', 'aria-describedby': 'translator-chat-privacy' } });
+    const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation' } });
     const send = element('button', { className: 'translator-chat-send', text: en ? 'Find an answer' : 'Antwort finden', attributes: { type: 'submit' } });
     const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
-    const privacy = element('p', { className: 'translator-chat-privacy', attributes: { id: 'translator-chat-privacy' } });
-    // The same pre-submit terms/privacy/AI disclosure remains reachable here.
-    const originalNotice = document.getElementById('translator-privacy-note');
-    if (originalNotice) {
-      const links = originalNotice.querySelectorAll('a');
-      if (links.length >= 2) {
-        const terms = links[0].cloneNode(true), information = links[1].cloneNode(true);
-        information.textContent = en ? 'Privacy & AI' : 'Datenschutz & KI';
-        privacy.append(en ? 'By submitting you accept the ' : 'Mit Absenden akzeptierst du die ', terms, '. ', information, '.');
-      } else privacy.append(...Array.from(originalNotice.childNodes, node => node.cloneNode(true)));
-    }
-    const panel = element('div', { className: 'translator-chat-panel' }, [chatForm, privacy]);
+    const panel = element('div', { className: 'translator-chat-panel' }, [chatForm]);
     const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': en ? 'Describe another situation' : 'Andere Situation beschreiben', hidden: '' } }, [panel]);
     let positionFrame = 0;
     // Keep an unsent draft available to the existing feedback/correction flow.
@@ -2214,7 +2206,7 @@
       chat.style.bottom = '';
       const viewport = window.visualViewport;
       const keyboardInset = viewport ? Math.max(0, innerHeight - viewport.height - viewport.offsetTop) : 0;
-      if (keyboardInset) chat.style.bottom = `${keyboardInset + 8}px`;
+      if (keyboardInset) chat.style.bottom = `${keyboardInset}px`;
       panel.style.maxHeight = '';
       panel.style.overflowY = '';
       if (!chat.hidden) {

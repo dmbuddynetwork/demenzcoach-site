@@ -841,3 +841,12 @@ body.einfach .translator-other-goals > .translator-ai-goal-choices { margin:14px
 body.einfach .translator-other-goals .translator-ai-goal-choice[hidden] { display:none!important; }
 body.einfach .translator-goal-answer > .translator-ai,
 body.einfach .translator-ai-clarification { padding:0!important; border:0!important; background:transparent!important; }
+/* A compact composer docked to the browser edge, with the main form's legal links retained. */
+body.einfach .translator-chat{left:0;right:0;bottom:0;width:100%;margin:0;border-top:1px solid var(--e-line,#ded9e8);background:#fffffff5;box-shadow:0 -3px 16px #29213c0a;padding:8px max(12px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+body.einfach .translator-chat-panel{max-width:820px;margin:0 auto;padding:0;gap:0;border:0;border-radius:0;box-shadow:none;background:transparent}
+body.einfach .translator-chat-form{gap:8px}
+body.einfach .translator-chat-input{min-height:48px;border-width:1px;border-radius:12px;padding:10px 12px;font-size:1rem!important;line-height:1.35!important}
+body.einfach .translator-chat-send{min-height:48px;min-width:108px;border-radius:12px;padding:10px 12px;font-size:1rem!important;line-height:1.35!important;white-space:normal}
+body.einfach:has(> .translator-chat:not([hidden])){padding-bottom:104px}
+html:has(body.einfach .translator-chat){scroll-padding-bottom:104px}
+body.dc-signup-sheet-open .translator-chat{display:none!important}

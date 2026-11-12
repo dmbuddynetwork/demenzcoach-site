@@ -15,11 +15,14 @@ const auth={currentUser:user};const sdk={async sendSignInLinkToEmail(a,email,set
   });
   const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
   await page.goto(preview.origin+'/abo/konto.html?returnTo='+encodeURIComponent(language==='de'?'/de/':'/en/dementia-translator/'),{waitUntil:'networkidle'});
-  await page.locator('.dc-signup input').fill('caregiver@example.test');await page.locator('.dc-signup .primary').click();
+  await page.locator('.dc-signup input').fill('caregiver@example.test');await page.locator('.dc-signup .offer-body .primary').click();
   await page.waitForFunction(()=>window.__fakeLink);const callback=await page.evaluate(()=>window.__fakeLink);
   await page.goto(callback,{waitUntil:'networkidle'});
   await page.locator('#account-status').filter({hasText:language==='de'?/ungültig oder abgelaufen/:/invalid or has expired/}).waitFor();
   assert.equal(new URL(page.url()).search,'');assert.equal(await page.locator('#account-send').isVisible(),true);
+  await page.locator('#account-email').fill('caregiver@example.test'); await page.locator('#account-send').click();
+  await page.getByRole('heading',{name:language==='de'?'Öffne jetzt dein E-Mail-Postfach':'Open your email inbox now',exact:true}).waitFor();
+  assert.equal(await page.locator('.signup-address').innerText(),'caregiver@example.test');
   assert.equal(await page.locator('input[type=tel]').count(),0);assert.deepEqual(errors,[]);
   cases.push(language+': expired-link message, clean URL, new-link form, no phone');await context.close();
  }

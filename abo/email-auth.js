@@ -74,6 +74,8 @@ export function createEmailAccess({ webAuth, config, host = window, now = Date.n
       const item = { nonce, email, uid: value.auth.currentUser?.uid || null, intent: intent === 'signin' ? 'signin' : 'link', target, createdAt: now() };
       try { host.localStorage.setItem(attemptKey, JSON.stringify(item)); }
       catch { throw new EmailAccessError('storage_unavailable'); }
+      // Apply the actual page language to this send, not a different checkout's auth instance.
+      value.auth.languageCode = /^en(?:-|$)/i.test(host.document?.documentElement?.lang || '') ? 'en' : 'de';
       try { await timeout(value.sdk.sendSignInLinkToEmail(value.auth, email, { url: url.href, handleCodeInApp: true })); }
       catch (error) { forget(); throw error; }
       return { target };
