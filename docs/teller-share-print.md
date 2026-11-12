@@ -1,6 +1,6 @@
 # Fixed five-tip list and social preview
 
-Scope: user-approved sharing/printing design, plus the separately authorized exact legacy-mail routing exception. Based on live main `26f15ceeba0926b665aed8c85fd13825a49eb274`. No homepage layout, menu, signup, AI prompt, account, quota, funnel or general experiment change.
+Scope: user-approved sharing/printing design, plus the separately authorized exact legacy-mail routing exception. Based on live main `26f15ceeba0926b665aed8c85fd13825a49eb274`. No homepage layout/global-menu redesign, signup, AI prompt, account, quota, funnel or general experiment change.
 
 ## Destinations and source boundaries
 
@@ -14,7 +14,7 @@ Scope: user-approved sharing/printing design, plus the separately authorized exa
 The topics match the supplied five-trick email screenshot. The new page does not repeat its study, percentage, drinking-volume-effect, fall-prevention, sleep-effect or professional-qualification claims.
 
 1. **Roter Teller:** exact currently rendered site override from `alltagstricks/sources.json`, not the older raw red-plate text. Contrast matters; red is one option.
-2. **Farbiger Becher:** existing site text from `alltagstricks/tricks.json`, unchanged. The general note retains individual eating/drinking instructions.
+2. **Farbiger Becher:** existing site text from `alltagstricks/tricks.json`, with the domain-recommended clarification “zunächst halb voll und bei Bedarf nach”. The general note retains individual eating/drinking instructions.
 3. **Foto an der Zimmertür:** this exact topic is in the screenshot and existing `teller/t-tuer.webp` illustration, not in the site's separate photo-album tip. New bounded proposal: permission, familiar recognisable picture, try and observe. NHS supports clear recognisable picture/sign cues; it does not establish a measured effect of this particular bedroom-photo intervention. Domain/safety review must explicitly decide this contextual extension before publication. No claimed study or guaranteed room finding.
 4. **Lieblingslied beim Anziehen:** same email topic; existing site's invitation to sing familiar music, with a preference/stop condition. NIHR's primary guidance supports individual preferences and checking reactions. No claimed reduction in resistance or a dressing-specific study.
 5. **Nachtlicht mit Bewegungsmelder:** same email topic and existing illustration. Wording concerns lighting the route, avoiding glare and keeping it clear. NHS supports lighting and automatic sensors. No fall/sleep guarantee.
@@ -40,3 +40,10 @@ Only head metadata/descriptions in the two German entry files change. The false 
 - No real WhatsApp send, email, account, AI request, purchase or publication in these checks.
 
 Publication remains with the sole existing publisher after Root's source-bound QA and care/safety gate.
+
+## Review closure (Root-directed, 12 November)
+
+- Remove the visible sources disclosure in accordance with the previous user instruction. Internal JSON source mappings, generator validation, structured citations and this review documentation remain.
+- Restore the approved logo/menu shell on this list only: sticky header, native keyboard-accessible disclosure with links back to the existing everyday-help homepage and App Store, and the existing functional text-size preference. No shared homepage code, auth, analytics, account or signup implementation is loaded or changed. Escape closes the menu and returns focus; navigation/outside clicks close it.
+- Hide the full menu in print, unstick the header and use stable print type sizes even after the large-text setting. The domain-approved cup clarification is the only care-copy delta.
+- Reuse the 16 routing/metadata/experiment source checks and original source-bound domain/safety findings. Closure checks cover visible source removal, unchanged internal sources, menu keyboard/focus, sticky navigation, large-text preference and blocked storage, direct list and fixed share URL, all five exact texts, and one A4 page with the menu open/large text enabled. No repeated provider or full audit runs.

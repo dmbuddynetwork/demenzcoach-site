@@ -26,12 +26,13 @@ const html = `<!doctype html>
 </head>
 <body>
  <a class="skip" href="#liste">Zur Liste springen</a>
- <header><a class="brand" href="/de/"><img src="/assets/lovable-logo.jpg" width="34" height="34" alt="">Demenz Coach App</a></header>
+ <header><div class="nav-wrap"><a class="brand" href="/de/"><img src="/assets/lovable-logo.jpg" width="34" height="34" alt="">Demenz Coach App</a>
+  <details class="site-menu"><summary>Menü</summary><nav aria-label="Hauptnavigation"><a href="/de/">Zur Alltagshilfe</a><a href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_nav&amp;mt=8" target="_blank" rel="noopener noreferrer">Zur App</a><button type="button" data-font-toggle aria-pressed="false">Schrift größer</button></nav></details>
+ </div></header>
  <main id="liste"><h1>${escape(data.title)}</h1><p class="intro">${escape(data.description)}</p>
   <div class="actions"><button class="action" type="button" data-print-list>Liste drucken</button><a class="action secondary" href="${escape(share)}" target="_blank" rel="noopener noreferrer">Per WhatsApp teilen</a></div>
   <ol class="tips">${data.tips.map(tip => `<li class="tip" id="${tip.id}"><img src="${tip.image}" width="88" height="92" alt=""><div><h2>${escape(tip.title)}</h2><p>${escape(tip.text)}</p></div></li>`).join('\n   ')}</ol>
   <p class="note">${escape(data.note)}</p>
-  <details class="sources"><summary>Quellen und Einordnung</summary><ul>${Object.values(data.sources).map(source => `<li><a href="${escape(source.url)}" target="_blank" rel="noopener noreferrer">${escape(source.label)} (Englisch)</a></li>`).join('')}</ul><p>Die Hinweise sind allgemeine Anregungen. Sie passen nicht für jede Person oder jede Situation.</p></details>
   <p class="print-url">Diese Liste: dementiacoachapp.com/de/demenz-alltagstipps.html</p>
  </main>
  <footer><nav aria-label="Weitere Informationen"><a href="/de/">Demenz Coach</a><a href="/datenschutz.html">Datenschutz</a><a href="/impressum.html">Impressum</a></nav><p>Allgemeine Alltagshinweise; kein Ersatz für individuelle Beratung.</p></footer>

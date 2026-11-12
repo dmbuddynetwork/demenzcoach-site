@@ -13,7 +13,7 @@
     {
       "id": "farbiger-becher",
       "title": "Farbiger Becher",
-      "text": "Nimm einen bunten Becher, der sich vom Tisch abhebt, und fülle ihn nur halb voll.",
+      "text": "Nimm einen bunten Becher, der sich vom Tisch abhebt, und fülle ihn zunächst halb voll und bei Bedarf nach.",
       "image": "/teller/t-becher.webp",
       "sources": ["eating"]
     },
