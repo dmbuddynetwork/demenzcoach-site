@@ -1045,8 +1045,8 @@
       ? element('ol', { className: 'translator-self-support-steps' }, result.steps.map(text => element('li', { className: 'translator-meaning', text })))
       : element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
     const context = [element('h3', { className: 'translator-step', text: 'Was dahintersteckt' }), element('p', { className: 'translator-meaning translator-ai-meaning', text: result.meaning })];
-    // Runde 198: Wie in der App gibt es einen konkreten nächsten Schritt.
-    if (typeof result.nextStep === 'string' && result.nextStep) {
+    // Communication answers keep their next step; self-support already has its concrete steps.
+    if (!selfSupport && typeof result.nextStep === 'string' && result.nextStep) {
       nodes.push(element('h3', { className: 'translator-step', text: 'Das kannst du tun' }));
       nodes.push(element('p', { className: 'translator-meaning translator-ai-next', text: result.nextStep }));
     }

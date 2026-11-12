@@ -7,6 +7,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const { createPreviewServer } = require('./generator-preview.cjs');
 const recorded = JSON.parse(fs.readFileSync(process.env.OUTCOMES_REPLAY_FILE, 'utf8'));
 const evidence = process.env.OUTCOMES_EVIDENCE;
+const focusedSupport = process.env.OUTCOMES_FOCUSED_SUPPORT === '1';
 const approved = JSON.parse(fs.readFileSync(process.env.GENERAL_INFO_APPROVED_FILE, 'utf8'));
 const caseByID = id => recorded.cases.find(c => c.id === id);
 const finalRecorded = process.env.FINAL_OUTCOMES_REPLAY_FILE ? JSON.parse(fs.readFileSync(process.env.FINAL_OUTCOMES_REPLAY_FILE, 'utf8')) : null;
@@ -29,7 +30,7 @@ const english = {
     if (evidence) fs.mkdirSync(evidence, { recursive: true });
     preview = await createPreviewServer();
     browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH });
-    for (const language of ['de', 'en']) for (const width of [390, 1280]) {
+    for (const language of (focusedSupport ? ['de'] : ['de', 'en'])) for (const width of [390, 1280]) {
       const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
       try {
         const calls = [];
@@ -74,7 +75,17 @@ const english = {
         const page = await context.newPage(); page.setDefaultTimeout(10000);
         page.on('pageerror', e => report.errors.push(e.message));
         const home = async () => { await page.goto(`${preview.origin}/${language}/`); await page.waitForFunction(() => !!window.DemenzTranslatorAI && document.querySelector('#translator-input')); };
-        const submit = async item => { current = clone(item); followup = false; controlledWarning = false; controlledInfo = false; controlledQuestion = false; malformedMode = 0; recoverEdited = false; accessMode = ''; delayNext = false; releaseHeld = undefined; await home(); await page.locator('#translator-input').fill(item.input.text); await page.locator('#translator-form').evaluate(f => f.requestSubmit()); };
+        const submit = async item => { current = clone(item); followup = false; controlledWarning = false; controlledInfo = false; controlledQuestion = false; malformedMode = 0; recoverEdited = false; accessMode = ''; delayNext = false; releaseHeld = undefined; await home();
+          if (focusedSupport) await page.evaluate(() => {
+            const ask = window.DemenzTranslatorAI.ask;
+            window.__renderedRawResults = [];
+            window.DemenzTranslatorAI.ask = async (...args) => {
+              const result = await ask(...args);
+              window.__renderedRawResults.push({ kind: result.kind, nextStep: result.nextStep, steps: result.steps, meaning: result.meaning, avoid: result.avoid });
+              return result;
+            };
+          });
+          await page.locator('#translator-input').fill(item.input.text); await page.locator('#translator-form').evaluate(f => f.requestSubmit()); };
         const answer = () => page.locator('.translator-ai-answer').waitFor();
         const settleMotion = () => page.evaluate(async () => { await Promise.all(document.getAnimations().filter(a => Number.isFinite(a.effect?.getComputedTiming().iterations)).map(a => a.finished.catch(() => {}))); });
         const productFrame = async name => {
@@ -85,7 +96,44 @@ const english = {
           if (evidence) await page.screenshot({ animations: 'disabled', path: path.join(evidence, name), fullPage: false });
         };
         const profile = { language, width, cases: [] };
-        if (language === 'de') {
+        if (focusedSupport) {
+          assert.ok(finalRecorded, 'Focused previews require the actual final2 recording');
+          const normal = finalRecorded.cases.find(c => c.id === 'G03');
+          const support = finalRecorded.cases.find(c => c.id === 'G11');
+          const supportResponse = support.requests.find(r => r.response.kind === 'self_support');
+          const assertSupport = async () => {
+            const node = page.locator('.translator-ai-self-support'); await node.waitFor();
+            assert.equal(await node.getByRole('heading', { name: 'Das kannst du tun', exact: true }).count(), 0);
+            assert.equal(await node.locator('.translator-ai-next').count(), 0);
+            assert.deepEqual(await node.locator('.translator-self-support-steps li').allTextContents(), supportResponse.response.steps);
+            assert.equal(await node.locator('.translator-ai-meaning').innerText(), supportResponse.response.meaning);
+            assert.ok((await node.locator('.translator-ai-avoid').innerText()).includes(supportResponse.response.avoid));
+            assert.equal(await page.evaluate(() => window.__renderedRawResults.find(r => r.kind === 'self_support').nextStep), supportResponse.response.nextStep, 'The complete nextStep remains in the untouched transport result');
+          };
+          await submit(normal); await answer();
+          assert.equal(await page.locator('.translator-ai-answer').getByRole('heading', { name: 'Das kannst du tun', exact: true }).count(), 1);
+          assert.equal(await page.locator('.translator-ai-next').innerText(), normal.requests[1].response.nextStep);
+          if (width === 1280) await productFrame('PRODUCT-PREVIEW-ICE-BOUNDARY-1280.png');
+          profile.cases.push('actualfinal2 G03 normal communication keeps complete separate nextStep block');
+          await submit(support); controlledWarning = true; controlledInfo = true;
+          await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+          await page.locator('.translator-ai-goal-choice').first().click(); await answer();
+          await page.getByRole('button', { name: supportResponse.selectedGoal.label, exact: true }).click(); await assertSupport();
+          assert.match(await page.locator('[data-goal-safety-history]').innerText(), /Kontrollierter bereits empfangener Hinweis/);
+          assert.equal(await page.locator('.translator-ai-self-support .translator-general-safety-info p').innerText(), approved.de);
+          const cachedCalls = calls.length;
+          await page.getByRole('button', { name: support.requests[0].response.goals[0].label, exact: true }).click(); await answer();
+          await page.getByRole('button', { name: supportResponse.selectedGoal.label, exact: true }).click(); await assertSupport();
+          assert.equal(calls.length, cachedCalls);
+          assert.match(await page.locator('[data-goal-safety-history]').innerText(), /Kontrollierter bereits empfangener Hinweis/);
+          assert.equal(await page.locator('.translator-ai-self-support .translator-general-safety-info p').innerText(), approved.de);
+          profile.cases.push('actualsupport steps/meaning/avoid preserved; nextStep only hidden; controlled canonical info and existing warning survive goal cache');
+          await submit(support); await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+          await page.getByRole('button', { name: supportResponse.selectedGoal.label, exact: true }).click(); await assertSupport();
+          assert.equal(await page.locator('.translator-ai-self-support .translator-general-safety-info').count(), 0);
+          if (width === 390) await productFrame('PRODUCT-PREVIEW-SELF-SUPPORT-390.png');
+          profile.cases.push('clean actualfinal2 G11 support preview has no duplicate nextStep chapter or synthetic warnings');
+        } else if (language === 'de') {
           await submit(caseByID('G01'));
           await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
           assert.equal(await page.locator('.translator-ai-goal-choice').count(), 1);
