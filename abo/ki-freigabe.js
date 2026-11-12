@@ -5,27 +5,62 @@
   const enabled = () => config.translatorGate?.enabled === true;
   const endpoint = config.translatorGate?.endpoint || 'https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web';
   const pendingKey = 'demenzCoachKiOffen';
-  const en = root.document?.documentElement?.lang === 'en';
-  let access, headerPromise, authModule, mountGeneration = 0, invitationShown = false;
+  const en = /^en(?:-|$)/i.test(root.document?.documentElement?.lang || '');
+  let access, signupCopyStatus, accessContractReady = false, headerPromise, authModule, mountGeneration = 0, invitationShown = false;
   const exp = () => root.DemenzWebExperiments;
   const node = (doc, tag, text = '') => { const item = doc.createElement(tag); item.textContent = text; return item; };
   const returnPath = () => en ? '/en/dementia-translator/' : '/de/';
   const accountURL = () => `/abo/konto.html?returnTo=${encodeURIComponent(returnPath())}`;
   const offerURL = '/abo/?src=web_translator';
-  function accept(value) {
-    if (value?.enabled !== true || typeof value.verified !== 'boolean' || !Number.isInteger(value.remaining)) return;
-    access = value; exp()?.accept(value.exposure);
+  const validAccess = value => value?.enabled === true && typeof value.verified === 'boolean' && typeof value.paid === 'boolean'
+    && Number.isInteger(value.remaining) && value.remaining >= 0
+    && Number.isInteger(value.registeredAdditional) && value.registeredAdditional >= 0 && value.registeredAdditional <= 5;
+  function clearCreditOffers() {
+    for (const view of root.document?.querySelectorAll?.('.dc-signup[data-signup-copy]') || []) {
+      delete view.dataset.signupCopy;
+      view.querySelector('h3').textContent = en ? 'Your DemenzCoach account.' : 'Dein Konto für DemenzCoach.';
+      view.querySelector('.lead').textContent = en ? 'Checking your access …' : 'Dein Zugang wird geprüft …';
+      view.querySelector('.primary').textContent = en ? 'Continue with email' : 'Mit E-Mail fortfahren';
+    }
+    for (const view of root.document?.querySelectorAll?.('[data-signup-credit-offer]') || []) {
+      delete view.dataset.signupCreditOffer;
+      view.querySelector('p').textContent = en ? 'Checking your access …' : 'Dein Zugang wird geprüft …';
+    }
   }
-  async function requestContext({ requestID } = {}) {
+  function accept(value, fromStatus = false) {
+    if (!validAccess(value)) return;
+    if (fromStatus) {
+      accessContractReady = value.contract === 'signup-bonus-v1';
+      signupCopyStatus = accessContractReady ? value.signupCopy : undefined;
+    } else if (accessContractReady && access?.verified === true && value.verified === false) {
+      void refresh().catch(() => {});
+      return;
+    }
+    access = { ...value, ...(accessContractReady ? { contract: 'signup-bonus-v1', signupCopy: signupCopyStatus } : {}) };
+    if (typeof exp()?.acceptAccess === 'function') exp().acceptAccess(access);
+    else exp()?.accept(value.exposure);
+  }
+  async function requestContext({ requestID, anonymous = true } = {}) {
     if (!enabled()) return {};
-    const operation = requestID ? { 'X-Translator-Request-ID': requestID } : {};
+    // Always negotiate the new contract, even if authentication is temporarily
+    // unavailable. Omitting it would silently select the legacy free path.
+    const operation = { 'X-Translator-Access-Contract': 'signup-bonus-v1', ...(requestID ? { 'X-Translator-Request-ID': requestID } : {}) };
     try {
-      headerPromise ||= (async () => {
+      const readHeaders = async () => {
         authModule ||= await import('/abo/web-auth.js');
-        const { auth } = await authModule.webAuth();
-        return { Authorization: `Bearer ${await auth.currentUser.getIdToken()}` };
-      })().finally(() => { headerPromise = null; });
-      const pending = headerPromise;
+        const { auth } = await authModule.webAuth({ anonymous });
+        const user = auth.currentUser;
+        if (!user) return {};
+        const signature = `${user?.uid}:${user?.isAnonymous}:${user?.emailVerified}`;
+        const token = await user.getIdToken();
+        if (`${auth.currentUser?.uid}:${auth.currentUser?.isAnonymous}:${auth.currentUser?.emailVerified}` !== signature) throw new Error('auth_changed');
+        return { Authorization: `Bearer ${token}` };
+      };
+      let pending;
+      if (anonymous) {
+        headerPromise ||= readHeaders().finally(() => { if (headerPromise === pending) headerPromise = null; });
+        pending = headerPromise;
+      } else pending = readHeaders();
       let timer;
       const headers = await Promise.race([pending, new Promise((resolve) => { timer = setTimeout(() => resolve(null), 1500); })]).finally(() => clearTimeout(timer));
       if (!headers) { if (headerPromise === pending) headerPromise = null; return operation; }
@@ -34,11 +69,21 @@
   }
   async function refresh() {
     if (!enabled()) return null;
-    const response = await root.fetch(`${endpoint}/access`, { headers: await requestContext(), credentials: 'omit', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(10000) });
+    const generation = mountGeneration;
+    const response = await root.fetch(`${endpoint}/access`, { headers: await requestContext({ anonymous: false }), credentials: 'omit', referrerPolicy: 'no-referrer', signal: AbortSignal.timeout(10000) });
     if (!response.ok) throw new Error('access_unavailable');
     const value = await response.json();
-    if (value.enabled !== true) throw new Error('access_not_ready');
-    accept(value); return access;
+    if (generation !== mountGeneration) throw new Error('access_superseded');
+    if (value.enabled !== true || value.needsSession === true || value.contract !== 'signup-bonus-v1') {
+      access = undefined; signupCopyStatus = undefined; accessContractReady = false; clearCreditOffers();
+      return value.enabled === true && value.needsSession === true && value.contract === 'signup-bonus-v1'
+        ? { enabled: true, needsSession: true, contract: 'signup-bonus-v1' } : { enabled: false, mode: 'legacy' };
+    }
+    if (!validAccess(value)) {
+      access = undefined; signupCopyStatus = undefined; accessContractReady = false; clearCreditOffers();
+      throw new Error('invalid_access');
+    }
+    accept(value, true); return access;
   }
   function remember(sentence) {
     try { root.sessionStorage.setItem(pendingKey, JSON.stringify({ text: String(sentence || '').slice(0, 200), until: Date.now() + 900000 })); } catch {}
@@ -69,10 +114,15 @@
       }); card.append(retry); return card;
     }
     const signup = reason === 'signup_required';
-    const bonus = access?.registeredAdditional ?? 3;
+    const creditEligible = signup && enabled() && accessContractReady && access?.enabled === true && access.verified === false && access.paid === false
+      && Number.isInteger(access.registeredAdditional) && access.registeredAdditional >= 3 && access.registeredAdditional <= 5;
+    const bonus = creditEligible ? access.registeredAdditional : 3;
+    if (creditEligible) card.dataset.signupCreditOffer = 'true';
     card.append(node(doc, 'h3', signup ? (en ? 'Continue with an account' : 'Mit Konto weiter ausprobieren') : (en ? 'More answers for everyday care' : 'Weitere Antworten für deinen Pflegealltag')));
     card.append(node(doc, 'p', signup
-      ? (en ? `With a verified account you receive ${bonus} additional introductory answers. No payment details required.` : `Mit verifiziertem Konto erhältst du ${bonus} weitere Antworten zum Ausprobieren. Ohne Zahlungsdaten.`)
+      ? creditEligible
+        ? (en ? `With a verified account you receive ${bonus} additional introductory answers. No payment details required.` : `Mit verifiziertem Konto erhältst du ${bonus} weitere Antworten zum Ausprobieren. Ohne Zahlungsdaten.`)
+        : (en ? 'Sign in with Google or email. No payment details required.' : 'Mit Google oder E-Mail anmelden. Ohne Zahlungsdaten.')
       : (en ? 'Your free introduction is used. Choose a paid membership for new situations. Saved helpful answers remain readable.' : 'Dein kostenloser Einstieg ist aufgebraucht. Wähle eine kostenpflichtige Mitgliedschaft für neue Situationen. Gespeicherte hilfreiche Antworten bleiben lesbar.')));
     if (signup && access?.remaining > 0) card.append(node(doc, 'p', en ? `${access.remaining} answer(s) are still available without signing in.` : `Ohne Anmeldung sind noch ${access.remaining} Antwort(en) verfügbar.`));
     const link = node(doc, 'a', signup ? (en ? 'Create or sign in to an account' : 'Konto erstellen oder anmelden') : (en ? 'View membership' : 'Mitgliedschaft ansehen'));
@@ -82,7 +132,7 @@
     card.append(node(doc, 'p', en ? 'Safety information and public guides remain free.' : 'Sicherheitshinweise und öffentliche Ratgeber bleiben kostenlos.'));
     if (signup && config.signIn?.emailLink === true) {
       import('/abo/inline-signup.js').then(({ mountInlineSignup }) => {
-        if (card.isConnected) return mountInlineSignup(card, { bonus, en, purpose: enabled() ? 'intro' : 'invitation', creditActive: enabled() && access?.enabled === true && Number.isInteger(access?.registeredAdditional) && access.registeredAdditional > 0, returnTo: returnPath(), onBegin: () => remember(sentence) });
+        if (card.isConnected) return mountInlineSignup(card, { bonus, en, purpose: enabled() ? 'intro' : 'invitation', signupCopy: access?.signupCopy, creditActive: creditEligible, returnTo: returnPath(), onBegin: () => remember(sentence) });
       }).catch(() => { /* The existing accessible account link remains usable. */ });
     }
     exp()?.track(signup ? 'web_signup_shown' : 'web_paywall_shown'); return card;
@@ -116,6 +166,8 @@
     card.append(link, node(doc, 'p', en ? 'No additional answers are included. — Debby Frey' : 'Damit sind keine zusätzlichen Antworten verbunden. — Debby Frey')); exp()?.track('web_supporter_shown'); return card;
   }
   async function mount() {
+    signupCopyStatus = undefined;
+    if (access) access = { ...access, signupCopy: undefined };
     if (!enabled()) return;
     const form = root.document?.querySelector('#translator-form'); if (!form) return;
     const generation = ++mountGeneration;
@@ -124,6 +176,10 @@
     try {
       const value = await refresh();
       if (generation !== mountGeneration) return;
+      if (value?.enabled !== true || value.needsSession === true) {
+        notice.textContent = en ? 'Describe your situation to get started.' : 'Beschreibe deine Situation, um zu starten.';
+        return;
+      }
       notice.textContent = value.paid ? (en ? 'Your membership is active.' : 'Deine Mitgliedschaft ist aktiv.')
         : value.verified ? (en ? `${value.remaining} introductory answers left, then paid membership.` : `Noch ${value.remaining} Antworten zum Ausprobieren, danach kostenpflichtige Mitgliedschaft.`)
         : (en ? `${value.remaining} introductory answer(s) remaining without an account. ${value.registeredAdditional} more with a verified account, then paid membership.` : `${value.remaining} Antwort(en) noch ohne Konto ausprobieren. ${value.registeredAdditional} weitere mit verifiziertem Konto, danach kostenpflichtige Mitgliedschaft.`);
@@ -132,6 +188,10 @@
   }
   root.DemenzKiFreigabe = Object.freeze({ enabled, requestContext, refresh, accept, afterAnswer, supporterCard, offerCard, takePending, mount, accountURL,
     check: async () => ({ allowed: true, reason: 'server_enforced' }), noteAnswer(result) { accept(result?.access); }, returnPath, offerURL, signInURL: accountURL() });
-  root.addEventListener?.('demenz-auth-changed', () => { void mount(); });
+  root.addEventListener?.('demenz-auth-changed', () => {
+    mountGeneration++;
+    access = undefined; signupCopyStatus = undefined; accessContractReady = false; headerPromise = null;
+    clearCreditOffers(); void mount();
+  });
   if (root.document?.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', mount, { once: true }); else void mount();
 })(typeof window !== 'undefined' ? window : globalThis);

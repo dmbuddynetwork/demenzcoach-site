@@ -40,10 +40,32 @@ GrowthBook account, email list or cloud answer history.
 
 ## Configuration and ownership
 
-The site defaults to `translatorGate.enabled: false`. The backend defaults to
-disabled unless `WEB_TRANSLATOR_USAGE_ENABLED=true`. These switches are release
-controls, not GrowthBook treatment values. Server-first deployment is necessary;
-turning on a browser flag alone does not enforce payment.
+This candidate sets `translatorGate.enabled: true` for the versioned
+`signup-bonus-v1` contract. Do not publish it against API39. The matching reviewed
+API, contract CORS support and intended `WEB_TRANSLATOR_USAGE_ENABLED=true`
+configuration must be ready first. These switches are release controls, not
+GrowthBook treatment values; a browser flag cannot grant answers or paid access.
+
+`GET /access` and normal-answer requests carry
+`X-Translator-Access-Contract: signup-bonus-v1`, including when auth initialization
+fails. This header negotiates a capability; it is not authentication. Missing or
+unknown contracts retain the bounded legacy API behavior and return
+`enabled:false` for discovery. Consequently this is not a universal API paywall.
+Do not silently drop the header to bypass a failed new-mode auth check.
+
+Status discovery reads an existing Firebase session without creating one. The
+server may return `enabled:true,needsSession:true` without inventing numerical
+allowances or verification. The first Care use initializes the existing guest
+auth flow. Trusted account verification preserves the UID and grants the
+configured additional allowance: normally one guest answer plus three additional
+answers, four total less prior use/reservations. It is not three new answers per
+sign-in. The server migration raises only the registered allowance floor to
+three, preserving higher allowances, usage, reservations and the guest basis.
+
+Numerical signup offers require a confirmed compatible status, an unverified,
+unpaid account, and an actual additional allowance of at least three. Higher
+allowances are displayed honestly; a two-answer or unready status never advertises
+three. Auth changes remove a stale credit promise without deleting an email draft.
 
 The `functions.mjs` delta is a **separate wiring proposal for the payment owner**.
 It lazily injects the usage service into the existing API and reads protected
@@ -52,10 +74,48 @@ Existing `webCustomers` association checks use Firebase Admin. The existing
 auth-deletion trigger attempts both biography and allowance deletion. No live
 function configuration was changed by this work.
 
-Validate the existing Firebase phone provider, authorized domains and reCAPTCHA
-in the target environment before rollout. Do not enable another provider to make
-the code appear ready. Real SMS, paid restore and production payments are not
-proven by the simulated browser checks.
+Validate the existing email-link and Google providers, authorized domains and
+guest-identity preservation before rollout. No SMS flow is enabled by this work.
+Real sign-in, paid restore and production payments are not proven by simulated
+browser checks.
+
+## Signup copy feature
+
+The copy-only String feature is `web-translator-signup-copy-v1`. Its allowed values
+are `variant_1` (default, “Was sage ich jetzt am besten?”) and `variant_3`
+(“Ein Satz zum Sagen. Ein Schritt zum Ausprobieren.”). Both use the same actual
+bonus, placement and permissions. Remote HTML/text and quota changes are not
+accepted. Unknown configuration and visitors without statistics consent receive
+variant 1. The mixed quota/placement experiment below stays disabled.
+
+The separate backend settings are:
+
+```text
+WEB_TRANSLATOR_SIGNUP_COPY_GROWTHBOOK_ENABLED=true
+WEB_TRANSLATOR_SIGNUP_COPY_GROWTHBOOK_API_HOST=https://cdn.growthbook.io
+WEB_TRANSLATOR_SIGNUP_COPY_GROWTHBOOK_CLIENT_KEY=<authorized public SDK client key>
+```
+
+Only authenticated `GET /access` adds `signupCopy:{variant,exposure?}`. The client
+keeps this metadata across Care access updates within the same session and
+clears it on consent/session changes. A valid exposure matches the feature key,
+current consented pseudonymous unit and index: 0 for variant 1, 1 for variant 3.
+
+`web_signup_copy_shown` records an intersecting offer or explicit sign-in action,
+not merely a status fetch. `web_signup_copy_verified` requires a completion marker
+and backend-confirmed verified access. It attributes the copy previously shown,
+not a new assignment returned after sign-in. It measures confirmed sign-in
+completion, not proof that a globally new Firebase user was created. Both events
+contain only experiment/variation/assignment/campaign metadata. The consented
+local `demenzcoach.signupCopyExposure.v1` record expires with the existing
+30-day browser unit and is cleared on revocation/rotation. No care text, email,
+Firebase UID, proof or read token is added. Email and Google use the same measured
+completion path without ordering a newsletter or purchasing membership.
+
+GrowthBook provisioning and a draft rule do not prove a running experiment or
+working analysis. Keep the published default at variant 1, with no live experiment
+rules, until the reviewed release, datasource, exposure/verified-conversion metrics
+and test activation have been checked separately.
 
 ## GrowthBook setup later
 
