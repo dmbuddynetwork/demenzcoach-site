@@ -5,10 +5,12 @@ import vm from 'node:vm';
 import worker from '../cloudflare-worker.js';
 const origin = 'https://dementiacoachapp.com';
 const paths = ['/teller', '/teller/', '/teller/index.html'];
+const mailValues = ['mail_weiter', 'mail_willkommen'];
+const otherQueries = ['', '?q=fb', '?q=mail', '?q=mail_weiteres', '?q=mail_willkommens', '?q=MAIL_WEITER', '?q=MAIL_WILLKOMMEN', '?q=mail_weiter%20', '?q=%20mail_willkommen', '?q=mail_weiter&q=fb', '?q=mail_weiter&q=mail_weiter', '?q=mail_willkommen&q=mail_willkommen', '?q=mail_weiter&q=mail_willkommen', '?q=fb&q=mail_willkommen', '?utm_source=mail_weiter', '?utm_source=mail_willkommen'];
 
 test('exact existing mail links skip allocation for either old arm and preserve no-store/method policy', async () => {
-  for (const path of paths) for (const arm of ['', 'website', 'funnel']) for (const method of ['GET', 'HEAD']) {
-    const response = await worker.fetch(new Request(origin + path + '?q=mail_weiter&text=synthetic-private-value', {
+  for (const path of paths) for (const mail of mailValues) for (const arm of ['', 'website', 'funnel']) for (const method of ['GET', 'HEAD']) {
+    const response = await worker.fetch(new Request(origin + path + '?q=' + mail + '&text=synthetic-private-value', {
       method, headers: arm ? { Cookie: 'dc_teller_v1=' + arm } : {}
     }), {});
     assert.equal(response.status, 302);
@@ -17,14 +19,14 @@ test('exact existing mail links skip allocation for either old arm and preserve 
     assert.equal(response.headers.get('Set-Cookie'), null);
     assert.equal(response.headers.get('Referrer-Policy'), 'no-referrer');
   }
-  assert.equal((await worker.fetch(new Request(origin + '/teller?q=mail_weiter', { method:'POST' }), {})).status, 405);
+  for(const path of paths) for(const mail of mailValues) assert.equal((await worker.fetch(new Request(origin + path + '?q=' + mail, { method:'POST' }), {})).status, 405);
 });
 
 test('other, malformed and duplicate mail parameters keep the existing ad experiment', async () => {
-  for (const query of ['', '?q=fb', '?q=mail', '?q=mail_weiteres', '?q=MAIL_WEITER', '?q=mail_weiter%20', '?q=mail_weiter&q=fb', '?q=mail_weiter&q=mail_weiter', '?utm_source=mail_weiter']) {
-    const response = await worker.fetch(new Request(origin + '/teller/' + query, { headers:{ Cookie:'dc_teller_v1=funnel' } }), {});
+  for (const path of paths) for (const query of otherQueries) for(const arm of ['website','funnel']) {
+    const response = await worker.fetch(new Request(origin + path + query, { headers:{ Cookie:'dc_teller_v1='+arm } }), {});
     assert.equal(response.status, 302);
-    assert.equal(response.headers.get('Location'), origin + '/start/?teller=funnel', query);
+    assert.equal(response.headers.get('Location'), origin + (arm==='website'?'/de/':'/start/') + '?teller='+arm, path+query);
     assert.match(response.headers.get('Cache-Control'), /no-store/);
   }
 });
@@ -43,16 +45,26 @@ test('the former draft URL has one exact permanent compatibility redirect', asyn
   assert.ok(fs.readFileSync(new URL('../wrangler.jsonc',import.meta.url),'utf8').includes('"/teller/liste.html"'));
 });
 
-test('static fallback repairs only the same exact link before storage reads or random allocation', () => {
+test('static fallback repairs both exact links before storage reads or random allocation', () => {
   const html = fs.readFileSync(new URL('../teller/index.html', import.meta.url), 'utf8');
   const script = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-  for (const path of paths) {
+  for (const path of paths) for(const mail of mailValues) {
     let reads = 0, samples = 0;
     const redirects = [];
-    vm.runInNewContext(script, { URL, location:{ href:origin+path+'?q=mail_weiter', replace:value=>redirects.push(value) },
+    vm.runInNewContext(script, { URL, location:{ href:origin+path+'?q='+mail+'&text=synthetic-private-value', replace:value=>redirects.push(value) },
       localStorage:{ getItem(){ reads++; throw Error('Must not read assignment'); } },
       crypto:{ getRandomValues(){ samples++; throw Error('Must not allocate'); } } });
     assert.deepEqual(redirects, ['/de/demenz-alltagstipps.html']); assert.equal(reads, 0); assert.equal(samples, 0);
+  }
+});
+
+
+test('static fallback leaves all other and duplicate mail queries in both original allocation arms', () => {
+  const script=fs.readFileSync(new URL('../teller/index.html',import.meta.url),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1];
+  for(const path of paths) for(const query of otherQueries) for(const sample of [0,2**31]) {
+    const redirects=[];let samples=0;
+    vm.runInNewContext(script,{URL,location:{href:origin+path+query,replace:value=>redirects.push(value)},localStorage:{getItem(){return null;}},crypto:{getRandomValues(array){samples++;array[0]=sample;return array;}}});
+    assert.deepEqual(redirects,[sample===0?'/de/?teller=website':'/start/?teller=funnel'],path+query);assert.equal(samples,1);
   }
 });
 

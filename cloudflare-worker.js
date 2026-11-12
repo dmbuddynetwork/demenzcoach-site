@@ -98,9 +98,9 @@ export default {
         return new Response(null, { status: 405, headers: { ...headers, Allow: 'GET, HEAD' } });
       }
       // Existing newsletter list links are content links, not ad experiment entries.
-      // Match only the one documented value; never infer from other mail/UTM text.
+      // Match only the two verified template values; never infer from other mail/UTM text.
       const mailQuery = url.searchParams.getAll('q');
-      if (mailQuery.length === 1 && mailQuery[0] === 'mail_weiter') {
+      if (mailQuery.length === 1 && ['mail_weiter', 'mail_willkommen'].includes(mailQuery[0])) {
         return new Response(null, { status: 302, headers: { ...headers, Location: 'https://dementiacoachapp.com/de/demenz-alltagstipps.html' } });
       }
       return new Response(null, { status: 302, headers: { ...headers, Location: tellerTarget(request) } });

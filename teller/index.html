@@ -4,7 +4,7 @@
 <script>
 (() => {
   const mailQuery = new URL(location.href).searchParams.getAll('q');
-  if (mailQuery.length === 1 && mailQuery[0] === 'mail_weiter') {
+  if (mailQuery.length === 1 && ['mail_weiter', 'mail_willkommen'].includes(mailQuery[0])) {
     location.replace('/de/demenz-alltagstipps.html');
     return;
   }
