@@ -92,6 +92,16 @@ for (const language of ['de', 'en']) test(`complete canonical general informatio
     assert.equal((await fixture({ ...support, generalSafetyInfo: invalid }, language).api.ask('A controlled situation.')).kind, 'error');
   }
 });
+for (const language of ['de', 'en']) test(`canonical ${language} general information survives malformed remaining fields without changing risk`, async () => {
+  const info = { topic: 'swallowing', text: generalCopy[language] };
+  for (const broken of [{ ...support, meaning: '' }, { ...support, steps: [] }, { kind: 'answer', meaning: 'Controlled normal explanation.', phrases: [], avoid: 'Controlled avoid.', nextStep: 'Controlled next step.', safetyLevel: 'concern', safetyMessage: 'An existing actual concern warning.' }]) {
+    const result = await fixture({ ...broken, generalSafetyInfo: info }, language).api.ask('A controlled situation.');
+    assert.equal(result.kind, 'error'); assert.equal(result.generalSafetyInfo.text, generalCopy[language]);
+    assert.equal(result.safetyLevel, broken.safetyLevel); assert.equal(result.safetyMessage, broken.safetyMessage || '');
+  }
+  const foreign = await fixture({ ...support, meaning: '', generalSafetyInfo: { topic: 'swallowing', text: 'Arbitrary medical advice.' } }, language).api.ask('A controlled situation.');
+  assert.equal(foreign.kind, 'error'); assert.equal(Object.hasOwn(foreign, 'generalSafetyInfo'), false);
+});
 test('fixed acute warning takes priority even over unrecognized optional information', async () => {
   const result = await fixture({ kind: 'safety', safetyLevel: 'urgent', message: 'Existing actual warning.', generalSafetyInfo: { topic: 'unknown', text: 'Unknown' } }).api.ask('A controlled situation.');
   assert.equal(result.kind, 'safety'); assert.equal(result.message, 'Existing actual warning.');

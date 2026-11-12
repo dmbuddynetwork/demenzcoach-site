@@ -1137,7 +1137,7 @@
     let exactText = requestState?.exactText === true;
     let draft = requestState?.draft || '', draftFor = requestState?.draftFor || '';
     let editDraft = requestState?.editDraft || '', editFor = requestState?.editFor || '';
-    let requestPending = false;
+    let requestPending = false, receivedGeneralInfo = null;
     const run = async (manual = false) => {
       if (requestPending) return;
       requestPending = true;
@@ -1158,6 +1158,10 @@
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
+      receivedGeneralInfo = ai?.generalSafetyInfo?.(result.generalSafetyInfo) || receivedGeneralInfo;
+      // Preserve independently validated information through format-error retries.
+      // The original result still owns auth/quota metadata; this copy is display-only.
+      const viewResult = receivedGeneralInfo ? { ...result, generalSafetyInfo: receivedGeneralInfo } : result;
       if (result.kind === 'access') {
         box.replaceChildren(window.DemenzKiFreigabe.offerCard({ sentence: requestText, reason: result.reason, value: result.access, onRetry: () => { if (result.reason === 'answer_recovery_credit') operationID = window.crypto.randomUUID(); box.replaceChildren(ask, status); void run(true); } }));
         return;
@@ -1222,7 +1226,7 @@
         });
         box.classList.add('translator-ai-clarification');
         status.textContent = ''; ask.hidden = true;
-        box.replaceChildren(title, ...[generalInfoNote(result)].filter(Boolean),
+        box.replaceChildren(title, ...[generalInfoNote(viewResult)].filter(Boolean),
           element('p', { className: 'translator-clarification-question', text: result.question }),
           element('p', { text: result.meaning }), element('p', { text: result.nextStep }), form, status, ask);
         title.focus({ preventScroll: true });
@@ -1230,7 +1234,7 @@
       }
       if ((result.kind === 'answer' && Array.isArray(result.phrases)) || (result.kind === 'self_support' && Array.isArray(result.steps))) {
         window.DemenzKiFreigabe?.noteAnswer(result);
-        const { node, focus, top } = aiAnswer(result, { allowHelpful: allowHelpful && !localSafetyHit, goal });
+        const { node, focus, top } = aiAnswer(viewResult, { allowHelpful: allowHelpful && !localSafetyHit, goal });
         // Die allgemeinen Ersatz-Sätze und „Diesen Satz kenne ich noch nicht.“ braucht es neben der KI-Antwort nicht mehr.
         output.querySelector('.translator-fallback')?.remove();
         output.querySelector('.translator-near-group')?.remove();
@@ -1266,6 +1270,7 @@
         if (result.safetyLevel === 'concern') {
           const note = fixedSafetyNote(result, localSafetyNote);
           box.replaceWith(note);
+          const receivedNote = generalInfoNote(viewResult); if (receivedNote) note.after(receivedNote);
           output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach(offer => offer.remove());
           setFollowupOpen(false);
           note.tabIndex = -1;
@@ -1282,6 +1287,7 @@
         const note = existing ?? freshNote;
         withFixedGuardLead(note, result);
         if (existing) box.remove(); else box.replaceWith(note);
+        const receivedNote = generalInfoNote(viewResult); if (receivedNote) note.after(receivedNote);
         output.querySelectorAll('.translator-suggest, .translator-plan-cta, .translator-extra-offers, .translator-signup, .translator-app-cta').forEach((offer) => offer.remove());
         // Der Dienst liefert hier keine Formulierung. Die Sicherheitsinformation bleibt
         // zuerst stehen; bei einer unbekannten Eingabe braucht es auch einen nächsten Schritt.
@@ -1308,6 +1314,8 @@
         box.querySelector('.safety-note')?.remove();
         box.prepend(safetyNote);
       }
+      const generalNote = generalInfoNote(viewResult);
+      if (generalNote && !box.querySelector('.translator-general-safety-info')) box.append(generalNote);
       if (result.kind === 'off_topic') {
         status.textContent = ui ? tr('Dazu kann der Übersetzer nicht helfen. Tippe einen Satz ein, den die Person mit Demenz gesagt hat.')
           : 'Dazu kann der Übersetzer nicht helfen. Beschreibe eine Situation im Alltag mit Demenz oder eine Frage als pflegende Person.';
@@ -1479,23 +1487,43 @@
         box.dataset.goalState = 'clarification';
         heading.textContent = en ? 'A question about your situation' : 'Eine Rückfrage zu deiner Situation';
         status.textContent = result.question;
-        const detail = element('textarea', { attributes: { rows: '3', autocomplete: 'off', required: '' } });
+        const detail = element('textarea', { className: 'translator-clarification-detail', attributes: { rows: '3', autocomplete: 'off', required: '' } });
         const submit = button(en ? 'Clarify my goal' : 'Anliegen klären', 'button', () => {}); submit.type = 'submit';
+        const original = element('textarea', { className: 'translator-clarification-original', attributes: { rows: '3', autocomplete: 'off' } });
+        original.value = planningText;
         const budget = element('p', { className: 'translator-clarification-budget', attributes: { role: 'status', 'aria-live': 'polite' } });
-        const updateBudget = () => { budget.textContent = clarificationBudget(planningText, detail.value); };
-        detail.addEventListener('input', updateBudget); updateBudget();
+        const updateBudget = () => {
+          budget.textContent = clarificationBudget(original.value, detail.value, true);
+          submit.textContent = original.value.normalize('NFC').trim() !== planningText
+            ? (en ? 'Restart with this situation' : 'Mit dieser Situation neu starten') : (en ? 'Clarify my goal' : 'Anliegen klären');
+        };
+        detail.addEventListener('input', updateBudget); original.addEventListener('input', updateBudget); updateBudget();
+        const edit = element('details', { className: 'translator-clarification-edit' }, [
+          element('summary', { text: en ? 'Edit situation' : 'Situation bearbeiten' }),
+          element('label', {}, [element('span', { text: en ? 'Your situation' : 'Deine Situation' }), original]),
+          element('p', { text: en ? 'If you change the situation, you choose your goal again. Your additional detail will be included.' : 'Wenn du die Situation änderst, wählst du dein Ziel erneut. Deine Ergänzung wird übernommen.' })
+        ]);
         const clarification = element('form', { className: 'translator-clarification-form translator-goal-clarification' }, [
-          element('label', {}, [element('span', { text: en ? 'Your detail' : 'Deine Ergänzung' }), detail]), budget, submit
+          edit, element('label', {}, [element('span', { text: en ? 'Your detail' : 'Deine Ergänzung' }), detail]), budget, submit
         ]);
         clarification.addEventListener('submit', event => {
           event.preventDefault();
           const reply = detail.value.normalize('NFC').trim();
           if (!reply) { detail.focus(); return; }
-          const combined = `${planningText}\n${reply}`;
+          const situation = original.value.normalize('NFC').trim();
+          if (!situation) { edit.open = true; original.focus(); return; }
+          const combined = `${situation}\n${reply}`;
           const issue = ai.requestIssue(combined, { formal: personal.formal });
           if (issue) {
-            status.textContent = clarificationBudget(planningText, detail.value) + (en ? ' Your draft stays here.' : ' Dein Entwurf bleibt hier erhalten.');
+            status.textContent = clarificationBudget(original.value, detail.value, true) + (en ? ' Your draft stays here.' : ' Dein Entwurf bleibt hier erhalten.');
             detail.focus(); return;
+          }
+          if (situation !== planningText) {
+            // Only an explicit valid submit replaces the original situation.
+            const otherDraft = input.value;
+            input.value = combined;
+            try { input.form.requestSubmit(); } finally { input.value = otherDraft; grow(); }
+            return;
           }
           planningText = combined;
           void load();

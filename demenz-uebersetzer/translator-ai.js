@@ -60,8 +60,10 @@
       }
       const result = await response.json();
       const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
+      const receivedGeneralInfo = generalSafetyInfo(result?.generalSafetyInfo);
       const invalid = () => ({ kind: 'error', reason: 'unavailable', safetyLevel: result?.safetyLevel,
-        safetyMessage: hasText(result?.safetyMessage) ? result.safetyMessage : '' });
+        safetyMessage: hasText(result?.safetyMessage) ? result.safetyMessage : '',
+        ...(receivedGeneralInfo ? { generalSafetyInfo: receivedGeneralInfo } : {}) });
       if (!result || typeof result.kind !== 'string') return invalid();
       if (result.kind === 'safety') return validFixedSafety(result) ? result : { kind: 'error', reason: 'unavailable' };
       if (Object.hasOwn(result, 'generalSafetyInfo') && !generalSafetyInfo(result.generalSafetyInfo)) return invalid();

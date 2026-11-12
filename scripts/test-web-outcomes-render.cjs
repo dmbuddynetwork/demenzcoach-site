@@ -9,6 +9,7 @@ const recorded = JSON.parse(fs.readFileSync(process.env.OUTCOMES_REPLAY_FILE, 'u
 const evidence = process.env.OUTCOMES_EVIDENCE;
 const approved = JSON.parse(fs.readFileSync(process.env.GENERAL_INFO_APPROVED_FILE, 'utf8'));
 const caseByID = id => recorded.cases.find(c => c.id === id);
+const finalRecorded = process.env.FINAL_OUTCOMES_REPLAY_FILE ? JSON.parse(fs.readFileSync(process.env.FINAL_OUTCOMES_REPLAY_FILE, 'utf8')) : null;
 const postfix = JSON.parse(fs.readFileSync(process.env.FOLLOWUP_REPLAY_FILE, 'utf8'));
 const realPause = postfix.cases.find(c => c.id === 'G26-POSTFIX-F1');
 const realPerception = postfix.cases.find(c => c.id === 'G20-POSTFIX-F1');
@@ -22,7 +23,7 @@ const english = {
 };
 (async () => {
   let preview, browser;
-  const report = { providerCalls: 0, realAuthActions: 0, profiles: [], errors: [], recordedResultsSHA256: recorded.sourceResultsSHA256,
+  const report = { providerCalls: 0, realAuthActions: 0, profiles: [], errors: [], recordedResultsSHA256: recorded.sourceResultsSHA256, finalResultsSHA256: finalRecorded?.sourceResultsSHA256 || null,
     limits: 'German care text replays real backend results. English, access, warning race, canonical-info injections and200char limit probes are controlled fixtures, not model evidence. Initial cbda questions and0569postfix real followups are explicitly from separate captures. Static presets deliberately retain their reviewed local flow.' };
   try {
     if (evidence) fs.mkdirSync(evidence, { recursive: true });
@@ -32,7 +33,7 @@ const english = {
       const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
       try {
         const calls = [];
-        let current = language === 'de' ? caseByID('G01') : clone(english), followup = false, controlledWarning = false, controlledInfo = false, controlledQuestion = false;
+        let current = language === 'de' ? caseByID('G01') : clone(english), followup = false, controlledWarning = false, controlledInfo = false, controlledQuestion = false, malformedMode = 0, recoverEdited = false;
         const allowance = { enabled: true, verified: true, paid: false, used: 0, remaining: 4, anonymousAnswers: 1, registeredAdditional: 3, signupPlacement: 'after-first' };
         await context.addInitScript(() => { localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied'); localStorage.setItem('demenzcoach.marketingConsent.v1', 'denied'); });
         await context.route('**/*', async route => {
@@ -45,17 +46,23 @@ const english = {
             const body = req.postDataJSON(); calls.push({ path: url.pathname, query: url.search, body });
             let response;
             if (url.pathname.endsWith('/goals')) {
-              response = followup ? realPause.requests[0].response : current.requests[0].response;
+              response = recoverEdited ? { kind: 'goals', contract: 'outcomes-v1', selectionMode: 'explicit', goals: [{ goal: 'act_now', label: 'Ein kontrolliert geklärtes Anliegen' }] } : followup ? realPause.requests[0].response : current.requests[0].response;
             } else {
               assert.equal(url.searchParams.get('response_contract'), 'clarification-v1');
               const match = current.requests.find(r => r.selectedGoal?.id === body.goal?.id && r.selectedGoal?.label === body.goal?.label);
-              response = followup ? realPause.requests[1].response : current.id === 'G20' && body.text !== current.input.text ? realPerception.requests[0].response : match?.response;
+              response = recoverEdited ? { kind: 'self_support', meaning: 'Kontrollierte Darstellung nach bewusstem Neustart.', steps: ['Ein kontrollierter erster Schritt.'], avoid: 'Ein kontrollierter ungünstiger Gedanke.', nextStep: 'Ein kontrollierter nächster Schritt.', safetyLevel: 'standard', safetyMessage: null } : followup ? realPause.requests[1].response : current.id === 'G20' && body.text !== current.input.text ? realPerception.requests[0].response : match?.response;
               assert.ok(response, 'A response must match the actual selected id and label');
               response = { ...response, access: { ...allowance, used: 1, remaining: 3 } };
               if (controlledWarning && body.goal.id === current.requests[0].response.goals[0].goal) response = { ...response, safetyLevel: 'concern', safetyMessage: 'Kontrollierter bereits empfangener Hinweis bleibt erhalten.' };
             }
             if (controlledInfo && !url.pathname.endsWith('/goals')) response = { ...response, generalSafetyInfo: { topic: 'swallowing', text: approved[language] } };
             if (controlledQuestion && !url.pathname.endsWith('/goals')) response = { kind: 'clarification', question: 'Welche Angabe fehlt noch?', meaning: 'Kontrollierte Rückfrage zur Darstellung.', nextStep: 'Ergänze die Angabe.', safetyLevel: 'standard', safetyMessage: null, generalSafetyInfo: { topic: 'swallowing', text: approved[language] } };
+            if (malformedMode && !url.pathname.endsWith('/goals')) {
+              response = { ...response };
+              delete response.generalSafetyInfo;
+              if (malformedMode === 1) response = { ...response, meaning: '', generalSafetyInfo: { topic: 'swallowing', text: approved[language] } };
+              if (malformedMode === 2) response = { ...response, phrases: [] };
+            }
             return route.fulfill({ json: response });
           }
           return url.origin === preview.origin ? route.continue() : route.abort();
@@ -63,7 +70,7 @@ const english = {
         const page = await context.newPage(); page.setDefaultTimeout(10000);
         page.on('pageerror', e => report.errors.push(e.message));
         const home = async () => { await page.goto(`${preview.origin}/${language}/`); await page.waitForFunction(() => !!window.DemenzTranslatorAI && document.querySelector('#translator-input')); };
-        const submit = async item => { current = clone(item); followup = false; controlledWarning = false; controlledInfo = false; controlledQuestion = false; await home(); await page.locator('#translator-input').fill(item.input.text); await page.locator('#translator-form').evaluate(f => f.requestSubmit()); };
+        const submit = async item => { current = clone(item); followup = false; controlledWarning = false; controlledInfo = false; controlledQuestion = false; malformedMode = 0; recoverEdited = false; await home(); await page.locator('#translator-input').fill(item.input.text); await page.locator('#translator-form').evaluate(f => f.requestSubmit()); };
         const answer = () => page.locator('.translator-ai-answer').waitFor();
         const settleMotion = () => page.evaluate(async () => { await Promise.all(document.getAnimations().filter(a => Number.isFinite(a.effect?.getComputedTiming().iterations)).map(a => a.finished.catch(() => {}))); });
         const profile = { language, width, cases: [] };
@@ -128,13 +135,13 @@ const english = {
           const beforeLong = calls.length;
           const room = 199 - Array.from(current.input.text).length;
           assert.match(await page.locator('.translator-goal-clarification .translator-clarification-budget').innerText(), new RegExp(`bis zu ${room} Zeichen`));
-          await page.locator('.translator-goal-clarification textarea').fill('x'.repeat(room + 1));
+          await page.locator('.translator-goal-clarification .translator-clarification-detail').fill('x'.repeat(room + 1));
           await page.locator('.translator-goal-clarification button').click();
           assert.equal(calls.length, beforeLong);
-          assert.equal(await page.locator('.translator-goal-clarification textarea').inputValue(), 'x'.repeat(room + 1));
+          assert.equal(await page.locator('.translator-goal-clarification .translator-clarification-detail').inputValue(), 'x'.repeat(room + 1));
           assert.match(await page.locator('.translator-ai-status').innerText(), /1 Zeichen zu lang/);
           const detail = realPause.input.text.slice(current.input.text.length + 1);
-          await page.locator('.translator-goal-clarification textarea').fill(detail); followup = true;
+          await page.locator('.translator-goal-clarification .translator-clarification-detail').fill(detail); followup = true;
           await page.locator('.translator-goal-clarification button').click(); await answer();
           const secondGoals = calls.filter(c => c.path.endsWith('/goals')).at(-1);
           assert.equal(secondGoals.body.text, current.input.text + '\n' + detail);
@@ -153,15 +160,74 @@ const english = {
           assert.equal(calls.at(-1).body.text, realPerception.input.text);
           assert.deepEqual(calls.at(-1).body.goal, realPerception.requests[0].selectedGoal);
           profile.cases.push('cbda G20 clarification plus actual0569postfix continuation preserves160char full text and selected goal');
-          const noRoom = clone(caseByID('G26')); noRoom.input.text = 'a'.repeat(200);
-          await submit(noRoom); await page.locator('.translator-goal-clarification').waitFor();
-          assert.match(await page.locator('.translator-clarification-budget').innerText(), /bis zu 0 Zeichen/);
-          assert.match(await page.locator('.translator-clarification-budget').innerText(), /ursprüngliche Situation/);
-          const noRoomCalls = calls.length;
-          await page.locator('.translator-goal-clarification textarea').fill('b');
-          await page.locator('.translator-goal-clarification button').click();
-          assert.equal(calls.length, noRoomCalls);
-          profile.cases.push('synthetic200char original reports zero room, no truncation and no unsupported followup');
+          for (const originalLength of [199, 200]) {
+            const noRoom = clone(caseByID('G26')); noRoom.input.text = 'a'.repeat(originalLength);
+            await submit(noRoom); await page.locator('.translator-goal-clarification').waitFor();
+            assert.match(await page.locator('.translator-clarification-budget').innerText(), /bis zu 0 Zeichen/);
+            const noRoomCalls = calls.length;
+            await page.locator('.translator-goal-clarification .translator-clarification-detail').fill('b');
+            await page.locator('.translator-goal-clarification button').click();
+            assert.equal(calls.length, noRoomCalls);
+            await page.locator('.translator-goal-clarification').getByText('Situation bearbeiten', { exact: true }).click();
+            const originalField = page.locator('.translator-goal-clarification .translator-clarification-original');
+            assert.equal(await originalField.isVisible(), true);
+            assert.equal(await originalField.inputValue(), noRoom.input.text);
+            assert.equal(await page.locator('.translator-goal-clarification .translator-clarification-detail').inputValue(), 'b');
+            await originalField.fill('a'.repeat(198));
+            assert.equal(calls.length, noRoomCalls, 'Editing alone never sends or replaces the situation');
+            assert.match(await page.locator('.translator-clarification-budget').innerText(), /bis zu 1 Zeichen/);
+            recoverEdited = true;
+            await page.getByRole('button', { name: 'Mit dieser Situation neu starten', exact: true }).click(); await answer();
+            assert.equal(calls.at(-2).body.text, 'a'.repeat(198) + '\nb');
+            assert.equal(calls.at(-1).body.text, calls.at(-2).body.text);
+            assert.equal(await page.locator('.translator-ai-self-support').count(), 1);
+          }
+          profile.cases.push('synthetic199/200char planning original: drafts intact, reachable edit, explicit valid200char restart reaches answer');
+          await submit(caseByID('G03')); malformedMode = 1;
+          await page.getByRole('button', { name: 'Noch einmal versuchen', exact: true }).waitFor();
+          assert.equal(await page.locator('.translator-general-safety-info p').innerText(), approved.de);
+          assert.equal(await page.locator('.safety-urgent').count(), 0);
+          malformedMode = 2;
+          const secondBroken = page.waitForResponse(r => r.url().includes('/translator-web?'));
+          await page.getByRole('button', { name: 'Noch einmal versuchen', exact: true }).click(); await secondBroken;
+          await page.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent === 'Noch einmal versuchen' && !b.disabled));
+          assert.equal(await page.locator('.translator-general-safety-info p').innerText(), approved.de);
+          malformedMode = 3;
+          await page.getByRole('button', { name: 'Noch einmal versuchen', exact: true }).click(); await answer();
+          assert.equal(await page.locator('.translator-ai-answer .translator-general-safety-info p').innerText(), approved.de);
+          await page.getByRole('button', { name: 'Ja, merken', exact: true }).click(); await page.getByText('Antwort gemerkt.', { exact: true }).waitFor();
+          assert.ok(await page.evaluate(text => JSON.parse(localStorage.getItem('demenzcoach.helpfulAnswers.v1')).items[0].answer.meaning.endsWith(text), approved.de));
+          profile.cases.push('synthetic malformed meaning+canonical info, malformed phrases retry withoutinfo, then valid answer+saved record retains full canonicalinfo; no false emergency');
+          if (finalRecorded) for (const id of ['G01', 'G03', 'G11', 'G26', 'G38']) {
+            const fresh = finalRecorded.cases.find(c => c.id === id);
+            await submit(fresh);
+            const planned = fresh.requests[0].response;
+            if (planned.selectionMode === 'guessed') {
+              await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+              assert.equal(await page.locator('.translator-ai-goal-choice').count(), planned.goals.length);
+              assert.equal(await page.locator('.translator-ai-answer').count(), 0);
+              await page.locator('.translator-ai-goal-choice').first().click();
+            }
+            if (id === 'G26') {
+              await page.locator('.translator-ai-clarification').waitFor();
+              assert.equal(await page.locator('.translator-clarification-question').innerText(), fresh.requests[1].response.question);
+              assert.equal(await page.locator('.translator-clarification-detail').isVisible(), true);
+            } else {
+              await answer();
+              assert.equal(await page.locator('.translator-ai-answer .translator-phrase').count(), fresh.requests[1].response.phrases.length);
+              if (id === 'G11') {
+                const intent = fresh.requests.find(r => r.response.kind === 'self_support');
+                await page.getByRole('button', { name: intent.selectedGoal.label, exact: true }).click(); await page.locator('.translator-ai-self-support').waitFor();
+                assert.equal(await page.locator('.translator-self-support-steps li').count(), intent.response.steps.length);
+                assert.equal(await page.locator('.translator-ai-self-support q').count(), 0);
+              }
+              if (id === 'G38') {
+                assert.equal(await page.locator('.translator-general-safety-info p').innerText(), approved.de);
+                assert.equal(await page.locator('.translator-general-safety-info.safety-note, .translator-general-safety-info a[href^="tel:"]').count(), 0);
+              }
+            }
+          }
+          if (finalRecorded) profile.cases.push('actualfinal2 G01guessed2, G03explicit1, G11normal+support, G26answerclarification, G38canonicalfullinfo');
           await submit(caseByID('G06'));
           await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
           assert.equal(calls.at(-1).body.text, current.input.text);
