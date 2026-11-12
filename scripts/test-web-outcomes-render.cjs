@@ -33,17 +33,21 @@ const english = {
       const context = await browser.newContext({ viewport: { width, height: 900 }, reducedMotion: 'reduce' });
       try {
         const calls = [];
-        let current = language === 'de' ? caseByID('G01') : clone(english), followup = false, controlledWarning = false, controlledInfo = false, controlledQuestion = false, malformedMode = 0, recoverEdited = false;
+        let current = language === 'de' ? caseByID('G01') : clone(english), followup = false, controlledWarning = false, controlledInfo = false, controlledQuestion = false, malformedMode = 0, recoverEdited = false, accessMode = '', delayNext = false, releaseHeld;
         const allowance = { enabled: true, verified: true, paid: false, used: 0, remaining: 4, anonymousAnswers: 1, registeredAdditional: 3, signupPlacement: 'after-first' };
         await context.addInitScript(() => { localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied'); localStorage.setItem('demenzcoach.marketingConsent.v1', 'denied'); });
         await context.route('**/*', async route => {
           const req = route.request(), url = new URL(req.url());
-          if (url.pathname === '/abo/web-auth.js') return route.fulfill({ contentType: 'text/javascript', body: "export async function webAuth(){return{auth:{currentUser:{uid:'outcome-fixture',isAnonymous:false,emailVerified:true,getIdToken:async()=>'fixture-only'}},sdk:{}}}" });
+          if (url.pathname === '/abo/web-auth.js') return route.fulfill({ contentType: 'text/javascript', body: "export async function webAuth(){globalThis.__outcomeFixtureAuth||={currentUser:{uid:'outcome-fixture',isAnonymous:false,emailVerified:true,getIdToken:async()=>'fixture-only'}};return{auth:globalThis.__outcomeFixtureAuth,sdk:{}}}" });
           if (url.hostname.endsWith('cloudfunctions.net') && url.pathname.includes('/translator-web')) {
             if (req.method() === 'OPTIONS') return route.fulfill({ status: 204 });
             if (url.pathname.endsWith('/access')) return route.fulfill({ json: { ...allowance, contract: 'signup-bonus-v1', signupCopy: { variant: 'variant_1' } } });
             assert.equal(url.searchParams.get('goal_contract'), 'outcomes-v1');
             const body = req.postDataJSON(); calls.push({ path: url.pathname, query: url.search, body });
+            if (!url.pathname.endsWith('/goals')) {
+              if (delayNext) { delayNext = false; await new Promise(resolve => { releaseHeld = resolve; }); }
+              if (accessMode) return route.fulfill({ status: accessMode === 'payment_required' ? 402 : 503, json: { code: accessMode, access: { ...allowance, remaining: 0 } } });
+            }
             let response;
             if (url.pathname.endsWith('/goals')) {
               response = recoverEdited ? { kind: 'goals', contract: 'outcomes-v1', selectionMode: 'explicit', goals: [{ goal: 'act_now', label: 'Ein kontrolliert geklärtes Anliegen' }] } : followup ? realPause.requests[0].response : current.requests[0].response;
@@ -70,9 +74,16 @@ const english = {
         const page = await context.newPage(); page.setDefaultTimeout(10000);
         page.on('pageerror', e => report.errors.push(e.message));
         const home = async () => { await page.goto(`${preview.origin}/${language}/`); await page.waitForFunction(() => !!window.DemenzTranslatorAI && document.querySelector('#translator-input')); };
-        const submit = async item => { current = clone(item); followup = false; controlledWarning = false; controlledInfo = false; controlledQuestion = false; malformedMode = 0; recoverEdited = false; await home(); await page.locator('#translator-input').fill(item.input.text); await page.locator('#translator-form').evaluate(f => f.requestSubmit()); };
+        const submit = async item => { current = clone(item); followup = false; controlledWarning = false; controlledInfo = false; controlledQuestion = false; malformedMode = 0; recoverEdited = false; accessMode = ''; delayNext = false; releaseHeld = undefined; await home(); await page.locator('#translator-input').fill(item.input.text); await page.locator('#translator-form').evaluate(f => f.requestSubmit()); };
         const answer = () => page.locator('.translator-ai-answer').waitFor();
         const settleMotion = () => page.evaluate(async () => { await Promise.all(document.getAnimations().filter(a => Number.isFinite(a.effect?.getComputedTiming().iterations)).map(a => a.finished.catch(() => {}))); });
+        const productFrame = async name => {
+          await settleMotion();
+          await page.locator('.translator-selected-goal').evaluate(el => { const header = document.querySelector('.e-header')?.getBoundingClientRect().height || 70; window.scrollTo({ top: Math.max(0, scrollY + el.getBoundingClientRect().top - header - 16), behavior: 'instant' }); });
+          await settleMotion();
+          assert.equal(await page.getByText('Kontrollierter bereits empfangener Hinweis bleibt erhalten.', { exact: true }).count(), 0);
+          if (evidence) await page.screenshot({ animations: 'disabled', path: path.join(evidence, name), fullPage: false });
+        };
         const profile = { language, width, cases: [] };
         if (language === 'de') {
           await submit(caseByID('G01'));
@@ -198,6 +209,58 @@ const english = {
           await page.getByRole('button', { name: 'Ja, merken', exact: true }).click(); await page.getByText('Antwort gemerkt.', { exact: true }).waitFor();
           assert.ok(await page.evaluate(text => JSON.parse(localStorage.getItem('demenzcoach.helpfulAnswers.v1')).items[0].answer.meaning.endsWith(text), approved.de));
           profile.cases.push('synthetic malformed meaning+canonical info, malformed phrases retry withoutinfo, then valid answer+saved record retains full canonicalinfo; no false emergency');
+          // Do not save until AFTER switching away and returning to the cached answer.
+          await page.evaluate(() => localStorage.removeItem('demenzcoach.helpfulAnswers.v1'));
+          await submit(caseByID('G11')); malformedMode = 1;
+          await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+          await page.locator('.translator-ai-goal-choice').first().click();
+          await page.getByRole('button', { name: 'Noch einmal versuchen', exact: true }).waitFor();
+          malformedMode = 3;
+          await page.getByRole('button', { name: 'Noch einmal versuchen', exact: true }).click(); await answer();
+          const cacheA = current.requests[0].response.goals[0].label;
+          const cacheB = current.requests.find(r => r.response.kind === 'self_support').selectedGoal.label;
+          await page.getByRole('button', { name: cacheB, exact: true }).click(); await page.locator('.translator-ai-self-support').waitFor();
+          const cachedCalls = calls.length;
+          await page.getByRole('button', { name: cacheA, exact: true }).click(); await answer();
+          assert.equal(calls.length, cachedCalls);
+          assert.equal(await page.locator('.translator-ai-answer .translator-general-safety-info p').innerText(), approved.de);
+          await page.getByRole('button', { name: 'Ja, merken', exact: true }).click(); await page.getByText('Antwort gemerkt.', { exact: true }).waitFor();
+          assert.ok(await page.evaluate(text => JSON.parse(localStorage.getItem('demenzcoach.helpfulAnswers.v1')).items[0].answer.meaning.endsWith(text), approved.de));
+          await home(); await page.locator('.translator-helpful-open').first().click(); await answer();
+          assert.equal(await page.locator('.translator-ai-answer .translator-general-safety-info p').innerText(), approved.de);
+          profile.cases.push('canonical errorA→validretrywithoutinfo→goalB→cachedA→firstbookmark→reopen retains complete info');
+          await submit(caseByID('G03')); await answer();
+          assert.equal(await page.locator('.translator-ai-answer .translator-general-safety-info').count(), 0, 'A different original situation never inherits prior display metadata');
+          await submit(caseByID('G03')); malformedMode = 1;
+          await page.getByRole('button', { name: 'Noch einmal versuchen', exact: true }).waitFor();
+          malformedMode = 3; accessMode = 'access_unavailable';
+          await page.getByRole('button', { name: 'Noch einmal versuchen', exact: true }).click();
+          await page.locator('.translator-ai .ki-angebot').waitFor();
+          assert.equal(await page.locator('.translator-ai .translator-general-safety-info p').innerText(), approved.de);
+          assert.equal(await page.locator('div.translator-ai').evaluate(el => Boolean(el.querySelector('.translator-general-safety-info').compareDocumentPosition(el.querySelector('.ki-angebot')) & Node.DOCUMENT_POSITION_FOLLOWING)), true);
+          // Account identity may change while this same original care flow remains visible.
+          await page.evaluate(() => { window.__outcomeFixtureAuth.currentUser = { uid: 'second-controlled-account', isAnonymous: false, emailVerified: true, getIdToken: async () => 'second-fixture-only' }; window.dispatchEvent(new Event('demenz-auth-changed')); });
+          accessMode = ''; delayNext = true;
+          const pendingRequest = page.waitForRequest(r => r.url().includes('/translator-web?'));
+          await page.locator('.translator-ai .ki-angebot').getByRole('button', { name: 'Erneut versuchen', exact: true }).click(); await pendingRequest;
+          try {
+            for (let attempt = 0; attempt < 30 && !releaseHeld; attempt++) await new Promise(resolve => setTimeout(resolve, 20));
+            assert.equal(typeof releaseHeld, 'function');
+            assert.equal(await page.locator('.translator-ai .translator-general-safety-info p').innerText(), approved.de);
+            assert.equal(await page.locator('.translator-ai .translator-general-safety-info').isVisible(), true);
+          } finally { releaseHeld?.(); }
+          await answer();
+          assert.equal(await page.locator('.translator-ai-answer .translator-general-safety-info p').innerText(), approved.de);
+          profile.cases.push('canonical error→accesscard, controlled account change→held pending retry→valid answer keeps care info; entitlement objects not retained');
+          await submit(caseByID('G03')); controlledQuestion = true;
+          await page.locator('.translator-clarification-detail').waitFor();
+          accessMode = 'payment_required';
+          await page.locator('.translator-clarification-detail').fill('Eine kontrollierte Ergänzung.');
+          await page.locator('.translator-clarification-form button[type="submit"]').click();
+          await page.locator('.translator-ai .ki-angebot').waitFor();
+          assert.equal(await page.locator('.translator-ai .translator-general-safety-info p').innerText(), approved.de);
+          assert.equal(await page.locator('div.translator-ai').evaluate(el => Boolean(el.querySelector('.translator-general-safety-info').compareDocumentPosition(el.querySelector('.ki-angebot')) & Node.DOCUMENT_POSITION_FOLLOWING)), true);
+          profile.cases.push('canonical clarification→detail→quota accesscard retains full info before card');
           if (finalRecorded) for (const id of ['G01', 'G03', 'G11', 'G26', 'G38']) {
             const fresh = finalRecorded.cases.find(c => c.id === id);
             await submit(fresh);
@@ -220,7 +283,9 @@ const english = {
                 await page.getByRole('button', { name: intent.selectedGoal.label, exact: true }).click(); await page.locator('.translator-ai-self-support').waitFor();
                 assert.equal(await page.locator('.translator-self-support-steps li').count(), intent.response.steps.length);
                 assert.equal(await page.locator('.translator-ai-self-support q').count(), 0);
+                if (width === 390) await productFrame('PRODUCT-PREVIEW-SELF-SUPPORT-390.png');
               }
+              if (id === 'G03' && width === 1280) await productFrame('PRODUCT-PREVIEW-ICE-BOUNDARY-1280.png');
               if (id === 'G38') {
                 assert.equal(await page.locator('.translator-general-safety-info p').innerText(), approved.de);
                 assert.equal(await page.locator('.translator-general-safety-info.safety-note, .translator-general-safety-info a[href^="tel:"]').count(), 0);

@@ -1006,6 +1006,16 @@
       element('h3', { className: 'translator-step', text: generalInfoTitle() }), element('p', { className: 'translator-meaning', text: info.text })
     ]) : null;
   };
+  // Care display metadata belongs to one original situation/address/goal flow,
+  // including its retries and cached answers. Store no account, access or quota
+  // objects here: those keep their original request-generation bindings.
+  const generalInfoMemory = () => {
+    let info = null;
+    return result => {
+      info = ai?.generalSafetyInfo?.(result.generalSafetyInfo) || info;
+      return info ? { ...result, generalSafetyInfo: info } : result;
+    };
+  };
   const aiAnswer = (result, { saved = false, allowHelpful = true, goal } = {}) => {
     if (saved && !result.generalSafetyInfo) {
       const marker = `\n\n${generalInfoTitle()}\n`, at = result.meaning.lastIndexOf(marker);
@@ -1123,11 +1133,12 @@
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, onRequestState = () => {}, onAnswerRendered = () => {} } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, displayResult = generalInfoMemory(), onRequestState = () => {}, onAnswerRendered = () => {} } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     if (!goal && !localSafetyHit && !requestState) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
     const box = element('div', { className: 'translator-ai' });
+    const replaceContent = (...nodes) => box.replaceChildren(...[generalInfoNote(displayResult({}))].filter(Boolean), ...nodes);
     const waiting = aiWaiting();
     let operationID = requestState?.operationID || (window.DemenzKiFreigabe?.enabled() ? window.crypto.randomUUID() : '');
     const correctionOf = requestState ? (requestState.options.correctionOf || '') : correctionRequestID;
@@ -1137,7 +1148,7 @@
     let exactText = requestState?.exactText === true;
     let draft = requestState?.draft || '', draftFor = requestState?.draftFor || '';
     let editDraft = requestState?.editDraft || '', editFor = requestState?.editFor || '';
-    let requestPending = false, receivedGeneralInfo = null;
+    let requestPending = false;
     const run = async (manual = false) => {
       if (requestPending) return;
       requestPending = true;
@@ -1158,12 +1169,11 @@
       waiting.remove();
       track('translator_ai', { step: result.kind, source });
       if (!box.isConnected) return;
-      receivedGeneralInfo = ai?.generalSafetyInfo?.(result.generalSafetyInfo) || receivedGeneralInfo;
-      // Preserve independently validated information through format-error retries.
-      // The original result still owns auth/quota metadata; this copy is display-only.
-      const viewResult = receivedGeneralInfo ? { ...result, generalSafetyInfo: receivedGeneralInfo } : result;
+      // Only the display copy receives retained care metadata. Auth/quota consumers
+      // below always receive the original, request-bound result.
+      const viewResult = displayResult(result);
       if (result.kind === 'access') {
-        box.replaceChildren(window.DemenzKiFreigabe.offerCard({ sentence: requestText, reason: result.reason, value: result.access, onRetry: () => { if (result.reason === 'answer_recovery_credit') operationID = window.crypto.randomUUID(); box.replaceChildren(ask, status); void run(true); } }));
+        replaceContent(window.DemenzKiFreigabe.offerCard({ sentence: requestText, reason: result.reason, value: result.access, onRetry: () => { if (result.reason === 'answer_recovery_credit') operationID = window.crypto.randomUUID(); replaceContent(ask, status); void run(true); } }));
         return;
       }
       if (result.kind === 'clarification') {
@@ -1226,7 +1236,7 @@
         });
         box.classList.add('translator-ai-clarification');
         status.textContent = ''; ask.hidden = true;
-        box.replaceChildren(title, ...[generalInfoNote(viewResult)].filter(Boolean),
+        replaceContent(title,
           element('p', { className: 'translator-clarification-question', text: result.question }),
           element('p', { text: result.meaning }), element('p', { text: result.nextStep }), form, status, ask);
         title.focus({ preventScroll: true });
@@ -1393,7 +1403,11 @@
     // This cache belongs only to this situation and address mode. Pending promises
     // are shared when A → B → A is chosen; detached views cannot paint stale results.
     const answers = new Map();
-    const requestStates = new Map();
+    const requestStates = new Map(), displayStates = new Map();
+    const displayFor = key => {
+      if (!displayStates.has(key)) displayStates.set(key, generalInfoMemory());
+      return displayStates.get(key);
+    };
     const requestAnswer = (situation, options) => {
       const key = JSON.stringify([situation.normalize('NFC').trim(), options.formal, options.goal, options.correctionOf || '']);
       if (answers.has(key)) return answers.get(key).then(result => { const { access, ...cached } = result; return cached; });
@@ -1403,6 +1417,7 @@
         const capturedGoal = { ...options.goal };
         const capturedKey = JSON.stringify([options.formal, capturedGoal]);
         pending.then(result => {
+          if (box.isConnected) displayFor(capturedKey)(result);
           if (!['answer', 'self_support', 'safety', 'clarification'].includes(result.kind) && answers.get(key) === pending) answers.delete(key);
           // This exact goal section identifies the original flow, even when a new
           // flow later has identical text. A detached response cannot affect it.
@@ -1436,7 +1451,7 @@
       });
       setViewState('answer');
       ownDetails.open = false;
-      answerSlot.replaceChildren(aiBox(planningText, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
+      answerSlot.replaceChildren(aiBox(planningText, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), displayResult: displayFor(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
         if (node.isConnected && selectedKey === key) node.after(changeGoals);
       } }));
       // Keep the controls connected while this goal loads, asks a question or warns.
