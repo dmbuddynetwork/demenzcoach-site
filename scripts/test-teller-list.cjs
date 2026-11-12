@@ -21,6 +21,11 @@ const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../content/teller-
         assert.deepEqual(await page.locator('.tip p').allTextContents(),data.tips.map(t=>t.text));
         assert.equal(await page.getByText('Quellen und Einordnung',{exact:true}).count(),0);
         assert.equal(await page.locator('.sources').count(),0);
+        for(const link of await page.locator('footer nav a').all()) {
+          assert.deepEqual(await link.evaluate(el=>{const s=getComputedStyle(el);return {decoration:s.textDecorationLine,weight:s.fontWeight};}),{decoration:'none',weight:'400'});
+          await link.focus();assert.equal(await link.evaluate(el=>getComputedStyle(el).outlineStyle),'solid');
+        }
+        await page.evaluate(()=>window.scrollTo(0,0));
         assert.equal(Object.keys(data.sources).length,3);
         const menu=page.locator('.site-menu'), toggle=menu.locator('summary'), navigation=page.getByRole('navigation',{name:'Hauptnavigation',exact:true});
         assert.equal(await navigation.isVisible(),false);
@@ -56,7 +61,7 @@ const data = JSON.parse(fs.readFileSync(path.join(__dirname, '../content/teller-
         const pdf=await page.pdf({format:'A4',preferCSSPageSize:true,printBackground:true});
         const pages=(pdf.toString('latin1').match(/\/Type\s*\/Page\b/g)||[]).length;assert.equal(pages,1,'All five tips fit on one A4 page');
         if(evidence&&width===1280){fs.writeFileSync(path.join(evidence,'LISTE-A4.pdf'),pdf);await page.screenshot({path:path.join(evidence,'LISTE-PRINT.png'),fullPage:true});}
-        assert.deepEqual(errors,[]);checks.push({width,direct200:true,fiveTopics:true,shareCanonicalOnly:true,printCalls:1,A4pages:pages,sourceDisclosureRemoved:true,internalSourcesRetained:true,nativeMenuKeyboardAndFocus:true,stickyHeader:true,largeTextPersisted:true,menuAndLargeTextSafeInPrint:true,noAuthOrAnalytics:true,errors});
+        assert.deepEqual(errors,[]);checks.push({width,direct200:true,fiveTopics:true,shareCanonicalOnly:true,printCalls:1,A4pages:pages,sourceDisclosureRemoved:true,quietFooterLinksWithKeyboardFocus:true,internalSourcesRetained:true,nativeMenuKeyboardAndFocus:true,stickyHeader:true,largeTextPersisted:true,menuAndLargeTextSafeInPrint:true,noAuthOrAnalytics:true,errors});
       } finally { await context.close(); }
     }
     const blocked=await browser.newContext({viewport:{width:390,height:850}});
