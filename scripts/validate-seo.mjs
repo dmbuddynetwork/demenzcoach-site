@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import {inspectGeneratorPage} from "./seo-generator-guard.mjs";
+import {inspectPrintListLayout} from "./seo-print-list-guard.mjs";
 
 const root = path.resolve(process.argv[2] ?? "landingpage");
 const baseURL = "https://dementiacoachapp.com";
@@ -95,7 +96,10 @@ for (const file of htmlFiles) {
   if (generator.registered && !generator.errors.length) validatedGeneratorPaths.add('/' + file);
   if (!title) fail(`${file}: missing title`);
   // Schlichtes Layout im App-Stil (einfach.css, 8. Nov 2026) für Startseite und Übersetzer-Seiten.
-  if (!/href=["'][^"']*lovable-home\.css\?v=/.test(html) && !/href=["'][^"']*einfach\.css["']/.test(html)) fail(`${file}: missing current shared layout`);
+  const printLayout = inspectPrintListLayout({pathname: '/' + file, html,
+    css: file === 'de/demenz-alltagstipps.html' && fs.existsSync(path.join(root, 'teller/liste.css')) ? read('teller/liste.css') : ''});
+  printLayout.errors.forEach(message => fail(`${file}: ${message}`));
+  if (!printLayout.registered && !/href=["'][^"']*lovable-home\.css\?v=/.test(html) && !/href=["'][^"']*einfach\.css["']/.test(html)) fail(`${file}: missing current shared layout`);
   if (/href=["'][^"']*\/(?:styles)\.css|href=["']styles\.css/.test(html)) fail(`${file}: legacy stylesheet remains`);
   if (/src=["'][^"']*\bscript\.js["']/.test(html)) fail(`${file}: legacy navigation script remains`);
   if (!description && file !== "404.html") fail(`${file}: missing meta description`);

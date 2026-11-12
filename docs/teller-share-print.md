@@ -53,3 +53,12 @@ Publication remains with the sole existing publisher after Root's source-bound Q
 ## Final verified direct-mail alias closure
 
 Root authorized the one additional, now directly verified `mail_willkommen` value on the same three entry paths, with exactly one `q`, identical 302/no-store headers and a clean fixed canonical destination before AB assignment. The static Pages fallback uses the same two exact values. Targeted routing tests cover both mail values, methods, prior arms, all entry paths, duplicate/malformed/other queries and both original fallback arms. UI/care/menu/metadata/OG blobs remain byte-identical to `b6a047c960e4d1b8cbe8a4e91067f4e09027b14c`; reuse all prior screenshots, browser, domain/safety and source checks. No UI rendering, provider actions or domain retest is needed for this alias-only delta.
+
+## Pages SEO release closure
+
+PR66 reached Cloudflare production, but Pages run `43247810218` stopped before deployment on four concrete checks: shared-layout detection for the approved local print page, duplicate German entry titles/descriptions and a missing canonical sitemap entry. This repair preserves the approved list UI, care copy, menu, print CSS, routing and OG images byte-for-byte.
+
+- Keep the shared-layout requirement for every other page. The exact fixed-list route gets a positive local-layout contract validating its stylesheet, brand/home link, native accessible menu, font control, print action/script, sticky header and A4/static-header/hidden-menu print rules. Missing requirements fail; this is not a general bypass or noindex workaround. Negative contract tests cover those requirements and unrelated routes.
+- Add the existing canonical fixed-list URL to the sitemap once.
+- Give the older German translator page a specific Demenz-Übersetzer title and description, consistently in its head previews, while keeping homepage metadata and every body byte unchanged. No benefit/medical claim or prompt change.
+- Run the precise layout-guard tests and the actual failing `node scripts/validate-seo.mjs .` release gate, plus diff verification. Prior UI/domain/safety/routing/browser evidence is reused. No provider run, pipeline retry or deployment by the Site writer; Root gates the new source for the sole publisher.
