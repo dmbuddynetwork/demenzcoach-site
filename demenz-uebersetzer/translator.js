@@ -1442,7 +1442,9 @@
       heading.classList.add('translator-selected-goal');
       heading.tabIndex = -1;
       if (!changeGoals.contains(choices)) changeGoals.append(choices, ownDetails);
-      box.insertBefore(changeGoals, answerSlot);
+      // Detach the same controls before replacing the previous answer. Their
+      // custom draft and listeners must survive every goal/cache transition.
+      box.append(changeGoals);
       heading.focus({ preventScroll: true });
       status.hidden = true;
       choices.querySelectorAll('button').forEach(choice => {
@@ -1453,12 +1455,11 @@
       const otherCount = [...choices.querySelectorAll('button')].filter(choice => !choice.hidden).length;
       changeGoals.querySelector('h3').textContent = otherCount ? (en ? 'Try another goal' : 'Ein anderes Ziel ausprobieren') : (en ? 'Adjust your goal' : 'Dein Ziel anpassen');
       setViewState('answer');
-      ownDetails.open = false;
       answerSlot.replaceChildren(aiBox(planningText, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), displayResult: displayFor(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
-        if (node.isConnected && selectedKey === key) box.insertBefore(changeGoals, answerSlot);
+        if (node.isConnected && selectedKey === key) node.after(changeGoals);
       } }));
       // Keep the controls connected while this goal loads, asks a question or warns.
-      box.insertBefore(changeGoals, answerSlot);
+      box.append(changeGoals);
       syncWarningHistory();
       // Wait for the choice layout to settle; keep a warning/question's own focus.
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1478,7 +1479,7 @@
       if (label.length < 3) { status.textContent = en ? 'Please describe your goal a little more.' : 'Beschreibe dein Ziel bitte etwas genauer.'; own.focus(); return; }
       if (ownForm.reportValidity()) select({ id: 'custom', label });
     });
-    const ownDetails = element('details', { className: 'translator-own-goal-details' }, [element('summary', { text: en ? 'Describe your own goal' : 'Eigenes Ziel beschreiben' }), ownForm]);
+    const ownDetails = element('section', { className: 'translator-own-goal-details' }, [ownForm]);
     const waiting = aiWaiting();
     waiting.querySelector('.translator-ai-wait-title').lastChild.textContent = en ? 'Finding goals for your situation …' : 'Ziele für deine Situation finden …';
     waiting.querySelectorAll('.translator-ai-steps li').forEach((step,index) => { step.textContent = (en ? ['Understand the situation','Find possible goals','Prepare your choices'] : ['Situation verstehen','Mögliche Ziele finden','Deine Auswahl vorbereiten'])[index]; });
@@ -1566,7 +1567,7 @@
         choices.replaceChildren(...result.goals.map(g => button(g.label, 'translator-ai-goal-choice', () => select({ id: g.goal, label: g.label }), { 'aria-pressed': 'false', 'data-goal-id': g.goal })));
         retry.hidden = true;
         if (result.selectionMode === 'explicit') {
-          ownDetails.querySelector('summary').textContent = en ? 'Change your goal' : 'Dein Anliegen ändern';
+          ownLabel.firstElementChild.textContent = en ? 'Change your goal' : 'Dein Anliegen ändern';
           select({ id: result.goals[0].goal, label: result.goals[0].label });
         }
       } else {
@@ -1763,16 +1764,16 @@
     nodes.push(answerCard);
     const goals = goal ? goalsFor(result) : null;
     const chosenGoal = goals?.find((candidate) => candidate.id === goal) ?? null;
-    // Selected goal remains green; genuine offered alternatives stay visible at the result start.
+    // The selected goal stays green above the answer; alternatives follow its full content.
     if (chosenGoal) answerCard.append(element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }));
-    if (chosenGoal) answerCard.append(element('section', { className: 'translator-other-goals translator-preset-other-goals' }, [
+    const presetOtherGoals = chosenGoal ? element('section', { className: 'translator-other-goals translator-preset-other-goals' }, [
       element('h3', { className: 'translator-step', text: 'Ein anderes Ziel ausprobieren' }),
       element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.filter(option => option.id !== goal).map(option => button(option.label, 'translator-ai-goal-choice', () => {
         track('translator_goal', { goal: option.id, result_key: result.key, step: 'switch' });
         setPage(result, option.id, false);
         render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id, preserveViewport: true });
       }, { 'aria-pressed': 'false' })))
-    ]));
+    ]) : null;
     // Die Zeichnung steht oben neben der Sprechblase (saidBlock), nicht mehr in der Karte.
     // Bausteine der Karte; die Reihenfolge richtet sich nach dem Ziel.
     const meaningBlock = [];
@@ -1921,6 +1922,7 @@
     if (!moreContent.length && !deeperInList && deeper.length) nodes.push(element('div', { className: 'translator-result-links' }, deeper));
     // Sicherheits- und Haftungshinweis als EINE ruhige Karte (Daniel, 9. Nov: „gestalte disclaimer besser“).
     nodes.push(notesCard(result.safety && !result.safetyOnly && !safetyHit && !safetyFirst ? safetyAside() : null, disclaimer()));
+    if (presetOtherGoals) nodes.push(presetOtherGoals);
 
     if (!result.safetyOnly) {
       if (result.feeling) nodes.push(feelingPicker('Anderes Gefühl?'));

@@ -84,6 +84,8 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           f.releaseStatus();
           await page.waitForFunction(() => window.__controllerRefreshFinished > 0);
           assert.equal(await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).count(), 0);
+          assert.equal(await page.locator('.dc-signin-notice').count(), 0, 'Stale identity cannot show a success notice');
+          assert.equal(await page.getByRole('dialog').count(), 1, 'Stale identity cannot dismiss the pending layer');
           assert.equal(await page.evaluate(() => sessionStorage.getItem('demenzCoachKiOffen')), pending, 'A stale success must not clear the original context');
           assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('__fixtureUser'))), changed, 'Controller neither replaces identity nor logs it out');
           report.races.push({ method, transition, passed: true });
@@ -107,9 +109,9 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           await shot(page, 'DESKTOP-CENTERED-1280.png');
           const before = { ...counters };
           await page.getByRole('button', { name: 'Mit Google fortfahren', exact: true }).click();
-          await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
+          await page.locator('.dc-signin-notice').waitFor();
           assert.equal(await page.getByRole('link', { name: 'Persönliche Alltagshilfe einrichten', exact: true }).getAttribute('href'), '/start/');
-          await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click(); await dialog.waitFor({ state: 'detached' });
+          assert.equal(await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).count(), 0); await dialog.waitFor({ state: 'detached' });
           assert.deepEqual(counters, before); assert.notEqual(await page.evaluate(() => getComputedStyle(document.body).overflow), 'hidden');
           report.profiles.push({ width, checks: ['centered compact desktop dialog with bounded width/no overflow/keyboard trap', 'explicit single goal has no fake alternatives', 'stable verified Google flow still succeeds after race fix; direct continuation keeps original care without another request'], ...counters });
           continue;
@@ -139,15 +141,15 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           await page.getByRole('button', { name: 'Adresse ändern', exact: true }).click();
           const before = { ...counters }, original = await page.locator('.translator-ai-answer').innerText();
           await page.getByRole('button', { name: 'Mit Google fortfahren', exact: true }).click();
-          await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
+          await page.locator('.dc-signin-notice').waitFor();
           const setup = page.getByRole('link', { name: 'Persönliche Alltagshilfe einrichten', exact: true });
           assert.equal(await setup.getAttribute('href'), '/start/');
-          assert.equal(await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).isVisible(), true);
+          assert.equal(await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).count(), 0, 'No continuation click needed');
           assert.equal(new URL(page.url()).pathname, '/de/', 'No automatic funnel redirect');
           await shot(page, 'VERIFIED-COMPACT-390.png');
-          await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click(); await dialog.waitFor({ state: 'detached' });
+          assert.equal(await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).count(), 0); await dialog.waitFor({ state: 'detached' });
           assert.deepEqual(counters, before); assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
-          report.profiles.push({ width, checks: ['Human-selected compact Signup and Sent copy; legal and close retained', 'Funnel absent before verification; after fresh verified unpaid sameUID intro: optional static /start/ action plus clear direct continuation, no redirect or extra care debit'], ...counters });
+          report.profiles.push({ width, checks: ['Human-selected compact Signup and Sent copy; legal and close retained', 'Funnel absent before verification; after fresh verified unpaid sameUID intro: optional static /start/ action in nonblocking notice plus immediate direct continuation, no redirect or extra care debit'], ...counters });
           continue;
         }
         const checks = [];
@@ -163,22 +165,21 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           const before = { ...counters }, original = await page.locator('.translator-ai-answer').innerText();
           const callback = await context.newPage(); callback.setDefaultTimeout(10000); callback.on('pageerror', error => report.errors.push(error.message));
           await callback.goto(await actionLink(page));
-          await callback.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
+          await callback.waitForURL(preview.origin + '/de/'); await callback.locator('.dc-signin-notice').waitFor();
           assert.equal(await callback.locator('#account-back').isVisible(), false);
           assert.equal(await callback.locator('#account-privacy').isVisible(), false);
           assert.equal(await callback.locator('#account-safety').isVisible(), false);
-          assert.equal(await callback.locator('#account-privacy-link').isVisible(), true);
-          assert.equal(await callback.locator('#account-help-link').isVisible(), true);
-          assert.equal(await callback.locator('.web-account > a').first().innerText(), 'Demenz Coach App');
-          assert.equal(await callback.locator('#account-continue').innerText(), 'Weiter');
-          await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
+          assert.equal(await callback.locator('.web-account').count(), 0);
+          assert.equal(new URL(callback.url()).pathname, '/de/');
+          assert.equal(await callback.locator('#account-continue').count(), 0);
+          await page.locator('.dc-signin-notice').waitFor();
           assert.deepEqual(counters, before);
           await shot(page, `ORIGINAL-SUCCESS-${width}.png`); await shot(callback, `CALLBACK-SUCCESS-${width}.png`);
-          await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click(); await dialog.waitFor({ state: 'detached' });
+          assert.equal(await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).count(), 0); await dialog.waitFor({ state: 'detached' });
           assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
           await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await page.locator('.translator-chat').waitFor({ state: 'visible' });
           await shot(page, `COMPOSER-${width}.png`);
-          report.profiles.push({ width, checks: ['final success hierarchy: no contradictory unsigned-back or repeated privacy/safety paragraphs; Continue/privacy/help and brand preserved', 'modal legal links normal weight/unadorned by default; both states and composer frames rebound', 'original answer retained without new care request'], ...counters });
+          report.profiles.push({ width, checks: ['direct safe callback return with small status notice instead of success wall', 'modal legal links normal weight/unadorned by default; both states and composer frames rebound', 'original answer retained without new care request'], ...counters });
           continue;
         }
         assert.equal(await dialog.evaluate(node => node.matches(':modal')), true);
@@ -241,14 +242,14 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         const before = { ...counters }, original = await page.locator('.translator-ai-answer').innerText();
         const callback = await context.newPage(); callback.setDefaultTimeout(10000); callback.on('pageerror', error => report.errors.push(error.message));
         await callback.goto(await actionLink(page));
-        await callback.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
+        await callback.waitForURL(preview.origin + '/de/'); await callback.locator('.dc-signin-notice').waitFor();
         assert.equal(new URL(callback.url()).search, '', 'Magic link is removed before page SDK and UI processing');
-        assert.equal(await callback.locator('#account-continue').innerText(), 'Weiter', 'A new tab never falsely promises a missing local situation');
-        await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
+        assert.equal(await callback.locator('#account-continue').count(), 0, 'Callback returns directly to the intended app');
+        await page.locator('.dc-signin-notice').waitFor();
         assert.deepEqual(counters, before, 'Mail callback and original-tab continuation never request another care answer');
         assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
         await shot(page, `ORIGINAL-SUCCESS-${width}.png`); await shot(callback, `CALLBACK-SUCCESS-${width}.png`);
-        await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click();
+        assert.equal(await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).count(), 0);
         await page.getByRole('dialog').waitFor({ state: 'detached' });
         assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
         assert.equal(await page.evaluate(() => sessionStorage.getItem('demenzCoachKiOffen')), null);
@@ -256,7 +257,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         await page.locator('.translator-chat').waitFor({ state: 'visible' });
         assert.equal(await page.locator('.translator-chat').evaluate(node => Math.abs(node.getBoundingClientRect().left) < 1 && Math.abs(node.getBoundingClientRect().right - innerWidth) < 1), true);
         await shot(page, `COMPOSER-${width}.png`);
-        checks.push('real email adapter mocked provider→new callback tab→sameUID verified original success; existing answer retained without extra debit; docked composer returns');
+        checks.push('real email adapter mocked provider→new callback tab→sameUID verified original sheet auto-closes with notice; existing answer retained without extra debit; docked composer returns');
         report.profiles.push({ width, checks, ...counters });
       } catch (error) {
         const diagnostics = [];
@@ -272,9 +273,9 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).fill('caregiver@example.test'); await page.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).click();
         await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).waitFor();
         const link = await actionLink(page), before = { ...counters }; await page.close();
-        const callback = await context.newPage(); await callback.goto(link); await callback.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
-        assert.equal(await callback.locator('#account-continue').innerText(), 'Weiter'); assert.deepEqual(counters, before);
-        report.originalClosed = 'PASS: generic success, no missing-situation promise, no new care request';
+        const callback = await context.newPage(); await callback.goto(link); await callback.waitForURL(preview.origin + '/de/'); await callback.locator('.dc-signin-notice').waitFor();
+        assert.equal(await callback.locator('#account-continue').count(), 0); assert.deepEqual(counters, before);
+        report.originalClosed = 'PASS: direct destination with notice, no missing-situation promise, no new care request';
       } finally { await context.close(); }
     }
     {
@@ -287,8 +288,8 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         await page.getByText('Die E-Mail-Anforderung konnte nicht bestätigt werden. Prüfe dein Postfach oder versuche es erneut. Du kannst auch Google nutzen.', { exact: true }).waitFor();
         assert.equal(await page.getByRole('heading', { name: 'Bestätige kurz deine E-Mail', exact: true }).count(), 0);
         assert.equal(await page.getByLabel('Deine E-Mail-Adresse', { exact: true }).inputValue(), 'failed@example.test');
-        await page.getByRole('button', { name: 'Mit Google fortfahren', exact: true }).click(); await page.getByRole('heading', { name: 'Du bist angemeldet', exact: true }).waitFor();
-        await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).click(); await page.getByRole('dialog').waitFor({ state: 'detached' });
+        await page.getByRole('button', { name: 'Mit Google fortfahren', exact: true }).click(); await page.locator('.dc-signin-notice').waitFor();
+        assert.equal(await page.getByRole('button', { name: 'Direkt weiterfragen', exact: true }).count(), 0); await page.getByRole('dialog').waitFor({ state: 'detached' });
         assert.deepEqual(counters, before); assert.equal(await page.locator('.translator-ai-answer').innerText(), original);
         report.googleSameTab = 'PASS controlled Google success keeps the original answer without reload or care debit';
       } finally { await context.close(); }

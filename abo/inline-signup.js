@@ -3,6 +3,7 @@ import { createEmailAccess } from './email-auth.js';
 import { createGoogleAccess } from './google-auth.js';
 import { createSignupOffer, mayOfferSignupSetup } from './signup-offer-view.js';
 import { openSignupSheet } from './signup-sheet.js';
+import { redirectAfterSignIn, showSignInNotice } from './signin-success.js';
 let stylesReady;
 function signupStyles() {
   if (stylesReady) return stylesReady;
@@ -30,7 +31,7 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
   const email = createEmailAccess({ webAuth, config });
   const google = createGoogleAccess({ webAuth, config });
   const hasSituation = purpose !== 'account' && Boolean(card.closest('.translator-goal-answer, .translator-ai-goals'));
-  let dismissed = false, exposureObserver, sheet;
+  let dismissed = false, exposureObserver, sheet, retryReturn;
   const dispose = () => { dismissed = true; exposureObserver?.disconnect(); view.disposeSignup?.(); window.removeEventListener('demenz-auth-changed', authChanged); };
   const confirmed = user => user?.uid && user.emailVerified === true && user.isAnonymous !== true && typeof user.email === 'string'
     ? { uid: user.uid, email: user.email, normalizedEmail: user.email.toLowerCase() } : null;
@@ -38,13 +39,30 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     const current = confirmed(currentAuth.currentUser);
     return Boolean(expected && current && expected.uid === current.uid && expected.normalizedEmail === current.normalizedEmail);
   };
+  const finishSuccess = (expected, currentAuth, access) => {
+    if (dismissed || !view.isConnected || !matches(expected, currentAuth)) return;
+    const offerSetup = setupAllowed(access);
+    if (hasSituation) window.DemenzKiFreigabe?.takePending();
+    if (purpose === 'account') {
+      if (redirectAfterSignIn({ target: returnTo, user: currentAuth.currentUser, offerSetup })) dispose();
+      else {
+        retryReturn = () => finishInPlace(expected, currentAuth);
+        view.showSignupSuccess(expected.email);
+        view.querySelector('.signup-state h3').textContent = en ? 'Your draft is preserved' : 'Deine Eingabe bleibt erhalten';
+        view.querySelector('.signup-guidance').textContent = en ? 'Safe return is temporarily unavailable. Try returning again; your draft stays in this tab.' : 'Die sichere Rückkehr ist gerade nicht möglich. Versuche es erneut; deine Eingabe bleibt in diesem Tab erhalten.';
+        view.querySelector('.signup-state button.primary').textContent = en ? 'Try returning again' : 'Rückkehr erneut versuchen';
+      }
+    } else {
+      sheet?.close('success');
+      showSignInNotice({ en, offerSetup });
+    }
+  };
   const finishInPlace = async (expected, currentAuth) => {
     if (dismissed || !view.isConnected || !matches(expected, currentAuth)) return;
     let access;
     try { access = await window.DemenzKiFreigabe?.refresh(); } catch { /* Actual sign-in is independent of optional status refresh. */ }
     if (dismissed || !view.isConnected || !matches(expected, currentAuth)) return;
-    if (hasSituation) window.DemenzKiFreigabe?.takePending();
-    view.showSignupSuccess(expected.email, { offerSetup: setupAllowed(access) });
+    finishSuccess(expected, currentAuth, access);
   };
   const authChanged = async () => {
     const requested = view.requestedEmail?.(); if (!requested || dismissed) return;
@@ -76,12 +94,12 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
         try { access = await window.DemenzKiFreigabe?.refresh(); } catch { /* No new care request on sign-in. */ }
         if (dismissed || !view.isConnected || !matches(expected, auth)) return { signedIn: false };
         if (creditActive === true && purpose === 'intro') window.DemenzWebExperiments?.queueSignupCompletion();
-        if (hasSituation) window.DemenzKiFreigabe?.takePending();
+        finishSuccess(expected, auth, access);
         return { ...result, email: expected.email, offerSetup: setupAllowed(access) };
       }
       return result;
     },
-    onContinue() { if (purpose === 'account') { dispose(); window.location.assign(returnTo); } else sheet?.close('continue'); },
+    onContinue() { if (purpose === 'account') void retryReturn?.(); else sheet?.close('continue'); },
     onLater: later
   });
   if (purpose === 'account') card.replaceWith(view);

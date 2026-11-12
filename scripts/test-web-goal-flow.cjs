@@ -113,7 +113,7 @@ const answer = {
           const image = page.locator('.translator-said-art');
           await image.evaluate(node => node.dispatchEvent(new Event('error')));
           assert.equal(await image.isVisible(), false, 'A failed fallback does not cause a retry loop');
-          await page.locator('.translator-own-goal-details > summary').click();
+          assert.equal(await page.locator('.translator-own-goal input').isVisible(), true, 'Custom goal is directly visible without expanding a disclosure');
           await page.getByLabel('Oder beschreibe dein eigenes Ziel', { exact: true }).fill('Ich möchte erst verstehen, was sie meint');
           await page.getByRole('button', { name: 'Antwort zu meinem Ziel', exact: true }).click();
           await page.locator('.translator-ai-answer').waitFor();

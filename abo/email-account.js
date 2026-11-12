@@ -1,6 +1,7 @@
 import { mountInlineSignup } from './inline-signup.js';
 import { webAuth } from './web-auth.js';
 import { createEmailAccess, safeEmailReturn } from './email-auth.js';
+import { redirectAfterSignIn } from './signin-success.js';
 const $ = (id) => document.getElementById(id);
 const input = window.DemenzEmailLinkContext.take();
 let target = safeEmailReturn(input.returnTo, location.origin);
@@ -32,29 +33,34 @@ $('account-privacy-link').href = en ? '/privacy-en.html' : '/datenschutz.html';
 $('account-help-link').href = en ? '/contact-en.html' : '/kontakt.html';
 const status = (text) => { $('account-status').textContent = text; };
 function complete(result) {
-  target = result?.target || target;
-  let ownSituation = false;
-  if (['/de/', '/en/dementia-translator/'].includes(target)) {
-    try { const pending = JSON.parse(sessionStorage.getItem('demenzCoachKiOffen') || 'null'); ownSituation = typeof pending?.text === 'string' && Boolean(pending.text.trim()) && pending.until > Date.now(); } catch {}
+  target = safeEmailReturn(result?.target || target, location.origin);
+  const expected = result?.user;
+  if (!expected?.uid || expected.emailVerified !== true || expected.isAnonymous !== false || !expected.email) throw { code: 'auth_unavailable' };
+  if (!redirectAfterSignIn({ target, user: expected })) {
+    $('account-title').classList.remove('account-sr-only');
+    $('account-title').textContent = en ? 'Your draft is preserved' : 'Deine Eingabe bleibt erhalten';
+    $('account-description').hidden = false;
+    $('account-description').textContent = en ? 'Safe return is temporarily unavailable. Your draft stays in this tab.' : 'Die sichere Rückkehr ist gerade nicht möglich. Deine Eingabe bleibt in diesem Tab erhalten.';
+    $('account-status').hidden = false; status('');
+    for (const id of ['web-account-form', 'account-existing', 'account-new-link', 'account-continue']) $(id).hidden = true;
+    let retry = $('account-return-retry');
+    if (!retry) {
+      retry = document.createElement('button'); retry.id = 'account-return-retry'; retry.type = 'button';
+      retry.textContent = en ? 'Try returning again' : 'Rückkehr erneut versuchen';
+      retry.addEventListener('click', async () => {
+        retry.disabled = true;
+        try {
+          const { auth } = await webAuth({ anonymous: false }), current = auth.currentUser;
+          if (current?.uid === expected.uid && current.email?.toLowerCase() === expected.email.toLowerCase() && current.emailVerified === true && current.isAnonymous === false) complete({ ...result, user: current });
+          else status(en ? 'Your sign-in has changed. Return to your original page or sign in again.' : 'Deine Anmeldung hat sich geändert. Öffne deine ursprüngliche Seite oder melde dich erneut an.');
+        } catch { status(en ? 'Safe return is still unavailable. Your draft is preserved.' : 'Die sichere Rückkehr ist noch nicht möglich. Deine Eingabe bleibt erhalten.'); }
+        finally { retry.disabled = false; }
+      });
+      $('web-account-form').before(retry);
+    }
+    callbackURL = ''; return;
   }
-  $('account-title').classList.remove('account-sr-only');
-  $('account-title').textContent = en ? 'You are signed in' : 'Du bist angemeldet';
-  const icon = document.createElement('span'); icon.className = 'account-success-icon'; icon.setAttribute('aria-hidden', 'true'); icon.textContent = '✓'; $('account-title').prepend(icon);
-  $('account-description').hidden = false;
-  $('account-description').textContent = ownSituation
-    ? (en ? 'Your situation is ready in the input field. No new answer is requested automatically.' : 'Deine Situation wartet im Eingabefeld. Eine neue Antwort wird nicht automatisch angefordert.')
-    : (en ? 'Your sign-in is complete. If your situation is open in another tab, you can continue there.' : 'Deine Anmeldung ist abgeschlossen. Wenn deine Situation in einem anderen Tab geöffnet ist, kannst du dort weitermachen.');
-  $('web-account-form').hidden = true; $('account-existing').hidden = true; $('account-new-link').hidden = true;
-  $('account-continue').href = target; $('account-continue').hidden = false;
-  $('account-continue').textContent = ownSituation ? (en ? 'Back to your situation' : 'Zurück zu deiner Situation') : copy.next;
-  $('account-continue').addEventListener('click', () => { if (ownSituation) { try { sessionStorage.setItem('demenzcoach.signupDraftReturn.v1', '1'); } catch {} } }, { once: true });
-  document.querySelector('.web-account').dataset.accountState = 'success';
-  document.querySelector('.web-account > a').textContent = 'Demenz Coach App';
-  for (const id of ['account-back', 'account-privacy', 'account-safety']) $(id).hidden = true;
-  if ($('account-back').nextSibling?.nodeType === Node.TEXT_NODE) $('account-back').nextSibling.textContent = '';
-  $('account-status').hidden = false;
-  status(result?.user?.email || (en ? 'Sign-in confirmed.' : 'Anmeldung bestätigt.'));
-  $('account-continue').focus(); callbackURL = '';
+  callbackURL = '';
 }
 function failure(error) {
   $('account-title').classList.remove('account-sr-only');
