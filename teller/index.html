@@ -3,6 +3,11 @@
 <body><p>Du wirst weitergeleitet.</p><noscript><p><a href="/de/">Zur Website</a> · <a href="/start/">Zum persönlichen Plan</a></p></noscript>
 <script>
 (() => {
+  const mailQuery = new URL(location.href).searchParams.getAll('q');
+  if (mailQuery.length === 1 && ['mail_weiter', 'mail_willkommen'].includes(mailQuery[0])) {
+    location.replace('/de/demenz-alltagstipps.html');
+    return;
+  }
   let arm;
   try {
     if (localStorage.getItem('demenzcoach.analyticsConsent.v1') === 'granted') {

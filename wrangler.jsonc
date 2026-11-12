@@ -15,6 +15,7 @@
     // der Worker zuerst und antwortet mit 301 auf /de/ bzw. /xx/ (Liste wie HOME_LANGUAGES im Worker).
     "run_worker_first": [
       "/teller", "/teller/", "/teller/index.html",
+      "/teller/liste.html",
       "/de/", "/de/index.html",
       "/en/", "/en/index.html",
       "/demenz-uebersetzer", "/demenz-uebersetzer/*",
