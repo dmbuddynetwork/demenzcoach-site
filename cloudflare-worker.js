@@ -83,6 +83,9 @@ export const tellerTarget = (request, random = () => crypto.getRandomValues(new 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/teller/liste.html') {
+      return new Response(null, { status: 301, headers: { Location: 'https://dementiacoachapp.com/de/demenz-alltagstipps.html', 'Referrer-Policy': 'no-referrer' } });
+    }
     if (['/teller', '/teller/', '/teller/index.html'].includes(url.pathname)) {
       const headers = {
         'Cache-Control': 'private, no-store, max-age=0',
@@ -93,6 +96,12 @@ export default {
       };
       if (!['GET', 'HEAD'].includes(request.method)) {
         return new Response(null, { status: 405, headers: { ...headers, Allow: 'GET, HEAD' } });
+      }
+      // Existing newsletter list links are content links, not ad experiment entries.
+      // Match only the one documented value; never infer from other mail/UTM text.
+      const mailQuery = url.searchParams.getAll('q');
+      if (mailQuery.length === 1 && mailQuery[0] === 'mail_weiter') {
+        return new Response(null, { status: 302, headers: { ...headers, Location: 'https://dementiacoachapp.com/de/demenz-alltagstipps.html' } });
       }
       return new Response(null, { status: 302, headers: { ...headers, Location: tellerTarget(request) } });
     }

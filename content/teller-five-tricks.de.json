@@ -1,0 +1,57 @@
+{
+  "title": "5 kleine Alltagstipps",
+  "description": "Fünf Ideen für den Demenz-Alltag: zum Ausprobieren, Ausdrucken und Weitergeben.",
+  "canonical": "https://dementiacoachapp.com/de/demenz-alltagstipps.html",
+  "tips": [
+    {
+      "id": "roter-teller",
+      "title": "Roter Teller",
+      "text": "Wähle einen Teller, der sich vom Tisch und vom Essen abhebt. Rot ist eine Möglichkeit, wenn der Kontrast passt.",
+      "image": "/teller/t-teller.webp",
+      "sources": ["home", "eating"]
+    },
+    {
+      "id": "farbiger-becher",
+      "title": "Farbiger Becher",
+      "text": "Nimm einen bunten Becher, der sich vom Tisch abhebt, und fülle ihn nur halb voll.",
+      "image": "/teller/t-becher.webp",
+      "sources": ["eating"]
+    },
+    {
+      "id": "foto-zimmertuer",
+      "title": "Foto an der Zimmertür",
+      "text": "Wenn die Person einverstanden ist, probiert ein vertrautes Foto an ihrer Zimmertür aus. Prüft gemeinsam, ob sie das Foto erkennt und es ihr bei der Orientierung hilft.",
+      "image": "/teller/t-tuer.webp",
+      "sources": ["home"]
+    },
+    {
+      "id": "lied-anziehen",
+      "title": "Lieblingslied beim Anziehen",
+      "text": "Summt oder singt zusammen ein Lied, das die Person mag. Hör auf, wenn es sie stört.",
+      "image": "/teller/t-lied.webp",
+      "sources": ["music"]
+    },
+    {
+      "id": "nachtlicht",
+      "title": "Nachtlicht mit Bewegungsmelder",
+      "text": "Ein Nachtlicht mit Bewegungsmelder kann den Weg zur Toilette beleuchten. Achte darauf, dass das Licht nicht blendet und der Weg frei bleibt.",
+      "image": "/teller/t-nacht.webp",
+      "sources": ["home"]
+    }
+  ],
+  "note": "Wähle, was zur Person passt. Bei bekannten Kau- oder Schluckproblemen oder individuellen Ernährungsvorgaben frage vor Änderungen das Behandlungsteam.",
+  "sources": {
+    "home": {
+      "label": "NHS: Die Wohnung demenzfreundlich gestalten",
+      "url": "https://www.nhs.uk/conditions/dementia/living-with-dementia/home-environment/"
+    },
+    "eating": {
+      "label": "Alzheimer’s Society: Essen und Trinken begleiten",
+      "url": "https://www.alzheimers.org.uk/get-support/living-with-dementia/eating-drinking"
+    },
+    "music": {
+      "label": "NIHR: Vertraute Musik passend zur Person auswählen",
+      "url": "https://arc-eoe.nihr.ac.uk/sites/default/files/uploads/files/5.Music%20260620%20v3JR.pdf"
+    }
+  }
+}
