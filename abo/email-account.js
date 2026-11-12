@@ -34,7 +34,32 @@ $('account-help-link').href = en ? '/contact-en.html' : '/kontakt.html';
 const status = (text) => { $('account-status').textContent = text; };
 function complete(result) {
   target = safeEmailReturn(result?.target || target, location.origin);
-  if (!redirectAfterSignIn({ target, user: result?.user })) throw { code: 'auth_unavailable' };
+  const expected = result?.user;
+  if (!expected?.uid || expected.emailVerified !== true || expected.isAnonymous !== false || !expected.email) throw { code: 'auth_unavailable' };
+  if (!redirectAfterSignIn({ target, user: expected })) {
+    $('account-title').classList.remove('account-sr-only');
+    $('account-title').textContent = en ? 'Your draft is preserved' : 'Deine Eingabe bleibt erhalten';
+    $('account-description').hidden = false;
+    $('account-description').textContent = en ? 'Safe return is temporarily unavailable. Your draft stays in this tab.' : 'Die sichere Rückkehr ist gerade nicht möglich. Deine Eingabe bleibt in diesem Tab erhalten.';
+    $('account-status').hidden = false; status('');
+    for (const id of ['web-account-form', 'account-existing', 'account-new-link', 'account-continue']) $(id).hidden = true;
+    let retry = $('account-return-retry');
+    if (!retry) {
+      retry = document.createElement('button'); retry.id = 'account-return-retry'; retry.type = 'button';
+      retry.textContent = en ? 'Try returning again' : 'Rückkehr erneut versuchen';
+      retry.addEventListener('click', async () => {
+        retry.disabled = true;
+        try {
+          const { auth } = await webAuth({ anonymous: false }), current = auth.currentUser;
+          if (current?.uid === expected.uid && current.email?.toLowerCase() === expected.email.toLowerCase() && current.emailVerified === true && current.isAnonymous === false) complete({ ...result, user: current });
+          else status(en ? 'Your sign-in has changed. Return to your original page or sign in again.' : 'Deine Anmeldung hat sich geändert. Öffne deine ursprüngliche Seite oder melde dich erneut an.');
+        } catch { status(en ? 'Safe return is still unavailable. Your draft is preserved.' : 'Die sichere Rückkehr ist noch nicht möglich. Deine Eingabe bleibt erhalten.'); }
+        finally { retry.disabled = false; }
+      });
+      $('web-account-form').before(retry);
+    }
+    callbackURL = ''; return;
+  }
   callbackURL = '';
 }
 function failure(error) {

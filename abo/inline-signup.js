@@ -31,7 +31,7 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
   const email = createEmailAccess({ webAuth, config });
   const google = createGoogleAccess({ webAuth, config });
   const hasSituation = purpose !== 'account' && Boolean(card.closest('.translator-goal-answer, .translator-ai-goals'));
-  let dismissed = false, exposureObserver, sheet;
+  let dismissed = false, exposureObserver, sheet, retryReturn;
   const dispose = () => { dismissed = true; exposureObserver?.disconnect(); view.disposeSignup?.(); window.removeEventListener('demenz-auth-changed', authChanged); };
   const confirmed = user => user?.uid && user.emailVerified === true && user.isAnonymous !== true && typeof user.email === 'string'
     ? { uid: user.uid, email: user.email, normalizedEmail: user.email.toLowerCase() } : null;
@@ -44,8 +44,14 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     const offerSetup = setupAllowed(access);
     if (hasSituation) window.DemenzKiFreigabe?.takePending();
     if (purpose === 'account') {
-      redirectAfterSignIn({ target: returnTo, user: currentAuth.currentUser, offerSetup });
-      dispose();
+      if (redirectAfterSignIn({ target: returnTo, user: currentAuth.currentUser, offerSetup })) dispose();
+      else {
+        retryReturn = () => finishInPlace(expected, currentAuth);
+        view.showSignupSuccess(expected.email);
+        view.querySelector('.signup-state h3').textContent = en ? 'Your draft is preserved' : 'Deine Eingabe bleibt erhalten';
+        view.querySelector('.signup-guidance').textContent = en ? 'Safe return is temporarily unavailable. Try returning again; your draft stays in this tab.' : 'Die sichere Rückkehr ist gerade nicht möglich. Versuche es erneut; deine Eingabe bleibt in diesem Tab erhalten.';
+        view.querySelector('.signup-state button.primary').textContent = en ? 'Try returning again' : 'Rückkehr erneut versuchen';
+      }
     } else {
       sheet?.close('success');
       showSignInNotice({ en, offerSetup });
@@ -93,7 +99,7 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
       }
       return result;
     },
-    onContinue() { if (purpose === 'account') { dispose(); window.location.assign(returnTo); } else sheet?.close('continue'); },
+    onContinue() { if (purpose === 'account') void retryReturn?.(); else sheet?.close('continue'); },
     onLater: later
   });
   if (purpose === 'account') card.replaceWith(view);
