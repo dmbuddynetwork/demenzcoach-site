@@ -1,3 +1,7 @@
+// A one-time functional hint only; the helper rechecks the actual signed-in user.
+try {
+  if (sessionStorage.getItem('demenzcoach.signinNotice.v1')) import('/abo/signin-success.js').then(module => module.consumeSignInNotice()).catch(() => {});
+} catch { /* Optional notice storage may be blocked. */ }
 // Teller experiment: fixed arms only; all durable state and statistics require consent.
 const createTellerExperiment = ({ host, statistics, track, entry, now = () => Date.now() }) => {
   const key = 'demenzcoach.teller.v1';
