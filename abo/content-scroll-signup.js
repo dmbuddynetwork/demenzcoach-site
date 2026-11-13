@@ -28,7 +28,7 @@ function readingNodes(doc) {
 }
 function editableOrPending(doc) {
   if (doc.visibilityState === 'hidden' || doc.defaultView.matchMedia?.('print').matches) return true;
-  if (doc.querySelector('dialog[open],.dc-signup-sheet,.ki-angebot,.e-menu[open]')) return true;
+  if (doc.querySelector('dialog[open],.dc-signup-sheet,.ki-angebot,.e-menu[open],.site-menu[open]')) return true;
   if ([...doc.querySelectorAll('[aria-modal="true"],.consent-banner:not([hidden]),.translator-ai-wait,[aria-busy="true"],.safety-urgent')].some(visible)) return true;
   if (doc.activeElement?.matches('input,textarea,select,[contenteditable="true"]')) return true;
   return [...doc.querySelectorAll('input:not([type=checkbox]):not([type=radio]):not([type=hidden]),textarea,[contenteditable="true"]')]
