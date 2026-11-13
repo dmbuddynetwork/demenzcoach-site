@@ -2200,7 +2200,7 @@
 
 
   const headerNav = document.querySelector('.e-header nav');
-  if (headerNav) {
+  if (headerNav && !document.querySelector('.dc-navigation')) {
     const en = ui?.lang === 'en';
     const menu = element('details', { className: 'e-menu' });
     const summary = element('summary', { text: en ? 'Menu' : 'Menü' });

@@ -1,7 +1,7 @@
 // Native modal semantics keep focus and background interaction inside this sheet.
 // Authentication, account linkage and introductory allowance remain with their owners.
 let currentSheet;
-export function openSignupSheet(view, { anchor, en = false, onDismiss = () => {}, doc = document } = {}) {
+export function openSignupSheet(view, { anchor, en = false, onDismiss = () => {}, doc = document, returnFocus = null } = {}) {
   if (!anchor?.isConnected) return null;
   currentSheet?.close('replaced');
   const previousFocus = doc.activeElement;
@@ -31,8 +31,9 @@ export function openSignupSheet(view, { anchor, en = false, onDismiss = () => {}
     if (!hadClass) body.classList.remove('dc-signup-sheet-open');
     if (currentSheet?.dialog === dialog) currentSheet = undefined;
     onDismiss(reason);
-    if (!['removed', 'replaced'].includes(reason)) {
-      const focus = previousFocus?.isConnected && previousFocus !== body && previousFocus.getClientRects().length ? previousFocus
+    if (!['removed', 'replaced', 'pagehide'].includes(reason)) {
+      const focus = returnFocus?.isConnected && returnFocus.getClientRects().length ? returnFocus
+        : previousFocus?.isConnected && previousFocus !== body && previousFocus.getClientRects().length ? previousFocus
         : doc.querySelector('.translator-ai-answer') || doc.querySelector('#translator-input');
       if (focus) { if (!focus.matches('input,button,a,textarea,select,[tabindex]')) focus.tabIndex = -1; focus.focus({ preventScroll: true }); }
     }

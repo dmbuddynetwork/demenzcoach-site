@@ -445,7 +445,8 @@ const hideConsentBanner = () => {
   consentChooseButton?.setAttribute('aria-expanded', 'false');
   if (consentChooseButton) consentChooseButton.hidden = false;
   consentSettingsButton.hidden = false;
-  if (mobileLayout.matches && menuButton) menuButton.focus({ preventScroll: true });
+  const focusMenu = document.querySelector('.dc-navigation-menu > summary') || menuButton;
+  if (mobileLayout.matches && focusMenu) focusMenu.focus({ preventScroll: true });
   else consentSettingsButton.focus({ preventScroll: true });
 };
 
@@ -620,7 +621,16 @@ observedSections.forEach((id) => {
 })();
 
 // Shared optional invitation for genuinely read public content; never starts a care request.
-import('/abo/content-scroll-signup.js').then(module => module.bootContentScrollSignup()).catch(() => {});
+import('/abo/content-scroll-signup.js').then(module => {
+  module.bootContentScrollSignup();
+  if (/^de(?:-|$)/i.test(document.documentElement.lang) && module.publicContentPage(location.pathname, document.body?.dataset.pageType)) {
+    return import('/start/content-funnel-promotions.js').then(funnel => funnel.bootContentFunnelPromotions());
+  }
+}).catch(() => {});
 
 // Existing and newly rendered tip cross-promotions open their own detail page.
 import('/alltagstricks/detail-links.js').catch(() => {});
+
+// Shared functional account/language navigation and optional static-tip membership invitation.
+import('/shared-navigation.js').catch(() => {});
+import('/abo/tip-membership.js').catch(() => {});

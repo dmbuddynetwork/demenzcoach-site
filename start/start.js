@@ -69,6 +69,12 @@
 
   const el = (tag, props = {}, children = []) => {
     const node = document.createElement(tag);
+    // Value-free draft contract exists before a form control can be edited, even while the header loads.
+    if (["input", "textarea", "select"].includes(tag)) {
+      node.dataset.formDraft = "v1";
+      const edited = () => { node.dataset.formEdited = "true"; };
+      node.addEventListener("input", edited); node.addEventListener("change", edited);
+    }
     for (const [key, value] of Object.entries(props)) {
       if (key === "text") node.textContent = value;
       else if (key === "html") node.innerHTML = value; // nur für feste Symbole, nie für Eingaben

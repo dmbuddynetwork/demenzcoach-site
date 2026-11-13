@@ -8,7 +8,7 @@ const fixtureSource = fs.readFileSync(path.join(__dirname, 'test-signup-sheet.cj
 const auth = fixtureSource.match(/const authModule = `([\s\S]*?)`;/)[1];
 const google = fixtureSource.match(/const googleModule = `([\s\S]*?)`;/)[1];
 const tips = require('../content/teller-five-tricks.de.json');
-const key = 'demenzcoach.contentSignupShown.v1';
+const key = 'demenzcoach.contentSignupCadence.v2';
 const report = { checks: [], realProviderCalls: 0, realEmails: 0, careRequests: 0 };
 (async () => {
  let preview, browser;
@@ -20,7 +20,7 @@ const report = { checks: [], realProviderCalls: 0, realEmails: 0, careRequests: 
    await context.addInitScript(({options,key}) => {
     localStorage.setItem('demenzcoach.analyticsConsent.v1','denied'); localStorage.setItem('demenzcoach.marketingConsent.v1','denied');
     if(options.user) localStorage.setItem('__fixtureUser',JSON.stringify(options.user));
-    if(options.seen) sessionStorage.setItem(key,'shown');
+    if(options.seen) sessionStorage.setItem(key,JSON.stringify({version:2,startedAt:Date.now(),expiresAt:Date.now()+1800000,count:3,lastAt:Date.now(),pendingUntil:0}));
     if(options.blocked) { const original=Storage.prototype.getItem; Storage.prototype.getItem=function(k){ if(this===sessionStorage)throw Error('controlled blocked'); return original.call(this,k); }; }
     window.__clockOffset=0;const now=Date.now;Date.now=()=>now()+window.__clockOffset;
    },{options,key});
@@ -31,7 +31,7 @@ const report = { checks: [], realProviderCalls: 0, realEmails: 0, careRequests: 
     if(url.pathname==='/abo/google-auth.js') return route.fulfill({contentType:'text/javascript',body:google});
     if(url.hostname.endsWith('cloudfunctions.net')) {
      if(req.method()==='OPTIONS') return route.fulfill({status:204});
-     if(url.pathname.endsWith('/access'))return route.fulfill({json:{enabled:true,verified:(req.headers().authorization||'').includes('signed-fixture'),paid:Boolean(options.paid),remaining:options.paid?999:1,registeredAdditional:3,anonymousAnswers:1,signupPlacement:'after-first'}});
+     if(url.pathname.endsWith('/access'))return route.fulfill({json:{enabled:true,verified:(req.headers().authorization||'').includes('signed-fixture'),paid:Boolean(options.paid),remaining:options.paid?999:1,registeredAdditional:3,anonymousAnswers:1,signupPlacement:'after-first',contract:'signup-bonus-v1'}});
      if(req.method()==='GET'&&url.pathname.endsWith('/config'))return route.fulfill({json:{enabled:false}});
      if(url.pathname.endsWith('/account-status'))return route.fulfill({json:{hasCustomer:false}});
      requests.push(url.pathname);report.careRequests++;return route.abort();
@@ -68,9 +68,9 @@ const report = { checks: [], realProviderCalls: 0, realEmails: 0, careRequests: 
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
   });
   await check('programmatic scrolling never opens signup',async({page})=>{await page.evaluate(()=>{window.__clockOffset=10000;scrollTo(0,2200)});await page.waitForTimeout(250);assert.equal(await modal(page).count(),0);});
-  await check('trusted scroll opens native signup; Escape restores position, focus and once-per-tab suppression',async({page})=>{
+  await check('trusted scroll opens native signup; Escape restores position, focus and cooldown suppression',async({page})=>{
    await read(page,true);const count=await page.locator('[data-content-item]').count(),y=await page.evaluate(()=>scrollY);
-   assert.equal(await page.locator('[data-content-signup]').count(),0);assert.equal(await page.evaluate(k=>sessionStorage.getItem(k),key),'shown');
+   assert.equal(await page.locator('[data-content-signup]').count(),0);assert.equal(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)).count,key),1);
    await page.keyboard.press('Tab');assert.equal(await modal(page).evaluate(n=>n.contains(document.activeElement)),true);
    await page.keyboard.press('Escape');assert.equal(await modal(page).count(),0);assert.equal(await page.locator('[data-content-item]').count(),count);assert.equal(await page.evaluate(()=>scrollY),y);assert.equal(await page.locator('body').evaluate(n=>n.classList.contains('dc-signup-sheet-open')),false);
    await page.locator('#translator-input').fill('Lokaler Entwurf bleibt erhalten');await page.locator('#translator-input').blur();await read(page);assert.equal(await modal(page).count(),0);
@@ -107,7 +107,7 @@ const report = { checks: [], realProviderCalls: 0, realEmails: 0, careRequests: 
   // Directly hold the existing sheet's lazy stylesheet, then change state before presentation.
   for(const race of ['auth','draft'])await check(`lazy presentation rechecks ${race}`,async({page})=>{
    await page.route('**/abo/signup-offer-view.css',async route=>{await page.evaluate(race=>{if(race==='auth')localStorage.setItem('__fixtureUser',JSON.stringify({uid:'late',email:'late@example.test',emailVerified:false,isAnonymous:false}));else document.querySelector('#translator-input').value='Entwurf während Anmeldung lädt';},race);await route.continue();});
-   await read(page);assert.equal(await modal(page).count(),0);assert.equal(await page.locator('[data-content-signup]').count(),0);assert.notEqual(await page.evaluate(k=>sessionStorage.getItem(k),key),'pending');
+   await read(page);assert.equal(await modal(page).count(),0);assert.equal(await page.locator('[data-content-signup]').count(),0);assert.equal(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)||'null')?.pendingUntil||0,key),0);
   });
   const output=JSON.stringify(report,null,2);if(process.env.CONTENT_SCROLL_REPORT)fs.writeFileSync(process.env.CONTENT_SCROLL_REPORT,output+'\n');console.log(output);
  } finally {await browser?.close();await preview?.close();}
