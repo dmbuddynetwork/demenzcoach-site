@@ -50,6 +50,15 @@ const report={checks:[],realProviderMailModelActions:0};
   await read(page,{show:false,steps:4});assert.equal(await modal(page).count(),0,'Fresh content reading within60s of leaving open sheet cannot reprompt');
   await page.goForward({waitUntil:'networkidle'});assert.equal(await modal(page).count(),0,'History return never restores stale open sheet');
  },{route:'/alltagstricks/zettel-wo-du-bist.html'});
+ await check('foreign real signup stays open across persisted lifecycle and later close renews cooldown once',async({page})=>{
+  await read(page);await page.keyboard.press('Escape');
+  await page.evaluate(async()=>{const {mountInlineSignup}=await import('/abo/inline-signup.js');const card=document.createElement('section');card.hidden=true;document.body.append(card);await mountInlineSignup(card,{bonus:3,en:false,purpose:'invitation',creditActive:false,returnTo:'/de/'});});
+  await modal(page).waitFor();await page.waitForFunction(k=>JSON.parse(sessionStorage.getItem(k)).count===2,key);
+  await page.evaluate(()=>{window.__foreignSignup=document.querySelector('.dc-signup-sheet[open]');dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));});
+  assert.equal(await modal(page).evaluate(n=>n===window.__foreignSignup),true,'Other owner keeps its actual sheet');assert.equal(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)).count,key),2,'Same dialog is never counted twice');
+  await tick(page,61000);const closeTime=await page.evaluate(()=>Date.now());await page.locator('.dc-signup-sheet-close').click();await page.waitForTimeout(80);
+  assert.ok(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)).lastAt,key)>=closeTime,'Actual later close renews cooldown');assert.equal(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)).count,key),2);
+ });
  await check('persisted page lifecycle resets owned signup without touching a foreign dialog or draft',async({page})=>{
   await read(page);await tick(page,61000);const departure=await page.evaluate(()=>Date.now());
   await page.evaluate(()=>dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true})));assert.equal(await modal(page).count(),0);assert.equal(await page.locator('[data-content-signup]').count(),0);

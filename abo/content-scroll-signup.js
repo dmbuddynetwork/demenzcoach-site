@@ -49,8 +49,9 @@ export function mountContentScrollSignup({ doc = document, now = Date.now, minRe
   const writeVisit = value => { try { host.sessionStorage.setItem(scrollSignupKey, JSON.stringify(value)); return true; } catch { disabled = true; return false; } };
   if (!readVisit()) disabled = true;
   const markShown = dialog => {
+    lastOpen = dialog;
     if (counted.has(dialog)) return;
-    counted.add(dialog); lastOpen = dialog; shown++; lastPromptProgress = highWater;
+    counted.add(dialog); shown++; lastPromptProgress = highWater;
     const value = readVisit(); if (value) writeVisit(nextInvitationCadence(value, now(), policy)); else disabled = true;
   };
   const resetReading = () => { firstRead = 0; distance = 0; intentAt = 0; previousY = host.scrollY; clearTimeout(timer); };
