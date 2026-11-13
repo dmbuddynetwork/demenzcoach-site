@@ -1,6 +1,5 @@
 // Actual web renderer in Chrome; every remote endpoint is intercepted, no AI call.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const {createPreviewServer}=require('./generator-preview.cjs');
 const evidence=process.env.GOAL_SYMBOL_EVIDENCE;
 const data=JSON.parse(fs.readFileSync(path.join(__dirname,'../de/index.html'),'utf8').match(/<script type="application\/json" id="translator-data">([\s\S]*?)<\/script>/)[1]);
@@ -12,7 +11,22 @@ const matrix=[
  [['Beim Duschen unterstützen','personal-care'],['Über ihre Arbeit sprechen','work'],['Über Geld sprechen','money']],
  [['Die Person schützen','safety'],['Eine ruhige Antwort finden','conversation'],['Ein anderes Anliegen','question']]
 ];
-(async()=>{let preview,browser;const report={mode:'Real Chrome UI, synthetic API responses; reviewed mother text replayed for screenshots',providerCalls:0,cases:[],errors:[]};try{
+const counterexamples=[
+ ['Heute nichts von meinem Eis abgeben','boundary'],
+ ['Mein Eis nicht teilen müssen','boundary'],
+ ['Pay attention to her feelings','question']
+];
+if(process.argv.includes('--icons-only')){
+ const source=fs.readFileSync(path.join(__dirname,'../demenz-uebersetzer/translator.js'),'utf8');
+ const start=source.indexOf('  const goalIcons = {'),end=source.indexOf('  const goalSvg = ',start);
+ assert.ok(start>=0&&end>start,'Test the actual bounded icon helper from the renderer');
+ const cases=[...matrix.flat(),...counterexamples];
+ const icons=require('node:vm').runInNewContext(source.slice(start,end)+'; '+JSON.stringify(cases.map(([label])=>label))+'.map(label=>goalIcon({id:"choice_1",label})[0]);');
+ for(let i=0;i<cases.length;i++)assert.equal(icons[i],cases[i][1],cases[i][0]);
+ const report={passed:true,mode:'Actual renderer icon helper only; no browser/provider',existingSemanticCases:matrix.flat().length,counterexamples:counterexamples.map(([label,icon])=>({label,icon})),cases:cases.length,providerCalls:0};
+ if(evidence){fs.mkdirSync(evidence,{recursive:true});fs.writeFileSync(path.join(evidence,'ICON-CLOSURE-REPORT.json'),JSON.stringify(report,null,2)+'\n');}
+ console.log(JSON.stringify(report));
+}else (async()=>{const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');let preview,browser;const report={mode:'Real Chrome UI, synthetic API responses; reviewed mother text replayed for screenshots',providerCalls:0,cases:[],errors:[]};try{
  if(evidence)fs.mkdirSync(evidence,{recursive:true});preview=await createPreviewServer();browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
  for(const width of [390,1280,320]){
   const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});let goals=mainGoals;const requests=[];

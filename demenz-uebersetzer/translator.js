@@ -665,11 +665,12 @@
     if (/versteh|warum|hintergrund|understand|\bwhy\b|meaning/.test(label)) return ['understand', goalIcons.verstehen];
     if (/fruher|erinner|biograf|vergangen|reminisc|memori|\bpast\b/.test(label)) return ['memory', meaningIcons.mutter];
     if (/grenz|nein sagen|ablehn|selbst behalten|fur mich behalten|boundary|boundaries|say no|keep my|keep .*portion/.test(label)) return ['boundary', meaningIcons.shield];
+    if (/\b(?:nicht|nichts)\b[^.!?;]*\b(?:teilen|abgeben)\b/.test(label)) return ['boundary', meaningIcons.shield];
     if (/teilen|abgeben|teil .*eis|share|sharing|give .*portion/.test(label)) return ['sharing', meaningIcons.gift];
     if (/nach hause|orientier|heimweg|home|orientat/.test(label)) return ['orientation', meaningIcons.nachhause];
     if (/wasch|dusch|baden|shower|washing|bath/.test(label)) return ['personal-care', meaningIcons.waschen];
     if (/arbeit|beruf|work|job/.test(label)) return ['work', meaningIcons.arbeit];
-    if (/geld|bezahlen|finanz|money|pay|financ/.test(label)) return ['money', meaningIcons.geld];
+    if (/geld|bezahlen|finanz|money|\bpayments?\b|financ/.test(label)) return ['money', meaningIcons.geld];
     if (/schutz|sicher|safe|protect/.test(label)) return ['safety', meaningIcons.shield];
     if (/plan|vorbereit|organisier|ablauf|alltag|schritt|tipps|prepare|routine|next step|tips/.test(label)) return ['planning', goalIcons.tipps];
     if (/sag|sprech|gesprach|antwort|worte|satz|speak|talk|say|answer|words|sentence/.test(label)) return ['conversation', goalIcons.jetzt];
