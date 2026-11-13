@@ -103,8 +103,15 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         assert.equal(await sheet.getByRole('heading', { name: 'Jetzt GRATIS anmelden, um fortzufahren', exact: true }).count(), 1);
         assert.equal(await sheet.locator('.lead').innerText(), 'Passende Worte und Tipps für pflegende Angehörige bei Demenz.');
         assert.equal(await legal.count(), 1); assert.equal(await legal.getAttribute('class'), 'signup-legal signup-entry-legal');
-        assert.match(await legal.innerText(), /^Mit der Kontoerstellung akzeptierst du die Nutzungsbedingungen\. Informationen zu Datenschutz & KI\.$/);
+        assert.match((await legal.innerText()).replaceAll('↗', ''), /^Mit der Kontoerstellung akzeptierst du die Nutzungsbedingungen\. Informationen zu Datenschutz & KI\.$/);
         assert.equal(await legal.locator('a').count(), 2);
+        assert.equal(await legal.locator('.signup-legal-marker:visible').count(), 2);
+        for (const marker of await legal.locator('.signup-legal-marker').all()) {
+          assert.equal(await marker.innerText(), '↗'); assert.equal(await marker.getAttribute('aria-hidden'), 'true');
+          assert.equal(await marker.evaluate(node => node.parentElement.target), '_blank');
+        }
+        assert.equal(await legal.getByRole('link', { name: 'Nutzungsbedingungen (neuer Tab)', exact: true }).count(), 1);
+        assert.equal(await legal.getByRole('link', { name: 'Datenschutz & KI (neuer Tab)', exact: true }).count(), 1);
         const legalText = await legal.evaluate(node => [...node.children].map(child => ({size: getComputedStyle(child).fontSize,weight:getComputedStyle(child).fontWeight})));
         assert.ok(legalText.every(style => style.size === legalText[0].size && style.weight === '400'), 'Legal sentence and links share one quiet readable style');
         assert.equal(await legal.locator('a').first().getAttribute('href'), '/nutzungsbedingungen.html');
@@ -136,6 +143,21 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         if (width === 390) await shot(page, 'SIGNUP-LARGE-390.png');
         await page.evaluate(() => { for (const [node, style] of window.__signupPresentationStyles) { if (style === null) node.removeAttribute('style'); else node.setAttribute('style', style); } delete window.__signupPresentationStyles; document.querySelector('dialog').scrollTop = 0; });
         report.presentation.push({ width, humanSelectedCopy: true, legalAfterCTAOnce: true, quietLegalLinks: true, emailButtonGap: gap, enlargedTextGap: largeGap, actualTextSize24px: true, noOverflow: true });
+        if (process.env.SIGNUP_SHEET_FOCUS_LEGAL === '1') {
+          for (const link of await legal.locator('a').all()) {
+            await link.focus(); assert.equal(await link.evaluate(node => getComputedStyle(node).outlineStyle), 'solid');
+          }
+          await page.evaluate(() => document.querySelector('.dc-signup').showSignupSent('caregiver@example.test'));
+          assert.equal(await legal.locator('.signup-legal-marker:visible').count(), 0);
+          assert.equal(await legal.locator('a').first().innerText(), 'Nutzungsbedingungen');
+          assert.equal(await legal.locator('a').last().innerText(), 'Datenschutz & KI');
+          assert.equal(await legal.locator('span:visible').count(), 0);
+          await page.evaluate(() => document.querySelector('.dc-signup').showSignupSuccess('caregiver@example.test'));
+          assert.equal(await legal.locator('.signup-legal-marker:visible').count(), 0);
+          assert.equal(await legal.locator('a').first().innerText(), 'Nutzungsbedingungen');
+          report.profiles.push({ width, checks: ['two visible decorative new-tab link markers in entry; same accessible names/hrefs and keyboard focus', 'sent/success footer remains original unmarked links'], ...counters });
+          continue;
+        }
         if (process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1') {
           const dialog = page.getByRole('dialog');
           const geometry = await dialog.evaluate(node => { const r = node.getBoundingClientRect(); return { width: r.width, height: r.height, centerX: r.left + r.width / 2, centerY: r.top + r.height / 2, vw: innerWidth, vh: innerHeight, overflow: document.documentElement.scrollWidth > innerWidth + 1 }; });
@@ -303,7 +325,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         console.error(JSON.stringify({ controlledFixtureDiagnostics: diagnostics })); throw error;
       } finally { await context.close(); }
     }
-    if (process.env.SIGNUP_SHEET_FOCUS_SUCCESS !== '1' && process.env.SIGNUP_SHEET_FOCUS_COPY !== '1' && process.env.SIGNUP_SHEET_FOCUS_DESKTOP !== '1') {
+    if (process.env.SIGNUP_SHEET_FOCUS_LEGAL !== '1' && process.env.SIGNUP_SHEET_FOCUS_SUCCESS !== '1' && process.env.SIGNUP_SHEET_FOCUS_COPY !== '1' && process.env.SIGNUP_SHEET_FOCUS_DESKTOP !== '1') {
     // Original tab closed before the link opens: honest generic continuation, no hidden care replay.
     {
       const { context, page, counters } = await fixture(390);
@@ -334,7 +356,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
     }
     }
     assert.deepEqual(report.errors, []); report.passed = true;
-    if (evidence) fs.writeFileSync(path.join(evidence, process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1' ? 'DESKTOP-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? 'COPY-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1' ? 'SUCCESS-REPORT.json' : 'FLOW-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
+    if (evidence) fs.writeFileSync(path.join(evidence, process.env.SIGNUP_SHEET_FOCUS_LEGAL === '1' ? 'LEGAL-CLOSURE-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1' ? 'DESKTOP-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? 'COPY-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1' ? 'SUCCESS-REPORT.json' : 'FLOW-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
     console.log(JSON.stringify(report));
   } finally { if (browser) await browser.close(); if (preview) await preview.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

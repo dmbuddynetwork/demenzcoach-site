@@ -71,6 +71,11 @@ export function createSignupOffer({ document: doc = document, additionalAnswers 
   const legalContext = [];
   if (compact) {
     const [terms, privacy] = legal.children;
+    for (const link of [terms, privacy]) {
+      const marker = doc.createElement('span'); marker.className = 'signup-legal-marker';
+      marker.textContent = '↗'; marker.setAttribute('aria-hidden', 'true');
+      link.append(marker); legalContext.push(marker);
+    }
     const text = value => { const span = doc.createElement('span'); span.textContent = value; legalContext.push(span); return span; };
     terms.before(text(en ? 'By creating an account, you accept the ' : 'Mit der Kontoerstellung akzeptierst du die '));
     terms.after(text(en ? '. Information about ' : '. Informationen zu '));
