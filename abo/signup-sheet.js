@@ -46,7 +46,7 @@ export function openSignupSheet(view, { anchor, en = false, onDismiss = () => {}
     const first = controls[0], last = controls.at(-1);
     if (!first) { event.preventDefault(); heading()?.focus(); return; }
     if (event.shiftKey && (doc.activeElement === first || !controls.includes(doc.activeElement))) { event.preventDefault(); last.focus(); }
-    else if (!event.shiftKey && doc.activeElement === last) { event.preventDefault(); first.focus(); }
+    else if (!event.shiftKey && (doc.activeElement === last || !controls.includes(doc.activeElement))) { event.preventDefault(); first.focus(); }
   });
   dialog.addEventListener('cancel', event => { event.preventDefault(); close('escape'); });
   dialog.addEventListener('close', () => close());
