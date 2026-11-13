@@ -1,16 +1,16 @@
 /* Fragebogen für Meta/TikTok. Bausteine wie die App und einfach.css: hellila Zeilen mit Symbol und Pfeil,
    weiße Karten mit feinem Rand, ein lila Knopf pro Seite, drei Schriftgrößen. */
-.start-page { padding-top: 12px; }
-/* Bestehende Footerlinks und Controls bleiben sichtbar und zusammen bedienbar. */
-.start-footer-clean { display: grid; gap: 12px; margin-top: 24px; padding-top: 16px; font-size: 1rem; line-height: 1.45; }
-.start-footer-clean-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 14px; }
-.start-footer-clean-links > .abo-cancel-link { grid-column: 1 / -1; }
-.start-footer-clean-links > a, .start-footer-clean-controls > button:not([hidden]) { display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; font: inherit; text-decoration: none; overflow-wrap: anywhere; }
-.start-footer-clean-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-top: 8px; border-top: 1px solid var(--line); }
-.start-footer-clean-controls > button:not([hidden]) { position: static; margin: 0; padding: 6px 0; border: 0; background: transparent; color: var(--purple); }
+/* Keep short funnel steps above a quiet, single-line footer at the viewport bottom. */
+body:has(.start-page) { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; }
+.start-page { flex: 1 0 auto; width: 100%; padding-top: 12px; padding-bottom: 24px; }
+.start-footer-clean { flex: none; display: flex; flex-wrap: nowrap; align-items: center; gap: 12px; max-width: 100%; margin: 0; padding: 4px 12px max(4px, env(safe-area-inset-bottom)); border: 0; color: var(--ink-2); font-size: .6875rem; line-height: 1.4; white-space: nowrap; overflow-x: auto; scrollbar-width: thin; }
+.start-footer-clean-links, .start-footer-clean-controls { display: contents; }
+.start-footer-clean-links > a, .start-footer-clean-controls > button:not([hidden]) { flex: none; display: inline-flex; align-items: center; min-height: 24px; max-width: none; font: inherit; text-decoration: none; white-space: nowrap; overflow-wrap: normal; }
+.start-footer-clean .abo-cancel-link { color: inherit; font-weight: 400; }
+.start-footer-clean-controls > button:not([hidden]) { position: static; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: inherit; }
 .start-footer-clean-controls > button[hidden] { display: none; }
-.start-footer-clean a:focus-visible, .start-footer-clean button:focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; border-radius: 2px; }
-.start-footer-clean > p { margin: 0; font-size: 1rem; line-height: 1.5; overflow-wrap: anywhere; }
+.start-footer-clean a:focus-visible, .start-footer-clean button:focus-visible { outline: 2px solid var(--purple); outline-offset: -2px; border-radius: 2px; }
+.start-footer-clean > p { flex: none; margin: 0; font: inherit; white-space: nowrap; overflow-wrap: normal; }
 .start-top { display: grid; grid-template-columns: 72px 1fr 72px; align-items: center; min-height: 52px; margin-bottom: 8px; }
 .start-top .abo-brand { justify-self: center; white-space: nowrap; }
 /* Nur Start: Nutzerzoom bleibt erhalten, Marke bricht innerhalb der verfügbaren Breite um. */
