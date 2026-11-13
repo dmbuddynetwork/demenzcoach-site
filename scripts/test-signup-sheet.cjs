@@ -21,7 +21,7 @@ export async function webAuth(){return{auth,sdk}}`;
 const googleModule = `export function createGoogleAccess(){return{begin:async()=>{window.__googleCalls=(window.__googleCalls||0)+1;if(window.__googleCancel)throw Object.assign(new Error('controlled cancel'),{code:'auth/popup-closed-by-user'});localStorage.setItem('__fixtureUser',JSON.stringify({uid:'controlled-guest',email:'google@example.test',emailVerified:true,isAnonymous:false}));window.dispatchEvent(new Event('demenz-auth-changed'));return{signedIn:true,email:'google@example.test'};}}}`;
 (async () => {
   let preview, browser;
-  const report = { sourceMode: 'controlled local browser with actual recorded care responses', providerCalls: 0, realEmails: 0, realGoogleActions: 0, profiles: [], errors: [] };
+  const report = { sourceMode: 'controlled local browser with actual recorded care responses', providerCalls: 0, realEmails: 0, realGoogleActions: 0, profiles: [], presentation: [], errors: [] };
   try {
     if (evidence) fs.mkdirSync(evidence, { recursive: true });
     preview = await createPreviewServer();
@@ -98,6 +98,66 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
     for (const width of (process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1' ? [1280] : process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? [390] : [390, 1280])) {
       const { context, page, counters } = await fixture(width);
       try {
+        const sheet = page.getByRole('dialog'), email = sheet.getByLabel('Deine E-Mail-Adresse', { exact: true });
+        const primary = sheet.locator('.offer-body .primary'), legal = sheet.locator('.signup-legal');
+        assert.equal(await sheet.getByRole('heading', { name: 'Jetzt GRATIS anmelden, um fortzufahren', exact: true }).count(), 1);
+        assert.equal(await sheet.locator('.lead').innerText(), 'Passende Worte und Tipps für pflegende Angehörige bei Demenz.');
+        assert.equal(await legal.count(), 1); assert.equal(await legal.getAttribute('class'), 'signup-legal signup-entry-legal');
+        assert.match((await legal.innerText()).replaceAll('↗', ''), /^Mit der Kontoerstellung akzeptierst du die Nutzungsbedingungen\. Informationen zu Datenschutz & KI\.$/);
+        assert.equal(await legal.locator('a').count(), 2);
+        assert.equal(await legal.locator('.signup-legal-marker:visible').count(), 2);
+        for (const marker of await legal.locator('.signup-legal-marker').all()) {
+          assert.equal(await marker.innerText(), '↗'); assert.equal(await marker.getAttribute('aria-hidden'), 'true');
+          assert.equal(await marker.evaluate(node => node.parentElement.target), '_blank');
+        }
+        assert.equal(await legal.getByRole('link', { name: 'Nutzungsbedingungen (neuer Tab)', exact: true }).count(), 1);
+        assert.equal(await legal.getByRole('link', { name: 'Datenschutz & KI (neuer Tab)', exact: true }).count(), 1);
+        const legalText = await legal.evaluate(node => [...node.children].map(child => ({size: getComputedStyle(child).fontSize,weight:getComputedStyle(child).fontWeight})));
+        assert.ok(legalText.every(style => style.size === legalText[0].size && style.weight === '400'), 'Legal sentence and links share one quiet readable style');
+        assert.equal(await legal.locator('a').first().getAttribute('href'), '/nutzungsbedingungen.html');
+        assert.equal(await legal.locator('a').last().getAttribute('href'), '/datenschutz.html#ki-uebersetzer');
+        const checkSpacing = async () => {
+          const field = await email.boundingBox(), button = await primary.boundingBox(), note = await legal.boundingBox();
+          assert.ok(button.y - field.y - field.height >= 18, 'Email/CTA gap leaves visible room beyond the focus ring');
+          assert.ok(note.y >= button.y + button.height + 8, 'One legal notice follows the email CTA');
+          assert.ok(field.height >= 44 && button.height >= 44);
+          assert.ok(await email.evaluate(node => parseFloat(getComputedStyle(node).fontSize)) >= 16);
+          return Math.round(button.y - field.y - field.height);
+        };
+        await email.focus(); const gap = await checkSpacing();
+        for (const link of await legal.locator('a').all()) {
+          assert.deepEqual(await link.evaluate(node => ({ weight: getComputedStyle(node).fontWeight, decoration: getComputedStyle(node).textDecorationLine })), { weight: '400', decoration: 'none' });
+        }
+        assert.equal(await email.getAttribute('type'), 'email'); assert.equal(await email.getAttribute('required'), '');
+        assert.equal(await primary.getAttribute('type'), 'submit'); assert.equal(await sheet.locator('.google').isVisible(), true);
+        await shot(page, `SIGNUP-${width}.png`);
+        await page.evaluate(() => {
+          window.__signupPresentationStyles = [...document.querySelectorAll('dialog h3,dialog .lead,dialog label,dialog input,dialog button,dialog .signup-entry-legal,dialog .micro')].map(node => [node, node.getAttribute('style')]);
+          for (const [node] of window.__signupPresentationStyles) { node.style.setProperty('font-size', node.tagName === 'H3' ? '34px' : '24px', 'important'); node.style.setProperty('line-height', '1.5', 'important'); }
+        });
+        assert.ok(await email.evaluate(node => parseFloat(getComputedStyle(node).fontSize)) >= 24, 'Actually enlarged input text, not only root size');
+        const largeGap = await checkSpacing();
+        assert.equal(await sheet.evaluate(node => node.scrollWidth > node.clientWidth + 1), false);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+        await primary.scrollIntoViewIfNeeded(); assert.equal(await sheet.getByRole('button', { name: 'Anmeldung schließen', exact: true }).isVisible(), true);
+        if (width === 390) await shot(page, 'SIGNUP-LARGE-390.png');
+        await page.evaluate(() => { for (const [node, style] of window.__signupPresentationStyles) { if (style === null) node.removeAttribute('style'); else node.setAttribute('style', style); } delete window.__signupPresentationStyles; document.querySelector('dialog').scrollTop = 0; });
+        report.presentation.push({ width, humanSelectedCopy: true, legalAfterCTAOnce: true, quietLegalLinks: true, emailButtonGap: gap, enlargedTextGap: largeGap, actualTextSize24px: true, noOverflow: true });
+        if (process.env.SIGNUP_SHEET_FOCUS_LEGAL === '1') {
+          for (const link of await legal.locator('a').all()) {
+            await link.focus(); assert.equal(await link.evaluate(node => getComputedStyle(node).outlineStyle), 'solid');
+          }
+          await page.evaluate(() => document.querySelector('.dc-signup').showSignupSent('caregiver@example.test'));
+          assert.equal(await legal.locator('.signup-legal-marker:visible').count(), 0);
+          assert.equal(await legal.locator('a').first().innerText(), 'Nutzungsbedingungen');
+          assert.equal(await legal.locator('a').last().innerText(), 'Datenschutz & KI');
+          assert.equal(await legal.locator('span:visible').count(), 0);
+          await page.evaluate(() => document.querySelector('.dc-signup').showSignupSuccess('caregiver@example.test'));
+          assert.equal(await legal.locator('.signup-legal-marker:visible').count(), 0);
+          assert.equal(await legal.locator('a').first().innerText(), 'Nutzungsbedingungen');
+          report.profiles.push({ width, checks: ['two visible decorative new-tab link markers in entry; same accessible names/hrefs and keyboard focus', 'sent/success footer remains original unmarked links'], ...counters });
+          continue;
+        }
         if (process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1') {
           const dialog = page.getByRole('dialog');
           const geometry = await dialog.evaluate(node => { const r = node.getBoundingClientRect(); return { width: r.width, height: r.height, centerX: r.left + r.width / 2, centerY: r.top + r.height / 2, vw: innerWidth, vh: innerHeight, overflow: document.documentElement.scrollWidth > innerWidth + 1 }; });
@@ -119,8 +179,8 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         if (process.env.SIGNUP_SHEET_FOCUS_COPY === '1') {
           if (width !== 390) continue;
           const dialog = page.getByRole('dialog');
-          assert.equal(await dialog.getByRole('heading', { name: '3 weitere Antworten kostenlos', exact: true }).count(), 1);
-          assert.equal(await dialog.locator('.lead').innerText(), 'Passende Worte und Tipps von der KI.');
+          assert.equal(await dialog.getByRole('heading', { name: 'Jetzt GRATIS anmelden, um fortzufahren', exact: true }).count(), 1);
+          assert.equal(await dialog.locator('.lead').innerText(), 'Passende Worte und Tipps für pflegende Angehörige bei Demenz.');
           assert.equal(await dialog.locator('.separator').innerText(), 'oder');
           assert.equal(await dialog.locator('.micro').innerText(), 'Ohne Passwort · Ohne Zahlungsdaten');
           assert.equal(await dialog.getByRole('button', { name: 'Kostenlos freischalten', exact: true }).isVisible(), true);
@@ -265,7 +325,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         console.error(JSON.stringify({ controlledFixtureDiagnostics: diagnostics })); throw error;
       } finally { await context.close(); }
     }
-    if (process.env.SIGNUP_SHEET_FOCUS_SUCCESS !== '1' && process.env.SIGNUP_SHEET_FOCUS_COPY !== '1' && process.env.SIGNUP_SHEET_FOCUS_DESKTOP !== '1') {
+    if (process.env.SIGNUP_SHEET_FOCUS_LEGAL !== '1' && process.env.SIGNUP_SHEET_FOCUS_SUCCESS !== '1' && process.env.SIGNUP_SHEET_FOCUS_COPY !== '1' && process.env.SIGNUP_SHEET_FOCUS_DESKTOP !== '1') {
     // Original tab closed before the link opens: honest generic continuation, no hidden care replay.
     {
       const { context, page, counters } = await fixture(390);
@@ -296,7 +356,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
     }
     }
     assert.deepEqual(report.errors, []); report.passed = true;
-    if (evidence) fs.writeFileSync(path.join(evidence, process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1' ? 'DESKTOP-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? 'COPY-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1' ? 'SUCCESS-REPORT.json' : 'FLOW-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
+    if (evidence) fs.writeFileSync(path.join(evidence, process.env.SIGNUP_SHEET_FOCUS_LEGAL === '1' ? 'LEGAL-CLOSURE-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_DESKTOP === '1' ? 'DESKTOP-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_COPY === '1' ? 'COPY-REPORT.json' : process.env.SIGNUP_SHEET_FOCUS_SUCCESS === '1' ? 'SUCCESS-REPORT.json' : 'FLOW-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
     console.log(JSON.stringify(report));
   } finally { if (browser) await browser.close(); if (preview) await preview.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

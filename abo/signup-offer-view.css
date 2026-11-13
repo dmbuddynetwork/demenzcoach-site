@@ -43,3 +43,11 @@
 .dc-signup .signup-state .signup-direct{background:#fff;color:#47408c;border-color:#a59bb8}
 
 @media(min-width:768px){.dc-signup-sheet{inset:0;margin:auto;height:fit-content;max-height:calc(var(--dc-sheet-height,100dvh) - 48px);border-radius:24px}}
+
+/* Entry hierarchy: leave room for the field's visible focus ring before the CTA. */
+.dc-signup .inline-form > .primary{margin-top:12px}
+.dc-signup .signup-entry-legal{display:block;margin:4px 0 0;padding:0;color:#5b5267;font-size:14px!important;font-weight:400;line-height:1.5;text-align:left}
+.dc-signup .signup-entry-legal a{display:inline;white-space:nowrap;min-height:0;font-size:inherit!important;font-weight:400!important;text-decoration:none!important}
+.dc-signup .signup-entry-legal a:focus-visible{outline:2px solid #7c65d3;outline-offset:2px;border-radius:2px}
+.dc-signup .signup-entry-legal span{font-size:inherit!important;font-weight:400!important;line-height:inherit!important}
+.dc-signup .signup-entry-legal .signup-legal-marker{margin-left:2px}
