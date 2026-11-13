@@ -53,11 +53,31 @@ export function mountSharedNavigation(doc = document) {
     option.textContent = name + (item.equivalent ? '' : en ? ' · Home' : ' · Startseite'); option.lang = item.lang;
     option.selected = item.lang === doc.documentElement.lang.split('-')[0]; select.append(option);
   }
+  // Remember edited controls, never their values. Programmatically prefilled defaults are not drafts.
+  const editedFields = new WeakSet();
+  const edited = event => {
+    const field = event.target?.closest?.('input,textarea,select,[contenteditable="true"]');
+    if (field && !field.closest('.dc-navigation')) editedFields.add(field);
+  };
+  doc.addEventListener('input', edited); doc.addEventListener('change', edited);
   const change = doc.createElement('button'); change.type = 'button'; change.textContent = en ? 'Change language' : 'Sprache wechseln';
   change.addEventListener('click', () => {
     if (select.value === host.location.pathname) { menu.open = false; summary.focus({ preventScroll: true }); return; }
-    const draft = doc.querySelector('#translator-input');
-    if (draft?.value?.trim() && !host.confirm(en ? 'Change page? Your unsent text is not automatically transferred.' : 'Seite wechseln? Deine ungesendete Eingabe wird nicht automatisch übernommen.')) return;
+    const draft = [...doc.querySelectorAll('input,textarea,select,[contenteditable="true"]')].some(field => {
+      if (field.closest('.dc-navigation') || field.disabled || field.readOnly || !field.getClientRects().length || host.getComputedStyle(field).visibility === 'hidden') return false;
+      if (field.id === 'translator-input') return Boolean(field.value?.trim());
+      if (!editedFields.has(field)) return false;
+      if (field.isContentEditable) return true;
+      if (field.matches('input[type="hidden"],input[type="button"],input[type="submit"],input[type="reset"],input[type="image"]')) return false;
+      if (field.matches('input[type="checkbox"],input[type="radio"]')) return field.checked !== field.defaultChecked;
+      if (field.tagName === 'SELECT') {
+        if (field.multiple) return [...field.options].some(option => option.selected !== option.defaultSelected);
+        const initial = [...field.options].findIndex(option => option.defaultSelected);
+        return field.selectedIndex !== Math.max(0, initial);
+      }
+      return field.value !== field.defaultValue && Boolean(String(field.value || '').trim());
+    });
+    if (draft && !host.confirm(en ? 'Change page? Your unsent text is not automatically transferred.' : 'Seite wechseln? Deine ungesendete Eingabe wird nicht automatisch übernommen.')) return;
     host.location.assign(select.value);
   });
   label.append(select); items.append(label, change, status); dock.append(account, menu); container.append(dock); if (oldNav) oldNav.remove();
