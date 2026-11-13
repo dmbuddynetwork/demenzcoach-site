@@ -2,6 +2,7 @@
 // Übersetzer-Inhalten (landingpage/translator-content.mjs und die Satz-Seiten /demenz-uebersetzer/<seite>.html,
 // Stand 8. Nov 2026). Nichtmedizinisch: allgemeine Kommunikations- und Alltagshilfe.
 window.DEMENZ_PLAN_DATA = Object.freeze({
+  quizProgress: Object.freeze({ key: "demenzCoachQuizProgress.v1", maxAge: 30 * 60 * 1000 }),
   relations: [
     { key: "mama", label: "Meine Mutter", call: "Mama", pron: "sie" },
     { key: "papa", label: "Mein Vater", call: "Papa", pron: "ihn" },

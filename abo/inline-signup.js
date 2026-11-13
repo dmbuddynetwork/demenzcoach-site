@@ -18,11 +18,12 @@ function signupStyles() {
   });
   return stylesReady;
 }
-export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, purpose = 'intro', creditActive = false, signupCopy, sentEmail = '' }) {
+export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, purpose = 'intro', creditActive = false, signupCopy, sentEmail = '', canPresent = () => true, onPresented = () => {} }) {
   const config = window.DEMENZ_ABO_CONFIG;
   if (config?.signIn?.emailLink !== true) return;
   const [{ auth }] = await Promise.all([webAuth({ anonymous: false }), signupStyles()]);
   if (!card.isConnected) return;
+  if (!canPresent({ auth })) { card.remove(); return; }
   // Recheck after lazy resources: stale status never creates a new-credit promise.
   creditActive = creditActive === true && card.dataset.signupCreditOffer === 'true';
   if (purpose === 'invitation' && auth.currentUser?.emailVerified) { card.remove(); return; }
@@ -107,6 +108,7 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     const anchor = document.createElement('span'); anchor.hidden = true; anchor.dataset.signupSheetAnchor = '';
     card.replaceWith(anchor); sheet = openSignupSheet(view, { anchor, en, onDismiss: dispose });
   }
+  if (sheet) onPresented(sheet);
   if (sentEmail) view.showSignupSent(sentEmail);
   window.addEventListener('demenz-auth-changed', authChanged);
   if (creditActive === true && purpose === 'intro' && view.isConnected) {

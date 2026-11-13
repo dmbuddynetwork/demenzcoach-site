@@ -618,3 +618,6 @@ observedSections.forEach((id) => {
   script.async = true;
   document.head.append(script);
 })();
+
+// Shared optional invitation for genuinely read public content; never starts a care request.
+import('/abo/content-scroll-signup.js').then(module => module.bootContentScrollSignup()).catch(() => {});
