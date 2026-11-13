@@ -31,7 +31,7 @@ export function openSignupSheet(view, { anchor, en = false, onDismiss = () => {}
     if (!hadClass) body.classList.remove('dc-signup-sheet-open');
     if (currentSheet?.dialog === dialog) currentSheet = undefined;
     onDismiss(reason);
-    if (!['removed', 'replaced'].includes(reason)) {
+    if (!['removed', 'replaced', 'pagehide'].includes(reason)) {
       const focus = returnFocus?.isConnected && returnFocus.getClientRects().length ? returnFocus
         : previousFocus?.isConnected && previousFocus !== body && previousFocus.getClientRects().length ? previousFocus
         : doc.querySelector('.translator-ai-answer') || doc.querySelector('#translator-input');

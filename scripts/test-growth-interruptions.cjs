@@ -12,17 +12,18 @@ const report={checks:[],realProviderMailModelActions:0};
   const context=await browser.newContext({viewport:{width:options.width||390,height:900},reducedMotion:'reduce'});
   await context.addInitScript(({options,key})=>{
    localStorage.setItem('demenzcoach.analyticsConsent.v1','denied');localStorage.setItem('demenzcoach.marketingConsent.v1','denied');
-   if(options.user)localStorage.setItem('__fixtureUser',JSON.stringify(options.user));
+   if(Object.prototype.hasOwnProperty.call(options,'user'))localStorage.setItem('__fixtureUser',JSON.stringify(options.user));
    Object.defineProperty(window,'__clockOffset',{get:()=>Number(localStorage.getItem('__growthClock')||0),set:value=>localStorage.setItem('__growthClock',String(value))});
    const now=Date.now;Date.now=()=>now()+window.__clockOffset;
    if(options.blocked){const original=Storage.prototype.getItem;Storage.prototype.getItem=function(k){if(this===sessionStorage)throw Error('controlled blocked session');return original.call(this,k);};}
   },{options,key});
   let hold=false;const gates=[],requests=[],errors=[];let page;
   await context.route('**/*',async route=>{const req=route.request(),url=new URL(req.url());
-   if(url.pathname==='/abo/web-auth.js')return route.fulfill({contentType:'text/javascript',body:auth});
+   if(url.pathname==='/abo/web-auth.js')return route.fulfill({contentType:'text/javascript',body:options.lateAuth?auth.replace('export async function webAuth(){','export async function webAuth(){if(window.__holdSignupAuth){window.__holdSignupAuth=false;await new Promise(resolve=>window.__releaseSignupAuth=resolve);}'):auth});
+   if(options.lateAuth&&url.pathname==='/abo/inline-signup.js'){const body=fs.readFileSync(path.join(__dirname,'../abo/inline-signup.js'),'utf8').replace('export async function mountInlineSignup(','async function realMountInlineSignup(');return route.fulfill({contentType:'text/javascript',body:body+'\nexport function mountInlineSignup(...args){window.__holdSignupAuth=true;return realMountInlineSignup(...args)}'});}
    if(url.hostname.endsWith('cloudfunctions.net')){
     if(req.method()==='OPTIONS')return route.fulfill({status:204});
-    if(url.pathname.endsWith('/access')){if(hold)await new Promise(resolve=>gates.push(resolve));return route.fulfill({json:{enabled:true,verified:Boolean(options.user?.emailVerified),paid:Boolean(options.paid),remaining:options.paid?999:1,registeredAdditional:3,contract:'signup-bonus-v1'}});}
+    if(url.pathname.endsWith('/access')){if(hold)await new Promise(resolve=>gates.push(resolve));const paid=Boolean(options.paid)||(options.lateAuth&&await page.evaluate(()=>JSON.parse(localStorage.getItem('__fixtureUser'))?.uid==='different-paid'));return route.fulfill({json:{enabled:true,verified:Boolean(options.user?.emailVerified),paid:Boolean(paid),remaining:paid?999:1,registeredAdditional:3,contract:'signup-bonus-v1'}});}
     if(url.pathname.endsWith('/config'))return route.fulfill({json:{enabled:false}});
     requests.push(url.pathname);return route.abort();
    }
@@ -43,6 +44,27 @@ const report={checks:[],realProviderMailModelActions:0};
   if(process.env.GROWTH_FOCUS&&!new RegExp(process.env.GROWTH_FOCUS).test(name))return;
   const f=await fixture(options);try{await fn(f);assert.deepEqual(f.requests,[]);assert.deepEqual(f.errors,[]);report.checks.push(name);console.log('PASS',name);}finally{f.gates.forEach(resolve=>resolve());await f.context.close();}
  }
+ await check('open signup history departure starts cooldown at departure, not initial presentation',async({page})=>{
+  await page.goto(preview.origin+'/de/',{waitUntil:'networkidle'});await read(page);await tick(page,61000);const departure=await page.evaluate(()=>Date.now());
+  await page.goBack({waitUntil:'networkidle'});assert.ok(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)).lastAt,key)>=departure,'Open sheet departure synchronously persists close cooldown');
+  await read(page,{show:false,steps:4});assert.equal(await modal(page).count(),0,'Fresh content reading within60s of leaving open sheet cannot reprompt');
+  await page.goForward({waitUntil:'networkidle'});assert.equal(await modal(page).count(),0,'History return never restores stale open sheet');
+ },{route:'/alltagstricks/zettel-wo-du-bist.html'});
+ await check('persisted page lifecycle resets owned signup without touching a foreign dialog or draft',async({page})=>{
+  await read(page);await tick(page,61000);const departure=await page.evaluate(()=>Date.now());
+  await page.evaluate(()=>dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true})));assert.equal(await modal(page).count(),0);assert.equal(await page.locator('[data-content-signup]').count(),0);
+  assert.ok(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)).lastAt,key)>=departure);assert.equal(await page.evaluate(()=>document.body.classList.contains('dc-signup-sheet-open')),false);
+  await page.evaluate(()=>dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));await read(page,{show:false,steps:4});assert.equal(await modal(page).count(),0);
+  await page.evaluate(()=>{const d=document.createElement('dialog');d.id='foreign-dialog';d.innerHTML='<input value="Unveränderte Eingabe">';document.body.append(d);d.showModal();d.querySelector('input').focus();dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));});
+  assert.equal(await page.locator('#foreign-dialog').evaluate(d=>d.open),true);assert.equal(await page.locator('#foreign-dialog input').inputValue(),'Unveränderte Eingabe');assert.equal(await page.locator('#foreign-dialog input').evaluate(n=>document.activeElement===n),true);
+ });
+ for(const initial of ['guest','anonymous'])for(const change of [false,true])await check('late signup auth '+initial+(change?' to paid identity is suppressed':' stable identity still presents'),async({page})=>{
+  await read(page,{show:false});await page.waitForFunction(()=>typeof window.__releaseSignupAuth==='function');
+  assert.equal(await modal(page).count(),0,'Presentation waits for actual second auth resolution');
+  await page.evaluate(change=>{if(change)localStorage.setItem('__fixtureUser',JSON.stringify({uid:'different-paid',email:null,emailVerified:false,isAnonymous:true}));window.__holdSignupAuth=false;window.__releaseSignupAuth();},change);
+  if(change){await page.waitForTimeout(250);assert.equal(await modal(page).count(),0,'A newly changed anonymous paid identity never inherits earlier free status');assert.equal(await page.locator('[data-content-signup]').count(),0,'No orphan invite');assert.equal(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)).count,key),0);}
+  else{await modal(page).waitFor();assert.equal(await page.evaluate(k=>JSON.parse(sessionStorage.getItem(k)).count,key),1);}
+ },{lateAuth:true,user:initial==='guest'?null:{uid:'anonymous-free',email:null,emailVerified:false,isAnonymous:true}});
  await check('earlier first invitation is reading based; dismissal restores reading focus',async({page})=>{
   await page.evaluate(()=>scrollTo(0,350));await tick(page,10000);await page.waitForTimeout(80);assert.equal(await modal(page).count(),0,'Programmatic scroll alone never invites');
   await page.evaluate(()=>scrollTo(0,0));await page.waitForTimeout(60);await page.mouse.move(180,700);await page.mouse.wheel(0,260);await page.waitForTimeout(60);await tick(page,4000);await page.mouse.wheel(0,20);await page.waitForTimeout(60);assert.equal(await modal(page).count(),0,'Not before five seconds');

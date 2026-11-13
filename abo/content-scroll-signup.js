@@ -41,6 +41,7 @@ export function mountContentScrollSignup({ doc = document, now = Date.now, minRe
   if (controllers.has(doc)) return controllers.get(doc);
   const host = doc.defaultView;
   if (!/^(?:de|en)(?:-|$)/i.test(doc.documentElement.lang) || !publicContentPage(host.location.pathname, doc.body?.dataset.pageType) || !doc.querySelector('main')) return null;
+  let suspended = false;
   let disabled = false, shown = 0, opening = false, firstRead = 0, intentAt = 0, distance = 0, previousY = host.scrollY, timer, sheet;
   let highWater = 0, lastPromptProgress = null, lastOpen = null, ownPendingUntil = 0;
   const counted = new WeakSet();
@@ -52,18 +53,21 @@ export function mountContentScrollSignup({ doc = document, now = Date.now, minRe
     counted.add(dialog); lastOpen = dialog; shown++; lastPromptProgress = highWater;
     const value = readVisit(); if (value) writeVisit(nextInvitationCadence(value, now(), policy)); else disabled = true;
   };
+  const resetReading = () => { firstRead = 0; distance = 0; intentAt = 0; previousY = host.scrollY; clearTimeout(timer); };
+  const recordClosed = () => {
+    if (!lastOpen) return;
+    lastOpen = null; resetReading();
+    const value = readVisit(); if (value) writeVisit({ ...value, lastAt: now(), pendingUntil: 0 });
+  };
   const noticeOtherSheet = () => {
     const dialog = doc.querySelector('.dc-signup-sheet[open]');
     if (dialog) { markShown(dialog); return; }
-    if (lastOpen) {
-      lastOpen = null; firstRead = 0; distance = 0; clearTimeout(timer);
-      const value = readVisit(); if (value) writeVisit({ ...value, lastAt: now(), pendingUntil: 0 });
-    }
+    recordClosed();
   };
   const modalObserver = new host.MutationObserver(noticeOtherSheet);
   modalObserver.observe(doc.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open'] });
   noticeOtherSheet();
-  const eligible = () => !disabled && !contentInteractionBusy(doc)
+  const eligible = () => !suspended && !disabled && !contentInteractionBusy(doc)
     && invitationCadenceAllows(readVisit(), now(), policy, ownPendingUntil)
     && distance >= Math.max(180, host.innerHeight * policy.minimumScrollFraction)
     && firstRead > 0 && now() - firstRead >= minReadMS
@@ -86,8 +90,14 @@ export function mountContentScrollSignup({ doc = document, now = Date.now, minRe
       await signupStyles();
       if (!eligible()) return;
       if (auth.currentUser && !auth.currentUser.isAnonymous) { disabled = true; return; }
+      const checked = auth.currentUser;
+      const identity = checked ? { uid: checked.uid, anonymous: checked.isAnonymous, verified: checked.emailVerified } : null;
+      const sameIdentity = current => {
+        const user = current.currentUser;
+        return identity ? Boolean(user && user.uid === identity.uid && user.isAnonymous === identity.anonymous && user.emailVerified === identity.verified) : !user;
+      };
       if (await contentAccessState(auth, doc) !== 'free') { disabled = true; return; }
-      if (!eligible()) return;
+      if (!eligible() || !sameIdentity(auth)) return;
       card = doc.createElement('section'); card.hidden = true; card.dataset.contentSignup = ''; doc.body.append(card);
       const en = /^en(?:-|$)/i.test(doc.documentElement.lang);
       const returnFocus = doc.activeElement && doc.activeElement !== doc.body ? doc.activeElement
@@ -95,7 +105,7 @@ export function mountContentScrollSignup({ doc = document, now = Date.now, minRe
       await mountInlineSignup(card, { bonus: 3, en, purpose: 'invitation', creditActive: false, returnFocus,
         returnTo: en ? '/en/dementia-translator/' : '/de/',
         canPresent({ auth: current }) {
-          return eligible() && (!current.currentUser || current.currentUser.isAnonymous === true);
+          return eligible() && sameIdentity(current) && (!current.currentUser || current.currentUser.isAnonymous === true);
         },
         onPresented(value) { sheet = value; markShown(value.dialog); }
       });
@@ -122,10 +132,19 @@ export function mountContentScrollSignup({ doc = document, now = Date.now, minRe
     if (event.type === 'keydown' && (event.target?.closest?.('button') || !['ArrowDown','PageDown','End',' '].includes(event.key))) return;
     intentAt = now();
   };
+  const pageHide = () => {
+    suspended = true; resetReading();
+    // Only close this controller's sheet; never restore focus while leaving a page.
+    sheet?.close('pagehide'); sheet = null; recordClosed();
+    const value = readVisit();
+    if (ownPendingUntil && value?.pendingUntil === ownPendingUntil) writeVisit({ ...value, pendingUntil: 0 });
+    ownPendingUntil = 0;
+  };
+  const pageShow = () => { suspended = false; resetReading(); noticeOtherSheet(); };
   const beforePrint = () => { clearTimeout(timer); sheet?.close('print'); };
   host.addEventListener('wheel', intent, { passive: true }); host.addEventListener('touchmove', intent, { passive: true }); host.addEventListener('keydown', intent);
-  host.addEventListener('scroll', progress, { passive: true }); host.addEventListener('beforeprint', beforePrint);
-  const api = { dispose() { clearTimeout(timer); modalObserver.disconnect(); host.removeEventListener('wheel', intent); host.removeEventListener('touchmove', intent); host.removeEventListener('keydown', intent); host.removeEventListener('scroll', progress); host.removeEventListener('beforeprint', beforePrint); }, seen: () => shown > 0 };
+  host.addEventListener('scroll', progress, { passive: true }); host.addEventListener('beforeprint', beforePrint); host.addEventListener('pagehide', pageHide); host.addEventListener('pageshow', pageShow);
+  const api = { dispose() { clearTimeout(timer); modalObserver.disconnect(); host.removeEventListener('wheel', intent); host.removeEventListener('touchmove', intent); host.removeEventListener('keydown', intent); host.removeEventListener('scroll', progress); host.removeEventListener('beforeprint', beforePrint); host.removeEventListener('pagehide', pageHide); host.removeEventListener('pageshow', pageShow); }, seen: () => shown > 0 };
   controllers.set(doc, api); return api;
 }
 export function bootContentScrollSignup() {
