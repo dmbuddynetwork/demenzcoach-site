@@ -14,6 +14,10 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
  const report = { directPages: [], views: [], legacyLinks: [], realProviderMailModelActions: 0 };
  try {
   const { tipDetailRoutes, tipDetailHref } = await import(pathToFileURL(path.join(root,'alltagstricks/detail-links.js')));
+  const origin='https://local.example';
+  assert.equal(tipDetailHref('/alltagstricks/#becher-farbig',origin),'/alltagstricks/farbiger-becher.html');
+  for(const url of ['https://foreign.example/alltagstricks/#teller-rot','/alltagstricks/?private=1#teller-rot','/alltagstricks/#unknown','/alltagstricks/#constructor','/alltagstricks/#toString','/alltagstricks/#__proto__','/de/demenz-alltagstipps.html'])assert.equal(tipDetailHref(url,origin),null,url);
+  if(process.env.TIP_ROUTE_POLICY_ONLY==='1'){const result={status:'PASS',knownRoute:true,foreignQueryUnknownAndPrototypeFragmentsIgnored:true,browserOrProviderActions:0};if(process.env.TIP_ROUTE_POLICY_REPORT)fs.writeFileSync(process.env.TIP_ROUTE_POLICY_REPORT,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));return;}
   const paths = [...new Set(Object.values(tipDetailRoutes))]; assert.equal(paths.length,122);
   for (const old of catalog.tricks) {
    const selected = reviewed.tips.find(tip => tip.id === (aliases[old.id] || old.id));
@@ -31,9 +35,6 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
     const note=html.indexOf(esc(reviewed.note));assert.ok(note>0&&note<html.indexOf('translator-next tricks-jump'),'full food note precedes next actions');
    }
   }
-  const origin='https://local.example';
-  assert.equal(tipDetailHref('/alltagstricks/#becher-farbig',origin),'/alltagstricks/farbiger-becher.html');
-  for(const url of ['https://foreign.example/alltagstricks/#teller-rot','/alltagstricks/?private=1#teller-rot','/alltagstricks/#unknown','/de/demenz-alltagstipps.html'])assert.equal(tipDetailHref(url,origin),null,url);
   preview=await createPreviewServer();
   // Every generated destination must directly resolve through the actual Worker.
   for(let i=0;i<paths.length;i+=8)await Promise.all(paths.slice(i,i+8).map(async route=>{

@@ -3,7 +3,8 @@ export const tipDetailRoutes = Object.freeze({"teller-rot":"/alltagstricks/roter
 export function tipDetailHref(value, origin = location.origin) {
   let url; try { url = new URL(value, origin); } catch { return null; }
   if (![origin, 'https://dementiacoachapp.com'].includes(url.origin) || url.pathname !== '/alltagstricks/' || url.search) return null;
-  return tipDetailRoutes[url.hash.slice(1)] || null;
+  const key = url.hash.slice(1);
+  return Object.prototype.hasOwnProperty.call(tipDetailRoutes, key) ? tipDetailRoutes[key] : null;
 }
 export function enhanceTipLinks(root = document) {
   const links = [...(root.matches?.('a[href]') ? [root] : []), ...root.querySelectorAll('a[href]')];
