@@ -55,13 +55,14 @@ const report = { checks: [], realProviderCalls: 0, realEmails: 0, careRequests: 
    if(process.env.CONTENT_SCROLL_FOCUS&&!new RegExp(process.env.CONTENT_SCROLL_FOCUS).test(name))return;
    const f=await fixture(options);try{await fn(f);assert.deepEqual(f.requests,[]);assert.deepEqual(f.errors,[]);report.checks.push(name);if(process.env.CONTENT_SCROLL_REPORT)fs.writeFileSync(process.env.CONTENT_SCROLL_REPORT,JSON.stringify(report,null,2)+'\n');console.log('PASS',name);}finally{await f.context.close();}
   }
-  await check('actual catalog, two examples, early original question, complete reviewed tips, finite unique feed',async({page})=>{
+  await check('actual catalog, two examples, early original question, compact previews with original grid and reviewed detail links, finite unique feed',async({page})=>{
    assert.equal(await page.locator('.home-situations .e-tiles > li').count(),2);
    assert.equal(await page.locator('#web-access-notice').isVisible(),false);
    assert.deepEqual(await page.locator('#e-tiles > li').evaluateAll(nodes=>nodes.slice(0,4).map(n=>n.hasAttribute('data-feed-interlude'))),[false,false,false,true]);
    await page.evaluate(()=>{const more=document.querySelector('.content-feed-more');for(let i=0;i<40&&!more.hidden;i++)more.click();});
    const hrefs=await page.locator('[data-content-item] > a').evaluateAll(nodes=>nodes.map(n=>n.href));assert.equal(hrefs.length,161);assert.equal(new Set(hrefs).size,161);
-   for(const tip of tips.tips){const card=page.locator(`[data-feed-verified-tip="${tip.id}"]`);assert.equal(await card.locator('h3').textContent(),tip.title);assert.equal(await card.locator('p').first().textContent(),tip.text);const food=['roter-teller','farbiger-becher'].includes(tip.id);assert.equal(await card.locator('.content-tip-note').count(),food?1:0);if(food)assert.equal(await card.locator('.content-tip-note').textContent(),tips.note);}
+   for(const tip of tips.tips){const card=page.locator(`[data-feed-verified-tip="${tip.id}"]`);assert.equal(await card.locator('span').textContent(),tip.title);assert.equal(await card.locator('p,h3').count(),0,'Home stays a compact preview');assert.equal(await card.locator('a').getAttribute('href'),tips.canonical+'#'+tip.id);}
+   const grid=await page.locator('#e-tiles').evaluate(node=>({display:getComputedStyle(node).display,columns:getComputedStyle(node).gridTemplateColumns.split(' ').length}));assert.deepEqual(grid,{display:'grid',columns:2});assert.equal(await page.locator('[data-content-item] > a').first().evaluate(n=>getComputedStyle(n).flexDirection),'column');
    assert.equal(await page.locator('.content-feed-more').isVisible(),false);assert.match(await page.locator('.content-feed-status').textContent(),/alle Tipps/);assert.equal(await modal(page).count(),0);
    const image=page.locator('[data-content-item] img').first();await image.evaluate(n=>n.dispatchEvent(new Event('error')));assert.match(await image.getAttribute('src'),/chat-helferin-fragend-lossless/);await image.evaluate(n=>n.dispatchEvent(new Event('error')));assert.equal(await image.isVisible(),false);
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
