@@ -66,8 +66,8 @@ export function mountSharedNavigation(doc = document) {
     const draft = [...doc.querySelectorAll('input,textarea,select,[contenteditable="true"]')].some(field => {
       if (field.closest('.dc-navigation') || field.disabled || field.readOnly || !field.getClientRects().length || host.getComputedStyle(field).visibility === 'hidden') return false;
       if (field.id === 'translator-input') return Boolean(field.value?.trim());
-      if (!editedFields.has(field)) return false;
-      if (field.isContentEditable) return true;
+      if (field.isContentEditable) return editedFields.has(field);
+      if (field.dataset.formDraft === 'v1' && field.dataset.formEdited !== 'true') return false;
       if (field.matches('input[type="hidden"],input[type="button"],input[type="submit"],input[type="reset"],input[type="image"]')) return false;
       if (field.matches('input[type="checkbox"],input[type="radio"]')) return field.checked !== field.defaultChecked;
       if (field.tagName === 'SELECT') {
