@@ -30,7 +30,7 @@ export function mountContentFeed(section) {
       const item = unique[cursor]; item.dataset.contentItem = String(cursor + 1);
       if ((cursor + 1) % 6 === 0 || cursor + 1 === unique.length) item.dataset.contentBatchEnd = '';
       list.append(item);
-      if (cursor === 2 && interlude) list.append(interlude);
+      if (cursor === 5 && interlude) list.append(interlude);
     }
     section.dataset.contentLoaded = String(cursor); section.dataset.contentTotal = String(unique.length);
     const finished = cursor === unique.length;
