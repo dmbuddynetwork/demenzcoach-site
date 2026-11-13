@@ -32,3 +32,6 @@ document.addEventListener('keydown', event => {
 document.addEventListener('click', event => {
   if (menu?.open && !menu.contains(event.target)) menu.open = false;
 });
+
+// Same optional public-content invitation; printing and fixed sharing stay independent.
+import('/abo/content-scroll-signup.js').then(module => module.bootContentScrollSignup()).catch(() => {});

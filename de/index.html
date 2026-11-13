@@ -67,6 +67,8 @@
   <link rel="stylesheet" href="/einfach.css">
   <link rel="stylesheet" href="/abo/ki-freigabe.css">
   <link rel="stylesheet" href="/de/homepage.css">
+  <link rel="stylesheet" href="/content-feed.css">
+  <link rel="stylesheet" href="/start/inline-entry.css">
   <script>(function(){var d=document.documentElement,u=navigator.userAgent||'';d.classList.add('app-check');try{if(localStorage.getItem('demenzcoach.textSize.v1')==='large')d.classList.add('e-large');}catch(e){}document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('[data-font-toggle]');if(!b)return;var on=d.classList.toggle('e-large');b.setAttribute('aria-pressed',String(on));try{if(on)localStorage.setItem('demenzcoach.textSize.v1','large');else localStorage.removeItem('demenzcoach.textSize.v1');}catch(e){}});document.addEventListener('DOMContentLoaded',function(){var b=document.querySelector('[data-font-toggle]');if(b)b.setAttribute('aria-pressed',String(d.classList.contains('e-large')));});if(/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1))d.classList.add('is-ios');document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href*="apps.apple.com"]');if(a){a.target='_blank';a.rel='noopener';}},true);})();</script>
   <script type="application/ld+json">
 {
@@ -132,8 +134,8 @@
         <div class="home-intro">
           <h1 id="home-title">Demenz im Alltag: Was sagen, was tun?</h1>
         </div>
-        <form class="translator-card" id="translator-form" autocomplete="off" data-empty-hint="Bitte zuerst einen Satz eintippen – oder eine Situation auswählen." data-chat-after-input>
-          <label class="translator-form-label" for="translator-input">Was sagen und tun bei Demenz?</label><p class="translator-form-intro" id="translator-form-intro">Passende Worte und praktische Tipps für deine Situation.</p>
+        <form class="translator-card" id="translator-form" data-access-notice="on-action" autocomplete="off" data-empty-hint="Bitte zuerst einen Satz eintippen – oder eine Situation auswählen." data-chat-after-input>
+          <label class="translator-form-label" for="translator-input">Beschreibe eure Situation</label><p class="translator-form-intro" id="translator-form-intro">Beschreibe eure Situation</p>
           <div class="translator-input-row">
             <textarea id="translator-input" rows="2" maxlength="200" placeholder="Zum Beispiel: Meine Mutter will nach Hause." enterkeyhint="go" aria-describedby="translator-form-intro translator-empty-hint translator-privacy-note"></textarea>
             <button class="button" type="submit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M21.6 2.4a.9.9 0 0 0-.95-.2L2.9 9.1a.9.9 0 0 0-.05 1.67l7.2 3.17 3.17 7.2a.9.9 0 0 0 1.67-.05l6.9-17.75a.9.9 0 0 0-.2-.95ZM10.6 12.2 5.6 10l12.2-4.75-7.2 6.95Zm1.2 1.2 6.95-7.2L14 18.4l-2.2-5Z"/></svg><span>Antwort finden</span></button>
@@ -143,52 +145,24 @@
         </form>
         <div id="translator-result" class="translator-result" hidden></div>
         <section id="translator-saved" class="translator-saved" aria-label="Meine Sätze" hidden></section>
-        <section class="home-situations" aria-labelledby="home-situations-title">
-          <h2 class="home-section-title" id="home-situations-title">Oder wähle eine Situation:</h2>
+        <section class="home-situations" aria-label="Beispielsituationen">
           <ul class="e-tiles" role="list">
             <li><a class="e-tile" data-translator-key="nachhause" href="/de/ratgeber/demenz-nach-hause-was-sagen.html"><img src="/assets/zeichnungen/nach-hause.webp" width="480" height="664" alt="" decoding="async"><span>Will nach Hause</span></a></li>
             <li><a class="e-tile" data-translator-key="waschen" href="/de/demenz-uebersetzer/ich-will-nicht-duschen.html"><img src="/assets/zeichnungen/tuch-mama.webp" width="480" height="505" alt="" decoding="async"><span>Will nicht duschen</span></a></li>
-            <li><a class="e-tile" data-translator-key="schongegessen" href="/de/demenz-uebersetzer/ich-habe-schon-gegessen.html"><img src="/assets/zeichnungen/together.webp" width="480" height="284" alt="" loading="lazy" decoding="async"><span>Will nichts essen</span></a></li>
-            <li><a class="e-tile" data-translator-key="abend" href="/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html"><img src="/assets/zeichnungen/sunset.webp" width="480" height="382" alt="" loading="lazy" decoding="async"><span>Unruhig am Abend</span></a></li>
-            <li><a class="e-tile" data-translator-key="auto" href="/de/demenz-uebersetzer/ich-will-auto-fahren.html"><img src="/assets/zeichnungen/car.webp" width="480" height="384" alt="" loading="lazy" decoding="async"><span>Will Auto fahren</span></a></li>
-            <li><a class="e-tile" data-translator-key="mutter" href="/de/demenz-uebersetzer/wo-ist-meine-mutter.html"><img src="/assets/zeichnungen/s-dead.webp" width="480" height="411" alt="" loading="lazy" decoding="async"><span>Fragt nach der Mutter</span></a></li>
           </ul>
         </section>
-        <noscript><p>Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der <a href="/de/demenz-uebersetzer/">Übersicht</a>.</p></noscript>
-        <div class="e-offers">
-          <section id="plan" class="e-card e-plan" aria-labelledby="plan-title">
-            <img src="/assets/zeichnungen/app-tablet.webp" width="480" height="409" alt="" loading="lazy" decoding="async">
-            <div class="e-app-text">
-              <h2 id="plan-title">Persönliche Hilfe für euren Alltag</h2>
-              <ul class="e-checks">
-                <li>Wähle die Situation, die dich beschäftigt</li>
-                <li>Satzideen und kleine nächste Schritte</li>
-                <li>Wochenplan als zusätzliche Hilfe</li>
-              </ul>
-              <a class="button" href="/start/?src=home" data-related-link="plan_home">Persönliche Hilfe ansehen</a>
-            </div>
-          </section>
-          <section id="app" class="e-card e-app" aria-labelledby="app-title">
-            <img src="/assets/zeichnungen/v-umarmung.webp" width="480" height="489" alt="" loading="lazy" decoding="async">
-            <div class="e-app-text">
-              <h2 id="app-title">Die richtigen Worte bei Demenz. Auch als App.</h2>
-              <ul class="e-checks">
-                <li>Ruhige Sätze für schwere Momente</li>
-                <li>Für jede Situation, in deinen Worten</li>
-                <li>Kostenlos laden, Abo nur, wenn du willst</li>
-              </ul>
-              <a class="button e-store" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_app&amp;mt=8" data-store-link="home-app">Kostenlos im App Store</a>
-            </div>
-          </section>
-          <section id="liste" class="e-card" aria-labelledby="liste-title">
-            <h2 id="liste-title">Alle Sätze zum Ausdrucken</h2>
-            <p class="e-muted">Mit allen Antworten, als Liste für den Kühlschrank. Kostenlos per E-Mail.</p>
-            <div id="home-signup"></div>
-          </section>
-        </div>
-        <div class="e-moments-block e-tiles-block e-tiles-more-block">
-          <h2 class="e-moments-title" id="e-tiles-more-title">Weitere Situationen</h2>
-          <ul class="e-tiles" id="e-tiles" role="list" aria-labelledby="e-tiles-more-title">
+        <section class="content-feed" id="content-feed" aria-label="Tipps und Beispiele">
+          <ul class="e-tiles" id="e-tiles" aria-label="Tipps und Beispiele" role="list">
+            <li data-feed-verified-tip="roter-teller"><a class="e-tile e-feed-tip" href="https://dementiacoachapp.com/de/demenz-alltagstipps.html#roter-teller"><img src="/teller/t-teller.webp" width="88" height="92" alt="" loading="lazy" decoding="async"><div><h3>Roter Teller</h3><p>Wähle einen Teller, der sich vom Tisch und vom Essen abhebt. Rot ist eine Möglichkeit, wenn der Kontrast passt.</p><p class="content-tip-note">Wähle, was zur Person passt. Bei bekannten Kau- oder Schluckproblemen oder individuellen Ernährungsvorgaben frage vor Änderungen das Behandlungsteam.</p></div></a></li>
+            <li><a class="e-tile" data-translator-key="mutter" href="/de/demenz-uebersetzer/wo-ist-meine-mutter.html"><img src="/assets/zeichnungen/s-dead.webp" width="480" height="411" alt="" loading="lazy" decoding="async"><span>Fragt nach der Mutter</span></a></li>
+            <li data-feed-verified-tip="farbiger-becher"><a class="e-tile e-feed-tip" href="https://dementiacoachapp.com/de/demenz-alltagstipps.html#farbiger-becher"><img src="/teller/t-becher.webp" width="88" height="92" alt="" loading="lazy" decoding="async"><div><h3>Farbiger Becher</h3><p>Nimm einen bunten Becher, der sich vom Tisch abhebt, und fülle ihn zunächst halb voll und bei Bedarf nach.</p><p class="content-tip-note">Wähle, was zur Person passt. Bei bekannten Kau- oder Schluckproblemen oder individuellen Ernährungsvorgaben frage vor Änderungen das Behandlungsteam.</p></div></a></li>
+            <li class="content-feed-interlude" data-feed-interlude><section class="content-funnel"><h2>Für wen suchst du Hilfe?</h2><div class="start-pics"><button type="button" class="start-pic" aria-label="Meine Mutter" data-relation="mama"><img src="/assets/zeichnungen/v-umarmung.webp" width="200" height="180" alt=""><span>Mutter<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></button><button type="button" class="start-pic" aria-label="Mein Vater" data-relation="papa"><img src="/assets/zeichnungen/papa.webp" width="200" height="180" alt=""><span>Vater<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></button><button type="button" class="start-pic" aria-label="Mein Partner oder meine Partnerin" data-relation="partner"><img src="/assets/zeichnungen/paar.webp" width="200" height="180" alt=""><span>Partner<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></button><button type="button" class="start-pic" aria-label="Oma oder Opa" data-relation="grosseltern"><img src="/assets/zeichnungen/grosseltern.webp" width="200" height="180" alt=""><span>Oma oder Opa<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></button></div><div class="start-options"><button type="button" class="start-option" data-relation="andere"><span>Jemand anderes</span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></div></section></li>
+            <li><a class="e-tile" data-translator-key="schongegessen" href="/de/demenz-uebersetzer/ich-habe-schon-gegessen.html"><img src="/assets/zeichnungen/together.webp" width="480" height="284" alt="" loading="lazy" decoding="async"><span>Will nichts essen</span></a></li>
+            <li data-feed-verified-tip="foto-zimmertuer"><a class="e-tile e-feed-tip" href="https://dementiacoachapp.com/de/demenz-alltagstipps.html#foto-zimmertuer"><img src="/teller/t-tuer.webp" width="88" height="92" alt="" loading="lazy" decoding="async"><div><h3>Foto an der Zimmertür</h3><p>Wenn die Person einverstanden ist, probiert ein vertrautes Foto an ihrer Zimmertür aus. Prüft gemeinsam, ob sie das Foto erkennt und es ihr bei der Orientierung hilft.</p></div></a></li>
+            <li><a class="e-tile" data-translator-key="abend" href="/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html"><img src="/assets/zeichnungen/sunset.webp" width="480" height="382" alt="" loading="lazy" decoding="async"><span>Unruhig am Abend</span></a></li>
+            <li data-feed-verified-tip="lied-anziehen"><a class="e-tile e-feed-tip" href="https://dementiacoachapp.com/de/demenz-alltagstipps.html#lied-anziehen"><img src="/teller/t-lied.webp" width="88" height="92" alt="" loading="lazy" decoding="async"><div><h3>Lieblingslied beim Anziehen</h3><p>Summt oder singt zusammen ein Lied, das die Person mag. Hör auf, wenn es sie stört.</p></div></a></li>
+            <li><a class="e-tile" data-translator-key="auto" href="/de/demenz-uebersetzer/ich-will-auto-fahren.html"><img src="/assets/zeichnungen/car.webp" width="480" height="384" alt="" loading="lazy" decoding="async"><span>Will Auto fahren</span></a></li>
+            <li data-feed-verified-tip="nachtlicht"><a class="e-tile e-feed-tip" href="https://dementiacoachapp.com/de/demenz-alltagstipps.html#nachtlicht"><img src="/teller/t-nacht.webp" width="88" height="92" alt="" loading="lazy" decoding="async"><div><h3>Nachtlicht mit Bewegungsmelder</h3><p>Ein Nachtlicht mit Bewegungsmelder kann den Weg zur Toilette beleuchten. Achte darauf, dass das Licht nicht blendet und der Weg frei bleibt.</p></div></a></li>
             <li><a class="e-tile" data-translator-key="wer" href="/de/demenz-uebersetzer/wer-sind-sie.html"><img src="/assets/zeichnungen/s-recognize.webp" width="480" height="402" alt="" loading="lazy" decoding="async"><span>Erkennt mich nicht</span></a></li>
             <li><a class="e-tile" data-translator-key="geld" href="/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html"><img src="/assets/zeichnungen/s-money.webp" width="480" height="396" alt="" loading="lazy" decoding="async"><span>Sagt, Geld wurde gestohlen</span></a></li>
             <li><a class="e-tile" data-translator-key="arbeit" href="/de/demenz-uebersetzer/ich-muss-zur-arbeit.html"><img src="/assets/zeichnungen/work.webp" width="480" height="486" alt="" loading="lazy" decoding="async"><span>Will zur Arbeit</span></a></li>
@@ -224,8 +198,6 @@
             <li><a class="e-tile" data-translator-key="kind" href="/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html"><img src="/assets/zeichnungen/accuse.webp" width="480" height="379" alt="" loading="lazy" decoding="async"><span>Fühlt sich bevormundet</span></a></li>
             <li><a class="e-tile" data-translator-key="tagespflege" href="/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html"><img src="/assets/zeichnungen/daycare.webp" width="480" height="455" alt="" loading="lazy" decoding="async"><span>Will nicht zur Tagespflege</span></a></li>
             <li><a class="e-tile" data-translator-key="hilfe" href="/de/demenz-uebersetzer/hilfe-hilfe-rufen.html"><img src="/assets/zeichnungen/ruhig-hilfe-oben.webp" width="480" height="429" alt="" loading="lazy" decoding="async"><span>Ruft immer wieder um Hilfe</span></a></li>
-            <li class="e-tiles-heading"><h2 class="e-moments-title">Alltagstricks</h2><p class="e-muted">Kleine Handgriffe, die den Alltag leichter machen. <a href="/alltagstricks/">Alle Tricks</a></p></li>
-            <li><a class="e-tile e-tile-trick" href="/alltagstricks/#teller-rot" data-related-link="trick_teller-rot"><img src="/alltagstricks/img/illu-plate-red.webp" width="600" height="395" alt="" loading="lazy" decoding="async"><span>Roter Teller</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#erst-riechen" data-related-link="trick_erst-riechen"><img src="/alltagstricks/img/illu-trick-riechen.webp" width="600" height="472" alt="" loading="lazy" decoding="async"><span>Erst riechen lassen</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#kraeftig-wuerzen" data-related-link="trick_kraeftig-wuerzen"><img src="/alltagstricks/img/illu-trick-wuerzen.webp" width="600" height="449" alt="" loading="lazy" decoding="async"><span>Kräftiger würzen</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#zaehne-pruefen" data-related-link="trick_zaehne-pruefen"><img src="/alltagstricks/img/illu-trick-zaehne.webp" width="600" height="467" alt="" loading="lazy" decoding="async"><span>Zähne und Prothese nachsehen</span></a></li>
@@ -243,14 +215,12 @@
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#kleine-portionen" data-related-link="trick_kleine-portionen"><img src="/alltagstricks/img/illu-trick-kleine-portionen.webp" width="600" height="539" alt="" loading="lazy" decoding="async"><span>Öfter kleine Portionen</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#fernseher-aus-beim-essen" data-related-link="trick_fernseher-aus-beim-essen"><img src="/alltagstricks/img/illu-trick-fernseher-aus-beim-essen.webp" width="600" height="375" alt="" loading="lazy" decoding="async"><span>Fernseher aus beim Essen</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#rutschfest-mit-rand" data-related-link="trick_rutschfest-mit-rand"><img src="/alltagstricks/img/illu-trick-rutschfest-mit-rand.webp" width="600" height="321" alt="" loading="lazy" decoding="async"><span>Teller mit hohem Rand</span></a></li>
-            <li><a class="e-tile e-tile-trick" href="/alltagstricks/#becher-farbig" data-related-link="trick_becher-farbig"><img src="/alltagstricks/img/illu-becher-red.webp" width="495" height="398" alt="" loading="lazy" decoding="async"><span>Farbiger Becher</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#getraenke-ueberall" data-related-link="trick_getraenke-ueberall"><img src="/alltagstricks/img/illu-trick-getraenke.webp" width="600" height="290" alt="" loading="lazy" decoding="async"><span>Getränke überall</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#anstossen" data-related-link="trick_anstossen"><img src="/alltagstricks/img/illu-becher-drink.webp" width="600" height="518" alt="" loading="lazy" decoding="async"><span>Anstoßen</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#wasserreiches-essen" data-related-link="trick_wasserreiches-essen"><img src="/alltagstricks/img/illu-trick-wasserreiches-essen.webp" width="600" height="411" alt="" loading="lazy" decoding="async"><span>Trinken zum Essen</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#kleine-becher-halb-voll" data-related-link="trick_kleine-becher-halb-voll"><img src="/alltagstricks/img/illu-trick-kleine-becher-halb-voll.webp" width="600" height="534" alt="" loading="lazy" decoding="async"><span>Kleine Becher, halb voll</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#wc-sitz-farbig" data-related-link="trick_wc-sitz-farbig"><img src="/alltagstricks/img/illu-wc-red.webp" width="370" height="600" alt="" loading="lazy" decoding="async"><span>Farbiger Toilettensitz</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#tuer-bild" data-related-link="trick_tuer-bild"><img src="/alltagstricks/img/illu-trick-wc-tuer.webp" width="353" height="600" alt="" loading="lazy" decoding="async"><span>Bild an der Toilettentür</span></a></li>
-            <li><a class="e-tile e-tile-trick" href="/alltagstricks/#nachtlicht-weg" data-related-link="trick_nachtlicht-weg"><img src="/alltagstricks/img/illu-nacht-sensor.webp" width="600" height="361" alt="" loading="lazy" decoding="async"><span>Licht auf dem Weg</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#bad-vorwaermen" data-related-link="trick_bad-vorwaermen"><img src="/alltagstricks/img/illu-tuch-towel.webp" width="600" height="583" alt="" loading="lazy" decoding="async"><span>Bad vorwärmen</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#lied-beim-waschen" data-related-link="trick_lied-beim-waschen"><img src="/alltagstricks/img/illu-lied-sing.webp" width="600" height="464" alt="" loading="lazy" decoding="async"><span>Lieblingslied beim Waschen</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#erst-die-haende" data-related-link="trick_erst-die-haende"><img src="/alltagstricks/img/illu-trick-waschlappen.webp" width="600" height="472" alt="" loading="lazy" decoding="async"><span>Erst nur die Hände</span></a></li>
@@ -315,7 +285,6 @@
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#sortierkiste" data-related-link="trick_sortierkiste"><img src="/alltagstricks/img/illu-trick-sortierkiste.webp" width="600" height="468" alt="" loading="lazy" decoding="async"><span>Kiste zum Sortieren</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#waesche-falten" data-related-link="trick_waesche-falten"><img src="/alltagstricks/img/illu-trick-waesche.webp" width="600" height="453" alt="" loading="lazy" decoding="async"><span>Wäsche falten</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#haende-halten" data-related-link="trick_haende-halten"><img src="/alltagstricks/img/illu-hand-massage.webp" width="600" height="412" alt="" loading="lazy" decoding="async"><span>Hand halten</span></a></li>
-            <li><a class="e-tile e-tile-trick" href="/alltagstricks/#lieblingslied" data-related-link="trick_lieblingslied"><img src="/alltagstricks/img/illu-lied-notes.webp" width="600" height="315" alt="" loading="lazy" decoding="async"><span>Lieblingslied</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#fummeldecke" data-related-link="trick_fummeldecke"><img src="/alltagstricks/img/illu-trick-fummeldecke.webp" width="592" height="600" alt="" loading="lazy" decoding="async"><span>Fummeldecke</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#ruhige-ecke" data-related-link="trick_ruhige-ecke"><img src="/alltagstricks/img/illu-noise.webp" width="600" height="527" alt="" loading="lazy" decoding="async"><span>Ruhige Ecke</span></a></li>
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#erst-grundbeduerfnisse" data-related-link="trick_erst-grundbeduerfnisse"><img src="/alltagstricks/img/illu-trick-erst-grundbeduerfnisse.webp" width="585" height="600" alt="" loading="lazy" decoding="async"><span>Erst an das Einfache denken</span></a></li>
@@ -348,7 +317,42 @@
             <li><a class="e-tile e-tile-trick" href="/alltagstricks/#zeit-zum-antworten" data-related-link="trick_zeit-zum-antworten"><img src="/alltagstricks/img/illu-trick-zeit-zum-antworten.webp" width="600" height="485" alt="" loading="lazy" decoding="async"><span>Zeit zum Antworten</span></a></li>
           </ul>
           <div id="e-tiles-end" aria-hidden="true"></div>
+          <p class="content-feed-status" role="status" aria-live="polite"></p>
+          <button class="button content-feed-more" type="button">Weitere Tipps und Beispiele</button>
+        </section>
+        <noscript><p>Der Übersetzer braucht JavaScript. Alle Sätze findest du auch in der <a href="/de/demenz-uebersetzer/">Übersicht</a>.</p></noscript>
+        <div class="e-offers">
+          <section id="plan" class="e-card e-plan" aria-labelledby="plan-title">
+            <img src="/assets/zeichnungen/app-tablet.webp" width="480" height="409" alt="" loading="lazy" decoding="async">
+            <div class="e-app-text">
+              <h2 id="plan-title">Persönliche Hilfe für euren Alltag</h2>
+              <ul class="e-checks">
+                <li>Wähle die Situation, die dich beschäftigt</li>
+                <li>Satzideen und kleine nächste Schritte</li>
+                <li>Wochenplan als zusätzliche Hilfe</li>
+              </ul>
+              <a class="button" href="/start/?src=home" data-related-link="plan_home">Persönliche Hilfe ansehen</a>
+            </div>
+          </section>
+          <section id="app" class="e-card e-app" aria-labelledby="app-title">
+            <img src="/assets/zeichnungen/v-umarmung.webp" width="480" height="489" alt="" loading="lazy" decoding="async">
+            <div class="e-app-text">
+              <h2 id="app-title">Die richtigen Worte bei Demenz. Auch als App.</h2>
+              <ul class="e-checks">
+                <li>Ruhige Sätze für schwere Momente</li>
+                <li>Für jede Situation, in deinen Worten</li>
+                <li>Kostenlos laden, Abo nur, wenn du willst</li>
+              </ul>
+              <a class="button e-store" href="https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&amp;ct=web_de_home_app&amp;mt=8" data-store-link="home-app">Kostenlos im App Store</a>
+            </div>
+          </section>
+          <section id="liste" class="e-card" aria-labelledby="liste-title">
+            <h2 id="liste-title">Alle Sätze zum Ausdrucken</h2>
+            <p class="e-muted">Mit allen Antworten, als Liste für den Kühlschrank. Kostenlos per E-Mail.</p>
+            <div id="home-signup"></div>
+          </section>
         </div>
+
       </div>
     </section>
   </main>
@@ -377,7 +381,7 @@
   <script src="/demenz-uebersetzer/translator-signup.js"></script>
   <script src="/demenz-uebersetzer/translator-saved.js"></script>
   <script src="/demenz-uebersetzer/translator.js"></script>
-  <script>(function(){var list=document.getElementById('e-tiles'),end=document.getElementById('e-tiles-end');if(!list||!end||!('IntersectionObserver' in window))return;var step=6,items=[].slice.call(list.children);items.forEach(function(li,i){if(i>=step)li.hidden=true;});function rest(){return list.querySelectorAll('li[hidden]');}var io=new IntersectionObserver(function(e){if(!e[0].isIntersecting)return;var h=rest();for(var i=0;i<step&&i<h.length;i++)h[i].hidden=false;if(!rest().length)io.disconnect();else{io.unobserve(end);io.observe(end);}},{rootMargin:'400px 0px'});io.observe(end);})();</script>
+  <script type="module" src="/content-feed.js"></script>
   <script>(function(){var b=window.DemenzTranslatorSignup&&window.DemenzTranslatorSignup.box();if(b){document.getElementById('home-signup').append(b);}else{document.getElementById('liste').hidden=true;}})();</script>
 </body>
 </html>

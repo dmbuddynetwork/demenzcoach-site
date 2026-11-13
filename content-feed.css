@@ -1,0 +1,18 @@
+/* Only the reused home catalog; live header, menu and answer styling are untouched. */
+body.einfach .content-feed{margin:28px 0}
+body.einfach .content-feed .e-tiles{display:block}
+body.einfach .content-feed .e-tiles>li{margin:0 0 14px}
+body.einfach .content-feed .e-tile{display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:16px;min-height:88px;padding:16px;text-align:left}
+body.einfach .content-feed .e-tile img{flex:0 0 72px;width:72px;height:76px;object-fit:contain}
+body.einfach .content-feed .e-feed-tip{display:grid;grid-template-columns:72px minmax(0,1fr);align-items:start}
+body.einfach .content-feed .e-feed-tip h3{margin:0 0 10px!important;font-size:1.2rem!important;line-height:1.35!important}
+body.einfach .content-feed .e-feed-tip p{margin:0;font-size:1rem!important;font-weight:400;line-height:1.55!important}
+body.einfach .content-feed .e-feed-tip .content-tip-note{margin-top:14px;color:var(--e-muted);font-size:.875rem!important}
+body.einfach .content-feed .content-feed-interlude{margin:28px 0}
+body.einfach .content-feed-status{margin:18px 0;font-weight:400}
+body.einfach .content-feed-status:empty{display:none}
+body.einfach .content-feed-more{width:100%;min-height:48px}
+#e-tiles-end{height:1px}
+@media(max-width:420px){body.einfach .content-feed .e-feed-tip{grid-template-columns:54px minmax(0,1fr);gap:12px}body.einfach .content-feed .e-tile img{flex-basis:54px;width:54px;height:64px}}
+@media print{.content-feed-more,#e-tiles-end{display:none!important}}
+.content-feed [hidden]{display:none!important}

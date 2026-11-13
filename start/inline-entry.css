@@ -1,0 +1,18 @@
+/* Exact existing /start/start.css relation-card rules; no new visual variant. */
+.content-funnel{--card:#fff;--line:#d6d3dc;--ink:#1c1b1f;--purple:#47408c;--lav:#ece9f7;--lav-ink:#2e2870;--body:1.1875rem;--sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Arial,sans-serif;font-family:var(--sans);font-size:var(--body);margin-bottom:28px}.content-funnel h2{text-align:center;margin:0 0 20px;font-size:1.5rem}
+.content-funnel .start-options { display: grid; gap: 10px; margin: 0 0 16px; padding: 0; list-style: none; }
+.content-funnel .start-option { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; padding: 14px 18px; margin: 0;
+  background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 16px; font: 600 var(--body)/1.3 var(--sans);
+  text-align: left; cursor: pointer; box-shadow: 0 1px 2px rgba(28, 27, 31, .04); }
+.content-funnel .start-option:hover { border-color: var(--purple); }
+.content-funnel .start-option[aria-pressed="true"] { border: 2px solid var(--purple); padding: 13px 17px; background: var(--lav); color: var(--lav-ink); }
+.content-funnel .start-option > span { flex: 1 1 auto; }
+.content-funnel .start-option svg { flex: none; width: 26px; height: 26px; color: var(--purple); }
+.content-funnel .start-dot { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); background: var(--card); }
+.content-funnel .start-option[aria-pressed="true"] .start-dot { border: 7px solid var(--purple); }
+.content-funnel .start-pics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 12px; }
+.content-funnel .start-pic { display: grid; padding: 0; overflow: hidden; background: var(--card); border: 1px solid var(--line); border-radius: 16px; cursor: pointer; font: inherit; color: inherit; }
+.content-funnel .start-pic img { display: block; width: 100%; height: 132px; object-fit: contain; padding: 12px 10px 4px; background: #fff; }
+.content-funnel .start-pic > span { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 12px 14px; background: var(--purple); color: #fff; font-weight: 700; text-align: left; }
+.content-funnel .start-pic svg { width: 20px; height: 20px; flex: none; }
+.content-funnel .start-pic:hover { border-color: var(--purple); }
