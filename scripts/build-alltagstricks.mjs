@@ -12,6 +12,17 @@ for (const [id, override] of Object.entries(references.overrides)) {
   if (!data.tricks.some(trick => trick.id === id) || !references.sources[override.source]) throw new Error(`Unknown source override: ${id}`);
 }
 data.tricks = data.tricks.map(trick => ({ ...trick, ...references.overrides[trick.id] }));
+// Reuse the five reviewed full tips, without rewriting the shared native App catalog.
+const reviewed = JSON.parse(fs.readFileSync(path.join(root, 'content/teller-five-tricks.de.json'), 'utf8'));
+const reviewedIDs = { 'teller-rot': 'roter-teller', 'becher-farbig': 'farbiger-becher', 'lieblingslied': 'lied-anziehen', 'nachtlicht-weg': 'nachtlicht' };
+const reviewedFor = trick => reviewed.tips.find(tip => tip.id === (reviewedIDs[trick.id] || trick.id));
+data.tricks = data.tricks.map(trick => { const tip = reviewedFor(trick); return tip ? { ...trick, title: tip.title, text: tip.text } : trick; });
+const photo = reviewed.tips.find(tip => tip.id === 'foto-zimmertuer');
+if (!photo) throw new Error('Missing reviewed photo tip');
+data.tricks.push({ id: photo.id, category: 'orientierung', title: photo.title, text: photo.text, image: photo.image, situations: [], source: 'home' });
+const detailPath = trick => `/alltagstricks/${reviewedFor(trick)?.id || trick.id}.html`;
+const detailURLs = data.tricks.map(trick => `https://dementiacoachapp.com${detailPath(trick)}`);
+if (new Set(detailURLs).size !== data.tricks.length) throw new Error('Duplicate tip detail route');
 const url = "https://dementiacoachapp.com/alltagstricks/";
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -65,10 +76,11 @@ const card = (t) => {
     });
   return `
             <article class="translator-trick" id="${t.id}">
-              <img class="translator-trick-art" src="img/${t.drawing}.webp" width="300" height="220" loading="lazy" decoding="async" alt="">
+              <img class="translator-trick-art" src="${t.image || `img/${t.drawing}.webp`}" width="300" height="220" loading="lazy" decoding="async" alt="">
               <div class="translator-trick-text">
                 <h3 class="translator-trick-title">${esc(t.title)}</h3>
                 <p>${esc(t.text)}</p>${t.source ? `<p class="article-meta">Zum Weiterlesen: ${sourceLink(t.source)}</p>` : ""}${links.join("")}
+                <a class="text-link translator-trick-link" href="${detailPath(t)}" data-tip-detail="${t.id}">Ausführlich lesen →</a>
               </div>
             </article>`;
 };
@@ -92,7 +104,7 @@ const schema = {
       image: `https://dementiacoachapp.com/alltagstricks/img/illu-plate-red.webp`,
       citation: Object.values(references.sources).map(source => source.url) },
     { "@type": "ItemList", "@id": `${url}#tricks`, name: "Alltagstricks bei Demenz", numberOfItems: data.tricks.length,
-      itemListElement: data.tricks.map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.title, url: `${url}#${t.id}` })) },
+      itemListElement: data.tricks.map((t, i) => ({ "@type": "ListItem", position: i + 1, name: t.title, url: `https://dementiacoachapp.com${detailPath(t)}` })) },
     { "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "Start", item: "https://dementiacoachapp.com/de/" },
       { "@type": "ListItem", position: 2, name: "Alltagstricks", item: url }] },
@@ -106,7 +118,7 @@ const navigation = categories.map(([key, name]) => `<a class="translator-copy" h
 const renderPage = ({ pageURL = url, pageTitle = title, pageDescription = description,
   headline = overviewHeading, intro = overviewIntro, jumpLinks = navigation, content = sections,
   pageSchema = schema, slug = "alltagstricks", breadcrumb = '<a href="/de/">Startseite</a> › Alltagstricks',
-  extraStyles = "", jumpTitle = "Themen", brandName = "Demenz Coach" } = {}) => `<!doctype html>
+  extraStyles = "", jumpTitle = "Themen", brandName = "Demenz Coach", pageImage = "https://dementiacoachapp.com/assets/og-teller.jpg" } = {}) => `<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
@@ -121,7 +133,7 @@ const renderPage = ({ pageURL = url, pageTitle = title, pageDescription = descri
   <meta property="og:title" content="${esc(pageTitle)}">
   <meta property="og:description" content="${esc(pageDescription)}">
   <meta property="og:url" content="${pageURL}">
-  <meta property="og:image" content="https://dementiacoachapp.com/assets/og-teller.jpg">
+  <meta property="og:image" content="${esc(pageImage)}">
   <meta name="twitter:card" content="summary_large_image">
   <title>${esc(pageTitle)}</title>
   <link rel="canonical" href="${pageURL}">
@@ -238,9 +250,34 @@ fs.writeFileSync(path.join(root, 'alltagstricks/essen-trinken.html'), rewriteGer
   breadcrumb: '<a href="/de/">Startseite</a> › <a href="/alltagstricks/">Alltagstricks</a> › Essen und Trinken'
 }), "alltagstricks/essen-trinken.html"));
 
+// Each existing tip gets a real, direct-loadable page with its original safeguards.
+for (const trick of data.tricks) {
+  const tip = reviewedFor(trick), pageURL = `https://dementiacoachapp.com${detailPath(trick)}`;
+  const notes = [...new Set([references.notes[trick.category], tip && ['essen', 'trinken'].includes(trick.category) ? reviewed.note : ''].filter(Boolean))];
+  const sourceEntries = tip ? tip.sources.map(id => reviewed.sources[id]) : (trick.source ? [references.sources[trick.source]] : references.categories[trick.category].map(id => references.sources[id]));
+  if (sourceEntries.some(source => !source)) throw new Error(`Missing sources for ${trick.id}`);
+  const detailSchema = structuredClone(schema);
+  detailSchema['@graph'] = detailSchema['@graph'].filter(item => item['@type'] !== 'ItemList');
+  Object.assign(detailSchema['@graph'][0], { '@id': `${pageURL}#content`, headline: trick.title, description: `${trick.title}: ${trick.text}`, image: `https://dementiacoachapp.com${tip?.image || `/alltagstricks/img/${trick.drawing}.webp`}`, citation: sourceEntries.map(source => source.url) });
+  detailSchema['@graph'].find(item => item['@type'] === 'BreadcrumbList').itemListElement.push({ '@type': 'ListItem', position: 3, name: trick.title, item: pageURL });
+  const sources = `<section aria-label="Weiterlesen"><h2>Zum Weiterlesen</h2><ul>${sourceEntries.map(source => `<li><a href="${esc(source.url)}" rel="noopener">${esc(source.label)}</a></li>`).join('')}</ul></section>`;
+  const related = [...new Set(trick.situations.filter(key => pages[key]).map(key => pages[key][0]))].slice(0, 1).map(slug => { const label = Object.values(pages).find(([value]) => value === slug)[1]; return `<p><a href="/demenz-uebersetzer/${slug}.html" data-related-link="tip-${trick.id}-${slug}">${esc(label)}</a></p>`; }).join('');
+  const html = renderPage({ pageURL, pageTitle: `${trick.title} bei Demenz: Alltagstipp | Demenz Coach`, pageDescription: `${trick.title}: ${trick.text}`,
+    headline: esc(trick.title), pageImage: `https://dementiacoachapp.com${tip?.image || `/alltagstricks/img/${trick.drawing}.webp`}`, intro: `<img class="tip-detail-art" src="${tip?.image || `/alltagstricks/img/${trick.drawing}.webp`}" width="300" height="220" alt=""><p>${esc(trick.text)}</p>${notes.map(note => `<p class="tricks-safety">${esc(note)}</p>`).join('')}`,
+    jumpTitle: 'Weitere Hilfe', jumpLinks: '<a class="translator-copy" href="/alltagstricks/">Alle Alltagstipps</a><a class="translator-copy" href="/de/">Eigene Situation beschreiben</a>',
+    content: `${related}${sources}<p><a href="/de/demenz-alltagstipps.html">Fünf Tipps als Druckliste</a></p>`,
+    pageSchema: detailSchema, slug: `tip-${trick.id}`, breadcrumb: `<a href="/de/">Startseite</a> › <a href="/alltagstricks/">Alltagstipps</a> › ${esc(trick.title)}`,
+    extraStyles: '<style>.tip-detail-art{display:block;width:100%;max-width:240px;height:220px;object-fit:contain;margin:20px auto}.tricks-safety{padding:14px;border-left:3px solid var(--e-purple);background:var(--e-card)}</style>' });
+  const relative = detailPath(trick).slice(1);
+  fs.writeFileSync(path.join(root, relative), rewriteGermanRouteReferences(html, relative));
+}
+// Upgrade only known legacy tip anchors, including dynamically rendered cross-promotions.
+const routes = Object.fromEntries(data.tricks.map(trick => [trick.id, detailPath(trick)]));
+for (const tip of reviewed.tips) routes[tip.id] = detailPath(data.tricks.find(trick => reviewedFor(trick)?.id === tip.id));
+fs.writeFileSync(path.join(root, 'alltagstricks/detail-links.js'), `// Generated by build-alltagstricks.mjs; known own-site tip links only.\nexport const tipDetailRoutes = Object.freeze(${JSON.stringify(routes)});\nexport function tipDetailHref(value, origin = location.origin) {\n  let url; try { url = new URL(value, origin); } catch { return null; }\n  if (![origin, 'https://dementiacoachapp.com'].includes(url.origin) || url.pathname !== '/alltagstricks/' || url.search) return null;\n  const key = url.hash.slice(1);\n  return Object.prototype.hasOwnProperty.call(tipDetailRoutes, key) ? tipDetailRoutes[key] : null;\n}\nexport function enhanceTipLinks(root = document) {\n  const links = [...(root.matches?.('a[href]') ? [root] : []), ...root.querySelectorAll('a[href]')];\n  for (const link of links) { const target = tipDetailHref(link.getAttribute('href')); if (target) link.setAttribute('href', target); }\n}\nif (typeof document !== 'undefined') {\n  const start = () => { enhanceTipLinks(); new MutationObserver(records => { for (const record of records) for (const node of record.addedNodes) if (node.nodeType === 1) enhanceTipLinks(node); }).observe(document.body, { childList: true, subtree: true }); };\n  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true }); else start();\n}\n`);
 const sitemapPath = path.join(root, "sitemap.xml");
 let sitemap = fs.readFileSync(sitemapPath, "utf8");
-for (const pageURL of [url, topicURL]) {
+for (const pageURL of [url, topicURL, ...detailURLs]) {
 if (!sitemap.includes(`<loc>${pageURL}</loc>`)) {
   sitemap = sitemap.replace("</urlset>", `  <url>
     <loc>${pageURL}</loc>

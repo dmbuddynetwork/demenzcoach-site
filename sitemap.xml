@@ -322,4 +322,614 @@
   <url><loc>https://dementiacoachapp.com/guides/dementia-caregiver-overwhelmed.html</loc><xhtml:link rel="alternate" hreflang="en" href="https://dementiacoachapp.com/guides/dementia-caregiver-overwhelmed.html"/><xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/de/ratgeber/pflegende-angehoerige-ueberfordert.html"/><xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/de/ratgeber/pflegende-angehoerige-ueberfordert.html"/></url>
   <url><loc>https://dementiacoachapp.com/en/dementia-translator/i-cant-find-the-toilet.html</loc><xhtml:link rel="alternate" hreflang="en" href="https://dementiacoachapp.com/en/dementia-translator/i-cant-find-the-toilet.html"/><xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html"/><xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html"/></url>
   <url><loc>https://dementiacoachapp.com/en/caregivers/share-dementia-care-with-siblings.html</loc><xhtml:link rel="alternate" hreflang="en" href="https://dementiacoachapp.com/en/caregivers/share-dementia-care-with-siblings.html"/><xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/de/angehoerige/pflege-mit-geschwistern-aufteilen.html"/><xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/de/angehoerige/pflege-mit-geschwistern-aufteilen.html"/></url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/roter-teller.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/roter-teller.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/roter-teller.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/erst-riechen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/erst-riechen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/erst-riechen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/kraeftig-wuerzen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/kraeftig-wuerzen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/kraeftig-wuerzen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zaehne-pruefen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zaehne-pruefen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zaehne-pruefen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/unterlage-einfarbig.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/unterlage-einfarbig.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/unterlage-einfarbig.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/eins-nach-dem-anderen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/eins-nach-dem-anderen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/eins-nach-dem-anderen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/fingerfood.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/fingerfood.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/fingerfood.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/gemeinsam-essen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/gemeinsam-essen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/gemeinsam-essen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/nur-loeffel.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/nur-loeffel.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/nur-loeffel.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/lieblingsessen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/lieblingsessen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/lieblingsessen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zweites-fruehstueck.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zweites-fruehstueck.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zweites-fruehstueck.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/erst-selbst-probieren.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/erst-selbst-probieren.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/erst-selbst-probieren.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/essen-im-gehen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/essen-im-gehen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/essen-im-gehen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zusammen-kochen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zusammen-kochen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zusammen-kochen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/hand-ueber-hand.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/hand-ueber-hand.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/hand-ueber-hand.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/kleine-portionen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/kleine-portionen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/kleine-portionen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/fernseher-aus-beim-essen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/fernseher-aus-beim-essen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/fernseher-aus-beim-essen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/rutschfest-mit-rand.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/rutschfest-mit-rand.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/rutschfest-mit-rand.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/essen-beschreiben.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/essen-beschreiben.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/essen-beschreiben.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/restaurant-platz.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/restaurant-platz.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/restaurant-platz.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/farbiger-becher.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/farbiger-becher.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/farbiger-becher.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/getraenke-ueberall.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/getraenke-ueberall.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/getraenke-ueberall.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/anstossen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/anstossen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/anstossen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/wasserreiches-essen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/wasserreiches-essen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/wasserreiches-essen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/kleine-becher-halb-voll.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/kleine-becher-halb-voll.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/kleine-becher-halb-voll.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/wc-sitz-farbig.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/wc-sitz-farbig.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/wc-sitz-farbig.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/tuer-bild.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/tuer-bild.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/tuer-bild.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/nachtlicht.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/nachtlicht.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/nachtlicht.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/bad-vorwaermen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/bad-vorwaermen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/bad-vorwaermen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/lied-beim-waschen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/lied-beim-waschen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/lied-beim-waschen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/erst-die-haende.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/erst-die-haende.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/erst-die-haende.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zaehne-nebeneinander.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zaehne-nebeneinander.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zaehne-nebeneinander.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/handcreme.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/handcreme.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/handcreme.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/duschhocker.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/duschhocker.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/duschhocker.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/wasser-fuehlen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/wasser-fuehlen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/wasser-fuehlen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/handbrause.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/handbrause.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/handbrause.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/in-die-hand-geben.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/in-die-hand-geben.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/in-die-hand-geben.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/nicht-alles-auf-einmal.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/nicht-alles-auf-einmal.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/nicht-alles-auf-einmal.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/frisch-machen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/frisch-machen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/frisch-machen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/seife-farbig.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/seife-farbig.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/seife-farbig.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/feste-toilettenzeiten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/feste-toilettenzeiten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/feste-toilettenzeiten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/unruhe-toilette.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/unruhe-toilette.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/unruhe-toilette.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/eimer-weg.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/eimer-weg.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/eimer-weg.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/ruhig-bei-missgeschick.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/ruhig-bei-missgeschick.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/ruhig-bei-missgeschick.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/wenig-wasser.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/wenig-wasser.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/wenig-wasser.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/gewohnte-badezeit.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/gewohnte-badezeit.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/gewohnte-badezeit.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/haare-mit-krug.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/haare-mit-krug.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/haare-mit-krug.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/hahn-markieren.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/hahn-markieren.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/hahn-markieren.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/elektrische-zahnbuerste.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/elektrische-zahnbuerste.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/elektrische-zahnbuerste.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zahnpasta-vorbereiten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zahnpasta-vorbereiten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zahnpasta-vorbereiten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/lieblingsseife.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/lieblingsseife.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/lieblingsseife.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/vor-der-tuer-warten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/vor-der-tuer-warten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/vor-der-tuer-warten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/uhr-mit-datum.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/uhr-mit-datum.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/uhr-mit-datum.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/antwort-zettel.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/antwort-zettel.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/antwort-zettel.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/tagestafel.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/tagestafel.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/tagestafel.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/fotoalbum.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/fotoalbum.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/fotoalbum.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/fotos-mit-namen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/fotos-mit-namen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/fotos-mit-namen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/schrank-bilder.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/schrank-bilder.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/schrank-bilder.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/vorhaenge-auf.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/vorhaenge-auf.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/vorhaenge-auf.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/fester-platz.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/fester-platz.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/fester-platz.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/abends-vorhaenge-zu.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/abends-vorhaenge-zu.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/abends-vorhaenge-zu.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/einfarbige-vorhaenge.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/einfarbige-vorhaenge.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/einfarbige-vorhaenge.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zimmer-wie-frueher.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zimmer-wie-frueher.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zimmer-wie-frueher.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/tageslicht-spaziergang.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/tageslicht-spaziergang.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/tageslicht-spaziergang.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/abendritual.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/abendritual.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/abendritual.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/gleichmaessiges-licht.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/gleichmaessiges-licht.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/gleichmaessiges-licht.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/ruhige-musik.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/ruhige-musik.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/ruhige-musik.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/schlafanzug-zeichen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/schlafanzug-zeichen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/schlafanzug-zeichen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/uhr-tag-nacht.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/uhr-tag-nacht.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/uhr-tag-nacht.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/nachts-mitgehen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/nachts-mitgehen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/nachts-mitgehen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/wichtiges-vormittags.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/wichtiges-vormittags.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/wichtiges-vormittags.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/leichtes-abendessen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/leichtes-abendessen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/leichtes-abendessen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/schlafzimmer-ruhig.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/schlafzimmer-ruhig.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/schlafzimmer-ruhig.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/wasser-am-bett.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/wasser-am-bett.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/wasser-am-bett.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/armband.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/armband.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/armband.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/tuerglocke.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/tuerglocke.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/tuerglocke.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/aktuelles-foto.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/aktuelles-foto.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/aktuelles-foto.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/mantel-weg.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/mantel-weg.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/mantel-weg.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/spiegel-abdecken.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/spiegel-abdecken.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/spiegel-abdecken.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/eigenes-portemonnaie.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/eigenes-portemonnaie.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/eigenes-portemonnaie.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/garderobenhaken.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/garderobenhaken.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/garderobenhaken.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/keine-dunklen-matten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/keine-dunklen-matten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/keine-dunklen-matten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/mitgehen-fragen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/mitgehen-fragen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/mitgehen-fragen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/tuer-tarnen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/tuer-tarnen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/tuer-tarnen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/nummer-in-jacke.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/nummer-in-jacke.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/nummer-in-jacke.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/nachbarn-einweihen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/nachbarn-einweihen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/nachbarn-einweihen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/rundweg-im-garten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/rundweg-im-garten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/rundweg-im-garten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/autoschluessel-weg.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/autoschluessel-weg.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/autoschluessel-weg.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zettel-wo-du-bist.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zettel-wo-du-bist.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zettel-wo-du-bist.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/kleidung-bereitlegen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/kleidung-bereitlegen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/kleidung-bereitlegen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/klettverschluss.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/klettverschluss.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/klettverschluss.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/schuhe-laufrichtung.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/schuhe-laufrichtung.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/schuhe-laufrichtung.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/lieblingsteil-doppelt.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/lieblingsteil-doppelt.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/lieblingsteil-doppelt.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/etiketten-raus.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/etiketten-raus.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/etiketten-raus.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/duenne-schichten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/duenne-schichten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/duenne-schichten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/kleidung-fuer-zuhause.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/kleidung-fuer-zuhause.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/kleidung-fuer-zuhause.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/sortierkiste.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/sortierkiste.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/sortierkiste.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/waesche-falten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/waesche-falten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/waesche-falten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/haende-halten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/haende-halten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/haende-halten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/lied-anziehen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/lied-anziehen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/lied-anziehen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/fummeldecke.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/fummeldecke.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/fummeldecke.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/ruhige-ecke.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/ruhige-ecke.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/ruhige-ecke.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/erst-grundbeduerfnisse.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/erst-grundbeduerfnisse.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/erst-grundbeduerfnisse.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/arbeit-wie-frueher.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/arbeit-wie-frueher.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/arbeit-wie-frueher.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/tier-oder-kind.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/tier-oder-kind.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/tier-oder-kind.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zwei-wochen-aufschreiben.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zwei-wochen-aufschreiben.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zwei-wochen-aufschreiben.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/ruhig-dazusetzen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/ruhig-dazusetzen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/ruhig-dazusetzen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zum-plausch-einladen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zum-plausch-einladen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zum-plausch-einladen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/erinnerungskiste.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/erinnerungskiste.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/erinnerungskiste.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zwei-moeglichkeiten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zwei-moeglichkeiten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zwei-moeglichkeiten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/augenhoehe.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/augenhoehe.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/augenhoehe.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/name-nennen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/name-nennen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/name-nennen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/vertrautes-mitnehmen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/vertrautes-mitnehmen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/vertrautes-mitnehmen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/bildkarten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/bildkarten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/bildkarten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/kurzer-abschied.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/kurzer-abschied.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/kurzer-abschied.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/feste-pflegekraft.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/feste-pflegekraft.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/feste-pflegekraft.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/ein-schritt.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/ein-schritt.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/ein-schritt.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/nicht-widersprechen.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/nicht-widersprechen.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/nicht-widersprechen.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/spaeter-nochmal.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/spaeter-nochmal.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/spaeter-nochmal.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/foto-der-pflegekraft.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/foto-der-pflegekraft.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/foto-der-pflegekraft.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/zeit-zum-antworten.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/zeit-zum-antworten.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/zeit-zum-antworten.html"/>
+  </url>
+  <url>
+    <loc>https://dementiacoachapp.com/alltagstricks/foto-zimmertuer.html</loc>
+    <xhtml:link rel="alternate" hreflang="de" href="https://dementiacoachapp.com/alltagstricks/foto-zimmertuer.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dementiacoachapp.com/alltagstricks/foto-zimmertuer.html"/>
+  </url>
 </urlset>
