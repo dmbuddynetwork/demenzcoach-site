@@ -445,7 +445,8 @@ const hideConsentBanner = () => {
   consentChooseButton?.setAttribute('aria-expanded', 'false');
   if (consentChooseButton) consentChooseButton.hidden = false;
   consentSettingsButton.hidden = false;
-  if (mobileLayout.matches && menuButton) menuButton.focus({ preventScroll: true });
+  const focusMenu = document.querySelector('.dc-navigation-menu > summary') || menuButton;
+  if (mobileLayout.matches && focusMenu) focusMenu.focus({ preventScroll: true });
   else consentSettingsButton.focus({ preventScroll: true });
 };
 
@@ -629,3 +630,7 @@ import('/abo/content-scroll-signup.js').then(module => {
 
 // Existing and newly rendered tip cross-promotions open their own detail page.
 import('/alltagstricks/detail-links.js').catch(() => {});
+
+// Shared functional account/language navigation and optional static-tip membership invitation.
+import('/shared-navigation.js').catch(() => {});
+import('/abo/tip-membership.js').catch(() => {});

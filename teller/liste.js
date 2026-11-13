@@ -35,3 +35,7 @@ document.addEventListener('click', event => {
 
 // Same optional public-content invitation; printing and fixed sharing stay independent.
 import('/abo/content-scroll-signup.js').then(module => module.bootContentScrollSignup()).catch(() => {});
+
+// The shared header and optional membership offer never submit a care request.
+import('/shared-navigation.js').catch(() => {});
+import('/abo/tip-membership.js').catch(() => {});
