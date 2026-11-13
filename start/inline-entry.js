@@ -7,6 +7,30 @@ const choices = { relation: data.relations, situation: data.situations, frequenc
   goal: data.goals, burden: data.burdens, minutes: data.minutes };
 const moments = new Set(data.situations.filter(item => item.say).map(item => item.key));
 const images = { mama: 'v-umarmung.webp', papa: 'papa.webp', partner: 'paar.webp', grosseltern: 'grosseltern.webp', andere: 'chat-helferin-fragend-lossless.png' };
+// Same original picture question as /start/ and the existing Home interlude.
+export function createInlineEntry(doc = document, options = {}) {
+  const section = doc.createElement('section'); section.className = 'content-funnel';
+  const title = doc.createElement('h2'); title.textContent = 'Für wen suchst du Hilfe?'; section.append(title);
+  const pictures = doc.createElement('div'); pictures.className = 'start-pics';
+  const others = doc.createElement('div'); others.className = 'start-options';
+  const short = { mama: 'Mutter', papa: 'Vater', partner: 'Partner', grosseltern: 'Oma oder Opa' };
+  for (const relation of data.relations) {
+    const button = doc.createElement('button'); button.type = 'button'; button.dataset.relation = relation.key;
+    button.className = short[relation.key] ? 'start-pic' : 'start-option';
+    if (short[relation.key]) {
+      button.setAttribute('aria-label', relation.label);
+      const image = doc.createElement('img'); image.src = '/assets/zeichnungen/' + images[relation.key];
+      image.width = 200; image.height = 180; image.alt = ''; button.append(image);
+    }
+    const label = doc.createElement('span'); label.textContent = short[relation.key] || relation.label;
+    const svg = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    for (const [name, value] of Object.entries({ viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true' })) svg.setAttribute(name, value);
+    for (const d of ['M5 12h14', 'm13 6 6 6-6 6']) { const path = doc.createElementNS(svg.namespaceURI, 'path'); path.setAttribute('d', d); svg.append(path); }
+    if (short[relation.key]) { label.append(svg); button.append(label); pictures.append(button); }
+    else { button.append(label, svg); others.append(button); }
+  }
+  section.append(pictures, others); enhanceInlineEntry(section, options); return section;
+}
 function previous() {
   try {
     const saved = JSON.parse(sessionStorage.getItem(key) || 'null');

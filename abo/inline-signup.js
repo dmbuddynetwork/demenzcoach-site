@@ -5,7 +5,7 @@ import { createSignupOffer, mayOfferSignupSetup } from './signup-offer-view.js';
 import { openSignupSheet } from './signup-sheet.js';
 import { redirectAfterSignIn, showSignInNotice } from './signin-success.js';
 let stylesReady;
-function signupStyles() {
+export function signupStyles() {
   if (stylesReady) return stylesReady;
   stylesReady = new Promise(resolve => {
     let css = document.querySelector('link[data-inline-signup]');
@@ -18,7 +18,7 @@ function signupStyles() {
   });
   return stylesReady;
 }
-export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, purpose = 'intro', creditActive = false, signupCopy, sentEmail = '', canPresent = () => true, onPresented = () => {} }) {
+export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, purpose = 'intro', creditActive = false, signupCopy, sentEmail = '', canPresent = () => true, onPresented = () => {}, returnFocus = null }) {
   const config = window.DEMENZ_ABO_CONFIG;
   if (config?.signIn?.emailLink !== true) return;
   const [{ auth }] = await Promise.all([webAuth({ anonymous: false }), signupStyles()]);
@@ -106,7 +106,7 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
   if (purpose === 'account') card.replaceWith(view);
   else {
     const anchor = document.createElement('span'); anchor.hidden = true; anchor.dataset.signupSheetAnchor = '';
-    card.replaceWith(anchor); sheet = openSignupSheet(view, { anchor, en, onDismiss: dispose });
+    card.replaceWith(anchor); sheet = openSignupSheet(view, { anchor, en, onDismiss: dispose, returnFocus });
   }
   if (sheet) onPresented(sheet);
   if (sentEmail) view.showSignupSent(sentEmail);

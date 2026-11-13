@@ -620,7 +620,12 @@ observedSections.forEach((id) => {
 })();
 
 // Shared optional invitation for genuinely read public content; never starts a care request.
-import('/abo/content-scroll-signup.js').then(module => module.bootContentScrollSignup()).catch(() => {});
+import('/abo/content-scroll-signup.js').then(module => {
+  module.bootContentScrollSignup();
+  if (/^de(?:-|$)/i.test(document.documentElement.lang) && module.publicContentPage(location.pathname, document.body?.dataset.pageType)) {
+    return import('/start/content-funnel-promotions.js').then(funnel => funnel.bootContentFunnelPromotions());
+  }
+}).catch(() => {});
 
 // Existing and newly rendered tip cross-promotions open their own detail page.
 import('/alltagstricks/detail-links.js').catch(() => {});

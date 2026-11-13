@@ -16,3 +16,4 @@
 .content-funnel .start-pic > span { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 12px 14px; background: var(--purple); color: #fff; font-weight: 700; text-align: left; }
 .content-funnel .start-pic svg { width: 20px; height: 20px; flex: none; }
 .content-funnel .start-pic:hover { border-color: var(--purple); }
+@media print { .content-funnel-section, .content-feed-interlude { display: none !important; } }

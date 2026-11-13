@@ -1,5 +1,7 @@
 // Reuse the published #e-tiles catalog and its six-item sentinel pagination.
 import { enhanceInlineEntry } from './start/inline-entry.js';
+import { createInlineEntry, mayPromoteFunnel } from './start/content-funnel-promotions.js';
+import { contentInvitationPolicy } from './abo/content-invitation-policy.js';
 const mounted = new WeakMap();
 export function mountContentFeed(section) {
   if (!section || mounted.has(section)) return mounted.get(section);
@@ -22,7 +24,18 @@ export function mountContentFeed(section) {
       });
     }
   }
-  list.replaceChildren(); let cursor = 0, observer;
+  list.replaceChildren(); let cursor = 0, observer, funnelCount = interlude ? 1 : 0, pendingFunnels = 0;
+  const offerAgain = async (item, position) => {
+    if (funnelCount + pendingFunnels >= contentInvitationPolicy.maxFeedFunnels) return;
+    pendingFunnels++;
+    try {
+      if (!await mayPromoteFunnel(doc)) return;
+      // Never insert a large card behind the reader and move their current content.
+      if (funnelCount >= contentInvitationPolicy.maxFeedFunnels || !item.isConnected || item.getBoundingClientRect().bottom <= 0 || doc.querySelector('dialog[open]')) return;
+      const promotion = doc.createElement('li'); promotion.className = 'content-feed-interlude';
+      promotion.dataset.feedPromotionAt = String(position); promotion.append(createInlineEntry(doc)); item.after(promotion); funnelCount++;
+    } finally { pendingFunnels--; }
+  };
   function showNext() {
     if (doc.querySelector('dialog[open]') || cursor >= unique.length) return;
     const stop = Math.min(cursor + 6, unique.length);
@@ -31,6 +44,8 @@ export function mountContentFeed(section) {
       if ((cursor + 1) % 6 === 0 || cursor + 1 === unique.length) item.dataset.contentBatchEnd = '';
       list.append(item);
       if (cursor === 5 && interlude) list.append(interlude);
+      else if (cursor + 1 > contentInvitationPolicy.firstFunnelAt
+        && (cursor + 1 - contentInvitationPolicy.firstFunnelAt) % contentInvitationPolicy.funnelEvery === 0) void offerAgain(item, cursor + 1);
     }
     section.dataset.contentLoaded = String(cursor); section.dataset.contentTotal = String(unique.length);
     const finished = cursor === unique.length;
