@@ -646,14 +646,55 @@
     verstehen: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3Z"/>',
     tipps: '<path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="m3.5 6.5 1.5 1.5 2.5-3M3.5 12l1.5 1.5 2.5-3M3.5 17.5 5 19l2.5-3"/>'
   };
+  // Read-only native reference: CareGoal (quote.bubble / arrow.right.circle /
+  // calendar.badge.clock) and CareSymbol (memory/photo, safety/shield, dialogue).
+  // Web artwork below reuses the published funnel SVGs; no Apple glyph export.
+  const meaningIcons = {
+    nachhause: "<path d=\"M3.5 11 12 4l8.5 7\"/><path d=\"M5.5 9.5V20h13V9.5\"/><path d=\"M10 20v-5.5h4V20\"/>",
+    mutter: "<rect x=\"4\" y=\"3\" width=\"16\" height=\"18\" rx=\"1.5\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/><path d=\"M7 18c.8-2.6 2.7-4 5-4s4.2 1.4 5 4\"/>",
+    wer: "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9.6 9.3a2.5 2.5 0 1 1 3.4 2.3c-.7.3-1 .8-1 1.5v.6\"/><path d=\"M12 16.8v.2\"/>",
+    geld: "<path d=\"M4 7.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a1 1 0 0 1-1-1z\"/><path d=\"M4 7.5 15 4.5v3\"/><path d=\"M16 13.5h4\"/>",
+    arbeit: "<rect x=\"3.5\" y=\"7.5\" width=\"17\" height=\"12\" rx=\"1.5\"/><path d=\"M9 7.5V5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\"/><path d=\"M3.5 12.5h17\"/>",
+    waschen: "<path d=\"M5 21V6a3 3 0 0 1 6 0\"/><path d=\"M8.5 9h5a2.5 2.5 0 0 0-5 0Z\"/><path d=\"M10 13v1.2M13 13v1.2M16 13v1.2M11.5 16.5v1.2M14.5 16.5v1.2\"/>",
+    shield: "<path d=\"M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6z\"/><path d=\"m9 12 2 2 4-4\"/>",
+    gift: "<rect x=\"4\" y=\"9\" width=\"16\" height=\"11\" rx=\"1.5\"/><path d=\"M3 9h18v-.5A1.5 1.5 0 0 0 19.5 7h-15A1.5 1.5 0 0 0 3 8.5z\"/><path d=\"M12 7v13\"/><path d=\"M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z\"/>",
+  };
+  const goalIcon = goal => {
+    const label = String(goal.label || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    // Meaning takes precedence over request IDs: the same ID can have many labels.
+    if (/versteh|warum|hintergrund|understand|\bwhy\b|meaning/.test(label)) return ['understand', goalIcons.verstehen];
+    if (/fruher|erinner|biograf|vergangen|reminisc|memori|\bpast\b/.test(label)) return ['memory', meaningIcons.mutter];
+    if (/grenz|nein sagen|ablehn|selbst behalten|fur mich behalten|boundary|boundaries|say no|keep my|keep .*portion/.test(label)) return ['boundary', meaningIcons.shield];
+    if (/\b(?:nicht|nichts)\b[^.!?;]*\b(?:teilen|abgeben)\b/.test(label)) return ['boundary', meaningIcons.shield];
+    if (/teilen|abgeben|teil .*eis|share|sharing|give .*portion/.test(label)) return ['sharing', meaningIcons.gift];
+    if (/nach hause|orientier|heimweg|home|orientat/.test(label)) return ['orientation', meaningIcons.nachhause];
+    if (/wasch|dusch|baden|shower|washing|bath/.test(label)) return ['personal-care', meaningIcons.waschen];
+    if (/arbeit|beruf|work|job/.test(label)) return ['work', meaningIcons.arbeit];
+    if (/geld|bezahlen|finanz|money|\bpayments?\b|financ/.test(label)) return ['money', meaningIcons.geld];
+    if (/schutz|sicher|safe|protect/.test(label)) return ['safety', meaningIcons.shield];
+    if (/plan|vorbereit|organisier|ablauf|alltag|schritt|tipps|prepare|routine|next step|tips/.test(label)) return ['planning', goalIcons.tipps];
+    if (/sag|sprech|gesprach|antwort|worte|satz|speak|talk|say|answer|words|sentence/.test(label)) return ['conversation', goalIcons.jetzt];
+    if (goal.id === 'verstehen') return ['understand', goalIcons.verstehen];
+    if (goal.id === 'tipps') return ['planning', goalIcons.tipps];
+    return ['question', meaningIcons.wer];
+  };
   const goalSvg = (paths, className = 'translator-goal-icon') => {
     const span = element('span', { className, attributes: { 'aria-hidden': 'true' } });
-    span.innerHTML = `<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+    span.innerHTML = `<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
     return span;
   };
   const goalButton = (goal, onClick) => {
     const node = button('', 'translator-goal', onClick);
-    node.append(goalSvg(goalIcons[goal.id] ?? goalIcons.jetzt), element('span', { className: 'translator-goal-label', text: goal.label }), goalSvg('<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>', 'translator-goal-arrow'));
+    const [meaning, paths] = goalIcon(goal);
+    const icon = goalSvg(paths); icon.dataset.goalIcon = meaning;
+    node.append(icon, element('span', { className: 'translator-goal-label', text: goal.label }), goalSvg('<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>', 'translator-goal-arrow'));
+    return node;
+  };
+  const goalChoice = (goal, onClick, attributes = {}) => {
+    const node = button('', 'translator-ai-goal-choice', onClick, attributes);
+    const [meaning, paths] = goalIcon(goal);
+    const icon = goalSvg(paths); icon.dataset.goalIcon = meaning;
+    node.append(icon, element('span', { className: 'translator-goal-label', text: goal.label }));
     return node;
   };
   const askGoal = (entry, options = {}) => {
@@ -1469,8 +1510,8 @@
         if (top < headerBottom) window.scrollBy({ top: top - headerBottom - 12, behavior: 'instant' });
       }));
     };
-    const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'Describe what you need help with' : 'Beschreibe, wobei du Hilfe möchtest' } });
-    const ownLabel = element('label', {}, [element('span', { text: en ? 'Or describe your own goal' : 'Oder beschreibe dein eigenes Ziel' }), own]);
+    const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'For example: Say no calmly' : 'Zum Beispiel: Ruhig Nein sagen' } });
+    const ownLabel = element('label', {}, [element('span', { text: en ? 'What would you like to achieve?' : 'Was möchtest du erreichen?' }), own]);
     const ownForm = element('form', { className: 'translator-own-goal' }, [ownLabel, button(en ? 'Answer for my goal' : 'Antwort zu meinem Ziel', 'button', () => {})]);
     ownForm.querySelector('button').type = 'submit';
     ownForm.addEventListener('submit', event => {
@@ -1564,10 +1605,10 @@
         box.dataset.selectionMode = result.selectionMode || 'guessed';
         heading.textContent = en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?';
         status.textContent = en ? 'Choose a goal. Your answer will follow your choice.' : 'Wähle ein Ziel. Danach richtet sich deine Antwort.';
-        choices.replaceChildren(...result.goals.map(g => button(g.label, 'translator-ai-goal-choice', () => select({ id: g.goal, label: g.label }), { 'aria-pressed': 'false', 'data-goal-id': g.goal })));
+        choices.replaceChildren(...result.goals.map(g => goalChoice({ id: g.goal, label: g.label }, () => select({ id: g.goal, label: g.label }), { 'aria-pressed': 'false', 'data-goal-id': g.goal })));
         retry.hidden = true;
         if (result.selectionMode === 'explicit') {
-          ownLabel.firstElementChild.textContent = en ? 'Change your goal' : 'Dein Anliegen ändern';
+          ownLabel.firstElementChild.textContent = en ? 'What would you like to achieve?' : 'Was möchtest du erreichen?';
           select({ id: result.goals[0].goal, label: result.goals[0].label });
         }
       } else {
@@ -1768,7 +1809,7 @@
     if (chosenGoal) answerCard.append(element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }));
     const presetOtherGoals = chosenGoal ? element('section', { className: 'translator-other-goals translator-preset-other-goals' }, [
       element('h3', { className: 'translator-step', text: 'Ein anderes Ziel ausprobieren' }),
-      element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.filter(option => option.id !== goal).map(option => button(option.label, 'translator-ai-goal-choice', () => {
+      element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.filter(option => option.id !== goal).map(option => goalChoice(option, () => {
         track('translator_goal', { goal: option.id, result_key: result.key, step: 'switch' });
         setPage(result, option.id, false);
         render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id, preserveViewport: true });

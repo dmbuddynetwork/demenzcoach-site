@@ -38,6 +38,7 @@ const answer = {
           const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type' };
           if (url.hostname.endsWith('cloudfunctions.net') && url.pathname.includes('/translator-web')) {
             if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+            if (url.pathname.endsWith('/access')) return route.fulfill({ headers: cors, json: { enabled: true, needsSession: true, contract: 'signup-bonus-v1' } });
             const body = request.postDataJSON(); requests.push({ path: url.pathname, body });
             const goalRequest = url.pathname.endsWith('/goals');
             if (goalRequest && goalMode === 'error') return route.fulfill({ status: 502, headers: cors, body: '{}' });
@@ -114,7 +115,7 @@ const answer = {
           await image.evaluate(node => node.dispatchEvent(new Event('error')));
           assert.equal(await image.isVisible(), false, 'A failed fallback does not cause a retry loop');
           assert.equal(await page.locator('.translator-own-goal input').isVisible(), true, 'Custom goal is directly visible without expanding a disclosure');
-          await page.getByLabel('Oder beschreibe dein eigenes Ziel', { exact: true }).fill('Ich möchte erst verstehen, was sie meint');
+          await page.getByLabel('Was möchtest du erreichen?', { exact: true }).fill('Ich möchte erst verstehen, was sie meint');
           await page.getByRole('button', { name: 'Antwort zu meinem Ziel', exact: true }).click();
           await page.locator('.translator-ai-answer').waitFor();
           assert.deepEqual(requests[3].body.goal, { id: 'custom', label: 'Ich möchte erst verstehen, was sie meint' });

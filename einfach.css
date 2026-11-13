@@ -854,3 +854,17 @@ body.dc-signup-sheet-open .translator-chat{display:none!important}
 /* Goal alternatives are exposed at the result start, not behind an accordion or footer. */
 body.einfach .translator-other-goals{margin:12px 0 20px;padding-top:0;border-top:0}
 body.einfach .translator-other-goals > .translator-ai-goal-choices{margin:8px 0 10px}
+
+/* Goal-only presentation: semantic line icons and a compact, always-open editor. */
+body.einfach .translator-ai-goal-choice { display:flex; align-items:center; gap:10px; }
+body.einfach .translator-ai-goal-choice .translator-goal-icon { display:inline-flex; flex:0 0 22px; width:22px; height:22px; align-items:center; justify-content:center; }
+body.einfach .translator-ai-goal-choice .translator-goal-icon svg { width:22px; height:22px; }
+body.einfach .translator-ai-goal-choice .translator-goal-label { min-width:0; overflow-wrap:anywhere; }
+body.einfach .translator-own-goal { grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:10px; padding-top:12px; }
+body.einfach .translator-own-goal label { min-width:0; gap:6px; line-height:1.4; }
+body.einfach .translator-own-goal input { min-height:48px; padding:10px 12px; font-size:max(16px,1rem); line-height:1.35; }
+body.einfach .translator-own-goal > button { min-height:48px; margin:0; padding:10px 14px; font-size:max(16px,1rem); line-height:1.35; }
+@media(max-width:640px) {
+ body.einfach .translator-own-goal { grid-template-columns:minmax(0,1fr); }
+ body.einfach .translator-own-goal > button { width:100%; }
+}
