@@ -14,7 +14,9 @@ Public product, support and legal pages for the Demenz Coach iOS app.
 - [English support](https://dementiacoachapp.com/support-en.html)
 - [English imprint](https://dementiacoachapp.com/imprint-en.html)
 
-The GitHub Pages deployment rejects any release that still contains an incomplete legal-address placeholder.
+Cloudflare is the only website publisher. GitHub Actions runs the legal-address
+and SEO/link checks on pull requests and pushes to `main`, without deploying a
+GitHub Pages site.
 
 The homepage has 33 stable language URLs: `/de/`, `/en/`, `/fr/`, etc.
 `/` and `/index.html` permanently redirect to `/de/`; the former
@@ -26,8 +28,8 @@ is preserved at `/de/app/`, with its own assets and canonical. Other existing
 editorial, tool and legal addresses remain valid.
 
 Cloudflare runs the Worker before assets for the legacy homepage addresses
-listed in `wrangler.jsonc`. The root HTML files are redirect fallbacks for
-GitHub Pages, which cannot issue the same server redirects. Do not run the
+listed in `wrangler.jsonc`. The root HTML files remain static redirect
+fallbacks. Do not run the
 historical `scripts/refresh-localized-pages.mjs`: it targets the former paths
 and would overwrite newer layouts. Edit the existing language pages directly.
 
