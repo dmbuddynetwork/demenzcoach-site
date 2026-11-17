@@ -502,3 +502,12 @@ body[data-page-type="translator-tool"] .translator-section { padding-top: 32px; 
 .translator-helpful > p, .translator-helpful-notice { font-size: .875rem; }
 .translator-helpful-status:empty { display: none; }
 @media (max-width: 360px) { .translator-helpful > ul > li { grid-template-columns: minmax(0, 1fr); } .translator-helpful .translator-helpful-remove { justify-self: start; } }
+
+/* Answer links (optional, flag-gated in abo-config.js) */
+.translator-snapshot-share { margin: 18px 0 0; }
+.translator-snapshot-confirm-panel, .translator-snapshot-result { margin-top: 10px; padding: 14px 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; }
+.translator-snapshot-confirm-panel p { margin: 0 0 10px; }
+.translator-snapshot-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.translator-snapshot-url { width: 100%; min-height: 44px; margin-top: 6px; padding: 0 12px; font: inherit; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink-dark); }
+.translator-snapshot-result label span { display: block; font-weight: 700; }
+.translator-snapshot-until, .translator-snapshot-status { margin: 8px 0 0; color: var(--muted); font-size: .92rem; }

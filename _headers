@@ -13,3 +13,13 @@
 /abo/email-link.html
   Cache-Control: private, no-store
   Referrer-Policy: no-referrer
+
+# Shared answer links: the token sits in the URL fragment; nothing is cached or sent as referrer.
+/de/geteilt.html
+  Cache-Control: private, no-store
+  Referrer-Policy: no-referrer
+  X-Robots-Tag: noindex, nofollow, noarchive
+/en/shared.html
+  Cache-Control: private, no-store
+  Referrer-Policy: no-referrer
+  X-Robots-Tag: noindex, nofollow, noarchive
