@@ -521,6 +521,18 @@ if (websiteAnalytics.readConsent() === null
   showConsentBanner();
 }
 
+// Messung: Karte „Persönliche Hilfe“ gesehen (einmal je Seite, zu mindestens 30 % im Bild).
+// Zusammen mit dem Klick (related_guide_click, target_guide=plan_*) ergibt das die Klickrate der Karte.
+const planCard = document.querySelector('.e-plan');
+if (planCard && 'IntersectionObserver' in window) {
+  const planObserver = new IntersectionObserver((entries) => {
+    if (!entries.some((entry) => entry.isIntersecting)) return;
+    planObserver.disconnect();
+    websiteAnalytics.track('plan_card_view', { source_guide: pageContext.page_slug });
+  }, { threshold: 0.3 });
+  planObserver.observe(planCard);
+}
+
 document.addEventListener('click', (event) => {
   const link = event.target.closest('a');
   if (!link) return;
