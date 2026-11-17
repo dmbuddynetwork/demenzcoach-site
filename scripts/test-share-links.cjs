@@ -63,9 +63,9 @@ const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
             return route.fulfill({ contentType: 'application/json', headers: { ...cors, 'X-Translator-Snapshot-Proof': proof }, body: JSON.stringify(goalRequest ? { kind: 'goals', goals: goals[language], noSituation: false } : answer) });
           }
           if (url.pathname === '/abo/web-auth.js') return route.fulfill({ contentType: 'text/javascript', body: 'export async function webAuth(){return {auth:{currentUser:null},sdk:{}}}' });
-          if (url.pathname === '/abo/abo-config.js' && enabled) {
-            const text = fs.readFileSync(path.join(root, 'abo/abo-config.js'), 'utf8').replace("snapshotLinks: Object.freeze({ enabled: false, mode: 'auto' })", `snapshotLinks: Object.freeze({ enabled: true, mode: '${mode}' })`);
-            assert.match(text, new RegExp(`enabled: true, mode: '${mode}'`));
+          if (url.pathname === '/abo/abo-config.js') {
+            const text = fs.readFileSync(path.join(root, 'abo/abo-config.js'), 'utf8').replace(/snapshotLinks: Object\.freeze\(\{[^}]*\}\)/, `snapshotLinks: Object.freeze({ enabled: ${enabled}, mode: '${enabled ? mode : 'auto'}' })`);
+            assert.match(text, new RegExp(`enabled: ${enabled}, mode: '${enabled ? mode : 'auto'}'`));
             return route.fulfill({ contentType: 'text/javascript', body: text });
           }
           if (url.origin !== preview.origin) return route.abort();

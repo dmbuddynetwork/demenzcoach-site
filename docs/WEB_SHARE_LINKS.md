@@ -1,7 +1,7 @@
 # Answer links on the website (frontend)
 
 Status 17 Nov 2026: built and tested offline (`node scripts/test-share-links.cjs`, mocked backend). **Off by default.**
-Turn on only after the backend steps below, by setting `snapshotLinks.enabled` to `true` in `abo/abo-config.js`.
+Switched on 17 Nov 2026 (`snapshotLinks.enabled: true`, mode `auto`) after the permanent-retention backend deploy (c0624ed) and a live create, open and delete test.
 
 Backend contract and limits: `docs/WEB_SNAPSHOT_LINKS.md` in the app repo (dmbuddynetwork/dementia).
 
