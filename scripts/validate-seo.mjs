@@ -27,6 +27,8 @@ const walk = (directory, prefix = "") => {
     if (!prefix && (entry.name === "teller" || entry.name === "plate")) continue;
     // abo/ und start/: Kassen- und Werbeseiten mit eigenen Regeln (noindex), keine SEO-Seiten.
     if (!prefix && (entry.name === "abo" || entry.name === "start")) continue;
+    // Shared answer links: noindex shells without SEO content (token in the URL fragment).
+    if ((prefix === "de" && entry.name === "geteilt.html") || (prefix === "en" && entry.name === "shared.html")) continue;
     const relative = path.posix.join(prefix, entry.name);
     const absolute = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(absolute, relative);

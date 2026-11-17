@@ -19,5 +19,7 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
     endpoint: "https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web",
     supporter: Object.freeze({ enabled: false, reviewed: false, kind: "one-time", url: "" })
   }),
+  // Answer links: backend creation must be enabled and approved first (docs/WEB_SNAPSHOT_LINKS.md in the app repo).
+  snapshotLinks: Object.freeze({ enabled: false }),
   appStoreURL: "https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_abo&mt=8"
 });

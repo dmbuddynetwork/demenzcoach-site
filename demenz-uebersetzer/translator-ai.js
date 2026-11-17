@@ -32,7 +32,13 @@
     if (new TextEncoder().encode(JSON.stringify(bodyFor(value, options))).byteLength > 2048) return 'body_too_large';
     return '';
   };
-  const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal } = {}) => {
+  // Optional answer-link chain: send the previous proof, report the new one. Both stay in memory only.
+  const snapshotHeaders = snapshot => typeof snapshot?.context === 'string' && snapshot.context ? { 'X-Translator-Snapshot-Context': snapshot.context } : {};
+  const reportSnapshot = (snapshot, response) => {
+    if (typeof snapshot?.onResult !== 'function') return;
+    try { snapshot.onResult({ proof: response.headers.get('X-Translator-Snapshot-Proof') || null, error: response.headers.get('X-Translator-Snapshot-Error') || null }); } catch { /* sharing never blocks care */ }
+  };
+  const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal, snapshot } = {}) => {
     const accessContext = root.DemenzKiFreigabe?.createAccessContext?.();
     const finish = result => root.DemenzKiFreigabe?.bindAccessResult?.(result, accessContext) || result;
     const value = normalizedText(text);
@@ -48,11 +54,12 @@
         mode: 'cors',
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
-        headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID, accessContext }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}) },
+        headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID, accessContext }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}), ...snapshotHeaders(snapshot) },
         body: JSON.stringify(payload),
         signal: controller.signal
       });
       if (response.status === 429) return { kind: 'error', reason: 'busy' };
+      if (response.ok) reportSnapshot(snapshot, response);
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
         if ([401, 402, 409, 410, 503].includes(response.status) && ['signup_required', 'payment_required', 'authentication_required', 'access_unavailable', 'request_in_progress', 'request_completed', 'correction_unavailable', 'answer_recovery_credit', 'answer_unavailable'].includes(error.code)) return finish({ kind: 'access', reason: error.code, access: error.access });
@@ -124,7 +131,7 @@
     }
   };
 
-  const askGoals = async (text, { formal = false } = {}) => {
+  const askGoals = async (text, { formal = false, snapshot } = {}) => {
     const textValue = normalizedText(text);
     const issue = requestIssue(textValue, { formal });
     if (issue) return { kind: 'error', reason: issue };
@@ -132,8 +139,9 @@
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
       const response = await fetch(`${endpoint}/goals?goal_contract=${outcomesContract}`, { method: 'POST', mode: 'cors', credentials: 'omit',
-        referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json' },
+        referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json', ...snapshotHeaders(snapshot) },
         body: JSON.stringify(bodyFor(textValue, { formal })), signal: controller.signal });
+      if (response.ok) reportSnapshot(snapshot, response);
       if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
       const value = await response.json();
       if (validFixedSafety(value)) return value;

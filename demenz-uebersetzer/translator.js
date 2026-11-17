@@ -1174,7 +1174,7 @@
   // Der Hinweis unter dem Eingabefeld sagt das. Der Knopf erscheint nur noch zum erneuten
   // Versuch oder nach „Nein“ beim zweiten Versuch (auto = false).
   let correctionRequestID = '';
-  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, displayResult = generalInfoMemory(), onRequestState = () => {}, onAnswerRendered = () => {} } = {}) => {
+  const aiBox = (text, source, onFail = () => {}, { auto = false, localSafetyHit = false, localSafetyNote, allowHelpful = true, goal, requestAnswer, requestState, displayResult = generalInfoMemory(), onRequestState = () => {}, onAnswerRendered = () => {}, snapshot = null } = {}) => {
     if (!ai || !text || text.length < 2) return null;
     if (!goal && !localSafetyHit && !requestState) return aiGoalBox(text, source, onFail, { auto, allowHelpful });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status' } });
@@ -1201,7 +1201,8 @@
       status.textContent = auto ? '' : tr('Einen Moment, die KI schreibt eine Antwort …');
       if (auto) box.append(waiting);
       track('translator_ai', { step: 'ask', source: auto ? `${source}_auto` : source });
-      const options = { ...(continuation || { formal: personal.formal, correctionOf, goal }), requestID: operationID, exactText };
+      const baseOptions = { ...(continuation || { formal: personal.formal, correctionOf, goal }), requestID: operationID, exactText };
+      const options = snapshot && baseOptions.goal ? { ...baseOptions, snapshot: snapshot.forAnswer(baseOptions.formal, baseOptions.goal) } : baseOptions;
       const remember = () => onRequestState({ text: requestText, options: { formal: options.formal, correctionOf: options.correctionOf || '', goal: options.goal }, exactText, operationID, draft, draftFor, editDraft, editFor });
       remember();
       const result = await (requestAnswer || ai.ask)(requestText, options);
@@ -1406,6 +1407,24 @@
     const choices = element('div', { className: 'translator-ai-goal-choices' });
     const changeGoals = element('section', { className: 'translator-other-goals' }, [element('h3', { className: 'translator-step', text: en ? 'Try another goal' : 'Ein anderes Ziel ausprobieren' })]);
     let busy = false, selectedKey = '', selectedGoal = null, planningText = text;
+    // Optional answer links (config flag, off by default). The chain only keeps signed proofs in memory.
+    const snapshotChain = window.DEMENZ_ABO_CONFIG?.snapshotLinks?.enabled === true ? (() => {
+      const chain = { latest: null, proofs: new Map(), activated: false };
+      const keyOf = (formal, goal) => JSON.stringify([formal === true, goal?.id ?? '', goal?.label ?? '']);
+      const record = (key, result) => {
+        if (result.proof) { chain.latest = result.proof; if (key) chain.proofs.set(key, result.proof); }
+        else if (result.error && key) chain.proofs.delete(key);
+      };
+      chain.keyOf = keyOf;
+      chain.forGoals = () => ({ context: chain.latest, onResult: result => record('', result) });
+      chain.forAnswer = (formal, goal) => { const key = keyOf(formal, goal); return { context: chain.latest, onResult: result => record(key, result) }; };
+      return chain;
+    })() : null;
+    const loadShare = () => new Promise(resolve => {
+      if (window.DemenzSnapshotShare) return resolve(true);
+      const loadScript = src => new Promise(done => { const tag = document.createElement('script'); tag.src = src; tag.onload = () => done(true); tag.onerror = () => done(false); document.head.append(tag); });
+      loadScript('/demenz-uebersetzer/snapshot-api.js').then(ok => ok ? loadScript('/demenz-uebersetzer/translator-snapshot-share.js') : false).then(ok => resolve(ok && Boolean(window.DemenzSnapshotShare)));
+    });
     const answerSlot = element('div', { className: 'translator-goal-answer' });
     // These are received warnings for this original situation, not a severity
     // classification of a different goal. Keep their exact nodes and call links.
@@ -1496,8 +1515,16 @@
       const otherCount = [...choices.querySelectorAll('button')].filter(choice => !choice.hidden).length;
       changeGoals.querySelector('h3').textContent = otherCount ? (en ? 'Try another goal' : 'Ein anderes Ziel ausprobieren') : (en ? 'Adjust your goal' : 'Dein Ziel anpassen');
       setViewState('answer');
-      answerSlot.replaceChildren(aiBox(planningText, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, requestState: requestStates.get(key), displayResult: displayFor(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
+      answerSlot.replaceChildren(aiBox(planningText, source, onFail, { auto: true, allowHelpful, goal, requestAnswer, snapshot: snapshotChain, requestState: requestStates.get(key), displayResult: displayFor(key), onRequestState: state => requestStates.set(key, state), onAnswerRendered: node => {
         if (node.isConnected && selectedKey === key) node.after(changeGoals);
+        if (snapshotChain) {
+          const shareKey = snapshotChain.keyOf(personal.formal, goal);
+          if (snapshotChain.proofs.has(shareKey)) void loadShare().then(ready => {
+            if (!ready || !node.isConnected || node.querySelector('[data-snapshot-share]')) return;
+            const share = window.DemenzSnapshotShare.create({ chain: snapshotChain, key: shareKey, en });
+            if (share) node.append(share);
+          });
+        }
       } }));
       // Keep the controls connected while this goal loads, asks a question or warns.
       box.append(changeGoals);
@@ -1529,7 +1556,7 @@
       busy = true; box.dataset.goalState = 'loading'; box.setAttribute('aria-busy', 'true'); retry.disabled = true; retry.hidden = true; choices.replaceChildren(); ownDetails.hidden = true; box.insertBefore(waiting, choices);
       status.textContent = en ? 'The AI is finding goals for your situation …' : 'Die KI formuliert Ziele für deine Situation …';
       let result;
-      try { result = typeof ai.askGoals === 'function' ? await ai.askGoals(planningText, { formal: personal.formal }) : { kind: 'error' }; }
+      try { result = typeof ai.askGoals === 'function' ? await ai.askGoals(planningText, { formal: personal.formal, ...(snapshotChain ? { snapshot: snapshotChain.forGoals() } : {}) }) : { kind: 'error' }; }
       catch { result = { kind: 'error' }; }
       if (!box.isConnected) return;
       waiting.remove();
