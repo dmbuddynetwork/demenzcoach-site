@@ -174,7 +174,8 @@
       && Number.isInteger(access.registeredAdditional) && access.registeredAdditional >= 3 && access.registeredAdditional <= 5;
     const bonus = creditEligible ? access.registeredAdditional : 3;
     if (creditEligible) card.dataset.signupCreditOffer = 'true';
-    card.append(node(doc, 'h3', signup ? (en ? 'Continue with an account' : 'Mit Konto weiter ausprobieren') : (en ? 'More answers for everyday care' : 'Weitere Antworten für deinen Pflegealltag')));
+    const accountFirst = signup && access?.signupBeforePaywall === true;
+    card.append(node(doc, 'h3', signup ? (accountFirst ? (en ? 'Create your free account' : 'Kostenloses Konto anlegen') : en ? 'Continue with an account' : 'Mit Konto weiter ausprobieren') : (en ? 'More answers for everyday care' : 'Weitere Antworten für deinen Pflegealltag')));
     card.append(node(doc, 'p', signup
       ? creditEligible
         ? (en ? `With a verified account you receive ${bonus} additional introductory answers. No payment details required.` : `Mit verifiziertem Konto erhältst du ${bonus} weitere Antworten zum Ausprobieren. Ohne Zahlungsdaten.`)
@@ -208,7 +209,7 @@
     accept(result.access);
     if (!access || result.safetyLevel !== 'standard' || result.safetyMessage) return null;
     exp()?.track('web_answer_completed');
-    if (!access.verified && !access.paid && access.registeredAdditional > 0 && (access.signupPlacement === 'after-first' || !access.remaining)) return offerCard({ reason: 'signup_required', doc, sentence });
+    if (!access.verified && !access.paid && (access.registeredAdditional > 0 || access.signupBeforePaywall === true) && (access.signupPlacement === 'after-first' || !access.remaining)) return offerCard({ reason: 'signup_required', doc, sentence });
     if (!access.paid && !access.remaining) return offerCard({ reason: 'payment_required', doc });
     const notice = node(doc, 'p', access.paid ? (en ? 'Your membership is active.' : 'Deine Mitgliedschaft ist aktiv.') : (en ? `${access.remaining} introductory answers remaining.` : `Noch ${access.remaining} Antworten zum Ausprobieren.`)); notice.className = 'ki-angebot-klein'; return notice;
   }
@@ -241,6 +242,7 @@
       }
       notice.textContent = value.paid ? (en ? 'Your membership is active.' : 'Deine Mitgliedschaft ist aktiv.')
         : value.verified ? (en ? `${value.remaining} introductory answers left, then paid membership.` : `Noch ${value.remaining} Antworten zum Ausprobieren, danach kostenpflichtige Mitgliedschaft.`)
+        : value.signupBeforePaywall === true ? (en ? `${value.remaining} introductory answer(s) remaining without an account. Then a free account and paid membership.` : `${value.remaining} Antwort(en) noch ohne Konto ausprobieren. Danach kostenloses Konto und Mitgliedschaft.`)
         : (en ? `${value.remaining} introductory answer(s) remaining without an account. ${value.registeredAdditional} more with a verified account, then paid membership.` : `${value.remaining} Antwort(en) noch ohne Konto ausprobieren. ${value.registeredAdditional} weitere mit verifiziertem Konto, danach kostenpflichtige Mitgliedschaft.`);
       exp()?.track('web_access_viewed');
     } catch {
