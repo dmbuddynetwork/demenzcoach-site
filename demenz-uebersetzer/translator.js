@@ -1613,7 +1613,10 @@
         }
       } else {
         box.dataset.goalState = 'unavailable';
-        status.textContent = en ? 'The AI goals could not be loaded. Try again or describe your goal.' : 'Die KI-Ziele konnten nicht geladen werden. Versuche es erneut oder beschreibe dein Ziel.';
+        const rateLimited = result?.kind === 'error' && result.reason === 'busy';
+        status.textContent = rateLimited
+          ? (en ? 'Many requests are coming in right now. Please try again in a few minutes, or describe your goal.' : 'Gerade kommen viele Anfragen an. Versuche es in ein paar Minuten erneut oder beschreibe dein Ziel.')
+          : (en ? 'The AI goals could not be loaded. Try again or describe your goal.' : 'Die KI-Ziele konnten nicht geladen werden. Versuche es erneut oder beschreibe dein Ziel.');
         retry.hidden = false;
       }
     };
