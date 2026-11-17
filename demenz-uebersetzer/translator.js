@@ -2,6 +2,11 @@
 // Zielwahl zur KI-Antwort, nie an Analytics oder die öffentliche Sammlung.
 // Gemessen wird nach Einwilligung höchstens ein fester Ergebnis-Schlüssel.
 (() => {
+  // A shared answer link (…#r=<token>) opens the read-only page. This runs first, before other code can touch the fragment.
+  if (/^#r=[A-Za-z0-9_-]{43}$/u.test(location.hash)) {
+    location.replace((/^en(?:-|$)/i.test(document.documentElement.lang || '') ? '/en/shared.html' : '/de/geteilt.html') + location.hash);
+    return;
+  }
   const dataElement = document.getElementById('translator-data');
   const form = document.getElementById('translator-form');
   const input = document.getElementById('translator-input');
@@ -1420,6 +1425,9 @@
       chain.forAnswer = (formal, goal) => { const key = keyOf(formal, goal); return { context: chain.latest, onResult: result => record(key, result) }; };
       return chain;
     })() : null;
+    // The address bar must never point at an answer other than the one on screen.
+    const clearShareAddress = () => { if (snapshotChain && /^#r=/.test(location.hash)) history.replaceState(history.state, '', location.pathname); };
+    clearShareAddress();
     const loadShare = () => new Promise(resolve => {
       if (window.DemenzSnapshotShare) return resolve(true);
       const loadScript = src => new Promise(done => { const tag = document.createElement('script'); tag.src = src; tag.onload = () => done(true); tag.onerror = () => done(false); document.head.append(tag); });
@@ -1495,6 +1503,7 @@
       const key = JSON.stringify([personal.formal, goal]);
       if (!box.isConnected || busy || key === selectedKey) return;
       preserveWarnings();
+      clearShareAddress();
       selectedKey = key;
       selectedGoal = { ...goal };
       box.classList.add('translator-ai-goals-selected');
@@ -1521,7 +1530,7 @@
           const shareKey = snapshotChain.keyOf(personal.formal, goal);
           if (snapshotChain.proofs.has(shareKey)) void loadShare().then(ready => {
             if (!ready || !node.isConnected || node.querySelector('[data-snapshot-share]')) return;
-            const share = window.DemenzSnapshotShare.create({ chain: snapshotChain, key: shareKey, en });
+            const share = (window.DEMENZ_ABO_CONFIG?.snapshotLinks?.mode === 'ask' ? window.DemenzSnapshotShare.create : window.DemenzSnapshotShare.createAuto)({ chain: snapshotChain, key: shareKey, en });
             if (share) node.append(share);
           });
         }

@@ -9,14 +9,14 @@
     gone: 'This link has expired or was deleted.',
     unavailable: 'The answer is not available right now. Please try again later.',
     situation: 'The situation', goal: 'Goal', say: 'What you can say', avoid: 'Better to avoid', next: 'Next step', steps: 'Steps', question: 'A question',
-    others: 'Note from another goal in this situation', until: d => `Stored until ${d}.`, remove: 'Delete this link', removing: 'Deleting …', removed: 'The link is deleted.', removeFailed: 'The link could not be deleted. Please try again later.',
+    others: 'Note from another goal in this situation', permanent: 'This link is stored permanently.', until: d => `Stored until ${d}.`, remove: 'Delete this link', removing: 'Deleting …', removed: 'The link is deleted.', removeFailed: 'The link could not be deleted. Please try again later.',
     try: 'Try your own situation', translator: '/en/dementia-translator/', locale: 'en-GB', save: 'Safety notes'
   } : {
     invalid: 'Dieser Link ist nicht vollständig. Frage die Person, die ihn geschickt hat, nach dem ganzen Link.',
     gone: 'Dieser Link ist abgelaufen oder wurde gelöscht.',
     unavailable: 'Die Antwort ist gerade nicht verfügbar. Versuche es später noch einmal.',
     situation: 'Die Situation', goal: 'Ziel', say: 'Das kannst du sagen', avoid: 'Besser vermeiden', next: 'Nächster Schritt', steps: 'Schritte', question: 'Eine Rückfrage',
-    others: 'Hinweis zu einem anderen Ziel in dieser Situation', until: d => `Gespeichert bis ${d}.`, remove: 'Diesen Link löschen', removing: 'Wird gelöscht …', removed: 'Der Link ist gelöscht.', removeFailed: 'Der Link konnte nicht gelöscht werden. Versuche es später noch einmal.',
+    others: 'Hinweis zu einem anderen Ziel in dieser Situation', permanent: 'Dieser Link ist dauerhaft gespeichert.', until: d => `Gespeichert bis ${d}.`, remove: 'Diesen Link löschen', removing: 'Wird gelöscht …', removed: 'Der Link ist gelöscht.', removeFailed: 'Der Link konnte nicht gelöscht werden. Versuche es später noch einmal.',
     try: 'Eigene Situation ausprobieren', translator: '/de/demenz-uebersetzer/', locale: 'de-DE', save: 'Sicherheitshinweise'
   };
   const status = document.getElementById('shared-status'), content = document.getElementById('shared-content');
@@ -83,8 +83,8 @@
       const node = noteNode(notesFor(warning.response, label), warning.renderedWarning);
       if (node) content.append(node);
     }
-    const when = new Date(expiresAt);
-    const meta = Number.isNaN(when.getTime()) ? null : el('p', { className: 'shared-meta', text: text.until(when.toLocaleDateString(text.locale)) });
+    const when = expiresAt ? new Date(expiresAt) : null;
+    const meta = el('p', { className: 'shared-meta', text: when && !Number.isNaN(when.getTime()) ? text.until(when.toLocaleDateString(text.locale)) : text.permanent });
     if (meta) content.append(meta);
     const actions = el('div', { className: 'shared-actions' }, [el('a', { className: 'primary', text: text.try, attributes: { href: text.translator } })]);
     const token = (location.hash.match(/^#r=([A-Za-z0-9_-]{43})$/u) || [])[1];
