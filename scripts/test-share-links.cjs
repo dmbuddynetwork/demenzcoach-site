@@ -27,7 +27,8 @@ const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
     preview = await createPreviewServer({ root });
     browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
     for (const language of ['de', 'en']) {
-      for (const enabled of [true, false]) {
+      for (const mode of ['ask', 'auto', 'off']) {
+        const enabled = mode !== 'off';
         const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
         const seen = { contexts: [], created: [], deleted: [], resolved: [], composed: [] };
         let createdSnapshot = null;
@@ -63,8 +64,8 @@ const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
           }
           if (url.pathname === '/abo/web-auth.js') return route.fulfill({ contentType: 'text/javascript', body: 'export async function webAuth(){return {auth:{currentUser:null},sdk:{}}}' });
           if (url.pathname === '/abo/abo-config.js' && enabled) {
-            const text = fs.readFileSync(path.join(root, 'abo/abo-config.js'), 'utf8').replace('snapshotLinks: Object.freeze({ enabled: false })', 'snapshotLinks: Object.freeze({ enabled: true })');
-            assert.match(text, /enabled: true/);
+            const text = fs.readFileSync(path.join(root, 'abo/abo-config.js'), 'utf8').replace("snapshotLinks: Object.freeze({ enabled: false, mode: 'auto' })", `snapshotLinks: Object.freeze({ enabled: true, mode: '${mode}' })`);
+            assert.match(text, new RegExp(`enabled: true, mode: '${mode}'`));
             return route.fulfill({ contentType: 'text/javascript', body: text });
           }
           if (url.origin !== preview.origin) return route.abort();
@@ -83,7 +84,54 @@ const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
           await page.waitForTimeout(500);
           assert.equal(await page.locator('[data-snapshot-share]').count(), 0, 'Flag off: no share control');
           assert.deepEqual(seen.contexts.map(c => c.context), [null, null], 'Flag off: no proof header is sent');
-          report.cases.push({ language, enabled, noShareControl: true }); await context.close(); continue;
+          report.cases.push({ language, mode, noShareControl: true }); await context.close(); continue;
+        }
+        if (mode === 'auto') {
+          // No click and no question: the link exists and sits in the address bar as soon as the answer is shown.
+          const auto = page.locator('[data-snapshot-share]:not([hidden]) .translator-snapshot-remove');
+          await auto.waitFor();
+          assert.deepEqual(seen.contexts, [{ phase: 'goals', context: null }, { phase: 'answer', context: 'proof-goals' }]);
+          assert.deepEqual(seen.created, [{ proof: 'proof-answer-act_now' }]);
+          const here = new URL(page.url());
+          assert.equal(here.hash, '#r=' + readToken, 'The address bar holds the share link');
+          assert.doesNotMatch(page.url(), /%20|situation=|eis/, 'The situation text is never in the address');
+          assert.match(await page.locator('.translator-snapshot-auto').innerText(), language === 'de' ? /Adresszeile.*dauerhaft gespeichert/s : /address bar.*stored permanently/s);
+          if (evidence && language === 'de') await page.screenshot({ path: path.join(evidence, 'auto-390.png') });
+          // Opening the copied address (fresh visitor) lands on the read-only page, same fragment.
+          const visitor = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+          await visitor.route('**/*', async route => {
+            const request = route.request(), reqUrl = new URL(request.url());
+            if (reqUrl.hostname.endsWith('cloudfunctions.net')) {
+              if (request.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: cors });
+              return route.fulfill({ headers: cors, json: { proof: 'p', snapshot: { version: 1, originalText: 'sie ist mein eis weg', text: 'sie ist mein eis weg', language, formal: false, goals: [], selectedGoal: null, response: answer, warnings: [] } } });
+            }
+            return reqUrl.origin === preview.origin ? route.continue() : route.abort();
+          });
+          const view = await visitor.newPage();
+          await view.goto(here.href, { waitUntil: 'networkidle' });
+          await view.locator('#shared-content').waitFor();
+          assert.equal(new URL(view.url()).pathname, language === 'de' ? '/de/geteilt.html' : '/en/shared.html');
+          assert.equal(new URL(view.url()).hash, '#r=' + readToken);
+          assert.match(await view.locator('.shared-meta').innerText(), language === 'de' ? /dauerhaft gespeichert/ : /stored permanently/);
+          await visitor.close();
+          // Another goal: the old address is cleared at once and a new link replaces it.
+          await page.locator('.translator-ai-goal-choice:visible').first().click();
+          await page.waitForFunction(() => document.querySelectorAll('.translator-snapshot-auto:not([hidden])').length === 1);
+          assert.equal(seen.created.length, 2); assert.equal(new URL(page.url()).hash, '#r=' + readToken);
+          // A new situation clears the address bar before any new answer exists.
+          const next = page.locator('#translator-input');
+          if (await next.isVisible()) { await next.fill('er will nicht duschen'); await page.locator('#translator-form [type="submit"]').click(); }
+          else { await page.locator('.translator-chat-input').fill('er will nicht duschen'); await page.keyboard.press('Enter'); }
+          await page.waitForFunction(() => location.hash === '');
+          await page.locator('.translator-ai-goals[data-goal-state="ready"]').waitFor();
+          await page.locator('.translator-ai-goal-choice').first().click();
+          await page.locator('.translator-snapshot-remove').waitFor();
+          assert.equal(new URL(page.url()).hash, '#r=' + readToken);
+          await page.locator('.translator-snapshot-remove').click();
+          await page.waitForFunction(() => location.hash === '' && !document.querySelector('.translator-snapshot-auto'));
+          assert.deepEqual(seen.deleted.at(-1), { readToken, deleteToken });
+          report.cases.push({ language, mode, createdWithoutClick: true, addressBar: true, readerRedirect: true, clearedOnNewSituation: true, deleted: true });
+          await context.close(); continue;
         }
         const share = page.locator('[data-snapshot-share]');
         await share.waitFor();
@@ -91,7 +139,7 @@ const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
         assert.equal(seen.created.length, 0, 'Nothing is stored before the confirmation');
         await share.locator('.translator-snapshot-start').click();
         const notice = await share.locator('.translator-snapshot-confirm-panel').innerText();
-        assert.match(notice, language === 'de' ? /30 Tage.*Jede Person mit dem Link/s : /30 days.*Anyone with the link/s);
+        assert.match(notice, language === 'de' ? /dauerhaft.*Jede Person mit dem Link/s : /permanently.*Anyone with the link/s);
         assert.equal(seen.created.length, 0, 'Still nothing stored while the question is open');
         if (evidence && language === 'de') await page.screenshot({ path: path.join(evidence, 'confirm-390.png') });
         await share.locator('.translator-snapshot-confirm').click();
@@ -101,6 +149,7 @@ const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
         const shell = language === 'de' ? '/de/geteilt.html' : '/en/shared.html';
         assert.equal(url, preview.origin + shell + '#r=' + readToken, 'The link holds only the page and the read token in the fragment');
         assert.doesNotMatch(url, /sie%20ist|eis/i);
+        assert.equal(new URL(page.url()).hash, '#r=' + readToken, 'The address bar holds the link after the confirmation');
         const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('demenzcoach.sharedLinks.v1')));
         assert.equal(stored[0].deleteToken, deleteToken, 'The delete capability stays findable in this browser');
         if (evidence && language === 'de') await page.screenshot({ path: path.join(evidence, 'link-390.png'), fullPage: true });
@@ -169,7 +218,7 @@ const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers
         await page.waitForFunction(() => document.getElementById('shared-content').hidden);
         assert.deepEqual(seen.deleted[0], { readToken, deleteToken });
         assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('demenzcoach.sharedLinks.v1')).length), 0);
-        report.cases.push({ language, enabled, chain: true, confirmedOnce: true, createdRecords: seen.created.length, readerPage: true, deleted: true });
+        report.cases.push({ language, mode, chain: true, confirmedOnce: true, createdRecords: seen.created.length, readerPage: true, deleted: true });
         await context.close();
       }
     }
