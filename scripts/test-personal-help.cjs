@@ -42,7 +42,7 @@ async function offer(page, moment) {
     if (await page.locator('.start-tiers').count()) return;
     if (await page.locator('#email').count()) {
       await page.locator('#email').fill('synthetic@example.invalid');
-      await page.getByRole('button', { name: 'Zum Angebot', exact: true }).click();
+      await page.getByRole('button', { name: 'Meinen Plan ansehen', exact: true }).click();
     } else if (await page.getByRole('button', { name: 'Kein Interesse', exact: true }).count()) {
       await page.getByRole('button', { name: 'Kein Interesse', exact: true }).click();
     } else if (await page.getByRole('button', { name: 'Überspringen', exact: true }).count()) {

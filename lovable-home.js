@@ -179,6 +179,10 @@ const websiteAnalytics = (() => {
     window.dataLayer.push(arguments);
   };
 
+  // Eigene Zugriffe: /intern/ setzt auf diesem Gerät ein Merkzeichen. Es enthält keine Daten über Personen.
+  // Google Analytics bekommt dann traffic_type=internal und kann diese Zugriffe per Datenfilter ausschließen.
+  const internalTraffic = (() => { try { return localStorage.getItem('demenzcoach.internal.v1') === '1'; } catch { return false; } })();
+
   const loadTag = () => {
     if (tagLoaded || window.DemenzTeller?.redirecting()) return;
     tagLoaded = true;
@@ -201,7 +205,8 @@ const websiteAnalytics = (() => {
       allow_google_signals: false,
       allow_ad_personalization_signals: false,
       content_group: pageContext.page_type,
-      ...pageContext
+      ...pageContext,
+      ...(internalTraffic ? { traffic_type: 'internal' } : {})
     });
     addScript(`https://www.googletagmanager.com/gtag/js?id=${measurementID}`);
   };
