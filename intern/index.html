@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Eigene Zugriffe markieren</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #F6F5F2; color: #1d1b24; margin: 0; padding: 24px; line-height: 1.5; }
+    main { max-width: 34rem; margin: 0 auto; }
+    h1 { font-size: 1.5rem; }
+    button { font: inherit; font-size: 1.1rem; padding: 14px 20px; border-radius: 12px; border: 0; background: #47408C; color: #fff; margin: 8px 8px 8px 0; cursor: pointer; }
+    button.light { background: #ECE9F7; color: #47408C; }
+    p#status { font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Eigene Zugriffe markieren</h1>
+    <p>Diese Seite ist für das Team. Sie speichert auf diesem Gerät ein kleines Merkzeichen. Es enthält keine Daten über Personen.</p>
+    <p>Mit Merkzeichen zählt Google Analytics diese Besuche als „intern“. Sie lassen sich dann aus den Auswertungen herausfiltern.</p>
+    <p id="status" role="status">Prüfe …</p>
+    <button type="button" id="on">Dieses Gerät markieren</button>
+    <button type="button" id="off" class="light">Markierung entfernen</button>
+  </main>
+  <script>
+    (function () {
+      var key = 'demenzcoach.internal.v1';
+      var status = document.getElementById('status');
+      function read() { try { return localStorage.getItem(key) === '1'; } catch (e) { return null; } }
+      function show() {
+        var v = read();
+        status.textContent = v === null ? 'Dieser Browser erlaubt kein Speichern.' : v ? 'Dieses Gerät ist markiert.' : 'Dieses Gerät ist nicht markiert.';
+      }
+      document.getElementById('on').addEventListener('click', function () { try { localStorage.setItem(key, '1'); } catch (e) {} show(); });
+      document.getElementById('off').addEventListener('click', function () { try { localStorage.removeItem(key); } catch (e) {} show(); });
+      show();
+    })();
+  </script>
+</body>
+</html>

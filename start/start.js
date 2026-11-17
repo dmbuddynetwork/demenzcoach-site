@@ -63,7 +63,7 @@
   // Messen nur über die gemeinsame Einwilligung der Website (lovable-home.js, DemenzConsent):
   // GA4 nur mit Statistik-, Meta/TikTok nur mit Werbe-Einwilligung. Nie Antworten, Namen oder E-Mail senden.
   const track = (name, marketing) => {
-    try { window.DemenzConsent?.track?.(name, { source }); } catch { /* ohne Einwilligung nichts */ }
+    try { window.DemenzConsent?.track?.(name, { entry: source }); } catch { /* ohne Einwilligung nichts */ }
     try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing); } catch { /* */ }
   };
 
@@ -323,7 +323,7 @@
       if (!validEmail(value)) { status.textContent = "Bitte gib deine E-Mail-Adresse ein."; input.focus(); return; }
       answers.email = value;
       try { sessionStorage.setItem("demenzCoachEmail", value); } catch { /* */ }
-      track(directMode ? "direct_offer_email" : "quiz_email");
+      track(directMode ? "direct_offer_email" : "quiz_email_submit");
       if (directMode) {
         // The existing contact requirement remains before checkout. Reserve an intro
         // only with this validated address, then let the visitor review the real price.
@@ -338,11 +338,11 @@
     };
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") send(); });
     return [
-      el("h1", { text: directMode ? "E-Mail für die Vertragsbestätigung" : forWho() ? `Deine Hilfe für ${forWho()} ansehen` : "Deine persönliche Hilfe ansehen" }),
-      el("p", { class: "start-lead", text: directMode ? "An diese Adresse schicken wir die Vertragsbestätigung, wenn du ein Abo abschließt." : "Gib deine E-Mail-Adresse ein, um zum Angebot zu kommen." }),
+      el("h1", { text: directMode ? "E-Mail für die Vertragsbestätigung" : forWho() ? `Gib deine E-Mail ein, um den persönlichen Plan für ${forWho()} zu erhalten` : "Gib deine E-Mail ein, um deinen persönlichen Plan zu erhalten" }),
+      el("p", { class: "start-lead", text: directMode ? "An diese Adresse schicken wir die Vertragsbestätigung, wenn du ein Abo abschließt." : "Mit dieser Adresse bekommst du Zugang zu deinem Plan." }),
       el("label", { for: "email", class: "sr-only", text: "E-Mail" }),
       input,
-      el("button", { type: "button", class: "abo-button", text: directMode ? "Angebot prüfen" : "Zum Angebot", onclick: send }),
+      el("button", { type: "button", class: "abo-button", text: directMode ? "Angebot prüfen" : "Meinen Plan ansehen", onclick: send }),
       status,
       el("p", { class: "start-small" }, ["Startest du ein Abo, schicken wir die Vertragsbestätigung an diese Adresse. Für einen Willkommenspreis prüfen wir die Adresse. Keine Werbung ohne dein Ja. ",
         el("a", { href: "/datenschutz.html", text: "Datenschutz" }), "."])
