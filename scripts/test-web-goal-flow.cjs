@@ -42,6 +42,7 @@ const answer = {
             const body = request.postDataJSON(); requests.push({ path: url.pathname, body });
             const goalRequest = url.pathname.endsWith('/goals');
             if (goalRequest && goalMode === 'error') return route.fulfill({ status: 502, headers: cors, body: '{}' });
+            if (goalRequest && goalMode === 'busy') return route.fulfill({ status: 429, headers: { ...cors, 'Retry-After': '120' }, body: '{}' });
             const value = body.text === 'GuardFixture'
               ? { kind: 'safety', safetyLevel: 'urgent', message: 'Existing safety guidance' }
               : goalRequest && goalMode === 'empty' ? { kind: 'goals', goals: [], noSituation: true }
@@ -124,6 +125,10 @@ const answer = {
           await page.locator('.translator-ai-goals[data-goal-state="unavailable"]').waitFor();
           assert.equal(await page.locator('.translator-ai-answer').count(), 0);
           assert.equal(await page.locator('.translator-ai-goal-retry').isVisible(), true);
+          goalMode = 'busy';
+          await page.locator('.translator-ai-goal-retry').click();
+          await page.locator('.translator-ai-goals[data-goal-state="unavailable"]').waitFor();
+          assert.match(await page.locator('.translator-ai-goals > p, .translator-ai-goals [role=status]').first().innerText().catch(() => ''), /viele|many/i, 'A rate limit is explained as busy, not as a broken service');
           goalMode = 'normal';
           await page.locator('.translator-ai-goal-retry').click(); await ready();
           for (const mode of ['empty', 'contradictory']) {
