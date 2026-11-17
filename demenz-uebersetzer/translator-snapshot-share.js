@@ -110,8 +110,8 @@
         current = { readToken, deleteToken };
         setAddress(readToken);
         field.value = linkFor(readToken, en);
-        const when = new Date(expiresAt);
-        result_.querySelector('.translator-snapshot-until').textContent = Number.isNaN(when.getTime()) ? text.noExpiry : text.until(when.toLocaleDateString(en ? 'en-GB' : 'de-DE'));
+        const when = expiresAt ? new Date(expiresAt) : null;
+        result_.querySelector('.translator-snapshot-until').textContent = !when || Number.isNaN(when.getTime()) ? text.noExpiry : text.until(when.toLocaleDateString(en ? 'en-GB' : 'de-DE'));
         confirmPanel.hidden = true; start.hidden = true; result_.hidden = false; removeButton.disabled = false;
         status.textContent = '';
         field.focus(); field.select();
