@@ -20,3 +20,7 @@
 .guide-plan-cta p { margin: 0 0 20px; color: var(--muted); font-size: 1.1rem; }
 .guide-plan-cta .button { width: 100%; padding: 14px 20px; text-align: center; white-space: normal; }
 .guide-plan-cta .guide-plan-note { margin: 16px 0 0; font-size: 1rem; }
+.guide-inline-cta { margin: 24px 0; padding: clamp(18px, 3.5vw, 26px); border: 1px solid var(--line); border-radius: 20px; background: var(--mist); }
+.guide-inline-cta h2 { margin: 0 0 8px; font-size: clamp(1.3rem, 3.5vw, 1.6rem); line-height: 1.25; }
+.guide-inline-cta p { margin: 0 0 16px; color: var(--muted); font-size: 1.1rem; }
+.guide-inline-cta .button { width: 100%; padding: 14px 20px; text-align: center; white-space: normal; }
