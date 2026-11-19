@@ -369,8 +369,8 @@
     } });
     return [
       el("img", { class: "start-art", src: "../assets/zeichnungen/worte-fehlen.webp", width: "260", height: "240", alt: "" }),
-      el("h1", { class: "start-center", text: "Möchtest du jede Woche einen neuen Satz per E-Mail?" }),
-      el("p", { class: "start-lead start-center", text: "Kostenlos. Ein ruhiger Satz für einen schwierigen Moment, abmelden mit einem Klick." }),
+      el("h1", { class: "start-center", text: "Möchtest du E-Mails mit Sätzen für schwierige Momente?" }),
+      el("p", { class: "start-lead start-center", text: "Kostenlos. Jede Woche ein Satz, in den ersten Tagen auch ein Hinweis auf deinen Plan. Abmelden mit einem Klick." }),
       yes,
       el("button", { type: "button", class: "abo-button abo-button-light", text: "Kein Interesse", onclick: () => { track("quiz_newsletter_no"); go(after("newsletter"), { replace: true }); } }),
       el("p", { class: "start-small start-center" }, ["Bei „Ja“ kommt zuerst eine E-Mail zum Bestätigen. ", el("a", { href: "/datenschutz.html#e-mail-liste", text: "Datenschutz" }), "."])
