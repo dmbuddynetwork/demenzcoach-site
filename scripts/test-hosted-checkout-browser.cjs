@@ -34,7 +34,7 @@ const server = http.createServer((req,res)=>{try {
     assert.equal(await page.getByRole('heading',{name:'Stripe hosted fixture'}).count(),1);
     assert.equal(sessions.length,1);
     assert.equal(sessions[0].body.plan,plan);
-    assert.equal(sessions[0].body.checkoutMode,'hosted');
+    assert.equal(sessions[0].body.checkoutMode,mode==='page'?'hosted':undefined,'die Ebene fordert nie Hosted Checkout');
     assert.equal(sessions[0].token,'Bearer fixture-owner');
     assert.deepEqual(stripeScripts,[],'hosted flow must not load embedded Stripe.js');
     await page.getByRole('link',{name:'Abbrechen'}).click();

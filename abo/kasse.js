@@ -1,12 +1,9 @@
 // Kasse als Fenster auf derselben Seite (Daniel, 9. Nov 2026: wie BetterMe und Yazio, die Zahlung öffnet sich über der
 // Angebotsseite). Wird von /start/ geladen (window.DemenzKasse.open). Die Seite /abo/ bleibt als eigener Einstieg.
-// Neue Sitzungen wechseln zum Stripe Hosted Checkout. Bereits geladene ältere
-// Kassen und die gestufte Veröffentlichung behalten den Elements-Fallback.
-import { createHostedCheckoutRedirect, reserveCheckoutWindow } from "./checkout-redirect.js";
-const redirectHostedCheckout = createHostedCheckoutRedirect((url, attempt) => {
-  if (attempt?.paymentWindow) attempt.paymentWindow.navigate(url);
-  else location.assign(url);
-});
+// Die Zahlung läuft immer in dieser Ebene (Stripe Elements), nie in einem Pop-up-Fenster (Daniel, 19. Nov 2026).
+// Fordert der Server trotzdem Hosted Checkout, geht es im selben Tab weiter, nie in einem neuen Fenster.
+import { createHostedCheckoutRedirect } from "./checkout-redirect.js";
+const redirectHostedCheckout = createHostedCheckoutRedirect((url) => location.assign(url));
 // § 312j Abs. 2 BGB: Preis, Laufzeit und Kündigung stehen vor allen Zahlungsknöpfen und direkt über dem Bestellknopf,
 // der Bestellknopf heißt „Zahlungspflichtig abonnieren“. Texte gleich wie renderSummary in abo.js.
 const config = window.DEMENZ_ABO_CONFIG || {};
@@ -98,11 +95,9 @@ function close() {
 
 // open({ plan, email, offer, source, campaign, onClose, onOfferExpired, track })
 export async function open(options) {
-  if (sheet?.pending && sheet.plan === options.plan && sheet.email === options.email && (!sheet.uid || sheet.uid === auth?.currentUser?.uid)) { sheet.paymentWindow?.focus(); return; }
-  if (sheet?.handedOff && sheet.plan === options.plan && sheet.email === options.email && sheet.uid === auth?.currentUser?.uid) { sheet.paymentWindow?.focus(); return; }
+  if (sheet?.pending && sheet.plan === options.plan && sheet.email === options.email && (!sheet.uid || sheet.uid === auth?.currentUser?.uid)) return;
   close();
-  const paymentWindow = reserveCheckoutWindow(window);
-  const attempt = { paymentWindow };
+  const attempt = {};
   const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
   const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
   const loading = el("p", { class: "kasse-loading", role: "status", text: "Die sichere Zahlung wird geöffnet …" });
@@ -133,7 +128,7 @@ export async function open(options) {
     onclick: (event) => { if (event.target === node) close(); } }, card);
   const onKey = (event) => { if (event.key === "Escape") close(); };
   document.addEventListener("keydown", onKey);
-  sheet = { node, plan: options.plan, email: options.email, pending: true, paymentWindow, onClose: () => { paymentWindow?.discard(); clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
+  sheet = { node, plan: options.plan, email: options.email, pending: true, onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
   document.body.append(node);
   document.body.classList.add("start-noscroll");
   title.focus();
@@ -180,29 +175,12 @@ export async function open(options) {
     const session = await api("/session", {
       method: "POST",
       token,
-      body: { plan: options.plan, checkoutMode: "hosted", termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
+      body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
     if (!requireCurrentAccount()) return;
-    if (redirectHostedCheckout(session, { attempt, isCurrent: currentAttempt })) {
-      if (paymentWindow) {
-        sheet.handedOff = true;
-        clearTimeout(loadingTimer);
-        loading.textContent = "Die sichere Zahlung ist in einem neuen Fenster geöffnet.";
-        const focus = el("button", { type: "button", class: "abo-button", text: "Zahlungsfenster anzeigen", onclick: () => {
-          if (sheet?.node !== node) return;
-          if (!currentAttempt()) return fail("Dein Konto hat sich geändert. Öffne die Zahlung für dein aktuelles Konto erneut.");
-          if (paymentWindow.focus()) return;
-          fail("Das Zahlungsfenster lässt sich hier nicht erneut anzeigen. Du kannst dieselbe Zahlung in diesem Tab öffnen oder den Abo-Status prüfen.");
-          focus.textContent = "Zahlung in diesem Tab öffnen";
-          focus.onclick = () => { if (currentAttempt()) location.assign(session.url); else fail("Dein Konto hat sich geändert. Öffne die Zahlung für dein aktuelles Konto erneut."); };
-        } });
-        card.append(focus, el("a", { class: "abo-link-button", href: "/abo/mein-plan.html", text: "Abo-Status prüfen" }));
-      }
-      return;
-    }
-    paymentWindow?.discard();
+    if (redirectHostedCheckout(session, { attempt, isCurrent: currentAttempt })) return;
     loading.textContent = "Zahlungsarten werden geladen …";
     await loadStripe();
     if (!requireCurrentAccount()) return;
@@ -241,15 +219,9 @@ export async function open(options) {
     });
     paymentElement.mount(payment);
   } catch (problem) {
-    paymentWindow?.discard();
     clearTimeout(loadingTimer);
     loading.hidden = true;
     if (!sheet || sheet.node !== node) return;
-    if (problem.code === "checkout_window_closed") {
-      fail("Das Zahlungsfenster wurde geschlossen. Du kannst die Zahlung erneut öffnen.");
-      card.append(el("button", { type: "button", class: "abo-button", text: "Erneut versuchen", onclick: () => { if (sheet?.node === node) open(options); } }));
-      return;
-    }
     if (problem.code === "checkout_account_changed") {
       fail("Dein Konto hat sich geändert. Öffne die Zahlung für dein aktuelles Konto erneut.");
       card.append(el("button", { type: "button", class: "abo-button", text: "Erneut versuchen",
