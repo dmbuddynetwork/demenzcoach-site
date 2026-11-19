@@ -1,7 +1,7 @@
-// Sätze merken (Daniel, 8. Nov 2026): Gemerkte Sätze bleiben nur in diesem Browser (localStorage)
-// und werden nie gesendet. Gemerkt werden nur Sätze aus den festen, geprüften Antworten: Schlüssel
-// der Situation, ihre Überschrift und der Satz im Original. Nie die Eingabe, nie eine KI-Antwort,
-// nie Namen aus „Sätze persönlich machen“ (die setzt die Seite erst beim Anzeigen ein).
+// Sätze merken (Daniel, 8. Nov 2026; KI-Sätze und eigene Seite /de/meine-saetze/ seit 19. Nov): nur in diesem Browser (localStorage)
+// und werden nie gesendet. Feste Antworten: Schlüssel der Situation, ihre Überschrift und der Satz im Original.
+// KI-Antworten (Schlüssel „ki“): der Satz der KI und die Situation aus der Sprechblase (kann Teile der Eingabe enthalten).
+// Nie Namen aus „Sätze persönlich machen“ (die setzt die Seite erst beim Anzeigen ein).
 // Nur auf ausdrücklichen Tipp auf „Merken“ (§ 25 Abs. 2 Nr. 2 TDDDG: vom Nutzer gewünschte Funktion).
 (function (root) {
   const storageKey = 'demenzcoach.savedPhrases.v1';
