@@ -2335,25 +2335,101 @@
     const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation' } });
     const send = element('button', { className: 'translator-chat-send', text: en ? 'Find an answer' : 'Antwort finden', attributes: { type: 'submit' } });
     const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
-    const panel = element('div', { className: 'translator-chat-panel' }, [chatForm]);
+    // Nachfrage oder neue Situation (Daniel, 19. Nov, Variante 1): Unter einer Antwort stehen unten zwei
+    // große Knöpfe statt eines Felds. „Nachfrage“ schickt die Situation mit (sonst fragt die KI bei
+    // „Das klappt nicht“ nur „Was ist passiert?“), „Neue Situation“ schickt nur den neuen Text.
+    const moreHint = element('small');
+    const moreButton = element('button', { className: 'translator-chat-more', attributes: { type: 'button' } }, [element('span', { text: en ? 'Follow-up' : 'Nachfrage' }), moreHint]);
+    const newButton = element('button', { className: 'translator-chat-new', attributes: { type: 'button' } }, [element('span', { text: en ? 'New situation' : 'Neue Situation' }), element('small', { text: en ? 'start over' : 'von vorn' })]);
+    const choice = element('div', { className: 'translator-chat-choice', attributes: { hidden: '' } }, [moreButton, newButton]);
+    const chip = element('p', { className: 'translator-chat-chip', attributes: { hidden: '' } });
+    const cancel = element('button', { className: 'translator-chat-cancel', text: en ? 'Cancel' : 'Abbrechen', attributes: { type: 'button', hidden: '' } });
+    const chipRow = element('div', { className: 'translator-chat-chiprow' }, [chip, cancel]);
+    const panel = element('div', { className: 'translator-chat-panel' }, [choice, chipRow, chatForm]);
     const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': en ? 'Describe another situation' : 'Andere Situation beschreiben', hidden: '' } }, [panel]);
     let positionFrame = 0;
+    const maxLength = input.maxLength > 0 ? input.maxLength : 200;
+    const quoteless = (value) => String(value ?? '').replace(/^\s*[„"“]+|[“"”]+\s*$/gu, '').trim();
+    const followLabels = en ? ['Situation: ', 'Follow-up: '] : ['Situation: ', 'Nachfrage: '];
+    // base: die ursprüngliche Situation, follows: bisherige Nachfragen dazu. Beides nur im Speicher.
+    let chatMode = 'choose', base = '', follows = [], viaFollow = false, composed = '';
+    const shownSituation = () => document.body.dataset.translatorState === 'input' ? '' : quoteless(output.querySelector('.translator-said-bubble')?.textContent);
+    const situationNow = () => base || shownSituation();
+    const shortQuote = (value) => { const text = value.replace(/[.!?]+$/u, ''); return `„${Array.from(text).length > 32 ? Array.from(text).slice(0, 31).join('') + '…' : text}“`; };
+    const baseFor = (value) => Array.from(value).slice(0, 90).join('');
+    const compose = (situation, list) => {
+      const head = `${followLabels[0]}„${baseFor(situation)}“ ${followLabels[1]}`;
+      const parts = list.slice();
+      while (parts.length > 1 && Array.from(head + parts.join(' ')).length > maxLength) parts.shift();
+      return Array.from(head + parts.join(' ')).slice(0, maxLength).join('');
+    };
+    const setChatMode = (mode) => {
+      const situation = situationNow();
+      chatMode = situation ? mode : 'choose';
+      const choosing = Boolean(situation) && chatMode === 'choose';
+      choice.hidden = !choosing;
+      chatForm.hidden = choosing;
+      chip.hidden = cancel.hidden = chipRow.hidden = !situation || choosing;
+      chip.classList.toggle('translator-chat-chip-new', chatMode === 'new');
+      if (situation) moreHint.textContent = `${en ? 'about' : 'zu'} ${shortQuote(situation)}`;
+      if (chatMode === 'more') {
+        chip.textContent = `${en ? 'About' : 'Zu'}: ${shortQuote(situation)}`;
+        field.setAttribute('placeholder', en ? 'What happened then?' : 'Was ist dann passiert?');
+        field.setAttribute('aria-label', en ? `Follow-up about ${shortQuote(situation)}` : `Nachfrage zu ${shortQuote(situation)}`);
+        field.maxLength = Math.max(40, maxLength - Array.from(`${followLabels[0]}„${baseFor(situation)}“ ${followLabels[1]}`).length);
+      } else {
+        chip.textContent = en ? 'New situation' : 'Neue Situation';
+        field.setAttribute('placeholder', en ? 'What happened?' : 'Was ist passiert?');
+        field.setAttribute('aria-label', en ? 'Your situation' : 'Deine Situation');
+        field.maxLength = maxLength;
+      }
+    };
+    moreButton.addEventListener('click', () => { setChatMode('more'); field.focus(); track('translator_write_chat', { step: 'more' }); syncChat(); });
+    newButton.addEventListener('click', () => { setChatMode('new'); field.focus(); track('translator_write_chat', { step: 'new' }); syncChat(); });
+    cancel.addEventListener('click', () => { field.value = ''; setChatMode('choose'); syncChat(); });
+    // Jede Eingabe über das große Feld oder „Neue Situation“ beginnt neu; nur „Nachfrage“ behält die Situation.
+    form.addEventListener('submit', () => { if (!viaFollow) { base = ''; follows = []; composed = ''; } viaFollow = false; }, true);
+    // Die Sprechblase zeigt weiter die Situation, die Nachfrage steht darunter (nicht „Situation: … Nachfrage: …“).
+    const showFollowup = () => {
+      if (!composed) return;
+      const bubble = output.querySelector('.translator-said-bubble');
+      if (!bubble || quoteless(bubble.textContent) !== composed) return;
+      bubble.textContent = `„${base}“`;
+      const note = element('p', { className: 'translator-said-followup' }, [element('span', { text: en ? 'Your follow-up: ' : 'Deine Nachfrage: ' }), document.createTextNode(follows.join(' '))]);
+      bubble.after(note);
+    };
+    new MutationObserver(showFollowup).observe(output, { childList: true, subtree: true });
     // Keep an unsent draft available to the existing feedback/correction flow.
-    field.addEventListener('input', () => { input.value = field.value; grow(); });
+    field.addEventListener('input', () => { if (chatMode !== 'more') { input.value = field.value; grow(); } });
     chatForm.addEventListener('submit', (event) => {
       event.preventDefault();
       const value = field.value.trim();
       if (!value) { field.focus(); return; }
-      input.value = value;
+      const situation = situationNow();
+      if (situation && chatMode === 'more') {
+        base = situation;
+        follows.push(value);
+        composed = compose(base, follows);
+        input.value = composed;
+        viaFollow = true;
+      } else {
+        input.value = value;
+      }
+      track('translator_write_chat', { step: 'sent', kind: situation ? chatMode : 'first' });
       field.value = '';
       field.blur();
       grow();
-      track('translator_write_chat', { step: 'sent' });
+      chatMode = 'choose';
       form.requestSubmit();
+      setChatMode('choose');
     });
     document.body.append(chat);
+    setChatMode('choose');
+    let lastSituation = '';
     const updateChatPosition = () => {
       positionFrame = 0;
+      const situation = situationNow();
+      if (situation !== lastSituation) { lastSituation = situation; if (!chat.contains(document.activeElement)) setChatMode('choose'); }
       const inputRect = input.getBoundingClientRect();
       const entryPoint = inputRect.height > 0 ? input : form.closest('.translator-followup-question')?.querySelector('summary');
       const entryRect = entryPoint?.getBoundingClientRect() ?? inputRect;
