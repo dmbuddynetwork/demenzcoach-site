@@ -52,7 +52,7 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
     await context.route('**/*',route=>{const u=new URL(route.request().url());if(u.pathname==='/abo/web-auth.js')return route.fulfill({contentType:'text/javascript',body:auth});if(u.hostname.endsWith('cloudfunctions.net')&&u.pathname.endsWith('/access'))return route.fulfill({json:{enabled:true,verified:false,paid:false,remaining:1,registeredAdditional:3,contract:'signup-bonus-v1'}});return u.origin===preview.origin?route.continue():route.abort();});
     const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
     await page.goto(preview.origin+'/de/',{waitUntil:'networkidle'});await page.waitForFunction(()=>document.querySelector('.content-feed')?.dataset.contentLoaded==='6');
-    assert.equal(await page.locator('.home-situations .e-tile').count(),2);
+    assert.equal(await page.locator('.home-situations .e-tile').count(),6);
     const first=await page.locator('#e-tiles > li').evaluateAll(nodes=>nodes.slice(0,7).map(n=>({tip:n.dataset.feedVerifiedTip||null,interlude:n.hasAttribute('data-feed-interlude')})));
     assert.equal(first.slice(0,6).filter(n=>n.tip).length,5);assert.equal(first[6].interlude,true);
     assert.deepEqual(await page.locator('[data-feed-verified-tip] a').evaluateAll(ns=>ns.map(n=>n.getAttribute('href'))),reviewed.tips.map(t=>'/alltagstricks/'+t.id+'.html'));
@@ -60,7 +60,7 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
     if(process.env.TIP_ROUTE_EVIDENCE){await page.evaluate(()=>document.querySelectorAll('img[loading=lazy]').forEach(n=>n.loading='eager'));await page.waitForTimeout(200);await page.screenshot({path:path.join(process.env.TIP_ROUTE_EVIDENCE,'HOME-'+width+'.png'),fullPage:true});}
     await page.evaluate(()=>{const more=document.querySelector('.content-feed-more');for(let i=0;i<40&&!more.hidden;i++)more.click();});
     const all=await page.locator('[data-content-item] > a').evaluateAll(ns=>ns.map(n=>n.getAttribute('href')));
-    assert.equal(all.length,161);assert.equal(new Set(all).size,161);const tips=all.filter(url=>url.startsWith('/alltagstricks/')&&url.endsWith('.html'));assert.equal(tips.length,122);assert.deepEqual(new Set(tips),new Set(paths));
+    assert.equal(all.length,157);assert.equal(new Set(all).size,157);const tips=all.filter(url=>url.startsWith('/alltagstricks/')&&url.endsWith('.html'));assert.equal(tips.length,122);assert.deepEqual(new Set(tips),new Set(paths));
     // Actual card navigation, reload and clean direct URL: no trip through the print list.
     await page.locator('[data-feed-verified-tip="farbiger-becher"] a').click();await page.waitForURL('**/alltagstricks/farbiger-becher.html');await page.reload({waitUntil:'networkidle'});
     assert.equal(await page.locator('h1').textContent(),'Farbiger Becher');assert.ok((await page.locator('main').innerText()).includes(reviewed.note));
@@ -72,7 +72,7 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
     await page.evaluate(()=>{const a=document.createElement('a');a.id='dynamic-tip';a.href='/alltagstricks/#nachtlicht-weg';a.textContent='Vorhandener Tipp';document.querySelector('main').append(a);});
     await page.waitForFunction(()=>document.querySelector('#dynamic-tip')?.getAttribute('href')==='/alltagstricks/nachtlicht.html');
     assert.equal(await page.locator('a[href^="/alltagstricks/#"]').count(),0);report.legacyLinks.push({width,existingGuideLinks:before,dynamicKnownAnchor:true});
-    assert.deepEqual(errors,[]);report.views.push({width,initialCards:6,reviewedTipsBeforeQuestion:5,twoSituationExamples:true,allLoaded:161,ownTipPages:122,unique:true,actualCardClickAndReload:true,foodSafeguards:true,noOverflow:true,errors});
+    assert.deepEqual(errors,[]);report.views.push({width,initialCards:6,reviewedTipsBeforeQuestion:5,sixSituationExamples:true,allLoaded:157,ownTipPages:122,unique:true,actualCardClickAndReload:true,foodSafeguards:true,noOverflow:true,errors});
    } finally {await context.close();}
   }
   if(process.env.TIP_ROUTE_EVIDENCE)fs.writeFileSync(path.join(process.env.TIP_ROUTE_EVIDENCE,'DETAIL-ROUTE-CHECKS.json'),JSON.stringify(report,null,2)+'\n');

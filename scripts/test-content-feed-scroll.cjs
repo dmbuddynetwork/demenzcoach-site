@@ -32,6 +32,7 @@ const report = { checks: [], realProviderCalls: 0, realEmails: 0, careRequests: 
     if(url.hostname.endsWith('cloudfunctions.net')) {
      if(req.method()==='OPTIONS') return route.fulfill({status:204});
      if(url.pathname.endsWith('/access'))return route.fulfill({json:{enabled:true,verified:(req.headers().authorization||'').includes('signed-fixture'),paid:Boolean(options.paid),remaining:options.paid?999:1,registeredAdditional:3,anonymousAnswers:1,signupPlacement:'after-first',contract:'signup-bonus-v1'}});
+     if(url.pathname.endsWith('/quiz-count'))return route.fulfill({status:204});
      if(req.method()==='GET'&&url.pathname.endsWith('/config'))return route.fulfill({json:{enabled:false}});
      if(url.pathname.endsWith('/account-status'))return route.fulfill({json:{hasCustomer:false}});
      requests.push(url.pathname);report.careRequests++;return route.abort();
@@ -55,12 +56,12 @@ const report = { checks: [], realProviderCalls: 0, realEmails: 0, careRequests: 
    if(process.env.CONTENT_SCROLL_FOCUS&&!new RegExp(process.env.CONTENT_SCROLL_FOCUS).test(name))return;
    const f=await fixture(options);try{await fn(f);assert.deepEqual(f.requests,[]);assert.deepEqual(f.errors,[]);report.checks.push(name);if(process.env.CONTENT_SCROLL_REPORT)fs.writeFileSync(process.env.CONTENT_SCROLL_REPORT,JSON.stringify(report,null,2)+'\n');console.log('PASS',name);}finally{await f.context.close();}
   }
-  await check('actual catalog, two examples, early original question, compact previews with original grid and reviewed detail links, finite unique feed',async({page})=>{
-   assert.equal(await page.locator('.home-situations .e-tiles > li').count(),2);
+  await check('actual catalog, six examples, early original question, compact previews with original grid and reviewed detail links, finite unique feed',async({page})=>{
+   assert.equal(await page.locator('.home-situations .e-tiles > li').count(),6);
    assert.equal(await page.locator('#web-access-notice').isVisible(),false);
    assert.deepEqual(await page.locator('#e-tiles > li').evaluateAll(nodes=>nodes.slice(0,7).map(n=>n.hasAttribute('data-feed-interlude'))),[false,false,false,false,false,false,true]);
    await page.evaluate(()=>{const more=document.querySelector('.content-feed-more');for(let i=0;i<40&&!more.hidden;i++)more.click();});
-   const hrefs=await page.locator('[data-content-item] > a').evaluateAll(nodes=>nodes.map(n=>n.href));assert.equal(hrefs.length,161);assert.equal(new Set(hrefs).size,161);
+   const hrefs=await page.locator('[data-content-item] > a').evaluateAll(nodes=>nodes.map(n=>n.href));assert.equal(hrefs.length,157);assert.equal(new Set(hrefs).size,157);
    for(const tip of tips.tips){const card=page.locator(`[data-feed-verified-tip="${tip.id}"]`);assert.equal(await card.locator('span').textContent(),tip.id==='nachtlicht'?'Licht auf dem Weg':tip.title);assert.equal(await card.locator('p,h3').count(),0,'Home stays a compact preview');assert.equal(await card.locator('a').getAttribute('href'),'/alltagstricks/'+tip.id+'.html');}
    const grid=await page.locator('#e-tiles').evaluate(node=>({display:getComputedStyle(node).display,columns:getComputedStyle(node).gridTemplateColumns.split(' ').length}));assert.deepEqual(grid,{display:'grid',columns:2});assert.equal(await page.locator('[data-content-item] > a').first().evaluate(n=>getComputedStyle(n).flexDirection),'column');
    assert.equal(await page.locator('.content-feed-more').isVisible(),false);assert.match(await page.locator('.content-feed-status').textContent(),/alle Tipps/);assert.equal(await modal(page).count(),0);

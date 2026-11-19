@@ -159,6 +159,21 @@ body.homepage-v2 #translator-input:focus-visible {
   }
 }
 
-/* Requested direct-help entry: two original examples precede the existing feed. */
+/* Direct-help entry: six situations precede the existing feed. Phone: two columns, picture above text; wide screens keep the row tile. */
 body.homepage-v2 .home-situations .e-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
 body.homepage-v2 .home-situations{margin-bottom:28px}
+@media (max-width: 699px) {
+  body.homepage-v2 .home-situations .e-tile {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-content: start;
+    gap: 8px;
+    padding: 12px 8px 14px;
+    text-align: center;
+  }
+  body.homepage-v2 .home-situations .e-tile img { width: 72px; height: 72px; }
+  body.homepage-v2 .home-situations .e-tile span { overflow-wrap: break-word; hyphens: auto; }
+}
+@media (min-width: 1000px) {
+  body.homepage-v2 .home-situations .e-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
