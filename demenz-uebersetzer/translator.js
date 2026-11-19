@@ -2357,11 +2357,13 @@
     const situationNow = () => base || shownSituation();
     const shortQuote = (value) => { const text = value.replace(/[.!?]+$/u, ''); return `„${Array.from(text).length > 32 ? Array.from(text).slice(0, 31).join('') + '…' : text}“`; };
     const baseFor = (value) => Array.from(value).slice(0, 90).join('');
+    // Mehrere Nachfragen als eigene Sätze: „Das klappt nicht. Sie schreit jetzt.“
+    const joinFollows = (list) => list.map((text, index) => index < list.length - 1 && !/[.!?…]$/u.test(text) ? `${text}.` : text).join(' ');
     const compose = (situation, list) => {
       const head = `${followLabels[0]}„${baseFor(situation)}“ ${followLabels[1]}`;
       const parts = list.slice();
-      while (parts.length > 1 && Array.from(head + parts.join(' ')).length > maxLength) parts.shift();
-      return Array.from(head + parts.join(' ')).slice(0, maxLength).join('');
+      while (parts.length > 1 && Array.from(head + joinFollows(parts)).length > maxLength) parts.shift();
+      return Array.from(head + joinFollows(parts)).slice(0, maxLength).join('');
     };
     const setChatMode = (mode) => {
       const situation = situationNow();
@@ -2395,7 +2397,7 @@
       const bubble = output.querySelector('.translator-said-bubble');
       if (!bubble || quoteless(bubble.textContent) !== composed) return;
       bubble.textContent = `„${base}“`;
-      const note = element('p', { className: 'translator-said-followup' }, [element('span', { text: en ? 'Your follow-up: ' : 'Deine Nachfrage: ' }), document.createTextNode(follows.join(' '))]);
+      const note = element('p', { className: 'translator-said-followup' }, [element('span', { text: en ? 'Your follow-up: ' : 'Deine Nachfrage: ' }), document.createTextNode(joinFollows(follows))]);
       bubble.after(note);
     };
     new MutationObserver(showFollowup).observe(output, { childList: true, subtree: true });
