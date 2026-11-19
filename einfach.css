@@ -887,3 +887,19 @@ body.einfach .translator-phrases:has(> .translator-phrase-tappable)::before { co
 .translator-saved-toast span { white-space: nowrap; }
 body .translator-saved-toast a { color: #fff !important; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
 @keyframes e-toast-in { from { opacity: 0; } }
+/* Nachfrage oder neue Situation (Daniel, 19. Nov, Variante 1): zwei große Knöpfe unten, dann das Feld. */
+.translator-chat-choice { display: flex; gap: 8px; }
+.translator-chat-choice[hidden], .translator-chat-chiprow[hidden], .translator-chat-chip[hidden], .translator-chat-cancel[hidden], .translator-chat-form[hidden] { display: none !important; }
+.translator-chat-choice button { flex: 1 1 0; min-width: 0; min-height: 56px; margin: 0; padding: 6px; border: 2px solid var(--e-purple, #47408C); border-radius: 14px; background: var(--e-purple, #47408C); color: #fff; font: inherit; font-size: 15px !important; font-weight: 800; line-height: 1.2; cursor: pointer; }
+.translator-chat-choice button::after { content: none !important; }
+.translator-chat-choice .translator-chat-new { background: #fff; color: var(--e-purple, #47408C); }
+.translator-chat-choice small { display: block; margin-top: 2px; font-size: 13px !important; font-weight: 600; opacity: .92; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.translator-chat-chip { justify-self: start; max-width: 100%; margin: 0 !important; padding: 4px 12px; overflow: hidden; border-radius: 999px; background: var(--e-lav, #ece9f7); color: var(--e-text, #1f1d2b); font-size: 14px !important; font-weight: 800; line-height: 1.4 !important; text-overflow: ellipsis; white-space: nowrap; }
+.translator-chat-chip-new { background: #fdf3e1; color: #6b4200; }
+.translator-chat-cancel { flex: 0 0 auto; min-height: 40px; margin: 0 0 0 auto; padding: 4px 8px; background: transparent; border: 0; color: var(--e-muted, #5d5a6b); font: inherit; font-size: 15px !important; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.translator-chat-cancel::after { content: none !important; }
+.translator-said-followup { margin: 8px 0 0 !important; font-weight: 700; line-height: 1.4; }
+.translator-said-followup span { color: var(--e-muted, #5d5a6b); font-weight: 600; }
+.translator-chat-chiprow { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0 0 6px; }
+.translator-chat-chip { min-width: 0; }
+body.einfach .translator-chat:has(.translator-chat-choice:not([hidden])), body.einfach .translator-chat:has(.translator-chat-chiprow:not([hidden])) { background: #fff; }
