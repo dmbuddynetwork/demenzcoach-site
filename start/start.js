@@ -694,8 +694,19 @@
   ].map((section) => ({ ...section, steps: section.steps.filter((step) => flow.includes(step)) }));
   const bars = sections.map(() => el("span", {}, el("i")));
   $("progress").replaceChildren(...bars);
+  // Schrittzähler ohne Einwilligung (Daniel, 19. Nov 2026): Der Server zählt nur Schritt und Tag hoch.
+  // Nichts wird im Browser gespeichert, nichts wird als Kennung, Quelle oder Antwort gesendet.
+  const countEndpoint = `${String(config.translatorGate?.endpoint || "").replace(/\/v1\/translator-web$/u, "")}/v1/quiz-count`;
+  const countStep = (name) => {
+    if (!/^https:/u.test(countEndpoint)) return;
+    try {
+      fetch(countEndpoint, { method: "POST", body: JSON.stringify({ step: directMode ? "direct" : name }), keepalive: true,
+        credentials: "omit", referrerPolicy: "no-referrer", headers: { "Content-Type": "text/plain" } }).catch(() => {});
+    } catch { /* Zählen darf den Fragebogen nie stören */ }
+  };
   function render(name) {
     current = name;
+    countStep(name);
     const screen = $("screen");
     screen.replaceChildren(...screens[name]().filter(Boolean));
     screen.dataset.kind = isQuestion(name) ? "question" : name;
