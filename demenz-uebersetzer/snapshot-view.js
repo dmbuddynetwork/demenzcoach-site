@@ -100,6 +100,14 @@
       actions.append(remove);
     }
     content.append(actions);
+    // Empfänger sind meist selbst Angehörige: ein ruhiger Einstieg in die Persönliche Hilfe (Quiz ist nur deutsch).
+    if (!en) {
+      content.append(el('section', { className: 'shared-plan', attributes: { 'aria-labelledby': 'shared-plan-title' } }, [
+        el('h2', { text: 'Persönliche Hilfe für euren Alltag', attributes: { id: 'shared-plan-title' } }),
+        el('p', { text: 'Satzideen und kleine nächste Schritte für die Momente, die euch beschäftigen.' }),
+        el('a', { className: 'primary', text: 'Persönliche Hilfe ansehen', attributes: { href: '/start/?src=share', 'data-related-link': 'plan_share' } })
+      ]));
+    }
     content.hidden = false;
     status.hidden = true;
   };

@@ -297,7 +297,7 @@ body.einfach .e-muted { color: var(--e-muted); }
   .e-offers > #liste { order: -1; }
 }
 /* Sobald eine Antwort da ist, bringt sie App und Liste selbst mit: keine doppelten Karten unten. */
-.e-home:has(#translator-result:not([hidden])) :is(.e-offers, .e-hero-art) { display: none !important; }
+.e-home:has(#translator-result:not([hidden])) :is(.e-offers, .e-hero-art, #plan) { display: none !important; }
 /* Kein QR-Code (Daniel, 8. Nov: „Die Zielgruppe kann keinen QR-Code eingeben“). */
 body.einfach .translator-qr { display: none !important; }
 
@@ -510,6 +510,7 @@ body.einfach .e-plan .e-checks, body.einfach .translator-plan-cta .e-checks { ma
 body.einfach .e-plan .button, body.einfach .translator-plan-cta .button { width: 100%; }
 body.einfach .translator-plan-cta { margin: 28px 0 8px; padding: 22px 18px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 18px; }
 body.einfach .e-offers > #plan { order: -2; }
+.e-home > * > #plan.e-plan, .e-home #plan.e-plan { margin: 24px 0; }
 @media (min-width: 720px) {
   body.einfach .e-plan { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 24px; align-items: center; text-align: left; }
   body.einfach .e-plan > img { width: 180px; max-width: none; margin: 0; }

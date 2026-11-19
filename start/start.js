@@ -313,7 +313,7 @@
   // Werbe-Mails nur mit dem eigenen Schritt danach (Kopplungsverbot, Art. 7 Abs. 4 DSGVO): kein Haken, keine Vorauswahl.
   const validEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(value);
   function emailScreen() {
-    const input = el("input", { id: "email", type: "email", autocomplete: "email", inputmode: "email", placeholder: "Deine E-Mail-Adresse" });
+    const input = el("input", { id: "email", type: "email", autocomplete: "email", inputmode: "email", placeholder: "name@beispiel.de" });
     input.value = answers.email;
     const status = el("p", { class: "start-small", role: "status" });
     let sending = false;
@@ -339,14 +339,16 @@
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") send(); });
     return [
       el("h1", { text: directMode ? "E-Mail für die Vertragsbestätigung" : forWho() ? `Gib deine E-Mail ein, um den persönlichen Plan für ${forWho()} zu erhalten` : "Gib deine E-Mail ein, um deinen persönlichen Plan zu erhalten" }),
-      el("p", { class: "start-lead", text: directMode ? "An diese Adresse schicken wir die Vertragsbestätigung, wenn du ein Abo abschließt." : "Mit dieser Adresse bekommst du Zugang zu deinem Plan." }),
-      el("label", { for: "email", class: "sr-only", text: "E-Mail" }),
+      directMode ? el("p", { class: "start-lead", text: "An diese Adresse schicken wir die Vertragsbestätigung, wenn du ein Abo abschließt." }) : null,
+      el("label", { for: "email", class: "sr-only", text: "E-Mail-Adresse" }),
       input,
-      el("button", { type: "button", class: "abo-button", text: directMode ? "Angebot prüfen" : "Meinen Plan ansehen", onclick: send }),
+      el("button", { type: "button", class: "abo-button", text: directMode ? "Angebot prüfen" : "Weiter", onclick: send }),
       status,
-      el("p", { class: "start-small" }, ["Startest du ein Abo, schicken wir die Vertragsbestätigung an diese Adresse. Für einen Willkommenspreis prüfen wir die Adresse. Keine Werbung ohne dein Ja. ",
+      el("p", { class: "start-small" }, [directMode
+        ? "Startest du ein Abo, schicken wir die Vertragsbestätigung an diese Adresse. Für einen Willkommenspreis prüfen wir die Adresse. Keine Werbung ohne dein Ja. "
+        : "Wir respektieren deine Privatsphäre und tun alles für den Schutz deiner persönlichen Daten. Deine Daten werden entsprechend unserer Datenschutzerklärung verarbeitet. Startest du ein Abo, schicken wir die Vertragsbestätigung an diese Adresse. Keine Werbung ohne dein Ja. ",
         el("a", { href: "/datenschutz.html", text: "Datenschutz" }), "."])
-    ];
+    ].filter(Boolean);
   }
 
   // ---- Eigener Schritt für Tipps per E-Mail (wie BetterMe: „Ja, ich bin dabei / Kein Interesse“) ------------
