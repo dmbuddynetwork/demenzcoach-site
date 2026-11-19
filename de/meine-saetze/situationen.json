@@ -1,0 +1,268 @@
+{
+ "_hinweis": "Situationen für /de/meine-saetze/: Schlüssel -> gehörter Satz, Seite, Zeichnung. Erzeugt aus de/index.html translator-data.",
+ "mutter": {
+  "says": "Wo ist meine Mutter?",
+  "href": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+  "image": "/assets/zeichnungen/s-dead.webp"
+ },
+ "arbeit": {
+  "says": "Ich muss zur Arbeit.",
+  "href": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+  "image": "/assets/zeichnungen/work.webp"
+ },
+ "geld": {
+  "says": "Du hast mein Geld gestohlen!",
+  "href": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+  "image": "/assets/zeichnungen/s-money.webp"
+ },
+ "wer": {
+  "says": "Wer sind Sie?",
+  "href": "/de/demenz-uebersetzer/wer-sind-sie.html",
+  "image": "/assets/zeichnungen/s-recognize.webp"
+ },
+ "hunger": {
+  "says": "Ich habe heute noch nichts gegessen.",
+  "href": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+  "image": "/assets/zeichnungen/together.webp"
+ },
+ "waschen": {
+  "says": "Ich will nicht duschen.",
+  "href": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+  "image": "/assets/zeichnungen/tuch-mama.webp"
+ },
+ "ruhe": {
+  "says": "Lass mich in Ruhe!",
+  "href": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+  "image": "/assets/zeichnungen/wuetend-ruhig.webp"
+ },
+ "jemand": {
+  "says": "Da ist jemand im Zimmer.",
+  "href": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+  "image": "/assets/zeichnungen/s-fear.webp"
+ },
+ "krank": {
+  "says": "Ich bin doch nicht dement!",
+  "href": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+  "image": "/assets/zeichnungen/words.webp"
+ },
+ "dumm": {
+  "says": "Ich kann gar nichts mehr.",
+  "href": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+  "image": "/assets/zeichnungen/s-cry.webp"
+ },
+ "uhrzeit": {
+  "says": "Wann gehen wir?",
+  "href": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+  "image": "/assets/zeichnungen/s-coat.webp"
+ },
+ "heim": {
+  "says": "Ich will nicht ins Heim.",
+  "href": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+  "image": "/assets/zeichnungen/leave.webp"
+ },
+ "hilfe": {
+  "says": "Hilfe! Hilfe!",
+  "href": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+  "image": "/assets/zeichnungen/ruhig-hilfe-oben.webp"
+ },
+ "auto": {
+  "says": "Ich kann noch selbst Auto fahren.",
+  "href": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+  "image": "/assets/zeichnungen/car.webp"
+ },
+ "tabletten": {
+  "says": "Ich nehme keine Tabletten.",
+  "href": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+  "image": "/assets/zeichnungen/s-meds.webp"
+ },
+ "luegen": {
+  "says": "Du lügst mich an!",
+  "href": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+  "image": "/assets/zeichnungen/s-accuse.webp"
+ },
+ "eingesperrt": {
+  "says": "Ich bin hier eingesperrt!",
+  "href": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+  "image": "/assets/zeichnungen/tuer-hall.webp"
+ },
+ "aufstehen": {
+  "says": "Ich muss jetzt aufstehen!",
+  "href": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+  "image": "/assets/zeichnungen/getup.webp"
+ },
+ "kinder": {
+  "says": "Wo sind meine Kinder?",
+  "href": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+  "image": "/assets/zeichnungen/child.webp"
+ },
+ "langweilig": {
+  "says": "Mir ist so langweilig.",
+  "href": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+  "image": "/assets/zeichnungen/s-apathy.webp"
+ },
+ "wobin": {
+  "says": "Wo bin ich?",
+  "href": "/de/demenz-uebersetzer/wo-bin-ich.html",
+  "image": "/assets/zeichnungen/uhr-mama.webp"
+ },
+ "vergiftet": {
+  "says": "Das Essen ist vergiftet.",
+  "href": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+  "image": "/assets/zeichnungen/plates.webp"
+ },
+ "bett": {
+  "says": "Ich will nicht ins Bett.",
+  "href": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+  "image": "/assets/zeichnungen/s-evening.webp"
+ },
+ "einkaufen": {
+  "says": "Ich muss noch einkaufen.",
+  "href": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+  "image": "/assets/zeichnungen/s-keys.webp"
+ },
+ "nachbarn": {
+  "says": "Die Nachbarn reden über mich.",
+  "href": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+  "image": "/assets/zeichnungen/noise.webp"
+ },
+ "haustier": {
+  "says": "Wo ist mein Hund?",
+  "href": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+  "image": "/assets/zeichnungen/v-garten.webp"
+ },
+ "kalt": {
+  "says": "Mir ist so kalt.",
+  "href": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+  "image": "/assets/zeichnungen/s-cold.webp"
+ },
+ "besuch": {
+  "says": "Wann kommt mein Sohn?",
+  "href": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+  "image": "/assets/zeichnungen/visit.webp"
+ },
+ "anrufen": {
+  "says": "Ich muss sofort jemanden anrufen!",
+  "href": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+  "image": "/assets/zeichnungen/v-handy.webp"
+ },
+ "partner": {
+  "says": "Wo ist mein Mann?",
+  "href": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+  "image": "/assets/zeichnungen/paywall-fotoalbum.webp"
+ },
+ "allein": {
+  "says": "Lass mich nicht allein!",
+  "href": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+  "image": "/assets/zeichnungen/v-haende.webp"
+ },
+ "schongegessen": {
+  "says": "Ich habe schon gegessen.",
+  "href": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+  "image": "/assets/zeichnungen/together.webp"
+ },
+ "toilette": {
+  "says": "Ich muss nicht aufs Klo.",
+  "href": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+  "image": "/assets/zeichnungen/wc-mama.webp"
+ },
+ "umziehen": {
+  "says": "Ich ziehe mich nicht um.",
+  "href": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+  "image": "/assets/zeichnungen/lied-refuse.webp"
+ },
+ "ausziehen": {
+  "says": "Ich will das ausziehen!",
+  "href": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+  "image": "/assets/zeichnungen/trick-kleidung.webp"
+ },
+ "liegen": {
+  "says": "Ich bleibe heute im Bett.",
+  "href": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+  "image": "/assets/zeichnungen/nacht-room.webp"
+ },
+ "abend": {
+  "says": "Es wird dunkel, ich muss jetzt los!",
+  "href": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+  "image": "/assets/zeichnungen/sunset.webp"
+ },
+ "untreue": {
+  "says": "Du hast einen anderen!",
+  "href": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+  "image": "/assets/zeichnungen/s-jealous.webp"
+ },
+ "kind": {
+  "says": "Ich bin doch kein Kind!",
+  "href": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+  "image": "/assets/zeichnungen/accuse.webp"
+ },
+ "tagespflege": {
+  "says": "Ich gehe nicht in die Tagespflege!",
+  "href": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+  "image": "/assets/zeichnungen/daycare.webp"
+ },
+ "nachhause": {
+  "says": "Ich will nach Hause.",
+  "href": "/de/demenz-uebersetzer/",
+  "image": "/assets/zeichnungen/nach-hause.webp"
+ },
+ "sterben": {
+  "says": "Ich will nicht mehr leben.",
+  "href": "/de/demenz-uebersetzer/",
+  "image": ""
+ },
+ "erschoepft": {
+  "says": "Ich kann nicht mehr.",
+  "href": "/de/demenz-uebersetzer/",
+  "image": ""
+ },
+ "betrug": {
+  "says": "Mein Enkel hat angerufen, er braucht Geld.",
+  "href": "/de/demenz-uebersetzer/",
+  "image": ""
+ },
+ "pflegesorge": {
+  "says": "Die tun mir hier weh.",
+  "href": "/de/demenz-uebersetzer/",
+  "image": ""
+ },
+ "toilettefinden": {
+  "says": "Ich finde die Toilette nicht.",
+  "href": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html",
+  "image": "/assets/zeichnungen/wc-mama.webp"
+ },
+ "pflegeaufteilen": {
+  "says": "Meine Geschwister helfen nicht bei der Pflege.",
+  "href": "/de/angehoerige/pflege-mit-geschwistern-aufteilen.html",
+  "image": ""
+ },
+ "gefuehl-angst": {
+  "says": "Angst",
+  "href": "",
+  "image": "/assets/zeichnungen/stimmung-angst.webp"
+ },
+ "gefuehl-wut": {
+  "says": "Wut",
+  "href": "",
+  "image": "/assets/zeichnungen/stimmung-wut.webp"
+ },
+ "gefuehl-trauer": {
+  "says": "Traurigkeit",
+  "href": "",
+  "image": "/assets/zeichnungen/stimmung-traurig.webp"
+ },
+ "gefuehl-unruhe": {
+  "says": "Unruhe",
+  "href": "",
+  "image": "/assets/zeichnungen/stimmung-unruhe.webp"
+ },
+ "gefuehl-misstrauen": {
+  "says": "Misstrauen",
+  "href": "",
+  "image": "/assets/zeichnungen/stimmung-misstrauen.webp"
+ },
+ "gefuehl-sehnsucht": {
+  "says": "Sehnsucht",
+  "href": "",
+  "image": "/assets/zeichnungen/ruhig-partner.webp"
+ }
+}

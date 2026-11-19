@@ -743,6 +743,7 @@
     const node = button('', 'translator-save', () => {
       const on = savedStore.toggle(item);
       track('translator_save', { step: on ? 'saved' : 'removed', result_key: result.key });
+      if (on) showSavedToast();
     });
     const set = (on) => {
       node.setAttribute('aria-pressed', String(on));
@@ -776,62 +777,126 @@
     link.addEventListener('click', () => track('translator_share', { result_key: result.key, method: 'whatsapp', step: 'phrase' }));
     return link;
   };
-  // „Meine Sätze“ oben in der Menüleiste mit Zähler (Daniel, 9. Nov 03:26: nicht wahllos auf der Seite).
-  // Der Knopf öffnet die Liste als Fenster unter der Leiste; ohne gemerkte Sätze bleibt er unsichtbar.
-  const savedNav = document.querySelector('.e-header nav');
-  let savedBox = document.getElementById('translator-saved');
-  let savedToggle = null;
+  // Satz antippen (Daniel, 19. Nov): Unter dem Satz erscheinen zwei große, beschriftete Knöpfe
+  // „Merken“ und „Teilen“. Gilt für feste und für KI-Antworten. Geteilt wird nur der Satz selbst.
+  const shareAction = ({ text, url, key }) => {
+    const label = tr('Teilen');
+    const icon = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>';
+    if (navigator.share) {
+      const node = button('', 'translator-menu-share', async () => {
+        try { await navigator.share({ text, url }); track('translator_share', { result_key: key, method: 'native', step: 'phrase_menu' }); } catch { /* Abgebrochen. */ }
+      });
+      node.innerHTML = `${icon}<span>${label}</span>`;
+      return node;
+    }
+    const link = element('a', { className: 'translator-menu-share', attributes: { href: `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, rel: 'noopener', target: '_blank' } });
+    link.innerHTML = `${icon}<span>${label}</span>`;
+    link.addEventListener('click', () => track('translator_share', { result_key: key, method: 'whatsapp', step: 'phrase_menu' }));
+    return link;
+  };
+  let openPhraseMenu = null;
+  const closePhraseMenu = () => {
+    if (!openPhraseMenu) return;
+    openPhraseMenu.menu.remove();
+    openPhraseMenu.bubble.setAttribute('aria-expanded', 'false');
+    openPhraseMenu.bubble.classList.remove('translator-phrase-open');
+    openPhraseMenu = null;
+  };
+  const phraseTap = (bubble, { item = null, share = null } = {}) => {
+    if (ui || (!item && !share)) return bubble;
+    bubble.classList.add('translator-phrase-tappable');
+    bubble.setAttribute('tabindex', '0');
+    bubble.setAttribute('aria-expanded', 'false');
+    bubble.setAttribute('aria-label', `${bubble.querySelector('q')?.textContent ?? ''} – ${tr('antippen zum Merken oder Teilen')}`);
+    const open = () => {
+      const menu = element('div', { className: 'translator-phrase-menu', attributes: { role: 'group', 'aria-label': tr('Satz merken oder teilen') } });
+      if (item && savedStore) {
+        const save = button('', 'translator-menu-save', () => {
+          const on = savedStore.toggle(typeof item === 'function' ? item() : item);
+          paint();
+          track('translator_save', { step: on ? 'saved_menu' : 'removed_menu', result_key: currentItem.key });
+          if (on) showSavedToast();
+        });
+        let currentItem = typeof item === 'function' ? item() : item;
+        const paint = () => {
+          currentItem = typeof item === 'function' ? item() : item;
+          const on = savedStore.has(currentItem);
+          save.setAttribute('aria-pressed', String(on));
+          save.replaceChildren(element('span', { text: on ? '♥' : '♡', attributes: { 'aria-hidden': 'true' } }), element('span', { text: on ? 'Gemerkt' : 'Merken' }));
+        };
+        paint();
+        menu.append(save);
+      }
+      if (share) menu.append(share());
+      bubble.after(menu);
+      bubble.setAttribute('aria-expanded', 'true');
+      bubble.classList.add('translator-phrase-open');
+      openPhraseMenu = { bubble, menu };
+      track('translator_phrase_tap', { result_key: (typeof item === 'function' ? item() : item)?.key ?? 'none' });
+    };
+    const toggle = () => {
+      const mine = openPhraseMenu?.bubble === bubble;
+      closePhraseMenu();
+      if (!mine) open();
+    };
+    bubble.addEventListener('click', (event) => { if (event.target.closest('button, a, input, textarea, select')) return; toggle(); });
+    bubble.addEventListener('keydown', (event) => { if ((event.key === 'Enter' || event.key === ' ') && event.target === bubble) { event.preventDefault(); toggle(); } });
+    return bubble;
+  };
+  // „Meine Sätze“ als eigene Seite (Daniel, 19. Nov): Oben in der Leiste ein Herz mit Zähler, das zur Seite
+  // /de/meine-saetze/ führt (Überblick nach Situation, Drucken, mit Anmeldung). Kein Fenster mehr über der Antwort.
+  const savedPage = '/de/meine-saetze/';
+  let savedLink = null;
   let savedCount = null;
-  if (savedStore && savedNav && !ui) {
-    if (!savedBox) {
-      savedBox = element('section', { className: 'translator-saved', attributes: { id: 'translator-saved', 'aria-label': 'Meine Sätze', hidden: '' } });
-      document.body.append(savedBox);
-    } else if (savedBox.parentElement !== document.body) document.body.append(savedBox);
-    savedBox.classList.add('translator-saved-panel');
+  if (savedStore && !ui) {
+    document.getElementById('translator-saved')?.remove();
     savedCount = element('span', { className: 'e-saved-count' });
-    savedToggle = element('button', { className: 'e-saved-toggle', attributes: { type: 'button', 'aria-controls': 'translator-saved', 'aria-expanded': 'false', hidden: '' } }, [
+    savedLink = element('a', { className: 'e-saved-toggle', attributes: { href: savedPage, hidden: '' } }, [
+      element('span', { className: 'e-saved-heart', text: '♥', attributes: { 'aria-hidden': 'true' } }),
       element('span', { className: 'e-saved-label', text: 'Meine Sätze' }),
       savedCount
     ]);
-    savedNav.prepend(savedToggle);
+    savedLink.addEventListener('click', () => track('translator_save', { step: 'header_link' }));
+    // Die gemeinsame Navigation baut die Kopfleiste später um: Das Herz steht immer direkt vor „Anmelden“.
+    const place = () => {
+      const account = document.querySelector('.e-header .dc-navigation-account');
+      if (account) { if (account.previousElementSibling !== savedLink) account.before(savedLink); return true; }
+      const nav = document.querySelector('.e-header nav');
+      if (nav && !savedLink.isConnected) nav.prepend(savedLink);
+      return false;
+    };
+    if (!place()) {
+      const header = document.querySelector('.e-header');
+      if (header) {
+        const watcher = new MutationObserver(() => { if (place()) watcher.disconnect(); });
+        watcher.observe(header, { childList: true, subtree: true });
+      }
+    }
   }
-  const openSaved = (open) => {
-    if (!savedToggle) return;
-    savedBox.hidden = !open;
-    savedToggle.setAttribute('aria-expanded', String(open));
-    if (open) { savedBox.querySelector('button')?.focus(); track('translator_save', { step: 'list_opened' }); }
+  // Kurzer Hinweis nach dem Merken: wo die Sätze jetzt stehen.
+  let savedToast = null;
+  let savedToastTimer = 0;
+  const showSavedToast = () => {
+    if (ui) return;
+    savedToast?.remove();
+    clearTimeout(savedToastTimer);
+    savedToast = element('div', { className: 'translator-saved-toast', attributes: { role: 'status' } }, [
+      element('span', { text: 'Gemerkt.' }),
+      element('a', { text: 'Zu meinen Sätzen', attributes: { href: savedPage } })
+    ]);
+    document.body.append(savedToast);
+    savedToastTimer = setTimeout(() => savedToast?.remove(), 6000);
   };
-  savedToggle?.addEventListener('click', () => openSaved(savedBox.hidden));
-  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && savedToggle && !savedBox.hidden) { openSaved(false); savedToggle.focus(); } });
-  document.addEventListener('click', (event) => { if (savedToggle && !savedBox.hidden && !savedBox.contains(event.target) && !savedToggle.contains(event.target)) openSaved(false); });
   const renderSaved = () => {
     saveButtons = saveButtons.filter(({ node }) => node.isConnected);
     saveButtons.forEach(({ item, set }) => set(savedStore.has(item)));
-    if (!savedBox || !savedStore) return;
-    const items = savedStore.list();
-    if (savedToggle) {
-      const before = savedCount.textContent;
-      savedToggle.hidden = !items.length;
-      savedCount.textContent = String(items.length);
-      savedToggle.setAttribute('aria-label', `${tr('Meine Sätze')}: ${items.length}`);
-      if (before && before !== savedCount.textContent) { savedToggle.classList.remove('e-saved-bump'); void savedToggle.offsetWidth; savedToggle.classList.add('e-saved-bump'); }
-      if (!items.length) openSaved(false);
-    } else savedBox.hidden = !items.length;
-    if (!items.length) { savedBox.replaceChildren(); return; }
-    savedBox.replaceChildren(
-      element('div', { className: 'translator-saved-head' }, [
-        element('h2', { text: 'Meine Sätze' }),
-        savedToggle ? button('Schließen', 'translator-saved-close', () => { openSaved(false); savedToggle.focus(); }) : null
-      ]),
-      element('div', { className: 'translator-phrases' }, items.map((item) => element('div', { className: 'translator-phrase translator-saved-phrase' }, [
-        element('q', { text: core.personalize(item.text, personal, data.formal) }),
-        button('Entfernen', 'translator-saved-remove', () => {
-          savedStore.remove(item);
-          track('translator_save', { step: 'removed_list', result_key: item.key });
-        })
-      ]))),
-      element('p', { className: 'translator-privacy', text: 'Nur auf diesem Gerät gespeichert.' })
-    );
+    if (!savedStore || !savedLink) return;
+    const count = savedStore.list().length;
+    const before = savedCount.textContent;
+    savedLink.hidden = !count;
+    savedCount.textContent = String(count);
+    savedLink.setAttribute('aria-label', `${tr('Meine Sätze')}: ${count}`);
+    if (before && Number(count) > Number(before)) { savedLink.classList.remove('e-saved-bump'); void savedLink.offsetWidth; savedLink.classList.add('e-saved-bump'); }
   };
   savedStore?.onChange(renderSaved);
 
@@ -1089,7 +1154,11 @@
       ? (ui?.lang === 'en' ? 'What can help you now' : 'Das kann dir jetzt helfen') : 'Das kannst du sagen', attributes: { tabindex: '-1' } });
     nodes.push(first, selfSupport
       ? element('ol', { className: 'translator-self-support-steps' }, result.steps.map(text => element('li', { className: 'translator-meaning', text })))
-      : element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]))));
+      : element('div', { className: 'translator-phrases' }, result.phrases.map((phrase) => phraseTap(element('div', { className: 'translator-phrase' }, [element('q', { text: phrase })]), {
+        // KI-Satz merken: der Satz und die Situation, wie sie oben in der Sprechblase steht (nur auf diesem Gerät).
+        item: savedStore && !ui ? () => ({ key: 'ki', says: (output.querySelector('.translator-said-bubble')?.textContent ?? '').replace(/^[„"]|[“"]$/gu, '').trim().slice(0, 200), text: phrase }) : null,
+        share: ui ? null : () => shareAction({ text: `„${phrase}“ – ein Satz aus dem Demenz Coach. Mehr Sätze und Tipps:`, url: 'https://dementiacoachapp.com/de/', key: 'ki' })
+      }))));
     const context = [element('h3', { className: 'translator-step', text: 'Was dahintersteckt' }), element('p', { className: 'translator-meaning translator-ai-meaning', text: result.meaning })];
     // Communication answers keep their next step; self-support already has its concrete steps.
     if (!selfSupport && typeof result.nextStep === 'string' && result.nextStep) {
@@ -1881,12 +1950,18 @@
           const text = result.selfCare ? original : core.personalize(original, personal, data.formal);
           const exampleHint = !exampleHintShown && !String(personal.me ?? '').trim() && /\bAnna\b/.test(text);
           if (exampleHint) exampleHintShown = true;
-          return element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : exampleHint ? 'translator-phrase translator-phrase-example' : 'translator-phrase' }, [
+          const canSave = Boolean(savedStore && !ui && !result.selfCare && result.key);
+          const canShare = !ui && !result.selfCare && !result.safetyOnly && result.url && result.says;
+          const plain = core.personalize(original, { formal: personal.formal, callName: '', me: '', role: '' }, data.formal);
+          return phraseTap(element('div', { className: lead ? 'translator-phrase translator-phrase-mood' : exampleHint ? 'translator-phrase translator-phrase-example' : 'translator-phrase' }, [
             lead ? element('span', { className: 'translator-mood-lead', text: lead }) : null,
             exampleHint ? element('span', { className: 'translator-example-name', text: '„Anna“ ist ein Beispielname.' }) : null,
             element('q', { text }),
             element('div', { className: 'translator-phrase-actions' }, [saveButton(result, original), phraseShareButton(result, original)])
-          ]);
+          ]), {
+            item: canSave ? { key: result.key, says: result.says || '', text: original } : null,
+            share: canShare ? () => shareAction({ text: `„${plain}“ – das kann man sagen, wenn ein Mensch mit Demenz sagt: „${result.says}“. Mehr Sätze und Tipps:`, url: shareLink(result), key: result.key }) : null
+          });
         }));
       };
       paint();

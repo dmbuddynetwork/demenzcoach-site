@@ -2,7 +2,7 @@
 const attemptKey = 'demenzcoach.emailLinkAttempt.v1';
 const signupKey = 'demenzcoach.emailSignupCompleted.v1';
 const maxAge = 30 * 60 * 1000;
-const paths = new Set(['/de/', '/en/dementia-translator/', '/abo/', '/abo/index.html', '/abo/mein-plan.html', '/abo/ueber-mama.html']);
+const paths = new Set(['/de/', '/de/meine-saetze/', '/en/dementia-translator/', '/abo/', '/abo/index.html', '/abo/mein-plan.html', '/abo/ueber-mama.html']);
 const emailValue = (value) => typeof value === 'string' && value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(value.trim()) ? value.trim() : '';
 export class EmailAccessError extends Error {
   constructor(code) { super(code); this.code = code; }
