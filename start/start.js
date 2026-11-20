@@ -537,8 +537,17 @@
       ? `Heute zahlst du 0,00 €. Kündige ich nicht vor Ablauf der ${offer.trialDays} Tage, kostet das Abo danach ${priceText(plan)} und verlängert sich, bis ich kündige. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`
       : `Du zahlst ${priceText(plan)}, bis du kündigst. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`);
     const fine = () => el("p", { class: "start-fine", "data-start-fine": "", text: fineText() });
-    const payments = () => el("ul", { class: "start-pay", role: "list", "aria-label": "Sicher bezahlen" }, [
-      el("li", {}, [el("span", { html: icons.lock }), "SSL-verschlüsselt"]), el("li", { text: "Apple Pay" }), el("li", { text: "Google Pay" }), el("li", { text: "Karte" }), el("li", { text: "Stripe" })]);
+    // Zahlungs-Logos wie BetterMe („Guaranteed safe checkout“). Nur Wege, die die Kasse wirklich anbietet (Stripe: Karte, Apple Pay, Google Pay).
+    const payLogos = [
+      ["Visa", '<svg viewBox="0 0 60 24" aria-hidden="true"><text x="30" y="18" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="17" font-weight="900" font-style="italic" fill="#1a1f71" letter-spacing="1">VISA</text></svg>'],
+      ["Mastercard", '<svg viewBox="0 0 60 24" aria-hidden="true"><circle cx="24" cy="12" r="9" fill="#eb001b"/><circle cx="36" cy="12" r="9" fill="#f79e1b"/><path d="M30 5.3a9 9 0 0 1 0 13.4a9 9 0 0 1 0-13.4z" fill="#ff5f00"/></svg>'],
+      ["Apple Pay", '<svg viewBox="0 0 60 24" aria-hidden="true"><path d="M13.6 7.3c.6-.8 1-1.8.9-2.8-.9 0-2 .6-2.6 1.4-.6.6-1.1 1.7-.9 2.7 1 .1 2-.5 2.6-1.3zm.9 1.5c-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.9-.8-1.5 0-2.8.9-3.6 2.2-1.5 2.7-.4 6.6 1.1 8.8.7 1.1 1.6 2.2 2.7 2.2s1.5-.7 2.8-.7 1.7.7 2.9.7 1.9-1.1 2.6-2.1c.8-1.2 1.1-2.4 1.2-2.5 0 0-2.3-.9-2.3-3.5 0-2.2 1.8-3.2 1.9-3.3-1-1.5-2.6-1.7-3.1-1.8z" fill="#000"/><text x="20" y="18" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#000">Pay</text></svg>'],
+      ["Google Pay", '<svg viewBox="0 0 60 24" aria-hidden="true"><text x="7" y="18" font-family="Arial,Helvetica,sans-serif" font-size="15" font-weight="700"><tspan fill="#4285f4">G</tspan><tspan fill="#5f6368" font-weight="500"> Pay</tspan></text></svg>']
+    ];
+    const payments = () => el("div", { class: "start-pay" }, [
+      el("p", { class: "start-pay-title" }, [el("span", { html: icons.lock }), "Sicher bezahlen, SSL-verschlüsselt"]),
+      el("ul", { role: "list", "aria-label": "Zahlungswege" }, payLogos.map(([name, svg]) => el("li", { title: name, "aria-label": name, html: svg })))
+    ]);
     const guarantee = () => el("p", { class: "start-guarantee" }, [el("span", { html: icons.shield }),
       el("span", {}, [el("strong", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }), " ", el("a", { href: "/abo/garantie.html", text: "Bedingungen" })])]);
     const scrollToPlans = () => document.querySelector(".start-tiers")?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -619,6 +628,41 @@
     const includedList = el("ul", { class: "start-included", role: "list" }, included.map(([icon, title, text]) =>
       el("li", {}, [el("span", { class: "start-included-icon", html: icon }), el("span", {}, [el("strong", { text: title }), el("span", { text })])])));
 
+    // Bilder aus dem Plan wie BetterMe: echte Bildschirme in Handy-Rahmen, seitlich wischbar.
+    const shotList = [
+      ["ueben-waehlen", "Situation wählen, Antwort finden"],
+      ["ueben-rueckmeldung", "Sofort eine Rückmeldung"],
+      ["ueben-geschafft", "Geschafft: die Person wird ruhig"],
+      ["app-result", "Passende Sätze für den Moment"],
+      ["app-plan", "Jeden Tag ein kleiner Schritt"],
+      ["app-help", "Soforthilfe, wenn es schwierig wird"]
+    ];
+    const shots = el("div", { class: "start-shots", role: "list", "aria-label": "Bilder aus dem Plan" }, shotList.map(([file, caption]) =>
+      el("figure", { role: "listitem" }, [
+        el("span", { class: "start-phone" }, [el("img", { src: `/assets/angebot/${file}.webp`, width: "360", height: "740", loading: "lazy", decoding: "async", alt: caption })]),
+        el("figcaption", { text: caption })
+      ])));
+
+    // Übungsplan für 7 Tage (nur vom Üben): je Tag eine Situation. Tag 1 ist die gerade geübte Situation und ist geschafft.
+    const weekDays = [
+      ["Ich will nach Hause.", "/assets/zeichnungen/nach-hause.webp"],
+      ["Ich will nicht duschen.", "/assets/zeichnungen/tuch-mama.webp"],
+      ["Du hast mein Geld gestohlen!", "/assets/zeichnungen/s-money.webp"],
+      ["Ich will nicht ins Bett.", "/assets/zeichnungen/s-evening.webp"],
+      ["Ich muss zur Arbeit.", "/assets/zeichnungen/work.webp"],
+      ["Ich habe heute noch nichts gegessen.", "/assets/zeichnungen/together.webp"],
+      ["Wo ist meine Mutter?", "/assets/zeichnungen/s-dead.webp"],
+      ["Wer sind Sie?", "/assets/zeichnungen/s-recognize.webp"]
+    ];
+    const practiced = pair ? weekDays.findIndex(([, image]) => image === pair.before) : -1;
+    const days = (practiced > 0 ? [weekDays[practiced], ...weekDays.filter((_, index) => index !== practiced)] : weekDays).slice(0, 7);
+    const week = pair ? el("ol", { class: "start-week", role: "list" }, days.map(([quote, image], index) =>
+      el("li", { class: index === 0 ? "done" : "" }, [
+        el("img", { src: image, width: "64", height: "56", loading: "lazy", alt: "" }),
+        el("span", {}, [el("small", { text: `Tag ${index + 1}` }), el("strong", { text: `„${quote}“` })]),
+        el("span", { class: "start-week-mark", "aria-label": index === 0 ? "Geschafft" : "", text: index === 0 ? "✓" : "" })
+      ]))) : null;
+
     const offerBlock = () => [ticket(), table(), cta(), fine(), payments()];
 
     return [
@@ -630,7 +674,13 @@
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       ...offerBlock(),
       el("h2", { class: "start-section start-center start-big-title", text: "Was ist in deinem Plan enthalten" }),
+      shots,
       includedList,
+      week ? el("div", { class: "start-weekcard" }, [
+        el("h2", { text: "Dein Übungsplan für 7 Tage" }),
+        el("p", { class: "start-weekbar", role: "img", "aria-label": "1 von 7 Tagen geschafft" }, [el("span", { text: "Dein Fortschritt" }), el("i", {}, [el("b")]), el("span", { text: "1 von 7" })]),
+        week
+      ]) : null,
       hasSpecificPlan && !pair ? el("div", { class: "start-card" }, [
         el("h2", { text: `Wenn „${s.quote}“ fällt` }),
         el("p", { class: "start-small", text: "Probier heute einen dieser Sätze:" }),
