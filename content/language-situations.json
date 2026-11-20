@@ -1,0 +1,4066 @@
+{
+ "_hinweis": "Generiert aus der iOS-App (DemenzCoach/Content.swift + Localizable.xcstrings, geprüfte Übersetzungen) für die Sprach-Startseiten. Einfügen mit scripts/build-language-situations.mjs.",
+ "languages": {
+  "ar": {
+   "heading": "مواقف شائعة وما يساعد فيها",
+   "labels": {
+    "say": "يمكنك أن تقول",
+    "next": "ما يمكنك القيام به",
+    "why": "ما وراء ذلك",
+    "avoid": "الأفضل ألا تقول:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "الرغبة في العودة إلى المنزل",
+     "say": "أنت تفتقد منزلك. أخبرني بما كان جميلاً بشكل خاص هناك.",
+     "next": "قدم شيئًا مألوفًا، مثل الشاي، موسيقى هادئة، أو ألبوم صور.",
+     "why": "هذه اللحظة غالبًا ما تتعلق بالسلامة والألفة أكثر من الموقع الفعلي. مناقضة الشخص قد تخلق ضغطًا إضافيًا.",
+     "avoid": "لكنك في المنزل."
+    },
+    {
+     "id": "repeat",
+     "title": "نفس السؤال يستمر في الظهور",
+     "say": "تريد أن تعرف متى ننطلق. سأخبرك في الوقت المناسب.",
+     "next": "اكتب الإجابة بوضوح على ورقة وأشر إليها عندما يُطرح السؤال مرة أخرى.",
+     "why": "ربما لم تبق الإجابة في الذاكرة. الجملة الهادئة والمتسقة توفر التوجيه دون التسبب في الشعور بالذنب.",
+     "avoid": "لقد أخبرتك بذلك خمس مرات بالفعل."
+    },
+    {
+     "id": "wash",
+     "title": "تم رفض الاستحمام",
+     "say": "هل تريد أن تنتعش عند الحوض أولاً أم تأخذ حمامًا لاحقًا؟",
+     "next": "سخن الغرفة مسبقًا وضع المنشفة والملابس في مكان مرئي.",
+     "why": "يمكن أن تشعر العناية الشخصية بأنها غير مألوفة أو مهددة. خيار صغير يساعد على الحفاظ على السيطرة والكرامة.",
+     "avoid": "عليك أن تستحم الآن."
+    },
+    {
+     "id": "evening",
+     "title": "يبدأ القلق في المساء",
+     "say": "الوضع بدأ يصبح مضطربًا. سأبقى معك وسنجعل الأمور أهدأ قليلًا هنا.",
+     "next": "أطفئ الأضواء الساطعة والتلفاز واعرض نشاطًا هادئًا ومألوفًا.",
+     "why": "في المساء، يمكن للتعب والظلال والعديد من المحفزات أن تزيد من حالة الشعور بعدم الأمان. غالبًا ما يساعد التوجيه والهدوء أكثر من الضغط.",
+     "avoid": "عليك أخيرًا أن تنام الآن."
+    },
+    {
+     "id": "keys",
+     "title": "المفاتيح أو المال اختفى",
+     "say": "أنت تبحث عن مفاتيحك. لنبحث معًا في الأماكن المعتادة.",
+     "next": "تحقق بهدوء من مكانين مألوفين توضع فيهما الأشياء عادةً، ثم اعرض استراحة.",
+     "why": "البحث معًا يأخذ الشعور على محمل الجد ويتجنب الشعور بالذنب.",
+     "avoid": "لقد ضيعتها مرة أخرى."
+    },
+    {
+     "id": "accuse",
+     "title": "يتهمونني بالسرقة",
+     "say": "أنت قلق بشأن أموالك. سننظر فيها معًا.",
+     "next": "اعترف بالقلق وابحث معًا باختصار في مكان مألوف.",
+     "why": "القلق يبدو حقيقيًا. الدفاع يمكن أن يبدو بمثابة مقاومة إضافية.",
+     "avoid": "يا له من هراء، أنا لا أسرق."
+    },
+    {
+     "id": "eat",
+     "title": "تم رفض الطعام",
+     "say": "هل ترغب بملعقتين من الحساء أم بعض الخبز؟",
+     "next": "قدّم حصة صغيرة وخيارين مألوفين فقط.",
+     "why": "خيارات صغيرة وقابلة للتحكم تبدو أقل إرهاقًا.",
+     "avoid": "عليك أن تأكل شيئًا."
+    },
+    {
+     "id": "drink",
+     "title": "نسيان الشرب",
+     "say": "سأشرب كوبًا معك. هل تريد ماء أم شاي؟",
+     "next": "ضع كأسًا مفضلًا وواضحًا في متناول اليد وتناول رشفة معًا.",
+     "why": "القيام بالأشياء معًا واتخاذ خيار بسيط يخلق ضغطًا أقل.",
+     "avoid": "لقد شربت قليلًا جدًا اليوم."
+    },
+    {
+     "id": "night",
+     "title": "ينهض الشخص ليلًا",
+     "say": "لا يزال الليل. أنا هنا وسأرافقك لفترة قصيرة.",
+     "next": "استخدم إضاءة خافتة، ورافق الشخص إلى الحمام ثم أعده إلى السرير.",
+     "why": "التوجيه الهادئ يوفر الأمان دون بدء جدال.",
+     "avoid": "استلقِ مجددًا على الفور."
+    },
+    {
+     "id": "dress",
+     "title": "تم رفض ارتداء الملابس",
+     "say": "هل تريد السترة الزرقاء أم الرمادية؟",
+     "next": "ضع قطعتين مناسبتين من الملابس في مكان ظاهر، وامنح الشخص وقتًا كافيًا.",
+     "why": "خياران مرئيان يقللان الخيارات ويحافظان على تقرير المصير.",
+     "avoid": "لا يمكنك البقاء مرتديًا البيجامة."
+    },
+    {
+     "id": "work",
+     "title": "الشخص يريد الذهاب إلى العمل",
+     "say": "يمكنني الاعتماد عليك دائمًا. قبل أن تذهب، هل تساعدني هنا قليلًا؟",
+     "next": "اعرض مهمة ذات معنى تناسب المهنة السابقة، مثل ترتيب الأوراق أو إصلاح شيء أو تجهيز المائدة.",
+     "why": "كثيرًا ما منح العمل دورًا ونظامًا وتقديرًا. وغالبًا ما تكون وراء هذه الرغبة الحاجة إلى أن يشعر المرء بأنه مفيد.",
+     "avoid": "أنت متقاعد منذ زمن طويل."
+    },
+    {
+     "id": "car",
+     "title": "الشخص يريد قيادة السيارة بنفسه",
+     "say": "تريد أن تقود بنفسك، وأنا أفهم ذلك. اليوم أقود أنا، وأنت تدلّني على الطريق.",
+     "next": "قدم خيار سفر آمن محدد وضع المفاتيح بعيدًا عن الأنظار إذا لزم الأمر.",
+     "why": "الحاجة إلى الاستقلالية مفهومة؛ والبديل يساعد على حفظ ماء الوجه.",
+     "avoid": "لا يمكنك القيادة بعد الآن."
+    },
+    {
+     "id": "recognize",
+     "title": "الشخص لا يتعرّف عليّ",
+     "say": "أنا هنا من أجلك اليوم. أنا بجانبك.",
+     "next": "اذكر اسمك بهدوء، وحافظ على بعض المسافة، وتحدث عن شيء مألوف بدلًا من شرح صلة القرابة.",
+     "why": "أن لا يتعرّف عليك أحد أمر مؤلم، لكنه ليس رفضًا. الدفء والهدوء يمنحان الأمان دون اختبار الذاكرة.",
+     "avoid": "يجب أن تعرف من أنا."
+    },
+    {
+     "id": "anger",
+     "title": "يصرخ الشخص في وجهي",
+     "say": "سأتركك بهدوء قليلًا. سأبقى قريبًا منك.",
+     "next": "قلل من الضوضاء، حافظ على مسافة آمنة، وتحدث مرة أخرى فقط عندما يهدأ التوتر.",
+     "why": "أنت تخلق مسافة آمنة وفي نفس الوقت تنقل حضورًا هادئًا.",
+     "avoid": "اهدأ الآن، كفى!"
+    },
+    {
+     "id": "daycare",
+     "title": "رفض الذهاب إلى الرعاية النهارية",
+     "say": "سأوصلك إلى هناك وأعود لأصطحبك لاحقًا. يمكنك الاعتماد على ذلك.",
+     "next": "اجعل الوداع قصيرًا ولطيفًا، واذكر موعد العودة، واطلب من الفريق استقبالًا مألوفًا.",
+     "why": "وراء الرفض غالبًا خوف من الجديد أو من البقاء وحيدًا. الوعد الثابت بالعودة للاصطحاب يمنح الطمأنينة.",
+     "avoid": "يجب أن تذهب، أنا أيضًا أحتاج إلى بعض الراحة."
+    }
+   ]
+  },
+  "bg": {
+   "heading": "Чести ситуации и какво помага",
+   "labels": {
+    "say": "Можете да кажете",
+    "next": "Какво можете да направите",
+    "why": "Какво стои зад това",
+    "avoid": "По-добре не:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Желание да се прибере вкъщи",
+     "say": "Домът ти липсва. Разкажи ми какво беше особено хубаво там.",
+     "next": "Предложете нещо познато, като чай, спокойна музика или албум със снимки.",
+     "why": "В този момент често става дума повече за безопасност и усещане за познато, отколкото за действителното място. Възраженията могат да създадат допълнителен натиск.",
+     "avoid": "Ама ти си у дома."
+    },
+    {
+     "id": "repeat",
+     "title": "Един и същ въпрос се повтаря отново и отново",
+     "say": "Искаш да знаеш кога тръгваме. Ще ти кажа навреме.",
+     "next": "Напишете отговора ясно на лист хартия и го посочете при следващия въпрос.",
+     "why": "Отговорът може да не се е запомнил. Спокойното, последователно изречение дава ориентация, без да предизвиква чувство за вина.",
+     "avoid": "Вече ти го казах пет пъти."
+    },
+    {
+     "id": "wash",
+     "title": "Душът е отказан",
+     "say": "Искаш ли първо да се освежиш на мивката, или да вземеш душ по-късно?",
+     "next": "Предварително затоплете стаята и поставете кърпата и дрехите на видимо място.",
+     "why": "Личната грижа може да изглежда непозната или заплашителна. Малкият избор помага да се запази контролът и достойнството.",
+     "avoid": "Сега трябва да вземеш душ."
+    },
+    {
+     "id": "evening",
+     "title": "Безпокойството започва вечер",
+     "say": "Тук става неспокойно. Ще остана с теб и ще направим нещата тук малко по-тихи.",
+     "next": "Изключете ярките светлини и телевизора и предложете познато тихо занимание.",
+     "why": "Вечерта умората, сенките и много стимули могат да увеличат несигурността. Ориентацията и спокойствието често помагат повече от натиска.",
+     "avoid": "Сега най-накрая трябва да заспиш."
+    },
+    {
+     "id": "keys",
+     "title": "Ключове или пари са изчезнали",
+     "say": "Търсиш ключовете си. Хайде да погледнем заедно на обичайните места.",
+     "next": "Спокойно проверете две познати места, където обикновено се оставят нещата, и след това предложете почивка.",
+     "why": "Търсенето заедно приема чувството сериозно и избягва чувството за вина.",
+     "avoid": "Пак си ги загубил някъде."
+    },
+    {
+     "id": "accuse",
+     "title": "Обвиняват ме в кражба",
+     "say": "Притесняваш се за парите си. Ще погледнем заедно.",
+     "next": "Признайте загрижеността и потърсете за кратко заедно на познато място.",
+     "why": "Притеснението се чувства истинско. Оправданията могат да изглеждат като допълнителна съпротива.",
+     "avoid": "Какви глупости, не крада."
+    },
+    {
+     "id": "eat",
+     "title": "Отказва се храна",
+     "say": "Искаш ли няколко лъжици супа или по-скоро малко хляб?",
+     "next": "Предложете малка порция и само две познати опции.",
+     "why": "Малкият и ясен избор претоварва по-малко.",
+     "avoid": "Трябва да хапнеш нещо."
+    },
+    {
+     "id": "drink",
+     "title": "Забравя да пие",
+     "say": "Ще пия чаша с теб. Искаш ли вода или чай?",
+     "next": "Поставете любима, ясно видима чаша на обсег и отпийте заедно.",
+     "why": "Правенето на нещата заедно и вземането на лесен избор създава по-малко напрежение.",
+     "avoid": "Днес пи твърде малко."
+    },
+    {
+     "id": "night",
+     "title": "Човекът става през нощта",
+     "say": "Все още е нощ. Тук съм и ще те придружа за малко.",
+     "next": "Използвайте приглушено осветление, придружете човека до тоалетната и след това обратно до леглото.",
+     "why": "Спокойната ориентация осигурява сигурност без започване на спор.",
+     "avoid": "Веднага си легни обратно."
+    },
+    {
+     "id": "dress",
+     "title": "Отказва се обличане",
+     "say": "Искаш ли синия или сивия пуловер?",
+     "next": "Пригответе две подходящи дрехи на видно място и дайте на човека достатъчно време.",
+     "why": "Две видими опции намаляват решенията и запазват самоопределението.",
+     "avoid": "Не можеш да останеш по пижама."
+    },
+    {
+     "id": "work",
+     "title": "Човекът иска да отиде на работа",
+     "say": "На теб винаги може да се разчита. Преди да тръгнеш, ще ми помогнеш ли малко тук?",
+     "next": "Предложете смислена задача, свързана с предишната професия, например подреждане на документи, поправяне на нещо или слагане на масата.",
+     "why": "Работата често е давала смисъл, ред и признание. Зад това желание често стои потребността от чувство за полезност.",
+     "avoid": "Ти отдавна си в пенсия."
+    },
+    {
+     "id": "car",
+     "title": "Човекът иска сам да кара колата",
+     "say": "Искаш да караш, разбирам те. Днес карам аз, а ти ми показваш пътя.",
+     "next": "Предложете конкретна опция за безопасно пътуване и поставете ключовете извън полезрението, ако е необходимо.",
+     "why": "Нуждата от независимост е разбираема; алтернатива намалява загубата на лице.",
+     "avoid": "Вече не можеш да шофираш."
+    },
+    {
+     "id": "recognize",
+     "title": "Човекът не ме разпознава",
+     "say": "Днес съм тук заради теб. До теб съм.",
+     "next": "Кажете спокойно името си, запазете малко дистанция и говорете за нещо познато, вместо да обяснявате връзката.",
+     "why": "Неразпознаването боли, но не е отхвърляне. Топлината и спокойствието дават сигурност, без да изпитват паметта.",
+     "avoid": "Трябва да знаеш кой съм."
+    },
+    {
+     "id": "anger",
+     "title": "Човекът ми крещи",
+     "say": "Ще те оставя малко на спокойствие. Оставам наблизо.",
+     "next": "Намалете шума, спазвайте безопасно разстояние и говорете отново едва когато напрежението е спаднало.",
+     "why": "Създавате безопасно разстояние и в същото време предавате спокойно присъствие.",
+     "avoid": "Хайде, успокой се най-накрая."
+    },
+    {
+     "id": "daycare",
+     "title": "Отказ от дневния център",
+     "say": "Ще те заведа и после ще дойда да те взема. Можеш да разчиташ на това.",
+     "next": "Направете сбогуването кратко и приветливо, кажете часа на прибиране и помолете екипа за познато посрещане.",
+     "why": "Зад отказа често стои страх от новото или от изоставяне. Твърдото обещание за прибиране дава сигурност.",
+     "avoid": "Трябва да отидеш, и аз имам нужда от почивка."
+    }
+   ]
+  },
+  "bs": {
+   "heading": "Česte situacije i šta pomaže",
+   "labels": {
+    "say": "Možete reći",
+    "next": "Šta možete učiniti",
+    "why": "Šta se krije iza toga",
+    "avoid": "Bolje ne:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Želja za odlaskom kući",
+     "say": "Nedostaje ti tvoj dom. Reci mi šta ti je tamo bilo posebno lijepo.",
+     "next": "Ponudite nešto poznato, poput čaja, smirene muzike ili foto albuma.",
+     "why": "Ovaj trenutak je često više o sigurnosti i poznatosti nego o stvarnoj lokaciji. Proturječenje može stvoriti dodatni pritisak.",
+     "avoid": "Pa ti si kod kuće."
+    },
+    {
+     "id": "repeat",
+     "title": "Isto pitanje se stalno ponavlja",
+     "say": "Želiš znati kada krećemo. Reći ću ti na vrijeme.",
+     "next": "Napišite odgovor jasno na komadu papira i pokažite na njega kada vam ponovo postave pitanje.",
+     "why": "Odgovor možda nije ostao u pamćenju. Smirena, dosljedna rečenica pruža orijentaciju bez izazivanja krivice.",
+     "avoid": "Već sam ti to rekao pet puta."
+    },
+    {
+     "id": "wash",
+     "title": "Tuširanje je odbijeno",
+     "say": "Želiš li se prvo osvježiti na umivaoniku ili se kasnije istuširati?",
+     "next": "Unaprijed zagrijte sobu i pripremite peškir i odjeću na vidljivom mjestu.",
+     "why": "Lična njega može djelovati nepoznato ili prijeteće. Mali izbor pomaže očuvanju kontrole i dostojanstva.",
+     "avoid": "Moraš se sada otuširati."
+    },
+    {
+     "id": "evening",
+     "title": "Nemir počinje u večernjim satima",
+     "say": "Sad postaje nemirno. Ostat ću s tobom i ovdje ćemo sve malo smiriti.",
+     "next": "Isključite jaka svjetla i televizor i ponudite poznatu, mirnu aktivnost.",
+     "why": "U večernjim satima, umor, sjene i mnogi podražaji mogu povećati nesigurnost. Orijentacija i mir često pomažu više od pritiska.",
+     "avoid": "Konačno moraš sada spavati."
+    },
+    {
+     "id": "keys",
+     "title": "Ključevi ili novac su nestali",
+     "say": "Tražiš svoje ključeve. Hajde da zajedno pogledamo na uobičajenim mjestima.",
+     "next": "Mirno provjerite dva poznata mjesta na kojima stvari obično stoje, a zatim ponudite pauzu.",
+     "why": "Zajedničko traženje uzima osjećaj ozbiljno i izbjegava krivnju.",
+     "avoid": "Opet si ih negdje zametnuo."
+    },
+    {
+     "id": "accuse",
+     "title": "Optužuju me za krađu",
+     "say": "Brineš se za svoj novac. Pogledat ćemo zajedno.",
+     "next": "Priznajte zabrinutost i zajedno kratko pretražite poznatu lokaciju.",
+     "why": "Briga se osjeća stvarnom. Obrana može djelovati kao dalji otpor.",
+     "avoid": "Kakva glupost, ja ne kradem."
+    },
+    {
+     "id": "eat",
+     "title": "Hrana se odbija",
+     "say": "Želiš li nekoliko kašika supe ili radije malo hljeba?",
+     "next": "Ponudite malu porciju i samo dvije poznate opcije.",
+     "why": "Mali i pregledan izbor manje opterećuje.",
+     "avoid": "Moraš nešto pojesti."
+    },
+    {
+     "id": "drink",
+     "title": "Pijenje se zaboravlja",
+     "say": "Popit ću čašu s tobom. Hoćeš li vodu ili čaj?",
+     "next": "Stavite omiljenu, jasno vidljivu čašu na dohvat ruke i zajedno uzmite gutljaj.",
+     "why": "Raditi stvari zajedno i donijeti jednostavan izbor stvara manji pritisak.",
+     "avoid": "Danas si popio premalo."
+    },
+    {
+     "id": "night",
+     "title": "Osoba ustaje noću",
+     "say": "Još je noć. Tu sam i kratko ću ti praviti društvo.",
+     "next": "Koristite prigušeno svjetlo, pratite osobu do WC-a i zatim natrag u krevet.",
+     "why": "Smirena orijentacija pruža sigurnost bez započinjanja rasprave.",
+     "avoid": "Odmah ponovo legni."
+    },
+    {
+     "id": "dress",
+     "title": "Odbijeno oblačenje",
+     "say": "Hoćeš li plavi ili sivi džemper?",
+     "next": "Pripremite dva odgovarajuća odjevna predmeta na vidljivom mjestu i dajte osobi dovoljno vremena.",
+     "why": "Dvije vidljive opcije smanjuju odluke i čuvaju samoodređenje.",
+     "avoid": "Ne možeš ostati u pidžami."
+    },
+    {
+     "id": "work",
+     "title": "Osoba želi ići na posao",
+     "say": "Na tebe se uvijek mogu osloniti. Prije nego što odeš, hoćeš li mi kratko pomoći ovdje?",
+     "next": "Ponudite smislen zadatak koji odgovara ranijem zanimanju, na primjer sortiranje papira, popravljanje nečega ili postavljanje stola.",
+     "why": "Posao je često davao svrhu, strukturu i priznanje. Iza te želje često stoji potreba da osoba bude potrebna.",
+     "avoid": "Pa ti si već odavno u penziji."
+    },
+    {
+     "id": "car",
+     "title": "Osoba želi sama voziti auto",
+     "say": "Želiš voziti, razumijem te. Danas vozim ja, a ti mi pokazuješ put.",
+     "next": "Ponudite specifičnu sigurnu opciju putovanja i stavite ključeve izvan vidokruga ako je potrebno.",
+     "why": "Potreba za nezavisnošću je razumljiva; alternativno rješenje smanjuje gubitak ugleda.",
+     "avoid": "Ti više ne možeš voziti."
+    },
+    {
+     "id": "recognize",
+     "title": "Osoba me ne prepoznaje",
+     "say": "Danas sam tu za tebe. Uz tebe sam.",
+     "next": "Mirno recite svoje ime, držite malo razmaka i razgovarajte o nečemu poznatom umjesto da objašnjavate odnos.",
+     "why": "Kada vas ne prepoznaju, to boli, ali to nije odbijanje. Toplina i mir pružaju sigurnost bez provjeravanja pamćenja.",
+     "avoid": "Pa moraš znati ko sam ja."
+    },
+    {
+     "id": "anger",
+     "title": "Osoba viče na mene",
+     "say": "Ostavit ću te malo na miru. Ostajem u blizini.",
+     "next": "Smanjite buku, zadržite sigurnu udaljenost i ponovo govorite tek kada napetost popusti.",
+     "why": "Stvarate sigurnu udaljenost i u isto vrijeme prenosite smireno prisustvo.",
+     "avoid": "Sada se konačno smiri."
+    },
+    {
+     "id": "daycare",
+     "title": "Dnevni boravak se odbija",
+     "say": "Odvest ću te tamo i kasnije ću doći po tebe. Na to se možeš osloniti.",
+     "next": "Neka oproštaj bude kratak i ljubazan, recite vrijeme preuzimanja i zamolite tim za poznat doček.",
+     "why": "Iza odbijanja često stoji strah od novog ili od napuštanja. Čvrsto obećanje povratka daje sigurnost.",
+     "avoid": "Moraš ići, i meni treba malo mira."
+    }
+   ]
+  },
+  "cs": {
+   "heading": "Časté situace a co pomáhá",
+   "labels": {
+    "say": "Můžete říct",
+    "next": "Co můžete udělat",
+    "why": "Co za tím stojí",
+    "avoid": "Raději ne:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Chtít domů",
+     "say": "Chybí ti domov. Povídej mi, co tam bylo obzvlášť krásné.",
+     "next": "Nabídněte něco známého, například čaj, klidnou hudbu nebo fotoalbum.",
+     "why": "Tento okamžik se často týká více bezpečí a známého prostředí než skutečného místa. Odporování může vytvořit dodatečný tlak.",
+     "avoid": "Vždyť jsi doma."
+    },
+    {
+     "id": "repeat",
+     "title": "Stejná otázka se stále opakuje",
+     "say": "Chceš vědět, kdy vyrazíme. Včas ti dám vědět.",
+     "next": "Napište odpověď jasně na kus papíru a ukažte na ni, když budete dotázáni na další otázku.",
+     "why": "Odpověď možná nezůstala v paměti. Klidná, stále stejná věta poskytuje orientaci bez vyvolání pocitu viny.",
+     "avoid": "Už jsem ti to řekl pětkrát."
+    },
+    {
+     "id": "wash",
+     "title": "Sprchování je odmítnuto",
+     "say": "Chceš se nejdřív osvěžit u umyvadla nebo se později osprchovat?",
+     "next": "Předem vytopte místnost a připravte ručník a oblečení na viditelné místo.",
+     "why": "Osobní péče může působit neznámě nebo hrozivě. Malá volba pomáhá zachovat kontrolu a důstojnost.",
+     "avoid": "Musíš se teď osprchovat."
+    },
+    {
+     "id": "evening",
+     "title": "Nepokoj začíná večer",
+     "say": "Začíná tu být neklidno. Zůstanu s tebou a trochu to tu zklidníme.",
+     "next": "Vypněte ostré světlo a televizi a nabídněte známou, klidnou činnost.",
+     "why": "Večer může únava, stíny a mnoho podnětů zvyšovat nejistotu. Orientace a klid často pomáhají více než tlak.",
+     "avoid": "Konečně teď musíš spát."
+    },
+    {
+     "id": "keys",
+     "title": "Klíče nebo peníze zmizely",
+     "say": "Hledáš své klíče. Podívejme se spolu na obvyklá místa.",
+     "next": "Klidně zkontrolujte dvě známá místa, kam se věci obvykle odkládají, a pak nabídněte pauzu.",
+     "why": "Společné hledání bere pocit vážně a vyhýbá se vině.",
+     "avoid": "Zase jsi je někam založil."
+    },
+    {
+     "id": "accuse",
+     "title": "Obviňují mě z krádeže",
+     "say": "Máš obavy o své peníze. Podíváme se spolu.",
+     "next": "Uznejte obavu a krátce spolu hledejte na známém místě.",
+     "why": "Obava působí reálně. Obhajování se může působit jako další odpor.",
+     "avoid": "Co je to za nesmysl, vždyť nekradu."
+    },
+    {
+     "id": "eat",
+     "title": "Jídlo je odmítnuto",
+     "say": "Dáš si pár lžic polévky, nebo radši trochu chleba?",
+     "next": "Nabídněte malou porci a pouze dvě známé možnosti.",
+     "why": "Malý, přehledný výběr méně zahlcuje.",
+     "avoid": "Musíš něco sníst."
+    },
+    {
+     "id": "drink",
+     "title": "Zapomíná pít",
+     "say": "Napiju se s tebou. Chceš vodu, nebo čaj?",
+     "next": "Položte oblíbenou, dobře viditelnou sklenici na dosah a dejte si spolu doušek.",
+     "why": "Dělat věci společně a učinit jednoduchou volbu vytváří menší tlak.",
+     "avoid": "Dnes jsi toho vypil moc málo."
+    },
+    {
+     "id": "night",
+     "title": "Osoba vstává v noci",
+     "say": "Je stále noc. Jsem tu a budu tě chvíli doprovázet.",
+     "next": "Používejte tlumené osvětlení, doprovoďte na toaletu a pak zpět do postele.",
+     "why": "Klidná orientace poskytuje bezpečí, aniž by vyvolávala hádku.",
+     "avoid": "Hned si zase lehni."
+    },
+    {
+     "id": "dress",
+     "title": "Oblékání je odmítnuto",
+     "say": "Chceš modrý nebo šedý svetr?",
+     "next": "Připravte na viditelné místo dva vhodné kusy oblečení a dejte člověku dostatek času.",
+     "why": "Dvě viditelné možnosti snižují rozhodování a zachovávají sebeurčení.",
+     "avoid": "Nemůžeš zůstat v pyžamu."
+    },
+    {
+     "id": "work",
+     "title": "Osoba chce jít do práce",
+     "say": "Na tebe je vždycky spolehnutí. Než půjdeš, pomůžeš mi tady chvilku?",
+     "next": "Nabídněte smysluplný úkol, který odpovídá dřívějšímu povolání, například třídění papírů, opravu něčeho nebo prostírání stolu.",
+     "why": "Práce často dávala smysl, řád a uznání. Za tím přáním se často skrývá potřeba být někomu k užitku.",
+     "avoid": "Vždyť jsi už dávno v důchodu."
+    },
+    {
+     "id": "car",
+     "title": "Osoba chce řídit auto sama",
+     "say": "Chceš řídit, tomu rozumím. Dnes řídím já a ty mi ukazuješ cestu.",
+     "next": "Nabídněte konkrétní bezpečnou možnost cestování a pokud je to nutné, dejte klíče z dohledu.",
+     "why": "Potřeba nezávislosti je pochopitelná; alternativa snižuje ztrátu tváře.",
+     "avoid": "Už nemůžeš řídit."
+    },
+    {
+     "id": "recognize",
+     "title": "Osoba mě nepoznává",
+     "say": "Dnes jsem tu pro tebe. Jsem s tebou.",
+     "next": "Klidně řekněte své jméno, držte trochu odstup a mluvte o něčem známém, místo abyste vysvětlovali vztah.",
+     "why": "Když vás nepoznávají, bolí to, ale není to odmítnutí. Vlídnost a klid dávají jistotu, aniž by se zkoušela paměť.",
+     "avoid": "Přece musíš vědět, kdo jsem."
+    },
+    {
+     "id": "anger",
+     "title": "Osoba na mě křičí",
+     "say": "Na chvíli tě nechám v klidu. Zůstanu poblíž.",
+     "next": "Snižte hluk, udržujte bezpečnou vzdálenost a mluvte znovu až po zmírnění napětí.",
+     "why": "Vytváříte bezpečnou vzdálenost a zároveň působíte klidně.",
+     "avoid": "Teď se konečně uklidni."
+    },
+    {
+     "id": "daycare",
+     "title": "Denní stacionář je odmítán",
+     "say": "Doprovodím tě tam a později si pro tebe zase přijdu. Na to se můžeš spolehnout.",
+     "next": "Rozlučte se krátce a vlídně, řekněte čas vyzvednutí a požádejte tým o známé přivítání.",
+     "why": "Za odmítáním často stojí strach z nového nebo z opuštění. Pevný slib vyzvednutí dává oporu.",
+     "avoid": "Musíš tam jít, já taky potřebuju klid."
+    }
+   ]
+  },
+  "da": {
+   "heading": "Typiske situationer og hvad der hjælper",
+   "labels": {
+    "say": "Det kan du sige",
+    "next": "Hvad du kan gøre",
+    "why": "Hvad der ligger bag",
+    "avoid": "Hellere ikke:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Vil hjem",
+     "say": "Du savner dit hjem. Fortæl mig, hvad der var særligt smukt dér.",
+     "next": "Tilbyd noget velkendt, såsom te, rolig musik eller et fotoalbum.",
+     "why": "Dette øjeblik handler ofte mere om sikkerhed og det velkendte end om den faktiske placering. Modsigelse kan skabe yderligere pres.",
+     "avoid": "Du er jo hjemme."
+    },
+    {
+     "id": "repeat",
+     "title": "Det samme spørgsmål bliver ved med at komme op",
+     "say": "Du vil gerne vide, hvornår vi tager afsted. Jeg siger til i god tid.",
+     "next": "Skriv svaret tydeligt på et stykke papir og peg på det, når du bliver stillet det næste spørgsmål.",
+     "why": "Svaret er måske ikke blevet hængende i hukommelsen. En rolig, ensartet sætning giver orientering uden at skabe skyldfølelse.",
+     "avoid": "Jeg har allerede fortalt dig det fem gange."
+    },
+    {
+     "id": "wash",
+     "title": "Brusebad afvises",
+     "say": "Vil du først friske dig op ved vasken eller tage et bad senere?",
+     "next": "Varm rummet op på forhånd og læg håndklædet og tøjet frem på et synligt sted.",
+     "why": "Personlig pleje kan føles ukendt eller truende. Et lille valg hjælper med at bevare kontrol og værdighed.",
+     "avoid": "Du er nødt til at tage et bad nu."
+    },
+    {
+     "id": "evening",
+     "title": "Uro begynder om aftenen",
+     "say": "Det er ved at blive uroligt. Jeg bliver hos dig, og vi gør det lidt roligere her.",
+     "next": "Sluk for stærkt lys og fjernsyn, og tilbyd en velkendt, stille aktivitet.",
+     "why": "Om aftenen kan træthed, skygger og mange stimuli øge usikkerheden. Orientering og ro hjælper ofte mere end pres.",
+     "avoid": "Nu skal du altså sove."
+    },
+    {
+     "id": "keys",
+     "title": "Nøgler eller penge er forsvundet",
+     "say": "Du leder efter dine nøgler. Lad os lede sammen på de vanlige steder.",
+     "next": "Tjek roligt to velkendte steder, hvor tingene plejer at ligge, og tilbyd derefter en pause.",
+     "why": "At søge sammen tager følelsen alvorligt og undgår skyld.",
+     "avoid": "Du har forlagt dem igen."
+    },
+    {
+     "id": "accuse",
+     "title": "Jeg er beskyldt for tyveri",
+     "say": "Du er bekymret for dine penge. Vi kigger sammen.",
+     "next": "Anerkend bekymringen og søg kort sammen på et velkendt sted.",
+     "why": "Bekymringen føles virkelig. Forsvar kan virke som yderligere modstand.",
+     "avoid": "Sikke noget vrøvl, jeg stjæler da ikke."
+    },
+    {
+     "id": "eat",
+     "title": "Mad nægtes",
+     "say": "Vil du have et par skefulde suppe eller noget brød?",
+     "next": "Tilbyd en lille portion og kun to kendte muligheder.",
+     "why": "Små, håndterbare valg virker mindre overvældende.",
+     "avoid": "Du er nødt til at spise noget."
+    },
+    {
+     "id": "drink",
+     "title": "Det glemmes at drikke",
+     "say": "Jeg tager et glas med dig. Vil du have vand eller te?",
+     "next": "Placer et yndlingsglas, der er tydeligt synligt, inden for rækkevidde og tag en tår sammen.",
+     "why": "At gøre ting sammen og tage et simpelt valg skaber mindre pres.",
+     "avoid": "Du har drukket alt for lidt i dag."
+    },
+    {
+     "id": "night",
+     "title": "Personen står op om natten",
+     "say": "Det er stadig nat. Jeg er her og går lidt med dig.",
+     "next": "Brug dæmpet belysning, følg med til toilettet og derefter tilbage til sengen.",
+     "why": "Rolig orientering giver tryghed uden at starte en diskussion.",
+     "avoid": "Læg dig ned igen med det samme."
+    },
+    {
+     "id": "dress",
+     "title": "Påklædning nægtes",
+     "say": "Vil du have den blå eller den grå sweater?",
+     "next": "Læg to passende stykker tøj frem, så de kan ses, og giv personen god tid.",
+     "why": "To synlige muligheder reducerer beslutninger og bevarer selvbestemmelse.",
+     "avoid": "Du kan ikke blive i din pyjamas."
+    },
+    {
+     "id": "work",
+     "title": "Personen vil på arbejde",
+     "say": "Du er altid så pålidelig. Inden du går, vil du så lige hjælpe mig her?",
+     "next": "Tilbyd en meningsfuld opgave, der passer til det tidligere arbejde, for eksempel at sortere papirer, reparere noget eller dække bord.",
+     "why": "Arbejdet gav ofte mening, struktur og anerkendelse. Bag ønsket ligger ofte et behov for at føle sig nyttig.",
+     "avoid": "Du har jo været pensioneret i lang tid."
+    },
+    {
+     "id": "car",
+     "title": "Personen vil selv køre bilen",
+     "say": "Du vil gerne selv køre, det forstår jeg. I dag kører jeg, og du viser mig vej.",
+     "next": "Tilbyd en specifik sikker rejsemulighed og læg nøglerne uden for syne om nødvendigt.",
+     "why": "Behovet for uafhængighed er forståeligt; et alternativ reducerer ansigtstab.",
+     "avoid": "Du kan ikke længere køre bil."
+    },
+    {
+     "id": "recognize",
+     "title": "Personen genkender mig ikke",
+     "say": "I dag er jeg her for dig. Du er ikke alene.",
+     "next": "Sig roligt dit navn, hold lidt afstand, og tal om noget velkendt i stedet for at forklare jeres forhold.",
+     "why": "Det gør ondt ikke at blive genkendt, men det er ikke en afvisning. Varme og ro giver tryghed uden at teste hukommelsen.",
+     "avoid": "Du må da vide, hvem jeg er."
+    },
+    {
+     "id": "anger",
+     "title": "Personen råber ad mig",
+     "say": "Jeg lader dig være i fred et øjeblik. Jeg bliver i nærheden.",
+     "next": "Reducer støj, hold en sikker afstand, og tal kun igen, når spændingen er aftaget.",
+     "why": "Du skaber en sikker afstand og formidler samtidig en rolig tilstedeværelse.",
+     "avoid": "Rol nu endelig ned."
+    },
+    {
+     "id": "daycare",
+     "title": "Dagcentret afvises",
+     "say": "Jeg følger dig derhen og henter dig igen senere. Det kan du stole på.",
+     "next": "Gør afskeden kort og venlig, sig tidspunktet for afhentning, og bed personalet om en velkendt modtagelse.",
+     "why": "Bag afvisningen ligger ofte angst for det nye eller for at blive efterladt. Et fast løfte om at blive hentet giver tryghed.",
+     "avoid": "Du skal derhen, jeg har også brug for ro."
+    }
+   ]
+  },
+  "el": {
+   "heading": "Συνηθισμένες καταστάσεις και τι βοηθά",
+   "labels": {
+    "say": "Μπορείτε να πείτε",
+    "next": "Τι μπορείτε να κάνετε",
+    "why": "Τι κρύβεται πίσω από αυτό",
+    "avoid": "Καλύτερα όχι:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Επιθυμία για επιστροφή στο σπίτι",
+     "say": "Σου λείπει το σπίτι σου. Πες μου τι ήταν ιδιαίτερα όμορφο εκεί.",
+     "next": "Προσφέρετε κάτι οικείο, όπως τσάι, ήρεμη μουσική ή ένα άλμπουμ φωτογραφιών.",
+     "why": "Αυτή η στιγμή αφορά συχνά περισσότερο την ασφάλεια και τη γνώριμη κατάσταση παρά την πραγματική τοποθεσία. Η αντιλογία μπορεί να δημιουργήσει επιπλέον πίεση.",
+     "avoid": "Μα είσαι στο σπίτι."
+    },
+    {
+     "id": "repeat",
+     "title": "Η ίδια ερώτηση επανέρχεται συνεχώς",
+     "say": "Θέλεις να ξέρεις πότε φεύγουμε. Θα σου πω έγκαιρα.",
+     "next": "Γράψτε την απάντηση καθαρά σε ένα χαρτί και δείξτε την όταν σας γίνει η επόμενη ερώτηση.",
+     "why": "Η απάντηση ίσως δεν έμεινε στη μνήμη. Μία ήρεμη, σταθερή πρόταση δίνει προσανατολισμό χωρίς να προκαλεί ενοχές.",
+     "avoid": "Σου το έχω ήδη πει πέντε φορές."
+    },
+    {
+     "id": "wash",
+     "title": "Αρνείται το ντους",
+     "say": "Θέλεις πρώτα να φρεσκαριστείς στον νιπτήρα ή να κάνεις μπάνιο αργότερα;",
+     "next": "Ζεστάνετε από πριν το δωμάτιο και τοποθετήστε την πετσέτα και τα ρούχα σε εμφανές σημείο.",
+     "why": "Η προσωπική φροντίδα μπορεί να φαίνεται άγνωστη ή απειλητική. Μια μικρή επιλογή βοηθά στη διατήρηση του ελέγχου και της αξιοπρέπειας.",
+     "avoid": "Πρέπει να κάνεις μπάνιο τώρα."
+    },
+    {
+     "id": "evening",
+     "title": "Η ανησυχία ξεκινάει το βράδυ",
+     "say": "Απλώς αρχίζει να γίνεται ανήσυχο. Θα μείνω μαζί σου και θα κάνουμε τα πράγματα λίγο πιο ήσυχα εδώ.",
+     "next": "Σβήστε τα δυνατά φώτα και την τηλεόραση και προσφέρετε μια οικεία, ήσυχη δραστηριότητα.",
+     "why": "Το βράδυ, η κόπωση, οι σκιές και πολλά ερεθίσματα μπορούν να αυξήσουν την ανασφάλεια. Ο προσανατολισμός και η ηρεμία συχνά βοηθούν περισσότερο από την πίεση.",
+     "avoid": "Πρέπει επιτέλους να κοιμηθείς τώρα."
+    },
+    {
+     "id": "keys",
+     "title": "Τα κλειδιά ή τα χρήματα έχουν εξαφανιστεί",
+     "say": "Ψάχνεις τα κλειδιά σου. Ας ψάξουμε μαζί στα συνηθισμένα μέρη.",
+     "next": "Ελέγξτε ήρεμα δύο γνώριμα σημεία όπου συνήθως μπαίνουν τα πράγματα και μετά προτείνετε ένα διάλειμμα.",
+     "why": "Η κοινή αναζήτηση παίρνει το συναίσθημα σοβαρά και αποφεύγει την ενοχή.",
+     "avoid": "Τα έχασες πάλι."
+    },
+    {
+     "id": "accuse",
+     "title": "Με κατηγορούν για κλοπή",
+     "say": "Ανησυχείς για τα χρήματά σου. Θα κοιτάξουμε μαζί.",
+     "next": "Αναγνωρίστε την ανησυχία και αναζητήστε σύντομα μαζί σε έναν οικείο χώρο.",
+     "why": "Η ανησυχία φαίνεται πραγματική. Η άμυνα μπορεί να φαίνεται σαν περαιτέρω αντίσταση.",
+     "avoid": "Τι ανοησίες, δεν κλέβω."
+    },
+    {
+     "id": "eat",
+     "title": "Αρνείται το φαγητό",
+     "say": "Θα ήθελες λίγες κουταλιές σούπα ή λίγο ψωμί;",
+     "next": "Προσφέρετε μια μικρή ποσότητα και μόνο δύο οικεία επιλογές.",
+     "why": "Οι μικρές, διαχειρίσιμες επιλογές φαίνονται λιγότερο συντριπτικές.",
+     "avoid": "Πρέπει να φας κάτι."
+    },
+    {
+     "id": "drink",
+     "title": "Ξεχνά να πιει",
+     "say": "Θα πιω ένα ποτήρι μαζί σου. Θέλεις νερό ή τσάι;",
+     "next": "Τοποθετήστε ένα αγαπημένο, καθαρά ορατό ποτήρι σε προσιτή θέση και πιείτε μαζί.",
+     "why": "Το να κάνετε πράγματα μαζί και να παίρνετε μια απλή επιλογή δημιουργεί λιγότερη πίεση.",
+     "avoid": "Ήπιες πολύ λίγο σήμερα."
+    },
+    {
+     "id": "night",
+     "title": "Το άτομο σηκώνεται τη νύχτα",
+     "say": "Είναι ακόμα νύχτα. Είμαι εδώ και θα σε συνοδεύσω για λίγο.",
+     "next": "Χρησιμοποιήστε χαμηλό φωτισμό, συνοδέψτε το άτομο στην τουαλέτα και μετά πίσω στο κρεβάτι.",
+     "why": "Η ήρεμη προσέγγιση παρέχει ασφάλεια χωρίς να ξεκινήσει μια διαφωνία.",
+     "avoid": "Ξάπλωσε ξανά αμέσως."
+    },
+    {
+     "id": "dress",
+     "title": "Το ντύσιμο απορρίπτεται",
+     "say": "Θέλεις το μπλε ή το γκρι πουλόβερ;",
+     "next": "Αφήστε δύο κατάλληλα ρούχα σε εμφανές σημείο και δώστε αρκετό χρόνο.",
+     "why": "Δύο ορατές επιλογές μειώνουν τις αποφάσεις και διατηρούν την αυτονομία.",
+     "avoid": "Δεν μπορείς να μείνεις με τις πιτζάμες σου."
+    },
+    {
+     "id": "work",
+     "title": "Το άτομο θέλει να πάει στη δουλειά",
+     "say": "Μπορώ πάντα να βασίζομαι σε σένα. Πριν φύγεις, θα με βοηθήσεις λίγο εδώ;",
+     "next": "Προτείνετε μια ουσιαστική εργασία που ταιριάζει με το παλιό επάγγελμα, για παράδειγμα ταξινόμηση χαρτιών, μια μικρή επισκευή ή το στρώσιμο του τραπεζιού.",
+     "why": "Η δουλειά συχνά έδινε σκοπό, δομή και αναγνώριση. Πίσω από την επιθυμία συχνά βρίσκεται η ανάγκη να νιώθει κανείς χρήσιμος.",
+     "avoid": "Μα είσαι στη σύνταξη εδώ και πολύ καιρό."
+    },
+    {
+     "id": "car",
+     "title": "Το άτομο θέλει να οδηγήσει μόνο του το αυτοκίνητο",
+     "say": "Θέλεις να οδηγήσεις εσύ, το καταλαβαίνω. Σήμερα οδηγώ εγώ, κι εσύ μου δείχνεις τον δρόμο.",
+     "next": "Προσφέρετε μια συγκεκριμένη ασφαλή επιλογή μεταφοράς και βάλτε τα κλειδιά μακριά από τα μάτια αν χρειάζεται.",
+     "why": "Η ανάγκη για ανεξαρτησία είναι κατανοητή· μια εναλλακτική μειώνει την απώλεια αξιοπρέπειας.",
+     "avoid": "Δεν μπορείς να οδηγείς πια."
+    },
+    {
+     "id": "recognize",
+     "title": "Το άτομο δεν με αναγνωρίζει",
+     "say": "Σήμερα είμαι εδώ για σένα. Είμαι δίπλα σου.",
+     "next": "Πείτε ήρεμα το όνομά σας, κρατήστε λίγη απόσταση και μιλήστε για κάτι οικείο αντί να εξηγείτε τη σχέση σας.",
+     "why": "Το να μη σας αναγνωρίζουν πονά, αλλά δεν είναι απόρριψη. Η ζεστασιά και η ηρεμία δίνουν ασφάλεια χωρίς να δοκιμάζεται η μνήμη.",
+     "avoid": "Πρέπει να ξέρεις ποιος είμαι."
+    },
+    {
+     "id": "anger",
+     "title": "Το άτομο μου φωνάζει",
+     "say": "Σου δίνω λίγο χώρο. Μένω εδώ κοντά.",
+     "next": "Μειώστε τον θόρυβο, κρατήστε ασφαλή απόσταση και μιλήστε ξανά μόνο όταν η ένταση έχει υποχωρήσει.",
+     "why": "Δημιουργείτε μια ασφαλή απόσταση και ταυτόχρονα μεταδίδετε μια ήρεμη παρουσία.",
+     "avoid": "Ηρέμησε επιτέλους."
+    },
+    {
+     "id": "daycare",
+     "title": "Άρνηση για το κέντρο ημέρας",
+     "say": "Θα σε πάω εκεί και θα έρθω να σε πάρω αργότερα. Μπορείς να βασιστείς σε αυτό.",
+     "next": "Κρατήστε τον αποχαιρετισμό σύντομο και φιλικό, πείτε την ώρα παραλαβής και ζητήστε από το προσωπικό ένα οικείο καλωσόρισμα.",
+     "why": "Πίσω από την άρνηση κρύβεται συχνά φόβος για το καινούργιο ή για εγκατάλειψη. Μια σταθερή υπόσχεση επιστροφής δίνει σιγουριά.",
+     "avoid": "Πρέπει να πας, χρειάζομαι κι εγώ λίγη ησυχία."
+    }
+   ]
+  },
+  "es": {
+   "heading": "Situaciones frecuentes y qué ayuda",
+   "labels": {
+    "say": "Puedes decir",
+    "next": "Lo que puedes hacer",
+    "why": "Qué hay detrás",
+    "avoid": "Mejor no:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Querer ir a casa",
+     "say": "Extrañas tu hogar. Cuéntame qué era particularmente hermoso allí.",
+     "next": "Ofrece algo conocido, como té, música tranquila o un álbum de fotos.",
+     "why": "Este momento suele ser más sobre seguridad y familiaridad que sobre la ubicación real. Contradecir a la persona puede generar presión adicional.",
+     "avoid": "Pero si estás en casa."
+    },
+    {
+     "id": "repeat",
+     "title": "La misma pregunta sigue apareciendo",
+     "say": "Quieres saber cuándo nos vamos. Te aviso a tiempo.",
+     "next": "Escribe la respuesta claramente en un papel y señálala cuando te hagan la siguiente pregunta.",
+     "why": "Es posible que la respuesta no se haya quedado en la memoria. Una frase tranquila y siempre igual da orientación sin causar culpa.",
+     "avoid": "Ya te lo he dicho cinco veces."
+    },
+    {
+     "id": "wash",
+     "title": "Se rehúsa a ducharse",
+     "say": "¿Quieres refrescarte primero en el lavabo o ducharte después?",
+     "next": "Calienta antes la habitación y deja la toalla y la ropa preparadas en un lugar visible.",
+     "why": "El cuidado personal puede sentirse desconocido o amenazante. Una pequeña decisión ayuda a preservar el control y la dignidad.",
+     "avoid": "Tienes que ducharte ahora."
+    },
+    {
+     "id": "evening",
+     "title": "La inquietud comienza por la tarde",
+     "say": "Esto se está poniendo agitado. Me quedo contigo y vamos a tranquilizar un poco las cosas aquí.",
+     "next": "Apaga las luces fuertes y la televisión y ofrece una actividad familiar y tranquila.",
+     "why": "Por la tarde, el cansancio, las sombras y muchos estímulos pueden aumentar la inseguridad. La orientación y la calma suelen ayudar más que la presión.",
+     "avoid": "Ya tienes que dormir de una vez."
+    },
+    {
+     "id": "keys",
+     "title": "Las llaves o el dinero han desaparecido",
+     "say": "Estás buscando tus llaves. Busquemos juntos en los lugares habituales.",
+     "next": "Revisa con calma dos lugares habituales donde se guardan las cosas y luego ofrece un descanso.",
+     "why": "Buscar juntos toma en serio el sentimiento y evita la culpa.",
+     "avoid": "Otra vez las has perdido."
+    },
+    {
+     "id": "accuse",
+     "title": "Me acusan de robo",
+     "say": "Te preocupas por tu dinero. Lo miraremos juntos.",
+     "next": "Reconoce la preocupación y busca brevemente juntos en un lugar familiar.",
+     "why": "La preocupación se siente real. Defenderse puede parecer más resistencia.",
+     "avoid": "Qué tontería, yo no robo."
+    },
+    {
+     "id": "eat",
+     "title": "Se rechaza la comida",
+     "say": "¿Te gustaría un par de cucharadas de sopa o algo de pan?",
+     "next": "Ofrece una porción pequeña y solo dos opciones conocidas.",
+     "why": "Las opciones pequeñas y claras resultan menos abrumadoras.",
+     "avoid": "Tienes que comer algo."
+    },
+    {
+     "id": "drink",
+     "title": "Se olvida beber",
+     "say": "Tomaré un vaso contigo. ¿Quieres agua o té?",
+     "next": "Coloca un vaso favorito, claramente visible, al alcance y toma un sorbo juntos.",
+     "why": "Hacer cosas juntos y tomar una decisión simple genera menos presión.",
+     "avoid": "Hoy has bebido muy poco."
+    },
+    {
+     "id": "night",
+     "title": "La persona se levanta por la noche",
+     "say": "Todavía es de noche. Estoy aquí y te acompaño un momento.",
+     "next": "Usa iluminación tenue, acompaña a la persona al baño y luego de vuelta a la cama.",
+     "why": "La orientación tranquila proporciona seguridad sin iniciar una discusión.",
+     "avoid": "Vuelve a acostarte ahora mismo."
+    },
+    {
+     "id": "dress",
+     "title": "Se rechaza vestirse",
+     "say": "¿Quieres el suéter azul o el gris?",
+     "next": "Deja preparadas a la vista dos prendas adecuadas y dale a la persona tiempo suficiente.",
+     "why": "Dos opciones visibles reducen las decisiones y preservan la autodeterminación.",
+     "avoid": "No puedes quedarte en pijama."
+    },
+    {
+     "id": "work",
+     "title": "La persona quiere ir a trabajar",
+     "say": "Siempre se puede contar contigo. Antes de irte, ¿me ayudas un momento aquí?",
+     "next": "Ofrece una tarea con sentido que encaje con su antiguo oficio, por ejemplo ordenar papeles, arreglar algo o poner la mesa.",
+     "why": "El trabajo solía dar sentido, estructura y reconocimiento. Detrás de este deseo suele estar la necesidad de sentirse útil.",
+     "avoid": "Pero si hace mucho que te jubilaste."
+    },
+    {
+     "id": "car",
+     "title": "La persona quiere conducir el coche ella misma",
+     "say": "Quieres conducir tú, lo entiendo. Hoy conduzco yo y tú me indicas el camino.",
+     "next": "Ofrece una opción concreta y segura para el trayecto y, si es necesario, guarda las llaves fuera de la vista.",
+     "why": "La necesidad de independencia es comprensible; una alternativa reduce la pérdida de prestigio.",
+     "avoid": "No puedes conducir más."
+    },
+    {
+     "id": "recognize",
+     "title": "La persona no me reconoce",
+     "say": "Hoy estoy aquí para ti. Estoy contigo.",
+     "next": "Di tu nombre con calma, mantén algo de distancia y habla de algo conocido en lugar de explicar la relación.",
+     "why": "Que no te reconozcan duele, pero no es un rechazo. La calidez y la calma dan seguridad sin poner a prueba la memoria.",
+     "avoid": "Tienes que saber quién soy."
+    },
+    {
+     "id": "anger",
+     "title": "La persona me grita",
+     "say": "Te dejo un momento en paz. Me quedo cerca.",
+     "next": "Reduce el ruido, mantén una distancia segura y vuelve a hablar solo cuando baje la tensión.",
+     "why": "Creas una distancia segura y al mismo tiempo transmites una presencia tranquila.",
+     "avoid": "Cálmate de una vez."
+    },
+    {
+     "id": "daycare",
+     "title": "Se rechaza el centro de día",
+     "say": "Te llevo y luego vuelvo a recogerte. Puedes contar con ello.",
+     "next": "Haz que la despedida sea breve y amable, di la hora de recogida y pide al equipo un recibimiento familiar.",
+     "why": "Detrás del rechazo suele haber miedo a lo nuevo o al abandono. Una promesa firme de recogida da seguridad.",
+     "avoid": "Tienes que ir, yo también necesito descansar."
+    }
+   ]
+  },
+  "et": {
+   "heading": "Sagedased olukorrad ja mis aitab",
+   "labels": {
+    "say": "Seda võid öelda",
+    "next": "Mida saad teha",
+    "why": "Mis selle taga peitub",
+    "avoid": "Parem mitte:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Soov koju minna",
+     "say": "Sa igatsed oma kodu järele. Räägi mulle, mis seal eriti ilus oli.",
+     "next": "Paku midagi tuttavat, näiteks teed, rahulikku muusikat või fotoalbumit.",
+     "why": "See hetk on tihti rohkem seotud turvalisuse ja tuttavusega kui tegeliku asukohaga. Vastuvaidlemine võib tekitada täiendavat survet.",
+     "avoid": "Sa oled ju kodus."
+    },
+    {
+     "id": "repeat",
+     "title": "Sama küsimus tuleb korduvalt esile",
+     "say": "Sa tahad teada, millal me läheme. Ma ütlen sulle õigel ajal.",
+     "next": "Kirjuta vastus selgelt paberile ja osuta sellele, kui küsimus uuesti tuleb.",
+     "why": "Vastus ei pruukinud mällu jääda. Rahulik, alati sama lause pakub orientatsiooni ilma süütunnet tekitamata.",
+     "avoid": "Ma olen sulle seda juba viis korda öelnud."
+    },
+    {
+     "id": "wash",
+     "title": "Duši all käimist on keeldutud",
+     "say": "Kas tahad kõigepealt kraanikausi juures end värskendada või hiljem duši all käia?",
+     "next": "Soojenda tuba eelnevalt ning aseta rätik ja riided nähtavale kohale.",
+     "why": "Isiklik hooldus võib tunduda võõras või ähvardav. Väike valik aitab säilitada kontrolli ja väärikust.",
+     "avoid": "Sa pead nüüd duši võtma."
+    },
+    {
+     "id": "evening",
+     "title": "Rahutus algab õhtul",
+     "say": "Siin läheb praegu rahutuks. Ma jään sinu juurde ja teeme siin veidi rahulikumaks.",
+     "next": "Lülita ere valgus ja televiisor välja ning paku tuttavat, vaikset tegevust.",
+     "why": "Õhtul võivad väsimus, varjud ja paljud stiimulid suurendada ebakindlust. Suunamine ja rahu aitavad sageli rohkem kui surve.",
+     "avoid": "Sa pead lõpuks nüüd magama minema."
+    },
+    {
+     "id": "keys",
+     "title": "Võtmed või raha on kadunud",
+     "say": "Sa otsid oma võtmeid. Otsime koos tavapärastes kohtades.",
+     "next": "Kontrolli rahulikult kahte tuttavat hoiukohta ja paku seejärel pausi.",
+     "why": "Üheskoos otsimine võtab tunde tõsiselt ja väldib süütunnet.",
+     "avoid": "Sa paigutasid need jälle valesse kohta."
+    },
+    {
+     "id": "accuse",
+     "title": "Mind süüdistatakse varguses",
+     "say": "Sa oled oma raha pärast mures. Me vaatame koos.",
+     "next": "Tunnusta muret ja otsi koos temaga lühidalt tuttavast kohast.",
+     "why": "Mure tundub reaalne. Kaitsereaktsioon võib tunduda täiendava vastupanuna.",
+     "avoid": "Mis jama, ma ju ei varasta."
+    },
+    {
+     "id": "eat",
+     "title": "Toidust keeldutakse",
+     "say": "Kas soovid paar supilusikatäit suppi või natuke leiba?",
+     "next": "Paku väikest portsjonit ja ainult kahte tuttavat valikut.",
+     "why": "Väikesed ja selged valikud ei käi nii üle jõu.",
+     "avoid": "Sa pead midagi sööma."
+    },
+    {
+     "id": "drink",
+     "title": "Joomine ununeb",
+     "say": "Ma joon sinuga klaasi. Kas soovid vett või teed?",
+     "next": "Aseta lemmik, hästi nähtav klaas käeulatusse ja võta koos lonks.",
+     "why": "Üheskoos tegemine ja lihtsa valiku tegemine tekitab vähem survet.",
+     "avoid": "Sa jõid täna liiga vähe."
+    },
+    {
+     "id": "night",
+     "title": "Inimene tõuseb öösel üles",
+     "say": "On veel öö. Ma olen siin ja saadan sind natuke.",
+     "next": "Kasuta hämarat valgust, saada inimene tualetti ja siis tagasi voodisse.",
+     "why": "Rahulik orientatsioon pakub turvatunnet ilma vaidlust alustamata.",
+     "avoid": "Heida kohe tagasi pikali."
+    },
+    {
+     "id": "dress",
+     "title": "Riietumisest keeldutakse",
+     "say": "Kas soovid sinist või halli kampsunit?",
+     "next": "Pane kaks sobivat riideeset nähtavale valmis ja anna inimesele piisavalt aega.",
+     "why": "Kaks nähtavat valikut vähendavad otsuseid ja säilitavad enesemääramise.",
+     "avoid": "Sa ei saa pidžaamasse jääda."
+    },
+    {
+     "id": "work",
+     "title": "Inimene tahab tööle minna",
+     "say": "Sinu peale saab alati loota. Enne kui lähed, kas aitad mind siin korraks?",
+     "next": "Paku mõtestatud ülesannet, mis sobib varasema ametiga, näiteks pabereid sorteerida, midagi parandada või lauda katta.",
+     "why": "Töö andis sageli eesmärgi, struktuuri ja tunnustuse. Soovi taga on sageli vajadus tunda end vajalikuna.",
+     "avoid": "Sa oled ju juba ammu pensionil."
+    },
+    {
+     "id": "car",
+     "title": "Isik soovib autot ise juhtida",
+     "say": "Sa tahad ise sõita, ma saan aru. Täna sõidan mina ja sina juhatad mulle teed.",
+     "next": "Paku konkreetset turvalist sõiduvõimalust ja pane vajadusel võtmed silma alt ära.",
+     "why": "Iseseisvuse vajadus on arusaadav; alternatiiv vähendab näo kaotamise tunnet.",
+     "avoid": "Sa ei saa enam autot juhtida."
+    },
+    {
+     "id": "recognize",
+     "title": "Inimene ei tunne mind ära",
+     "say": "Ma olen täna sinu jaoks siin. Sa ei ole üksi.",
+     "next": "Ütle rahulikult oma nimi, hoia veidi distantsi ja räägi millestki tuttavast, selle asemel et suhet selgitada.",
+     "why": "Kui sind ära ei tunta, teeb see haiget, kuid see ei ole tõrjumine. Soojus ja rahu annavad turvatunnet ilma mälu proovile panemata.",
+     "avoid": "Sa pead ju teadma, kes ma olen."
+    },
+    {
+     "id": "anger",
+     "title": "Inimene karjub minu peale",
+     "say": "Ma jätan su korraks rahule. Ma jään lähedale.",
+     "next": "Vähenda müra, hoia ohutut kaugust ja räägi edasi alles siis, kui pinge on taandunud.",
+     "why": "Sa lood turvalise kauguse ja samal ajal edastad rahulikku kohalolekut.",
+     "avoid": "Nüüd lõpuks rahune maha."
+    },
+    {
+     "id": "daycare",
+     "title": "Päevakeskusest keeldutakse",
+     "say": "Ma viin sind sinna ja tulen sulle hiljem järele. Selle peale võid kindel olla.",
+     "next": "Hoia hüvastijätt lühike ja sõbralik, ütle järeletuleku aeg ja palu meeskonnalt tuttavlikku vastuvõttu.",
+     "why": "Keeldumise taga on sageli hirm uue ees või hirm maha jäetud saada. Kindel lubadus järele tulla annab turvatunde.",
+     "avoid": "Sa pead minema, mul on ka rahu vaja."
+    }
+   ]
+  },
+  "fa": {
+   "heading": "موقعیت‌های رایج و آنچه کمک می‌کند",
+   "labels": {
+    "say": "می‌توانید بگویید",
+    "next": "کاری که می‌توانید انجام دهید",
+    "why": "پشت ماجرا چیست",
+    "avoid": "بهتر است نگویید:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "میل به رفتن به خانه",
+     "say": "دلت برای خانه‌ات تنگ شده است. برایم بگو چه چیزی آنجا به‌خصوص زیبا بود.",
+     "next": "چیزی آشنا ارائه دهید، مثل چای، موسیقی آرام، یا یک آلبوم عکس.",
+     "why": "این لحظه اغلب بیشتر درباره ایمنی و آشنایی است تا مکان واقعی. مخالفت کردن می‌تواند فشار اضافی ایجاد کند.",
+     "avoid": "تو که در خانه هستی."
+    },
+    {
+     "id": "repeat",
+     "title": "همان سؤال مدام تکرار می‌شود",
+     "say": "می‌خواهی بدانی کی راه می‌افتیم. به‌موقع به تو خبر می‌دهم.",
+     "next": "جواب را به‌صورت واضح روی یک تکه کاغذ بنویسید و وقتی سؤال بعدی پرسیده شد، به آن اشاره کنید.",
+     "why": "ممکن است پاسخ در حافظه نمانده باشد. یک جمله آرام و ثابت، جهت‌یابی ارائه می‌دهد بدون اینکه احساس گناه ایجاد کند.",
+     "avoid": "من قبلاً پنج بار به تو گفته‌ام."
+    },
+    {
+     "id": "wash",
+     "title": "دوش گرفتن رد می‌شود",
+     "say": "می‌خواهی اول کنار روشویی خودت را تازه کنی یا بعداً دوش بگیری؟",
+     "next": "اتاق را از قبل گرم کنید و حوله و لباس‌ها را در جایی قابل دید آماده بگذارید.",
+     "why": "مراقبت شخصی می‌تواند غیرمعمول یا تهدیدآمیز به نظر برسد. یک انتخاب کوچک به حفظ کنترل و کرامت کمک می‌کند.",
+     "avoid": "تو باید همین حالا دوش بگیری."
+    },
+    {
+     "id": "evening",
+     "title": "ناآرامی از عصر شروع می‌شود",
+     "say": "فقط کمی بی‌قرار شده است. من کنار تو می‌مانم و با هم اینجا را کمی آرام‌تر می‌کنیم.",
+     "next": "چراغ‌های روشن و تلویزیون را خاموش کنید و یک فعالیت آرام و آشنا ارائه دهید.",
+     "why": "در عصر، خستگی، سایه‌ها و محرک‌های زیاد می‌توانند احساس ناامنی را افزایش دهند. جهت‌یابی و آرامش اغلب بیشتر از فشار کمک می‌کنند.",
+     "avoid": "تو بالاخره باید الان بخوابی."
+    },
+    {
+     "id": "keys",
+     "title": "کلیدها یا پول ناپدید شده‌اند",
+     "say": "دنبال کلیدهایت می‌گردی. بیا با هم جاهای همیشگی را نگاه کنیم.",
+     "next": "با آرامش دو جای آشنا را که وسایل معمولاً آنجا گذاشته می‌شوند بررسی کنید و سپس پیشنهاد استراحت بدهید.",
+     "why": "جستجو با هم، احساس را جدی می‌گیرد و از احساس گناه جلوگیری می‌کند.",
+     "avoid": "دوباره گمشان کردی."
+    },
+    {
+     "id": "accuse",
+     "title": "من به دزدی متهم شده‌ام",
+     "say": "نگران پولت هستی. با هم نگاه می‌کنیم.",
+     "next": "نگرانی را بپذیرید و به طور مختصر با هم در یک مکان آشنا جستجو کنید.",
+     "why": "نگرانی واقعی به نظر می‌رسد. دفاع می‌تواند به عنوان مقاومت بیشتر به نظر برسد.",
+     "avoid": "چه مزخرفی، من دزدی نمی‌کنم."
+    },
+    {
+     "id": "eat",
+     "title": "غذا رد می‌شود",
+     "say": "مایل هستی چند قاشق سوپ بخوری یا کمی نان؟",
+     "next": "مقدار کمی غذا و فقط دو گزینه آشنا پیشنهاد دهید.",
+     "why": "انتخاب‌های کوچک و قابل مدیریت کمتر دلهره‌آور به نظر می‌رسند.",
+     "avoid": "تو باید چیزی بخوری."
+    },
+    {
+     "id": "drink",
+     "title": "نوشیدن فراموش می‌شود",
+     "say": "با تو یک لیوان می‌نوشم. دوست داری آب یا چای؟",
+     "next": "یک لیوان مورد علاقه که واضح قابل مشاهده باشد را در دسترس قرار دهید و با هم یک جرعه بنوشید.",
+     "why": "انجام کارها با هم و اتخاذ یک انتخاب ساده فشار را کاهش می‌دهد.",
+     "avoid": "امروز خیلی کم نوشیدی."
+    },
+    {
+     "id": "night",
+     "title": "فرد در شب از جا برمی‌خیزد",
+     "say": "هنوز شب است. من اینجا هستم و کمی با تو همراه خواهم بود.",
+     "next": "از نور کم استفاده کنید، فرد را تا دستشویی همراهی کنید و سپس به تخت برگردانید.",
+     "why": "جهت‌گیری آرامش‌بخش امنیت را بدون شروع مشاجره فراهم می‌کند.",
+     "avoid": "فوراً دوباره دراز بکش."
+    },
+    {
+     "id": "dress",
+     "title": "پوشیدن لباس رد شد",
+     "say": "مایل هستی ژاکت آبی را برداری یا خاکستری؟",
+     "next": "دو لباس مناسب را در جایی که دیده شود آماده بگذارید و به فرد زمان کافی بدهید.",
+     "why": "دو گزینه قابل مشاهده تصمیم‌گیری‌ها را کاهش می‌دهند و خودمختاری را حفظ می‌کنند.",
+     "avoid": "نمی‌توانی با لباس خواب بمانی."
+    },
+    {
+     "id": "work",
+     "title": "فرد می‌خواهد سر کار برود",
+     "say": "همیشه می‌شود روی تو حساب کرد. قبل از اینکه بروی، یک لحظه اینجا کمکم می‌کنی؟",
+     "next": "یک کار معنادار متناسب با شغل قبلی پیشنهاد کنید، مثلاً مرتب کردن کاغذها، تعمیر چیزی یا چیدن میز.",
+     "why": "کار اغلب به زندگی هدف، نظم و قدردانی می‌داد. پشت این خواسته اغلب نیاز به احساس مفید بودن نهفته است.",
+     "avoid": "تو که خیلی وقت است بازنشسته شده‌ای."
+    },
+    {
+     "id": "car",
+     "title": "شخص می‌خواهد خودش رانندگی کند",
+     "say": "می‌خواهی خودت رانندگی کنی، می‌فهمم. امروز من رانندگی می‌کنم و تو راه را به من نشان می‌دهی.",
+     "next": "یک گزینه سفر امن مشخص ارائه دهید و در صورت لزوم کلیدها را از دید پنهان کنید.",
+     "why": "نیاز به استقلال قابل فهم است؛ یک جایگزین از دست دادن حیثیت را کاهش می‌دهد.",
+     "avoid": "تو دیگر نمی‌توانی رانندگی کنی."
+    },
+    {
+     "id": "recognize",
+     "title": "فرد مرا نمی‌شناسد",
+     "say": "امروز کنارت هستم. تنها نیستی.",
+     "next": "نام خود را با آرامش بگویید، کمی فاصله نگه دارید و به جای توضیح رابطه، درباره چیزی آشنا صحبت کنید.",
+     "why": "شناخته نشدن دردناک است، اما به معنای طرد شدن نیست. گرمی و آرامش بدون آزمودن حافظه احساس امنیت می‌دهند.",
+     "avoid": "تو باید بدانی من کی هستم."
+    },
+    {
+     "id": "anger",
+     "title": "فرد به من فریاد می‌زند",
+     "say": "کمی تو را به حال خودت می‌گذارم. همین نزدیکی می‌مانم.",
+     "next": "سر و صدا را کاهش دهید، فاصله ایمن را حفظ کنید، و تنها زمانی دوباره صحبت کنید که تنش کاهش یافته باشد.",
+     "why": "شما یک فاصله امن ایجاد می‌کنید و همزمان حضور آرامی را منتقل می‌کنید.",
+     "avoid": "حالا بالاخره آرام باش."
+    },
+    {
+     "id": "daycare",
+     "title": "مخالفت با رفتن به مرکز مراقبت روزانه",
+     "say": "تو را می‌برم و بعداً دوباره دنبالت می‌آیم. می‌توانی روی این حساب کنی.",
+     "next": "خداحافظی را کوتاه و مهربان کنید، ساعت آمدن به دنبال او را بگویید و از کارکنان بخواهید با گرمی از او استقبال کنند.",
+     "why": "پشت این مخالفت اغلب ترس از چیزهای تازه یا ترس از تنها ماندن است. قول قطعی برای برگشتن و بردن او آرامش می‌دهد.",
+     "avoid": "باید بروی، من هم کمی آرامش لازم دارم."
+    }
+   ]
+  },
+  "fi": {
+   "heading": "Tavallisia tilanteita ja mikä auttaa",
+   "labels": {
+    "say": "Voit sanoa näin",
+    "next": "Mitä voit tehdä",
+    "why": "Mitä sen takana on",
+    "avoid": "Parempi ei:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Halu lähteä kotiin",
+     "say": "Kaipaat kotiisi. Kerro, mikä siellä oli erityisen kaunista.",
+     "next": "Tarjoa jotain tuttua, kuten teetä, rauhallista musiikkia tai valokuva-albumia.",
+     "why": "Tämä hetki liittyy usein enemmän turvallisuuteen ja tuttuuteen kuin varsinaiseen sijaintiin. Vastaan väittäminen voi luoda lisäpainetta.",
+     "avoid": "Olethan sinä kotona."
+    },
+    {
+     "id": "repeat",
+     "title": "Sama kysymys tulee jatkuvasti esiin",
+     "say": "Haluat tietää, milloin lähdemme. Kerron sinulle hyvissä ajoin.",
+     "next": "Kirjoita vastaus selkeästi paperille ja osoita siihen, kun seuraava kysymys esitetään.",
+     "why": "Vastaus ei ehkä ole jäänyt muistiin. Rauhallinen, johdonmukainen lause tarjoaa suuntaa ilman syyllisyyden tunnetta.",
+     "avoid": "Olen jo kertonut sen sinulle viisi kertaa."
+    },
+    {
+     "id": "wash",
+     "title": "Suihkusta kieltäydytään",
+     "say": "Haluatko raikastautua ensin pesualtaalla vai käydä suihkussa myöhemmin?",
+     "next": "Lämmitä huone etukäteen ja asettele pyyhe ja vaatteet näkyvälle paikalle.",
+     "why": "Henkilökohtainen hoito voi tuntua vieraalta tai uhkaavalta. Pieni valinta auttaa säilyttämään hallinnan ja arvokkuuden.",
+     "avoid": "Sinun täytyy käydä suihkussa nyt."
+    },
+    {
+     "id": "evening",
+     "title": "Levottomuus alkaa illalla",
+     "say": "Nyt on vähän levotonta. Jään luoksesi, ja teemme täällä vähän rauhallisempaa.",
+     "next": "Sammuta kirkkaat valot ja televisio ja tarjoa tuttu, rauhallinen aktiviteetti.",
+     "why": "Illalla väsymys, varjot ja monet ärsykkeet voivat lisätä epävarmuutta. Suuntaaminen ja rauhallisuus auttavat usein enemmän kuin paine.",
+     "avoid": "Sinun täytyy vihdoin nukkua nyt."
+    },
+    {
+     "id": "keys",
+     "title": "Avaimet tai raha ovat kadonneet",
+     "say": "Etsit avaimiasi. Katsotaanpa yhdessä tavallisista paikoista.",
+     "next": "Tarkista rauhassa kaksi tuttua paikkaa, joihin tavarat yleensä laitetaan, ja tarjoa sitten tauko.",
+     "why": "Yhdessä etsiminen ottaa tunteen vakavasti ja välttää syyllisyyden.",
+     "avoid": "Laitoit ne jälleen väärään paikkaan."
+    },
+    {
+     "id": "accuse",
+     "title": "Minua syytetään varkaudesta",
+     "say": "Olet huolissasi rahoistasi. Katsotaan yhdessä.",
+     "next": "Tunnusta huoli ja etsi yhdessä lyhyesti tutusta paikasta.",
+     "why": "Huoli tuntuu todelta. Puolustus voi vaikuttaa lisävastustukselta.",
+     "avoid": "Mitä pötyä, enhän minä varasta."
+    },
+    {
+     "id": "eat",
+     "title": "Ruoasta kieltäydytään",
+     "say": "Haluatko muutaman lusikallisen keittoa vai vähän leipää?",
+     "next": "Tarjoa pieni annos ja vain kaksi tuttua vaihtoehtoa.",
+     "why": "Pienet, hallittavissa olevat valinnat näyttäytyvät vähemmän ylivoimaisina.",
+     "avoid": "Sinun täytyy syödä jotain."
+    },
+    {
+     "id": "drink",
+     "title": "Juominen unohdetaan",
+     "say": "Otan lasin kanssasi. Haluatko vettä vai teetä?",
+     "next": "Aseta suosikki, selvästi näkyvä lasi ulottuville ja ota kulaus yhdessä.",
+     "why": "Yhteiset toiminnot ja yksinkertaisen valinnan tekeminen luovat vähemmän painetta.",
+     "avoid": "Joit tänään aivan liian vähän."
+    },
+    {
+     "id": "night",
+     "title": "Henkilö nousee yöllä",
+     "say": "On vielä yö. Olen tässä ja saatan sinua hetken.",
+     "next": "Käytä himmennettyä valaistusta, saata WC:hen ja takaisin sänkyyn.",
+     "why": "Rauhallinen orientointi antaa turvaa ilman, että aloitetaan riitaa.",
+     "avoid": "Mene heti takaisin makuulle."
+    },
+    {
+     "id": "dress",
+     "title": "Pukeutumisesta kieltäydytään",
+     "say": "Haluatko sinisen vai harmaan neuleen?",
+     "next": "Laita kaksi sopivaa vaatetta näkyville valmiiksi ja anna henkilölle riittävästi aikaa.",
+     "why": "Kaksi näkyvää vaihtoehtoa vähentävät päätöksiä ja säilyttävät itsemääräämisoikeuden.",
+     "avoid": "Et voi jäädä pyjamaan."
+    },
+    {
+     "id": "work",
+     "title": "Henkilö haluaa lähteä töihin",
+     "say": "Sinuun voi aina luottaa. Ennen kuin lähdet, autatko minua hetken tässä?",
+     "next": "Tarjoa mielekäs tehtävä, joka sopii entiseen ammattiin, esimerkiksi papereiden lajittelu, jonkin korjaaminen tai pöydän kattaminen.",
+     "why": "Työ antoi usein tehtävän, rytmin ja arvostusta. Toiveen takana on usein tarve tuntea itsensä tarpeelliseksi.",
+     "avoid": "Olethan ollut eläkkeellä jo pitkään."
+    },
+    {
+     "id": "car",
+     "title": "Henkilö haluaa ajaa autoa itse",
+     "say": "Haluat ajaa itse, ymmärrän sen. Tänään minä ajan, ja sinä neuvot tietä.",
+     "next": "Tarjoa tietty turvallinen matkavaihtoehto ja laita avaimet näkyvistä tarvittaessa.",
+     "why": "Tarve itsenäisyyteen on ymmärrettävää; vaihtoehto vähentää kasvojen menetystä.",
+     "avoid": "Et voi enää ajaa."
+    },
+    {
+     "id": "recognize",
+     "title": "Henkilö ei tunnista minua",
+     "say": "Olen tänään täällä sinua varten. Et ole yksin.",
+     "next": "Kerro rauhallisesti nimesi, pidä hieman etäisyyttä ja puhu jostain tutusta sen sijaan, että selittäisit suhdettanne.",
+     "why": "On kipeää, kun sinua ei tunnisteta, mutta se ei ole torjuntaa. Lämpö ja rauhallisuus antavat turvaa testaamatta muistia.",
+     "avoid": "Kyllähän sinä tiedät, kuka minä olen."
+    },
+    {
+     "id": "anger",
+     "title": "Henkilö huutaa minulle",
+     "say": "Annan sinun olla hetken rauhassa. Pysyn lähellä.",
+     "next": "Vähennä melua, pidä turvallinen etäisyys ja puhu uudelleen vasta, kun jännitys on laantunut.",
+     "why": "Luot turvallisen etäisyyden ja samalla välität rauhallisen läsnäolon.",
+     "avoid": "Rauhoitu nyt viimein."
+    },
+    {
+     "id": "daycare",
+     "title": "Päivätoiminta torjutaan",
+     "say": "Vien sinut sinne ja haen sinut myöhemmin takaisin. Siihen voit luottaa.",
+     "next": "Pidä hyvästit lyhyinä ja ystävällisinä, kerro hakuaika ja pyydä henkilökuntaa tervehtimään tutulla tavalla.",
+     "why": "Torjunnan takana on usein pelko uutta kohtaan tai pelko jäädä yksin. Varma lupaus hakemisesta antaa turvaa.",
+     "avoid": "Sinun on pakko mennä, minäkin tarvitsen lepoa."
+    }
+   ]
+  },
+  "fr": {
+   "heading": "Situations fréquentes et ce qui aide",
+   "labels": {
+    "say": "Vous pouvez dire",
+    "next": "Ce que vous pouvez faire",
+    "why": "Ce qui se cache derrière",
+    "avoid": "Mieux vaut éviter :"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Vouloir rentrer chez soi",
+     "say": "Ta maison te manque. Dis-moi ce qui y était particulièrement beau.",
+     "next": "Offrez quelque chose de familier, comme du thé, de la musique calme ou un album photo.",
+     "why": "Ce moment est souvent plus lié à la sécurité et à la familiarité qu’à l’emplacement réel. Contredire la personne peut créer une pression supplémentaire.",
+     "avoid": "Mais tu es à la maison."
+    },
+    {
+     "id": "repeat",
+     "title": "La même question revient sans cesse",
+     "say": "Tu veux savoir quand on part. Je te préviens à temps.",
+     "next": "Écrivez la réponse clairement sur un morceau de papier et montrez-la lorsque la question suivante est posée.",
+     "why": "Il se peut que la réponse ne soit pas restée en mémoire. Une phrase calme et toujours la même donne des repères sans culpabiliser.",
+     "avoid": "Je te l’ai déjà dit cinq fois."
+    },
+    {
+     "id": "wash",
+     "title": "La douche est refusée",
+     "say": "Veux-tu te rafraîchir d’abord au lavabo ou prendre une douche plus tard ?",
+     "next": "Chauffez la pièce à l’avance et disposez la serviette et les vêtements à un endroit visible.",
+     "why": "Les soins personnels peuvent sembler inconnus ou menaçants. Un petit choix aide à préserver le contrôle et la dignité.",
+     "avoid": "Tu dois prendre une douche maintenant."
+    },
+    {
+     "id": "evening",
+     "title": "L’agitation commence le soir",
+     "say": "Ça devient un peu agité. Je reste avec toi et nous allons rendre les choses un peu plus calmes ici.",
+     "next": "Éteignez les lumières vives et la télévision et proposez une activité familière et calme.",
+     "why": "Le soir, la fatigue, les ombres et de nombreux stimuli peuvent augmenter le sentiment d’insécurité. L’orientation et le calme aident souvent plus que la pression.",
+     "avoid": "Maintenant, tu dois enfin dormir."
+    },
+    {
+     "id": "keys",
+     "title": "Les clés ou l’argent ont disparu",
+     "say": "Tu cherches tes clés. Cherchons ensemble aux endroits habituels.",
+     "next": "Vérifiez calmement deux endroits habituels où les objets sont rangés, puis proposez une pause.",
+     "why": "Rechercher ensemble prend le sentiment au sérieux et évite la culpabilité.",
+     "avoid": "Tu les as encore égarées."
+    },
+    {
+     "id": "accuse",
+     "title": "On m’accuse de vol",
+     "say": "Tu t’inquiètes pour ton argent. On va regarder ensemble.",
+     "next": "Reconnaissez l’inquiétude et recherchez brièvement ensemble dans un endroit familier.",
+     "why": "L’inquiétude semble réelle. Se défendre peut sembler une résistance supplémentaire.",
+     "avoid": "Quelle absurdité, je ne vole pas."
+    },
+    {
+     "id": "eat",
+     "title": "La nourriture est refusée",
+     "say": "Veux-tu quelques cuillerées de soupe ou un peu de pain ?",
+     "next": "Offrez une petite portion et seulement deux options familières.",
+     "why": "De petits choix gérables semblent moins accablants.",
+     "avoid": "Tu dois manger quelque chose."
+    },
+    {
+     "id": "drink",
+     "title": "Oublie de boire",
+     "say": "Je vais boire quelque chose avec toi. Tu veux de l’eau ou du thé ?",
+     "next": "Placez un verre préféré et bien visible à portée de main et prenez une gorgée ensemble.",
+     "why": "Faire des choses ensemble et faire un choix simple crée moins de pression.",
+     "avoid": "Tu n’as vraiment pas assez bu aujourd’hui."
+    },
+    {
+     "id": "night",
+     "title": "La personne se lève la nuit",
+     "say": "Il fait encore nuit. Je suis là et je t’accompagnerai un moment.",
+     "next": "Utilisez un éclairage tamisé, accompagnez la personne aux toilettes puis retour au lit.",
+     "why": "L’orientation calme fournit de la sécurité sans commencer une dispute.",
+     "avoid": "Recouche-toi immédiatement."
+    },
+    {
+     "id": "dress",
+     "title": "Habillage refusé",
+     "say": "Veux-tu le pull bleu ou le gris ?",
+     "next": "Préparez deux vêtements adaptés bien en vue et laissez suffisamment de temps à la personne.",
+     "why": "Deux options visibles réduisent les décisions et préservent l’autodétermination.",
+     "avoid": "Tu ne peux pas rester en pyjama."
+    },
+    {
+     "id": "work",
+     "title": "La personne veut aller au travail",
+     "say": "On peut toujours compter sur toi. Avant de partir, tu m’aides un instant ici ?",
+     "next": "Proposez une tâche utile en lien avec l’ancien métier, par exemple trier des papiers, réparer quelque chose ou mettre la table.",
+     "why": "Le travail donnait souvent un rôle, une structure et de la reconnaissance. Derrière ce souhait se cache souvent le besoin de se sentir utile.",
+     "avoid": "Mais tu es à la retraite depuis longtemps."
+    },
+    {
+     "id": "car",
+     "title": "La personne veut conduire la voiture elle-même",
+     "say": "Tu veux conduire toi-même, je comprends. Aujourd’hui, c’est moi qui conduis, et tu m’indiques le chemin.",
+     "next": "Proposez une option de voyage spécifique et sûre et mettez les clés hors de vue si nécessaire.",
+     "why": "Le besoin d’indépendance est compréhensible ; une alternative réduit la perte de face.",
+     "avoid": "Tu ne peux plus conduire."
+    },
+    {
+     "id": "recognize",
+     "title": "La personne ne me reconnaît pas",
+     "say": "Aujourd’hui, je suis là pour toi. Je reste avec toi.",
+     "next": "Dites calmement votre prénom, gardez un peu de distance et parlez de quelque chose de familier plutôt que d’expliquer votre lien.",
+     "why": "Ne pas être reconnu fait mal, mais ce n’est pas un rejet. La chaleur et le calme rassurent sans mettre la mémoire à l’épreuve.",
+     "avoid": "Tu dois bien savoir qui je suis."
+    },
+    {
+     "id": "anger",
+     "title": "La personne me crie dessus",
+     "say": "Je te laisse un peu tranquille. Je reste tout près.",
+     "next": "Réduisez le bruit, gardez une distance de sécurité et ne parlez à nouveau que lorsque la tension a diminué.",
+     "why": "Vous créez une distance sûre et en même temps transmettez une présence calme.",
+     "avoid": "Maintenant, calme-toi enfin."
+    },
+    {
+     "id": "daycare",
+     "title": "L’accueil de jour est refusé",
+     "say": "Je t’y emmène et je reviens te chercher plus tard. Tu peux compter sur moi.",
+     "next": "Faites des adieux courts et chaleureux, indiquez l’heure à laquelle vous reviendrez et demandez à l’équipe un accueil familier.",
+     "why": "Derrière le refus se cache souvent la peur de la nouveauté ou de l’abandon. Une promesse ferme de retour rassure.",
+     "avoid": "Tu dois y aller, moi aussi j’ai besoin de calme."
+    }
+   ]
+  },
+  "ga": {
+   "heading": "Cásanna coitianta agus cad a chabhraíonn",
+   "labels": {
+    "say": "Is féidir leat a rá",
+    "next": "Cad is féidir leat a dhéanamh",
+    "why": "Cad atá taobh thiar de",
+    "avoid": "Níos fearr gan:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Ag iarraidh dul abhaile",
+     "say": "Tá cumha ort i ndiaidh do bhaile. Inis dom cad a bhí go háirithe go hálainn ann.",
+     "next": "Tairg rud éigin a bhfuil aithne air, amhail tae, ceol suaimhneach, nó albam grianghraf.",
+     "why": "Bíonn an nóiméad seo níos mó faoi shábháilteacht agus faoi rudaí aithnidiúla ná faoin áit fhíor. Féadann bréagnú breis brú a chruthú.",
+     "avoid": "Ach tá tú sa bhaile."
+    },
+    {
+     "id": "repeat",
+     "title": "Leanann an cheist chéanna ag teacht suas",
+     "say": "Ba mhaith leat a fháil amach cathain a fhágfaimid. Inseoidh mé duit in am.",
+     "next": "Scríobh an freagra go soiléir ar phíosa páipéir agus taispeáin é nuair a chuirtear an cheist arís.",
+     "why": "B’fhéidir nár fhan an freagra sa chuimhne. Tugann abairt shocair nach n-athraíonn treoir gan mothú ciontachta a chruthú.",
+     "avoid": "Dúirt mé leat é sin cheana cúig huaire."
+    },
+    {
+     "id": "wash",
+     "title": "Diúltaítear don chithfholcadh",
+     "say": "Ar mhaith leat tú féin a ní ag an doirteal ar dtús nó cithfholcadh a ghlacadh níos déanaí?",
+     "next": "Déan an seomra a réamh-theasadh agus leag an tuáille agus éadaí in áit le feiceáil.",
+     "why": "Is féidir le cúram pearsanta a bheith aisteach nó bagrach. Cuidíonn rogha bheag le smacht agus dínit a chaomhnú.",
+     "avoid": "Ní mór duit cith a ghlacadh anois."
+    },
+    {
+     "id": "evening",
+     "title": "Tosaíonn míshuaimhneas tráthnóna",
+     "say": "Tá sé ag éirí míshuaimhneach díreach. Fanfaidh mé leat agus déanfaimid rudaí níos ciúine anseo.",
+     "next": "Cas amach soilse geala agus an teilifís agus tabhair gníomhaíocht eolach, chiúin.",
+     "why": "San tráthnóna, is féidir leis an tuirse, scáthanna agus go leor spreagthaí neamhchinnteacht a mhéadú. Cabhraíonn treoshuíomh agus suaimhneas go minic níos mó ná brú.",
+     "avoid": "Ní mór duit codladh anois ar deireadh."
+    },
+    {
+     "id": "keys",
+     "title": "Tá eochracha nó airgead imithe",
+     "say": "Tá tú ag cuardach d’eochracha. Féachaimis le chéile sna gnátháiteanna.",
+     "next": "Seiceáil go socair dhá áit aithnidiúla ina gcoinnítear rudaí de ghnáth, agus ansin tairg sos.",
+     "why": "Tógann cuardach le chéile an mothúchán go dáiríre agus seachnaíonn sé ciontacht.",
+     "avoid": "Chuir tú amú arís iad."
+    },
+    {
+     "id": "accuse",
+     "title": "Táim cúisithe as gadaíocht",
+     "say": "Tá imní ort faoi do chuid airgid. Féachfaimid le chéile.",
+     "next": "Aithin an imní agus déanaigí cuardach gearr le chéile in áit aithnidiúil.",
+     "why": "Tá an imní fíor don duine. Is féidir le cosaint a bheith cosúil le tuilleadh cur i gcoinne.",
+     "avoid": "Seafóid, ní ghoidim rud ar bith."
+    },
+    {
+     "id": "eat",
+     "title": "Diúltaítear do bhia",
+     "say": "Ar mhaith leat cúpla spúnóg anraith nó b’fhearr leat píosa aráin?",
+     "next": "Tairg cuid bheag agus dhá rogha aithnidiúla amháin.",
+     "why": "Bíonn roghanna beaga soiléire níos éasca le láimhseáil.",
+     "avoid": "Ní mór duit rud éigin a ithe."
+    },
+    {
+     "id": "drink",
+     "title": "Déantar dearmad ar ól",
+     "say": "Beidh gloine agam leat. Ar mhaith leat uisce nó tae?",
+     "next": "Cuir gloine is fearr leis an duine, atá furasta a fheiceáil, in aice láimhe agus ólaigí bolgam le chéile.",
+     "why": "Cruthaíonn rudaí a dhéanamh le chéile agus rogha shimplí níos lú brú.",
+     "avoid": "Is beag a d’ól tú inniu."
+    },
+    {
+     "id": "night",
+     "title": "Éiríonn an duine san oíche",
+     "say": "Tá sé fós oíche. Táim anseo agus beidh mé i do chomhluadar ar feadh tamaill.",
+     "next": "Úsáid solas íseal, téigh in éineacht leis an duine chuig an leithreas agus ansin ar ais chuig an leaba.",
+     "why": "Soláthraíonn treoshuíomh socair slándáil gan argóint a thosú.",
+     "avoid": "Luigh síos arís láithreach."
+    },
+    {
+     "id": "dress",
+     "title": "Diúltaítear do ghléasadh",
+     "say": "An mian leat an geansaí gorm nó an liath?",
+     "next": "Leag amach dhá bhall éadaigh oiriúnacha in áit fheiceálach agus tabhair go leor ama don duine.",
+     "why": "Laghdaíonn dhá rogha infheicthe líon na gcinntí agus coimeádann siad féinchinneadh.",
+     "avoid": "Ní féidir leat fanacht i do phajamas."
+    },
+    {
+     "id": "work",
+     "title": "Tá an duine ag iarraidh dul ag obair",
+     "say": "Is féidir brath ort i gcónaí. Sula n-imíonn tú, an gcabhróidh tú liom anseo ar feadh nóiméid?",
+     "next": "Tairg tasc fiúntach a oireann don seanghairm, mar shampla páipéir a shórtáil, rud éigin a dheisiú nó an bord a leagan.",
+     "why": "Ba mhinic a thug an obair cuspóir, struchtúr agus aitheantas. Is minic a bhíonn an gá le bheith úsáideach taobh thiar den mhian.",
+     "avoid": "Ach tá tú ar pinsean le fada."
+    },
+    {
+     "id": "car",
+     "title": "Ba mhaith leis an duine an carr a thiomáint féin",
+     "say": "Ba mhaith leat féin tiomáint, tuigim é sin. Inniu tiomáinfidh mise, agus taispeánfaidh tusa an bealach dom.",
+     "next": "Tairg rogha sábháilte taistil shonrach agus cuir na heochracha as radharc más gá.",
+     "why": "Tá an gá le neamhspleáchas intuigthe; laghdaíonn malairt an chaillteanas aghaidhe.",
+     "avoid": "Ní féidir leat tiomáint níos mó."
+    },
+    {
+     "id": "recognize",
+     "title": "Ní aithníonn an duine mé",
+     "say": "Tá mé anseo duit inniu. Níl tú i d’aonar.",
+     "next": "Abair d’ainm go socair, coinnigh beagán achair agus labhair faoi rud éigin eolach in ionad an gaol a mhíniú.",
+     "why": "Gortaíonn sé gan aithne a bheith ort, ach ní diúltú é. Tugann teas agus suaimhneas slándáil gan an chuimhne a thástáil.",
+     "avoid": "Caithfidh go bhfuil a fhios agat cé mé féin."
+    },
+    {
+     "id": "anger",
+     "title": "Béiceann an duine orm",
+     "say": "Fágfaidh mé leat féin tú ar feadh tamaill. Fanfaidh mé in aice láimhe.",
+     "next": "Laghdaigh torann, coinnigh fad sábháilte, agus labhair arís amháin nuair atá an teannas imithe.",
+     "why": "Cruthaíonn tú achar sábháilte agus léiríonn tú láithreacht shocair ag an am céanna.",
+     "avoid": "Anois socraigh leat féin ar deireadh."
+    },
+    {
+     "id": "daycare",
+     "title": "Diúltaítear don chúram lae",
+     "say": "Tabharfaidh mé ann thú agus baileoidh mé thú arís níos déanaí. Is féidir leat brath air sin.",
+     "next": "Coinnigh an slán gearr agus cairdiúil, luaigh am an bhailithe, agus iarr ar an bhfoireann fáilte aithnidiúil a chur roimh an duine.",
+     "why": "Is minic eagla roimh rud nua nó roimh thréigean taobh thiar den diúltú. Tugann gealltanas daingean go mbaileofar an duine arís slándáil.",
+     "avoid": "Caithfidh tú dul ann, teastaíonn suaimhneas uaimse freisin."
+    }
+   ]
+  },
+  "hr": {
+   "heading": "Česte situacije i što pomaže",
+   "labels": {
+    "say": "Možete reći",
+    "next": "Što možete učiniti",
+    "why": "Što je iza toga",
+    "avoid": "Bolje ne:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Želja za odlaskom kući",
+     "say": "Nedostaje ti tvoj dom. Reci mi što je tamo bilo posebno lijepo.",
+     "next": "Ponudite nešto poznato, poput čaja, mirne glazbe ili foto albuma.",
+     "why": "Ovaj trenutak često se više odnosi na sigurnost i poznatost nego na stvarnu lokaciju. Proturječenje može stvoriti dodatni pritisak.",
+     "avoid": "Pa kod kuće si."
+    },
+    {
+     "id": "repeat",
+     "title": "Isto se pitanje stalno ponavlja",
+     "say": "Želiš znati kada krećemo. Reći ću ti na vrijeme.",
+     "next": "Napišite odgovor jasno vidljivo na papirić i pokažite ga kad se pitanje ponovno postavi.",
+     "why": "Odgovor možda nije ostao u pamćenju. Smirena, dosljedna rečenica pruža orijentaciju bez izazivanja krivnje.",
+     "avoid": "Već sam ti to rekao pet puta."
+    },
+    {
+     "id": "wash",
+     "title": "Tuširanje je odbijeno",
+     "say": "Želiš li se prvo osvježiti kraj umivaonika ili se kasnije istuširati?",
+     "next": "Prethodno zagrijte sobu i rasporedite ručnik i odjeću na vidljivo mjesto.",
+     "why": "Osobna njega može djelovati nepoznato ili prijeteće. Mali izbor pomaže sačuvati kontrolu i dostojanstvo.",
+     "avoid": "Moraš se sada istuširati."
+    },
+    {
+     "id": "evening",
+     "title": "Nemir počinje navečer",
+     "say": "Samo postaje nemirno. Ostat ću s tobom i ovdje ćemo malo utišati stvari.",
+     "next": "Isključite jarko svjetlo i televizor i ponudite poznatu, mirnu aktivnost.",
+     "why": "Uvečer umor, sjene i mnogi podražaji mogu povećati nesigurnost. Orijentacija i smirenost često pomažu više od pritiska.",
+     "avoid": "Konačno moraš sada spavati."
+    },
+    {
+     "id": "keys",
+     "title": "Ključevi ili novac su nestali",
+     "say": "Tražiš svoje ključeve. Hajde da zajedno pogledamo na uobičajenim mjestima.",
+     "next": "Mirno provjerite dva poznata mjesta na kojima stvari obično stoje, a zatim ponudite pauzu.",
+     "why": "Zajedničko traženje shvaća osjećaj ozbiljno i izbjegava krivnju.",
+     "avoid": "Opet si ih izgubio."
+    },
+    {
+     "id": "accuse",
+     "title": "Optužuju me za krađu",
+     "say": "Brineš se za svoj novac. Pogledat ćemo zajedno.",
+     "next": "Uvažite zabrinutost i nakratko zajedno potražite na poznatom mjestu.",
+     "why": "Briga se osjeća stvarno. Obrana može izgledati kao dodatni otpor.",
+     "avoid": "Koja besmislica, ne kradem."
+    },
+    {
+     "id": "eat",
+     "title": "Hrana se odbija",
+     "say": "Želiš li nekoliko žlica juhe ili radije malo kruha?",
+     "next": "Ponudite malu porciju i samo dvije poznate opcije.",
+     "why": "Mali i pregledan izbor manje opterećuje.",
+     "avoid": "Moraš nešto pojesti."
+    },
+    {
+     "id": "drink",
+     "title": "Zaboravlja piti",
+     "say": "Popit ću čašu s tobom. Hoćeš li vodu ili čaj?",
+     "next": "Stavite omiljenu, jasno vidljivu čašu na dohvat ruke i zajedno uzmite gutljaj.",
+     "why": "Raditi stvari zajedno i donijeti jednostavan izbor stvara manji pritisak.",
+     "avoid": "Danas si popio premalo."
+    },
+    {
+     "id": "night",
+     "title": "Osoba ustaje noću",
+     "say": "Još je noć. Ovdje sam i nakratko ću te pratiti.",
+     "next": "Koristite prigušeno svjetlo, pratite osobu do WC-a i zatim natrag u krevet.",
+     "why": "Mirna orijentacija pruža sigurnost bez započinjanja svađe.",
+     "avoid": "Odmah lezi natrag."
+    },
+    {
+     "id": "dress",
+     "title": "Oblačenje se odbija",
+     "say": "Želiš li plavi ili sivi džemper?",
+     "next": "Pripremite dva prikladna komada odjeće na vidljivom mjestu i dajte osobi dovoljno vremena.",
+     "why": "Dvije vidljive opcije smanjuju odluke i čuvaju samoodređenje.",
+     "avoid": "Ne možeš ostati u pidžami."
+    },
+    {
+     "id": "work",
+     "title": "Osoba želi ići na posao",
+     "say": "Na tebe se uvijek mogu osloniti. Prije nego što odeš, hoćeš li mi kratko pomoći ovdje?",
+     "next": "Ponudite smislen zadatak koji odgovara ranijem zanimanju, na primjer razvrstavanje papira, popravljanje nečega ili postavljanje stola.",
+     "why": "Posao je često davao svrhu, strukturu i priznanje. Iza te želje često stoji potreba da osoba bude potrebna.",
+     "avoid": "Pa ti si već odavno u mirovini."
+    },
+    {
+     "id": "car",
+     "title": "Osoba želi sama voziti automobil",
+     "say": "Želiš voziti, razumijem te. Danas vozim ja, a ti mi pokazuješ put.",
+     "next": "Ponudite određenu sigurnu opciju putovanja i po potrebi stavite ključeve izvan vidokruga.",
+     "why": "Potreba za neovisnošću je razumljiva; alternativa smanjuje gubitak lica.",
+     "avoid": "Više ne možeš voziti."
+    },
+    {
+     "id": "recognize",
+     "title": "Osoba me ne prepoznaje",
+     "say": "Danas sam tu za tebe. Uz tebe sam.",
+     "next": "Mirno recite svoje ime, držite malo razmaka i razgovarajte o nečemu poznatom umjesto da objašnjavate odnos.",
+     "why": "Kada vas ne prepoznaju, to boli, ali to nije odbacivanje. Toplina i mir pružaju sigurnost bez provjeravanja pamćenja.",
+     "avoid": "Pa moraš znati tko sam ja."
+    },
+    {
+     "id": "anger",
+     "title": "Osoba viče na mene",
+     "say": "Ostavit ću te malo na miru. Ostajem u blizini.",
+     "next": "Smanjite buku, držite sigurnu udaljenost i ponovno govorite tek kad se napetost smiri.",
+     "why": "Stvarate sigurnu udaljenost i istovremeno prenosite mirnu prisutnost.",
+     "avoid": "Sad se konačno smiri."
+    },
+    {
+     "id": "daycare",
+     "title": "Dnevni boravak se odbija",
+     "say": "Odvest ću te tamo i kasnije ću opet doći po tebe. Na to se možeš osloniti.",
+     "next": "Neka oproštaj bude kratak i ljubazan, recite vrijeme preuzimanja i zamolite tim za poznat doček.",
+     "why": "Iza odbijanja često stoji strah od novoga ili od napuštanja. Čvrsto obećanje povratka daje sigurnost.",
+     "avoid": "Moraš ići, i meni treba malo mira."
+    }
+   ]
+  },
+  "hu": {
+   "heading": "Gyakori helyzetek és ami segít",
+   "labels": {
+    "say": "Ezt mondhatod",
+    "next": "Amit tehetsz",
+    "why": "Mi áll a háttérben",
+    "avoid": "Inkább ne:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Haza akar menni",
+     "say": "Hiányzik az otthonod. Mondd el, mi volt különösen szép ott.",
+     "next": "Ajánlj fel valami ismerőset, például teát, nyugodt zenét vagy egy fényképalbumot.",
+     "why": "Ez a pillanat gyakran inkább a biztonságról és a megszokottságról szól, mint a tényleges helyről. Az ellentmondás további nyomást okozhat.",
+     "avoid": "Hiszen otthon vagy."
+    },
+    {
+     "id": "repeat",
+     "title": "Ugyanaz a kérdés újra és újra felmerül",
+     "say": "Tudni szeretnéd, mikor indulunk. Időben szólok neked.",
+     "next": "Írd le a választ tisztán egy papírlapra, és mutasd rá, amikor következő kérdést tesznek fel.",
+     "why": "Lehet, hogy a válasz nem maradt meg az emlékezetben. Egy nyugodt, következetes mondat tájékozódást nyújt bűntudat kialakulása nélkül.",
+     "avoid": "Már ötször elmondtam neked."
+    },
+    {
+     "id": "wash",
+     "title": "Elutasítja a zuhanyzást",
+     "say": "Előbb szeretnél a mosdónál felfrissülni, vagy később zuhanyozni?",
+     "next": "Fűtsd be előre a szobát, és készítsd ki a törölközőt és a ruhákat jól látható helyre.",
+     "why": "A személyes ápolás ismeretlennek vagy fenyegetőnek tűnhet. Egy kis választás segít a kontroll és a méltóság megőrzésében.",
+     "avoid": "Most azonnal zuhanyoznod kell."
+    },
+    {
+     "id": "evening",
+     "title": "A nyugtalanság esténként kezdődik",
+     "say": "Most kezd épp nyugtalan lenni. Veled maradok, és kicsit megnyugtatjuk itt a helyzetet.",
+     "next": "Kapcsold ki az erős fényt és a televíziót, és kínálj fel egy ismerős, csendes tevékenységet.",
+     "why": "Este fáradtság, árnyékok és sok inger növelhetik a bizonytalanságot. A tájékozódás és a nyugalom gyakran többet segít, mint a nyomás.",
+     "avoid": "Végre aludnod kell most."
+    },
+    {
+     "id": "keys",
+     "title": "A kulcsok vagy a pénz eltűntek",
+     "say": "A kulcsaidat keresed. Nézzük együtt a szokásos helyeken.",
+     "next": "Nyugodtan nézz meg két ismerős tárolóhelyet, majd ajánlj fel egy szünetet.",
+     "why": "A közös keresés komolyan veszi az érzéseket, és elkerüli a bűntudatot.",
+     "avoid": "Már megint elhagytad őket."
+    },
+    {
+     "id": "accuse",
+     "title": "Lopással vádolnak",
+     "say": "Aggódsz a pénzed miatt. Együtt megnézzük.",
+     "next": "Ismerd el az aggodalmat, és röviden keressetek együtt egy ismerős helyen.",
+     "why": "Az aggodalom valósnak tűnik. A védekezés további ellenállásnak tűnhet.",
+     "avoid": "Milyen butaság, nem lopok."
+    },
+    {
+     "id": "eat",
+     "title": "Az ételt visszautasítják",
+     "say": "Szeretnél egy pár kanálnyi levest, vagy inkább kenyeret?",
+     "next": "Kínálj egy kis adagot, és csak két ismerős lehetőséget.",
+     "why": "A kis, áttekinthető választási lehetőségek kevésbé terhelnek túl.",
+     "avoid": "Enned kell valamit."
+    },
+    {
+     "id": "drink",
+     "title": "Elfelejt inni",
+     "say": "Iszunk egy pohárral együtt. Vizet vagy teát szeretnél?",
+     "next": "Tegyél egy jól látható kedvenc poharat elérhető helyre, és igyatok együtt egy kortyot.",
+     "why": "A közös tevékenységek és az egyszerű választás kevesebb nyomást teremtenek.",
+     "avoid": "Ma túl keveset ittál."
+    },
+    {
+     "id": "night",
+     "title": "A személy felkel éjszaka",
+     "say": "Még éjszaka van. Itt vagyok, és röviden elkísérlek.",
+     "next": "Használj tompított fényt, kísérd el a mosdóba, majd vissza az ágyba.",
+     "why": "A nyugodt tájékozódás biztonságot nyújt vita nélkül.",
+     "avoid": "Feküdj vissza azonnal."
+    },
+    {
+     "id": "dress",
+     "title": "Öltözködés megtagadva",
+     "say": "A kék vagy a szürke pulóvert szeretnéd?",
+     "next": "Készíts ki láthatóan két megfelelő ruhadarabot, és adj elegendő időt.",
+     "why": "Két látható lehetőség csökkenti a döntéseket és megőrzi az önrendelkezést.",
+     "avoid": "Nem maradhatsz pizsamában."
+    },
+    {
+     "id": "work",
+     "title": "A személy dolgozni akar menni",
+     "say": "Rád mindig lehet számítani. Mielőtt elmész, segítesz itt nekem egy kicsit?",
+     "next": "Kínálj fel egy értelmes feladatot, amely illik a korábbi szakmához, például papírok rendezését, valaminek a megjavítását vagy a terítést.",
+     "why": "A munka gyakran adott feladatot, rendet és elismerést. E kívánság mögött gyakran az az igény áll, hogy szükség legyen rá.",
+     "avoid": "Hiszen már régóta nyugdíjas vagy."
+    },
+    {
+     "id": "car",
+     "title": "A személy maga akarja vezetni az autót",
+     "say": "Szeretnél te vezetni, megértem. Ma én vezetek, te pedig mutatod az utat.",
+     "next": "Kínálj fel egy konkrét, biztonságos utazási lehetőséget, és ha szükséges, tedd el a kulcsokat a látótérből.",
+     "why": "A függetlenség iránti igény érthető; egy alternatíva csökkenti az arcvesztést.",
+     "avoid": "Már nem vezethetsz."
+    },
+    {
+     "id": "recognize",
+     "title": "A személy nem ismer meg",
+     "say": "Ma itt vagyok neked. Nem vagy egyedül.",
+     "next": "Mondd meg nyugodtan a neved, tarts egy kis távolságot, és beszélj valami ismerősről ahelyett, hogy a kapcsolatotokat magyaráznád.",
+     "why": "Fáj, ha nem ismernek fel, de ez nem elutasítás. A melegség és a nyugalom biztonságot ad anélkül, hogy próbára tenné az emlékezetet.",
+     "avoid": "Csak tudod, ki vagyok."
+    },
+    {
+     "id": "anger",
+     "title": "A személy rám kiabál",
+     "say": "Egy kicsit békén hagylak. A közelben maradok.",
+     "next": "Csökkentsd a zajt, tarts biztonságos távolságot, és csak akkor szólalj meg újra, ha a feszültség alábbhagyott.",
+     "why": "Biztonságos távolságot teremtesz, és egyúttal nyugodt jelenlétet közvetítesz.",
+     "avoid": "Most végre nyugodj meg."
+    },
+    {
+     "id": "daycare",
+     "title": "Elutasítja a nappali ellátást",
+     "say": "Elviszlek, és később érted jövök. Ebben biztos lehetsz.",
+     "next": "Az elköszönés legyen rövid és kedves, mondd meg, mikor jössz érte, és kérd meg a csapatot egy ismerős fogadtatásra.",
+     "why": "Az elutasítás mögött gyakran az újtól vagy az egyedül maradástól való félelem áll. A biztos ígéret, hogy érte mennek, kapaszkodót ad.",
+     "avoid": "Menned kell, nekem is kell egy kis nyugalom."
+    }
+   ]
+  },
+  "it": {
+   "heading": "Situazioni frequenti e cosa aiuta",
+   "labels": {
+    "say": "Puoi dire",
+    "next": "Cosa puoi fare",
+    "why": "Cosa c’è dietro",
+    "avoid": "Meglio evitare:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Voler tornare a casa",
+     "say": "Ti manca casa. Raccontami cosa era particolarmente bello lì.",
+     "next": "Offri qualcosa di familiare, come tè, musica calma o un album fotografico.",
+     "why": "Questo momento riguarda spesso più la sicurezza e la familiarità che la posizione effettiva. Contraddire la persona può creare ulteriore pressione.",
+     "avoid": "Ma sei a casa."
+    },
+    {
+     "id": "repeat",
+     "title": "La stessa domanda continua a ripresentarsi",
+     "say": "Vuoi sapere quando partiamo. Ti avviso io in tempo.",
+     "next": "Scrivi la risposta in modo ben visibile su un foglietto e indicala alla domanda successiva.",
+     "why": "La risposta potrebbe non essere rimasta in memoria. Una frase calma e sempre uguale dà orientamento senza provocare sensi di colpa.",
+     "avoid": "Te l’ho già detto cinque volte."
+    },
+    {
+     "id": "wash",
+     "title": "La doccia è rifiutata",
+     "say": "Vuoi rinfrescarti prima al lavandino o fare la doccia dopo?",
+     "next": "Riscalda la stanza in anticipo e disponi l’asciugamano e i vestiti in un luogo visibile.",
+     "why": "La cura personale può sembrare insolita o minacciosa. Una piccola scelta aiuta a preservare il controllo e la dignità.",
+     "avoid": "Devi fare una doccia adesso."
+    },
+    {
+     "id": "evening",
+     "title": "L’inquietudine inizia la sera",
+     "say": "Si sta creando un po’ di agitazione. Resto con te e rendiamo tutto un po’ più tranquillo qui.",
+     "next": "Spegni le luci intense e la televisione e proponi un’attività familiare e tranquilla.",
+     "why": "La sera, stanchezza, ombre e molti stimoli possono aumentare l’insicurezza. Orientamento e calma spesso aiutano più della pressione.",
+     "avoid": "Adesso devi dormire, una buona volta."
+    },
+    {
+     "id": "keys",
+     "title": "Le chiavi o i soldi sono scomparsi",
+     "say": "Stai cercando le tue chiavi. Cerchiamo insieme nei soliti posti.",
+     "next": "Controlla con calma due posti abituali dove si ripongono le cose e poi offri una pausa.",
+     "why": "Cercare insieme prende sul serio la sensazione ed evita sensi di colpa.",
+     "avoid": "Le hai perse un’altra volta."
+    },
+    {
+     "id": "accuse",
+     "title": "Mi accusano di furto",
+     "say": "Ti preoccupi per i tuoi soldi. Controlliamo insieme.",
+     "next": "Riconosci la preoccupazione e cerca brevemente insieme in un luogo familiare.",
+     "why": "La preoccupazione sembra reale. Difendersi può sembrare un’ulteriore resistenza.",
+     "avoid": "Che sciocchezza, io non rubo mica."
+    },
+    {
+     "id": "eat",
+     "title": "Il cibo viene rifiutato",
+     "say": "Vorresti qualche cucchiaiata di zuppa o un po’ di pane?",
+     "next": "Offri una piccola porzione e solo due opzioni familiari.",
+     "why": "Piccole scelte gestibili sembrano meno opprimenti.",
+     "avoid": "Devi mangiare qualcosa."
+    },
+    {
+     "id": "drink",
+     "title": "Si dimentica di bere",
+     "say": "Bevo qualcosa con te. Vuoi acqua o tè?",
+     "next": "Metti un bicchiere preferito, chiaramente visibile, a portata di mano e bevi un sorso insieme.",
+     "why": "Fare le cose insieme e fare una scelta semplice crea meno pressione.",
+     "avoid": "Oggi hai bevuto davvero troppo poco."
+    },
+    {
+     "id": "night",
+     "title": "La persona si alza di notte",
+     "say": "È ancora notte. Sono qui e ti accompagno un attimo.",
+     "next": "Usa una luce soffusa, accompagna la persona in bagno e poi di nuovo a letto.",
+     "why": "L’orientamento calmo fornisce sicurezza senza iniziare una discussione.",
+     "avoid": "Sdraiati di nuovo immediatamente."
+    },
+    {
+     "id": "dress",
+     "title": "Vestirsi è rifiutato",
+     "say": "Vuoi il maglione blu o quello grigio?",
+     "next": "Prepara due capi adatti ben in vista e concedi alla persona abbastanza tempo.",
+     "why": "Due opzioni visibili riducono le decisioni e preservano l’autodeterminazione.",
+     "avoid": "Non puoi restare in pigiama."
+    },
+    {
+     "id": "work",
+     "title": "La persona vuole andare al lavoro",
+     "say": "Su di te si può sempre contare. Prima di andare, mi aiuti un attimo qui?",
+     "next": "Proponi un compito utile adatto al lavoro di prima, per esempio riordinare documenti, aggiustare qualcosa o apparecchiare la tavola.",
+     "why": "Il lavoro dava spesso uno scopo, una struttura e riconoscimento. Dietro questo desiderio c’è spesso il bisogno di sentirsi utile.",
+     "avoid": "Ma sei in pensione da tanto tempo."
+    },
+    {
+     "id": "car",
+     "title": "La persona vuole guidare l’auto da sola",
+     "say": "Vuoi guidare tu, lo capisco. Oggi guido io e tu mi indichi la strada.",
+     "next": "Offri un’opzione specifica di viaggio sicura e metti le chiavi fuori dalla vista se necessario.",
+     "why": "Il bisogno di indipendenza è comprensibile; un’alternativa riduce la perdita di faccia.",
+     "avoid": "Non puoi più guidare."
+    },
+    {
+     "id": "recognize",
+     "title": "La persona non mi riconosce",
+     "say": "Oggi sono qui per te. Sono con te.",
+     "next": "Di’ con calma il tuo nome, mantieni un po’ di distanza e parla di qualcosa di familiare invece di spiegare il vostro legame.",
+     "why": "Non essere riconosciuti fa male, ma non è un rifiuto. Calore e calma danno sicurezza senza mettere alla prova la memoria.",
+     "avoid": "Devi pur sapere chi sono."
+    },
+    {
+     "id": "anger",
+     "title": "La persona mi urla contro",
+     "say": "Ti lascio un attimo in pace. Resto qui vicino.",
+     "next": "Riduci il rumore, mantieni una distanza sicura e parla di nuovo solo quando la tensione si è attenuata.",
+     "why": "Crei una distanza sicura e allo stesso tempo trasmetti una presenza calma.",
+     "avoid": "Adesso calmati una buona volta."
+    },
+    {
+     "id": "daycare",
+     "title": "Il centro diurno viene rifiutato",
+     "say": "Ti accompagno e più tardi vengo a riprenderti. Puoi contarci.",
+     "next": "Fai un saluto breve e gentile, di’ l’orario in cui torni e chiedi al personale un’accoglienza familiare.",
+     "why": "Dietro il rifiuto c’è spesso la paura del nuovo o dell’abbandono. Una promessa chiara di ritorno dà sicurezza.",
+     "avoid": "Devi andarci, anch’io ho bisogno di un po’ di pace."
+    }
+   ]
+  },
+  "lt": {
+   "heading": "Dažnos situacijos ir kas padeda",
+   "labels": {
+    "say": "Galite pasakyti",
+    "next": "Ką galite padaryti",
+    "why": "Kas už to slypi",
+    "avoid": "Geriau ne:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Noras eiti namo",
+     "say": "Tau trūksta namų. Papasakok, kas ten buvo ypač gražu.",
+     "next": "Pasiūlykite kažką pažįstamo, pavyzdžiui, arbatą, ramią muziką arba nuotraukų albumą.",
+     "why": "Šis momentas dažnai labiau susijęs su saugumu ir pažįstamumu nei su tikrąja vieta. Prieštaravimai gali sukelti papildomą įtampą.",
+     "avoid": "Juk tu esi namuose."
+    },
+    {
+     "id": "repeat",
+     "title": "Tas pats klausimas vis pasikartoja",
+     "say": "Nori žinoti, kada išvyksime. Pasakysiu tau laiku.",
+     "next": "Atsakymą aiškiai užrašykite ant popieriaus lapo ir parodykite jį, kai bus užduotas kitas klausimas.",
+     "why": "Gali būti, kad atsakymas neišliko atmintyje. Ramus, nuoseklus sakinys suteikia orientaciją, nesukeldamas kaltės jausmo.",
+     "avoid": "Aš tau tai jau sakiau penkis kartus."
+    },
+    {
+     "id": "wash",
+     "title": "Atsisakoma praustis",
+     "say": "Ar nori pirmiausia atsigaivinti prie kriauklės ar vėliau nusiprausti duše?",
+     "next": "Iš anksto sušildykite kambarį ir išdėliokite rankšluostį bei drabužius matomoje vietoje.",
+     "why": "Asmens priežiūra gali atrodyti nepažįstama ar grėsminga. Mažas pasirinkimas padeda išlaikyti kontrolę ir orumą.",
+     "avoid": "Dabar turi nusiprausti duše."
+    },
+    {
+     "id": "evening",
+     "title": "Nerimas prasideda vakare",
+     "say": "Tik prasideda nerimas. Aš pasiliksiu su tavimi ir čia šiek tiek nuriminsime.",
+     "next": "Išjunkite ryškias šviesas ir televizorių bei pasiūlykite pažįstamą, ramią veiklą.",
+     "why": "Vakarais nuovargis, šešėliai ir daugybė dirgiklių gali padidinti nesaugumo jausmą. Orientacija ir ramybė dažnai padeda labiau nei spaudimas.",
+     "avoid": "Galiausiai dabar turi eiti miegoti."
+    },
+    {
+     "id": "keys",
+     "title": "Raktai arba pinigai dingo",
+     "say": "Tu ieškai savo raktų. Pažiūrėkime kartu įprastose vietose.",
+     "next": "Ramiai patikrinkite dvi pažįstamas vietas, kur paprastai dedami daiktai, ir tada pasiūlykite pertrauką.",
+     "why": "Ieškojimas kartu rimtai vertina jausmus ir vengia kaltės.",
+     "avoid": "Tu vėl juos pametei."
+    },
+    {
+     "id": "accuse",
+     "title": "Mane kaltina vagyste",
+     "say": "Tau neramu dėl pinigų. Pažiūrėsime kartu.",
+     "next": "Pripažinkite rūpestį ir trumpai ieškokite kartu pažįstamoje vietoje.",
+     "why": "Nerimas jaučiasi tikras. Gynyba gali atrodyti kaip dar didesnis pasipriešinimas.",
+     "avoid": "Kokia nesąmonė, aš nevogiu."
+    },
+    {
+     "id": "eat",
+     "title": "Atsisakoma valgyti",
+     "say": "Ar norėtum kelis šaukštus sriubos ar šiek tiek duonos?",
+     "next": "Pasiūlykite mažą porciją ir tik du pažįstamus pasirinkimus.",
+     "why": "Maži, valdomi pasirinkimai atrodo mažiau gąsdinantys.",
+     "avoid": "Tu turi ką nors suvalgyti."
+    },
+    {
+     "id": "drink",
+     "title": "Pamirštama gerti",
+     "say": "Išgersiu su tavimi stiklinę. Nori vandens ar arbatos?",
+     "next": "Padėkite mėgstamą, aiškiai matomą stiklinę taip, kad būtų pasiekiama, ir kartu gurkšnokite.",
+     "why": "Darbas kartu ir paprasto pasirinkimo padarymas sukuria mažiau spaudimo.",
+     "avoid": "Šiandien išgėrei per mažai."
+    },
+    {
+     "id": "night",
+     "title": "Asmuo keliasi naktį",
+     "say": "Dar naktis. Aš čia ir trumpai tave palydėsiu.",
+     "next": "Naudokite blankią šviesą, palydėkite į tualetą ir tada atgal į lovą.",
+     "why": "Rami orientacija suteikia saugumo jausmą, neprovokuojant ginčo.",
+     "avoid": "Tuoj pat vėl atsigulk."
+    },
+    {
+     "id": "dress",
+     "title": "Atsisakoma rengtis",
+     "say": "Ar nori mėlyno ar pilko megztinio?",
+     "next": "Paruoškite du tinkamus drabužius matomoje vietoje ir skirkite žmogui pakankamai laiko.",
+     "why": "Dvi matomos parinktys mažina sprendimų priėmimą ir išlaiko savarankiškumą.",
+     "avoid": "Negali likti su pižama."
+    },
+    {
+     "id": "work",
+     "title": "Asmuo nori eiti į darbą",
+     "say": "Tavimi visada galima pasikliauti. Prieš tau išeinant, gal trumpai man čia padėsi?",
+     "next": "Pasiūlykite prasmingą užduotį, tinkančią buvusiai profesijai, pavyzdžiui, surūšiuoti popierius, ką nors pataisyti ar padengti stalą.",
+     "why": "Darbas dažnai suteikdavo prasmę, tvarką ir pripažinimą. Už šio noro dažnai slypi poreikis kam nors padėti.",
+     "avoid": "Juk tu jau seniai esi pensijoje."
+    },
+    {
+     "id": "car",
+     "title": "Asmuo nori pats vairuoti automobilį",
+     "say": "Nori vairuoti, aš suprantu. Šiandien vairuoju aš, o tu man rodai kelią.",
+     "next": "Pasiūlykite konkretų saugų kelionės variantą ir, jei reikia, padėkite raktus iš akių.",
+     "why": "Nepriklausomybės poreikis yra suprantamas; alternatyva sumažina veido praradimą.",
+     "avoid": "Tu nebegali vairuoti."
+    },
+    {
+     "id": "recognize",
+     "title": "Žmogus manęs neatpažįsta",
+     "say": "Šiandien esu čia dėl tavęs. Aš šalia.",
+     "next": "Ramiai pasakykite savo vardą, laikykitės šiek tiek atstumo ir kalbėkite apie ką nors pažįstamo, užuot aiškinę ryšį.",
+     "why": "Kai jūsų neatpažįsta, skauda, bet tai nėra atstūmimas. Šiluma ir ramybė suteikia saugumo netikrinant atminties.",
+     "avoid": "Juk turi žinoti, kas aš esu."
+    },
+    {
+     "id": "anger",
+     "title": "Asmuo šaukia į mane",
+     "say": "Trumpam paliksiu tave ramybėje. Būsiu netoliese.",
+     "next": "Sumažinkite triukšmą, laikykitės saugaus atstumo ir kalbėkite tik tada, kai įtampa sumažės.",
+     "why": "Jūs kuriate saugų atstumą ir tuo pačiu perteikiate ramų buvimą.",
+     "avoid": "Dabar pagaliau nusiramink."
+    },
+    {
+     "id": "daycare",
+     "title": "Atsisakoma lankyti dienos centrą",
+     "say": "Nuvešiu tave ten ir vėliau vėl paimsiu. Gali tuo pasikliauti.",
+     "next": "Atsisveikinkite trumpai ir draugiškai, pasakykite, kada grįšite, ir paprašykite darbuotojų šiltai pasitikti žmogų.",
+     "why": "Už atsisakymo dažnai slypi naujumo ar apleidimo baimė. Tvirtas pažadas grįžti suteikia saugumo.",
+     "avoid": "Tu privalai eiti, man irgi reikia ramybės."
+    }
+   ]
+  },
+  "lv": {
+   "heading": "Biežas situācijas un kas palīdz",
+   "labels": {
+    "say": "Varat teikt",
+    "next": "Ko jūs varat darīt",
+    "why": "Kas slēpjas aiz tā",
+    "avoid": "Labāk ne:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Vēlme doties mājās",
+     "say": "Tev pietrūkst mājas. Pastāsti, kas tur bija īpaši skaists.",
+     "next": "Piedāvājiet kaut ko pazīstamu, piemēram, tēju, mierīgu mūziku vai fotoalbumu.",
+     "why": "Šis brīdis bieži vairāk saistīts ar drošību un pazīstamību nekā ar faktiskās atrašanās vietas nozīmi. Iebildumi var radīt papildu spiedienu.",
+     "avoid": "Bet tu taču esi mājās."
+    },
+    {
+     "id": "repeat",
+     "title": "Tas pats jautājums atkārtojas atkal un atkal",
+     "say": "Tu gribi zināt, kad mēs dosimies ceļā. Es tev laikus pateikšu.",
+     "next": "Atbildi uzrakstiet skaidri uz papīra un norādiet uz to, kad tiks uzdots nākamais jautājums.",
+     "why": "Atbilde, iespējams, nav palikusi atmiņā. Mierīgs, nemainīgs teikums sniedz orientāciju, neizraisot vainas sajūtu.",
+     "avoid": "Es tev to jau esmu teicis piecas reizes."
+    },
+    {
+     "id": "wash",
+     "title": "Duša tiek noraidīta",
+     "say": "Vai tu vispirms vēlies atsvaidzināties pie izlietnes vai vēlāk iet dušā?",
+     "next": "Iepriekš sasildiet telpu un nolieciet dvieli un apģērbu redzamā vietā.",
+     "why": "Personīgā aprūpe var šķist nepierasta vai draudīga. Mazas izvēles palīdz saglabāt kontroli un cieņu.",
+     "avoid": "Tev tagad jāiet dušā."
+    },
+    {
+     "id": "evening",
+     "title": "Nemiers sākas vakarā",
+     "say": "Tikai sāk kļūt nemierīgi. Es palikšu ar tevi un mēs šeit padarīsim to mazliet klusāku.",
+     "next": "Izslēdziet spilgtās gaismas un televizoru un piedāvājiet pazīstamu, mierīgu nodarbi.",
+     "why": "Vakarā nogurums, ēnas un daudzi stimuli var palielināt nedrošības sajūtu. Orientācija un miers bieži palīdz vairāk nekā spiediens.",
+     "avoid": "Beidzot tev tagad jāaiziet gulēt."
+    },
+    {
+     "id": "keys",
+     "title": "Atslēgas vai nauda ir pazudušas",
+     "say": "Tu meklē savas atslēgas. Meklēsim kopā ierastajās vietās.",
+     "next": "Mierīgi pārbaudiet divas pazīstamas vietas, kur lietas parasti tiek noliktas, un pēc tam piedāvājiet pauzi.",
+     "why": "Meklēšana kopā uztver sajūtu nopietni un izvairās no vainas.",
+     "avoid": "Tu atkal tās pazaudēji."
+    },
+    {
+     "id": "accuse",
+     "title": "Mani apsūdz zādzībā",
+     "say": "Tu uztraucies par savu naudu. Paskatīsimies kopā.",
+     "next": "Atzīstiet satraukumu un īsi kopā meklējiet pazīstamā vietā.",
+     "why": "Uztraukums šķiet reāls. Aizstāvība var šķist kā papildu pretestība.",
+     "avoid": "Kādas muļķības, es taču nezogu."
+    },
+    {
+     "id": "eat",
+     "title": "Ēdiens tiek noraidīts",
+     "say": "Vai tu vēlētos dažas karotes zupas vai nedaudz maizes?",
+     "next": "Piedāvājiet nelielu porciju un tikai divas pazīstamas iespējas.",
+     "why": "Mazas, pārskatāmas izvēles šķiet mazāk nomācošas.",
+     "avoid": "Tev jāapēd kaut kas."
+    },
+    {
+     "id": "drink",
+     "title": "Aizmirst padzerties",
+     "say": "Es iedzeršu glāzi ar tevi. Vai tu gribi ūdeni vai tēju?",
+     "next": "Novietojiet iecienītu, skaidri redzamu glāzi pa rokai un iedzeriet kopā.",
+     "why": "Darot lietas kopā un pieņemot vienkāršu izvēli, rodas mazāk spiediena.",
+     "avoid": "Tu šodien izdzēri pārāk maz."
+    },
+    {
+     "id": "night",
+     "title": "Persona ceļas naktī",
+     "say": "Joprojām ir nakts. Es esmu šeit un īsi ar tevi pabūšu.",
+     "next": "Lietojiet vāju apgaismojumu, pavadiet uz tualeti un pēc tam atpakaļ gultā.",
+     "why": "Mierīga orientācija sniedz drošību, nesākot strīdu.",
+     "avoid": "Tūlīt atkal apgulies."
+    },
+    {
+     "id": "dress",
+     "title": "Atsakās ģērbties",
+     "say": "Vai tu vēlies zilo vai pelēko džemperi?",
+     "next": "Sagatavojiet redzamā vietā divus piemērotus apģērba gabalus un dodiet cilvēkam pietiekami daudz laika.",
+     "why": "Divas redzamas opcijas samazina lēmumu pieņemšanu un saglabā pašnoteikšanos.",
+     "avoid": "Tu nevari palikt pidžamā."
+    },
+    {
+     "id": "work",
+     "title": "Persona grib iet uz darbu",
+     "say": "Uz tevi vienmēr var paļauties. Pirms tu ej, vai tu man šeit mazliet palīdzēsi?",
+     "next": "Piedāvājiet jēgpilnu uzdevumu, kas atbilst agrākajai profesijai, piemēram, sakārtot papīrus, kaut ko salabot vai klāt galdu.",
+     "why": "Darbs bieži deva jēgu, kārtību un atzinību. Aiz šīs vēlēšanās bieži slēpjas vajadzība kādam palīdzēt.",
+     "avoid": "Tu taču jau sen esi pensijā."
+    },
+    {
+     "id": "car",
+     "title": "Persona vēlas pati vadīt automašīnu",
+     "say": "Tu gribi vadīt mašīnu, es saprotu. Šodien braucu es, un tu man rādi ceļu.",
+     "next": "Piedāvājiet konkrētu drošu ceļošanas iespēju un, ja nepieciešams, nolieciet atslēgas no redzesloka.",
+     "why": "Nepieciešamība pēc neatkarības ir saprotama; alternatīva palīdz saglabāt pašcieņu.",
+     "avoid": "Tu vairs nevari vadīt automašīnu."
+    },
+    {
+     "id": "recognize",
+     "title": "Cilvēks mani neatpazīst",
+     "say": "Šodien esmu šeit tevis dēļ. Es esmu blakus.",
+     "next": "Mierīgi pasakiet savu vārdu, ieturiet nelielu distanci un runājiet par kaut ko pazīstamu, nevis skaidrojiet attiecības.",
+     "why": "Ja jūs neatpazīst, tas sāp, taču tā nav atraidīšana. Siltums un miers dod drošību, nepārbaudot atmiņu.",
+     "avoid": "Tev taču jāzina, kas es esmu."
+    },
+    {
+     "id": "anger",
+     "title": "Persona kliedz uz mani",
+     "say": "Es tevi uz brīdi likšu mierā. Es palikšu tuvumā.",
+     "next": "Samaziniet troksni, ievērojiet drošu distanci un runājiet tikai tad, kad spriedze ir mazinājusies.",
+     "why": "Jūs radāt drošu distanci un vienlaikus izstarojat mierīgu klātbūtni.",
+     "avoid": "Tagad beidzot nomierinies."
+    },
+    {
+     "id": "daycare",
+     "title": "Dienas centra apmeklējums tiek atteikts",
+     "say": "Es tevi aizvedīšu un vēlāk atkal paņemšu. Uz to vari paļauties.",
+     "next": "Atvadieties īsi un laipni, nosauciet laiku, kad atnāksiet pakaļ, un palūdziet komandai pazīstamu sagaidīšanu.",
+     "why": "Aiz atteikuma bieži slēpjas bailes no jaunā vai no pamešanas. Stingrs solījums atkal atnākt pakaļ dod drošību.",
+     "avoid": "Tev jāiet, arī man vajag mieru."
+    }
+   ]
+  },
+  "mt": {
+   "heading": "Sitwazzjonijiet komuni u x'jgħin",
+   "labels": {
+    "say": "Tista’ tgħid",
+    "next": "Dak li tista' tagħmel",
+    "why": "X’hemm warajh",
+    "avoid": "Aħjar le:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Ix-xewqa li tmur id-dar",
+     "say": "Tixxennaq għad-dar tiegħek. Għidli x'kien sabiħ b'mod speċjali hemmhekk.",
+     "next": "Offre xi ħaġa familjari, bħat-te, mużika kalma, jew album tar-ritratti.",
+     "why": "Dan il-mument spiss huwa aktar dwar is-sigurtà u l-familjarità milli dwar il-post reali. Li tikkontradixxi lill-persuna jista' joħloq pressjoni addizzjonali.",
+     "avoid": "Imma inti d-dar."
+    },
+    {
+     "id": "repeat",
+     "title": "L-istess mistoqsija terġa' u terġa' ssir",
+     "say": "Trid tkun taf meta se nitilqu. Ngħidlek jien fil-ħin.",
+     "next": "Ikteb it-tweġiba b'mod ċar fuq biċċa karta u ipponta lejha meta terġa' ssir il-mistoqsija.",
+     "why": "It-tweġiba setgħet ma baqgħetx fil-memorja. Sentenza kalma u dejjem l-istess tagħti orjentazzjoni mingħajr ma tqanqal sens ta' ħtija.",
+     "avoid": "Diġà għedtlek dan ħames darbiet."
+    },
+    {
+     "id": "wash",
+     "title": "Id-doċċa tiġi rrifjutata",
+     "say": "Tixtieq l-ewwel tinħasel fil-lavandin jew tieħu doċċa aktar tard?",
+     "next": "Saħħan il-kamra minn qabel u poġġi t-twalja u l-ħwejjeġ lesti f'post viżibbli.",
+     "why": "Il-kura personali tista’ tinħass stramba jew ta’ theddida. Għażla żgħira tgħin iżżomm il-kontroll u d-dinjità.",
+     "avoid": "Trid tieħu doċċa issa."
+    },
+    {
+     "id": "evening",
+     "title": "L-irrekwitezza tibda filgħaxija",
+     "say": "Qed jinħoloq ftit inkwiet. Se nibqa’ miegħek u se nġibu ftit iktar kwiet hawn.",
+     "next": "Itfi d-dwal qawwija u t-TV u offri attività familjari u kwieta.",
+     "why": "Filgħaxija, għeja, dellijiet u ħafna stimoli jistgħu jżidu is-sens ta' nuqqas ta' sigurtà. L-orjentazzjoni u l-kalma spiss jgħinu aktar milli pressjoni.",
+     "avoid": "Issa trid torqod, fl-aħħar."
+    },
+    {
+     "id": "keys",
+     "title": "Iċ-ċwievet jew il-flus sparixxew",
+     "say": "Qed tfittex iċ-ċwievet tiegħek. Ejja nfittxu flimkien fil-postijiet tas-soltu.",
+     "next": "Iċċekkja bil-kalma żewġ postijiet familjari fejn is-soltu jitqiegħdu l-affarijiet u mbagħad offri waqfa.",
+     "why": "Tfittix flimkien tieħu l-emozzjoni bis-serjetà u tevita l-ħtija.",
+     "avoid": "Erġajt tlifthom."
+    },
+    {
+     "id": "accuse",
+     "title": "Qed jakkużawni bis-serq",
+     "say": "Qed tinkwieta dwar il-flus tiegħek. Ejja nħarsu flimkien.",
+     "next": "Agħraf l-inkwiet u fittxu ftit flimkien f’post familjari.",
+     "why": "Il-preokkupazzjoni tidher reali. Id-difiża tista’ tidher bħala reżistenza aktar.",
+     "avoid": "Xi ħmerija, jien ma nisraqx."
+    },
+    {
+     "id": "eat",
+     "title": "L-ikel jiġi rrifjutat",
+     "say": "Tixtieq ftit mgħaref soppa jew ftit ħobż minflok?",
+     "next": "Offri porzjoni żgħira u biss żewġ għażliet magħrufa.",
+     "why": "Għażliet żgħar u li jistgħu jiġu mmaniġġjati jidhru inqas stressanti.",
+     "avoid": "Trid tiekol xi ħaġa."
+    },
+    {
+     "id": "drink",
+     "title": "Ix-xorb jintesa",
+     "say": "Nixrob tazza miegħek. Trid ilma jew te?",
+     "next": "Poġġi tazza favorita li tidher sew fejn tilħaqha u ixorbu ftit flimkien.",
+     "why": "Li tagħmlu l-affarijiet flimkien u għażla sempliċi joħolqu inqas pressjoni.",
+     "avoid": "Illum xrobt ftit wisq."
+    },
+    {
+     "id": "night",
+     "title": "Il-persuna tqum bil-lejl",
+     "say": "Għadu bil-lejl. Jien hawn u se nimxi miegħek ftit.",
+     "next": "Uża dawl baxx, akkumpanja lill-persuna sat-tojlit u mbagħad lura lejn is-sodda.",
+     "why": "L-orjentazzjoni kalma tipprovdi sigurtà mingħajr ma tibda argument.",
+     "avoid": "Erġa’ imtedd minnufih."
+    },
+    {
+     "id": "dress",
+     "title": "It-tlibbis jiġi rrifjutat",
+     "say": "Tixtieq il-flokk blu jew dak griż?",
+     "next": "Ħejji żewġ biċċiet ħwejjeġ xierqa f'post fejn jidhru u agħti lill-persuna biżżejjed ħin.",
+     "why": "Żewġ għażliet viżibbli jnaqqsu d-deċiżjonijiet u jħarsu l-awtonomija personali.",
+     "avoid": "Ma tistax tibqa' bil-pajamas tiegħek."
+    },
+    {
+     "id": "work",
+     "title": "Il-persuna trid tmur ix-xogħol",
+     "say": "Dejjem wieħed jista' joqgħod fuqek. Qabel ma titlaq, tgħinni ftit hawn?",
+     "next": "Offri xogħol li jagħmel sens u li jaqbel mal-professjoni ta' qabel, pereżempju tqassam karti, issewwi xi ħaġa jew tħejji l-mejda.",
+     "why": "Ix-xogħol spiss kien jagħti skop, struttura u rikonoxximent. Wara x-xewqa ħafna drabi hemm il-bżonn li wieħed iħossu utli.",
+     "avoid": "Imma int ilek fil-pensjoni żmien twil."
+    },
+    {
+     "id": "car",
+     "title": "Il-persuna trid issuq il-karozza waħedha",
+     "say": "Trid issuq int, nifhem. Illum insuq jien, u int turini t-triq.",
+     "next": "Offri għażla konkreta u sigura biex tasal u, jekk meħtieġ, poġġi ċ-ċwievet fejn ma jidhrux.",
+     "why": "Il-bżonn ta' indipendenza jinftiehem; alternattiva tnaqqas is-sens ta' umiljazzjoni.",
+     "avoid": "Ma tistax issuq aktar."
+    },
+    {
+     "id": "recognize",
+     "title": "Il-persuna ma tagħrafnix",
+     "say": "Illum jien hawn għalik. Jien miegħek.",
+     "next": "Għid ismek bil-kalma, żomm ftit distanza u tkellem dwar xi ħaġa familjari minflok ma tispjega r-relazzjoni.",
+     "why": "Li ma tkunx magħruf iweġġa', imma mhuwiex rifjut. Is-sħana u l-kalma jagħtu sigurtà mingħajr ma tiġi ttestjata l-memorja.",
+     "avoid": "Għandek tkun taf min jien."
+    },
+    {
+     "id": "anger",
+     "title": "Il-persuna tgħajjat miegħi",
+     "say": "Se nħallik fil-paċi għal ftit. Nibqa' qribek.",
+     "next": "Naqqas il-ħsejjes, żomm distanza sikura, u tkellem biss meta t-tensjoni tonqos.",
+     "why": "Tqiegħed distanza sikura u fl-istess ħin twassal preżenza kalma.",
+     "avoid": "Issa fl-aħħar ikkalma ruħek."
+    },
+    {
+     "id": "daycare",
+     "title": "Iċ-ċentru tal-jum jiġi rrifjutat",
+     "say": "Inwasslek hemm u wara niġi għalik. Tista' toqgħod fuq dan.",
+     "next": "Żomm l-addiju qasir u ħbiberuż, għid meta se tiġi lura, u itlob lit-tim jagħti merħba familjari.",
+     "why": "Wara r-rifjut spiss ikun hemm biża' minn dak li hu ġdid jew mill-abbandun. Wegħda ċara li tiġi lura tagħti sigurtà.",
+     "avoid": "Trid tmur, jien ukoll għandi bżonn ftit serħan."
+    }
+   ]
+  },
+  "nl": {
+   "heading": "Veelvoorkomende situaties en wat helpt",
+   "labels": {
+    "say": "Dit kun je zeggen",
+    "next": "Wat je kunt doen",
+    "why": "Wat erachter zit",
+    "avoid": "Liever niet:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Naar huis willen",
+     "say": "Je mist je huis. Vertel wat daar bijzonder mooi was.",
+     "next": "Bied iets vertrouwds aan, zoals thee, rustige muziek of een fotoalbum.",
+     "why": "Dit moment gaat vaak meer over veiligheid en vertrouwdheid dan over de daadwerkelijke locatie. Tegenspreken kan extra druk creëren.",
+     "avoid": "Je bent toch thuis."
+    },
+    {
+     "id": "repeat",
+     "title": "Dezelfde vraag blijft terugkomen",
+     "say": "Je wilt weten wanneer we vertrekken. Ik zeg het je op tijd.",
+     "next": "Schrijf het antwoord duidelijk op een stuk papier en wijs erop wanneer de volgende vraag wordt gesteld.",
+     "why": "Het antwoord is mogelijk niet in het geheugen blijven hangen. Een rustige, steeds gelijke zin biedt houvast zonder schuldgevoel te veroorzaken.",
+     "avoid": "Ik heb je dat al vijf keer verteld."
+    },
+    {
+     "id": "wash",
+     "title": "Douchen wordt geweigerd",
+     "say": "Wil je eerst bij de wastafel opfrissen of later douchen?",
+     "next": "Verwarm de kamer van tevoren en leg de handdoek en kleding zichtbaar klaar.",
+     "why": "Persoonlijke verzorging kan onbekend of bedreigend aanvoelen. Een kleine keuze helpt om controle en waardigheid te behouden.",
+     "avoid": "Je moet nu douchen."
+    },
+    {
+     "id": "evening",
+     "title": "Onrust begint in de avond",
+     "say": "Het begint net onrustig te worden. Ik blijf bij je en we maken het hier een beetje rustiger.",
+     "next": "Zet fel licht en de televisie uit en bied een vertrouwde, rustige activiteit aan.",
+     "why": "In de avond kunnen vermoeidheid, schaduwen en veel prikkels de onzekerheid vergroten. Oriëntatie en rust helpen vaak meer dan druk uitoefenen.",
+     "avoid": "Je moet nu eindelijk slapen."
+    },
+    {
+     "id": "keys",
+     "title": "Sleutels of geld zijn verdwenen",
+     "say": "Je zoekt je sleutels. Laten we samen op de gebruikelijke plekken kijken.",
+     "next": "Controleer rustig twee vertrouwde plekken waar spullen meestal liggen en bied daarna een pauze aan.",
+     "why": "Samen zoeken neemt het gevoel serieus en vermijdt schuld.",
+     "avoid": "Je bent ze alweer kwijt."
+    },
+    {
+     "id": "accuse",
+     "title": "Ik word beschuldigd van diefstal",
+     "say": "Je maakt je zorgen over je geld. We kijken er samen naar.",
+     "next": "Erken de zorg en zoek kort samen op een vertrouwde locatie.",
+     "why": "De bezorgdheid voelt echt. Verdediging kan als verdere weerstand lijken.",
+     "avoid": "Wat een onzin, ik steel niet."
+    },
+    {
+     "id": "eat",
+     "title": "Eten wordt geweigerd",
+     "say": "Wil je een paar lepels soep of wat brood?",
+     "next": "Bied een kleine portie aan en slechts twee bekende opties.",
+     "why": "Kleine, beheersbare keuzes lijken minder overweldigend.",
+     "avoid": "Je moet iets eten."
+    },
+    {
+     "id": "drink",
+     "title": "Drinken wordt vergeten",
+     "say": "Ik drink een glas met je. Wil je water of thee?",
+     "next": "Plaats een favoriet, duidelijk zichtbaar glas binnen handbereik en neem samen een slok.",
+     "why": "Samen dingen doen en een eenvoudige keuze maken creëert minder druk.",
+     "avoid": "Je hebt vandaag veel te weinig gedronken."
+    },
+    {
+     "id": "night",
+     "title": "De persoon staat 's nachts op",
+     "say": "Het is nog nacht. Ik ben er en loop even met je mee.",
+     "next": "Gebruik gedimd licht, begeleid de persoon naar het toilet en daarna terug naar bed.",
+     "why": "Kalm oriënteren biedt veiligheid zonder een ruzie te beginnen.",
+     "avoid": "Ga onmiddellijk weer liggen."
+    },
+    {
+     "id": "dress",
+     "title": "Aankleden wordt geweigerd",
+     "say": "Wil je de blauwe of de grijze trui?",
+     "next": "Leg twee passende kledingstukken zichtbaar klaar en geef de persoon voldoende tijd.",
+     "why": "Twee zichtbare opties verminderen beslissingen en behouden zelfbeschikking.",
+     "avoid": "Je kunt niet in je pyjama blijven."
+    },
+    {
+     "id": "work",
+     "title": "De persoon wil naar het werk",
+     "say": "Je bent altijd zo betrouwbaar. Voordat je gaat, help je me hier even?",
+     "next": "Bied een zinvolle taak aan die past bij het vroegere beroep, bijvoorbeeld papieren sorteren, iets repareren of de tafel dekken.",
+     "why": "Werk gaf vaak een taak, structuur en waardering. Achter de wens zit vaak de behoefte om nodig te zijn.",
+     "avoid": "Je bent toch al lang met pensioen."
+    },
+    {
+     "id": "car",
+     "title": "De persoon wil zelf de auto besturen",
+     "say": "Je wilt zelf rijden, dat begrijp ik. Vandaag rijd ik, en jij wijst me de weg.",
+     "next": "Bied een specifieke veilige reismogelijkheid aan en leg indien nodig sleutels uit het zicht.",
+     "why": "De behoefte aan onafhankelijkheid is begrijpelijk; een alternatief vermindert het gezichtsverlies.",
+     "avoid": "Je kunt niet meer autorijden."
+    },
+    {
+     "id": "recognize",
+     "title": "De persoon herkent me niet",
+     "say": "Ik ben er vandaag voor je. Je bent niet alleen.",
+     "next": "Noem rustig je naam, houd wat afstand en praat over iets vertrouwds in plaats van jullie relatie uit te leggen.",
+     "why": "Niet herkend worden doet pijn, maar het is geen afwijzing. Warmte en rust geven zekerheid zonder het geheugen te testen.",
+     "avoid": "Je moet toch weten wie ik ben."
+    },
+    {
+     "id": "anger",
+     "title": "De persoon schreeuwt tegen mij",
+     "say": "Ik laat je even met rust. Ik blijf in de buurt.",
+     "next": "Verminder geluid, houd een veilige afstand en spreek alleen weer wanneer de spanning is afgenomen.",
+     "why": "Je creëert een veilige afstand en straalt tegelijkertijd een rustige aanwezigheid uit.",
+     "avoid": "Kalmeer nu eindelijk eens."
+    },
+    {
+     "id": "daycare",
+     "title": "Dagbesteding wordt geweigerd",
+     "say": "Ik breng je erheen en haal je later weer op. Daar kun je op rekenen.",
+     "next": "Houd het afscheid kort en vriendelijk, noem de ophaaltijd en vraag het team om een vertrouwde begroeting.",
+     "why": "Achter de weigering zit vaak angst voor iets nieuws of om alleen gelaten te worden. Een vaste belofte om iemand weer op te halen geeft houvast.",
+     "avoid": "Je moet erheen, ik heb ook even rust nodig."
+    }
+   ]
+  },
+  "pl": {
+   "heading": "Częste sytuacje i co pomaga",
+   "labels": {
+    "say": "To możesz powiedzieć",
+    "next": "Co możesz zrobić",
+    "why": "Co za tym stoi",
+    "avoid": "Lepiej nie:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Chęć powrotu do domu",
+     "say": "Tęsknisz za swoim domem. Opowiedz mi, co było tam szczególnie piękne.",
+     "next": "Zaproponuj coś znajomego, na przykład herbatę, spokojną muzykę lub album ze zdjęciami.",
+     "why": "W tym momencie często chodzi bardziej o bezpieczeństwo i swojskość niż o samą lokalizację. Zaprzeczanie może wywołać dodatkową presję.",
+     "avoid": "Przecież jesteś w domu."
+    },
+    {
+     "id": "repeat",
+     "title": "Ciągle pojawia się to samo pytanie",
+     "say": "Chcesz wiedzieć, kiedy wyjeżdżamy. Powiem ci w porę.",
+     "next": "Zapisz odpowiedź wyraźnie na kartce i wskaż ją, gdy padnie kolejne pytanie.",
+     "why": "Odpowiedź mogła nie zostać zapamiętana. Spokojne, zawsze takie samo zdanie daje orientację bez wywoływania poczucia winy.",
+     "avoid": "Mówiłem ci to już pięć razy."
+    },
+    {
+     "id": "wash",
+     "title": "Odmowa wzięcia prysznica",
+     "say": "Chcesz najpierw odświeżyć się przy umywalce, czy wziąć prysznic później?",
+     "next": "Ogrzej wcześniej pomieszczenie i przygotuj ręcznik oraz ubranie w widocznym miejscu.",
+     "why": "Pielęgnacja może wydawać się obca lub zagrażająca. Niewielki wybór pomaga zachować poczucie kontroli i godność.",
+     "avoid": "Musisz teraz wziąć prysznic."
+    },
+    {
+     "id": "evening",
+     "title": "Niepokój zaczyna się wieczorem",
+     "say": "Robi się niespokojnie. Zostanę z tobą i sprawimy, że będzie tu trochę ciszej.",
+     "next": "Wyłącz jasne światło i telewizor i zaproponuj znajome, ciche zajęcia.",
+     "why": "Wieczorem zmęczenie, cienie i wiele bodźców mogą zwiększać niepewność. Orientacja i spokój często pomagają bardziej niż presja.",
+     "avoid": "W końcu musisz teraz spać."
+    },
+    {
+     "id": "keys",
+     "title": "Zniknęły klucze lub pieniądze",
+     "say": "Szukasz swoich kluczy. Poszukajmy razem w zwykłych miejscach.",
+     "next": "Możesz sprawdzić dwa znane miejsca przechowywania, a następnie zaproponować przerwę.",
+     "why": "Wspólne poszukiwanie traktuje to uczucie poważnie i pozwala uniknąć poczucia winy.",
+     "avoid": "Znowu je gdzieś zapodziałeś."
+    },
+    {
+     "id": "accuse",
+     "title": "Oskarżają mnie o kradzież",
+     "say": "Martwisz się o swoje pieniądze. Poszukamy razem.",
+     "next": "Uznaj tę obawę i krótko poszukajcie razem w znanym miejscu.",
+     "why": "Niepokój wydaje się realny. Bronienie się może wydawać się dalszym oporem.",
+     "avoid": "Co za bzdury, nie kradnę."
+    },
+    {
+     "id": "eat",
+     "title": "Jedzenie jest odrzucane",
+     "say": "Czy masz ochotę na kilka łyżek zupy lub trochę chleba?",
+     "next": "Zaoferuj małą porcję i tylko dwie znane opcje.",
+     "why": "Niewielki, przejrzysty wybór mniej przytłacza.",
+     "avoid": "Musisz coś zjeść."
+    },
+    {
+     "id": "drink",
+     "title": "Zapomniano o piciu",
+     "say": "Wypiję z tobą szklankę. Chcesz wodę czy herbatę?",
+     "next": "Umieść ulubioną, dobrze widoczną szklankę w zasięgu ręki i wypijcie razem łyk.",
+     "why": "Wspólne robienie rzeczy i dokonywanie prostego wyboru powoduje mniejszą presję.",
+     "avoid": "Wypiłeś dziś o wiele za mało."
+    },
+    {
+     "id": "night",
+     "title": "Osoba wstaje w nocy",
+     "say": "Nadal jest noc. Jestem tutaj i będę ci towarzyszyć przez krótki czas.",
+     "next": "Używaj przyćmionego oświetlenia, odprowadź osobę do toalety, a potem z powrotem do łóżka.",
+     "why": "Spokojna orientacja zapewnia bezpieczeństwo bez wszczynania kłótni.",
+     "avoid": "Natychmiast połóż się z powrotem."
+    },
+    {
+     "id": "dress",
+     "title": "Odmawia się ubierania",
+     "say": "Chcesz niebieski czy szary sweter?",
+     "next": "Przygotuj w widocznym miejscu dwie odpowiednie części garderoby i daj tej osobie dość czasu.",
+     "why": "Dwie widoczne opcje ograniczają decyzje i chronią samostanowienie.",
+     "avoid": "Nie możesz zostać w piżamie."
+    },
+    {
+     "id": "work",
+     "title": "Osoba chce iść do pracy",
+     "say": "Zawsze można na tobie polegać. Zanim wyjdziesz, pomożesz mi tu na chwilę?",
+     "next": "Zaproponuj sensowne zadanie pasujące do dawnego zawodu, na przykład sortowanie papierów, naprawę czegoś albo nakrywanie do stołu.",
+     "why": "Praca często dawała cel, strukturę i uznanie. Za tym pragnieniem często kryje się potrzeba, by się komuś przydać.",
+     "avoid": "Przecież od dawna jesteś na emeryturze."
+    },
+    {
+     "id": "car",
+     "title": "Osoba chce sama prowadzić samochód",
+     "say": "Chcesz prowadzić, rozumiem. Dziś ja prowadzę, a ty pokazujesz mi drogę.",
+     "next": "Zaproponuj konkretny, bezpieczny sposób dojazdu i w razie potrzeby schowaj klucze.",
+     "why": "Potrzeba niezależności jest zrozumiała; alternatywa zmniejsza utratę twarzy.",
+     "avoid": "Nie możesz już prowadzić."
+    },
+    {
+     "id": "recognize",
+     "title": "Osoba mnie nie rozpoznaje",
+     "say": "Dziś jestem tu dla ciebie. Jestem przy tobie.",
+     "next": "Spokojnie powiedz swoje imię, zachowaj trochę dystansu i porozmawiaj o czymś znajomym, zamiast tłumaczyć, kim dla siebie jesteście.",
+     "why": "To boli, gdy cię nie rozpoznają, ale to nie jest odrzucenie. Ciepło i spokój dają poczucie bezpieczeństwa bez sprawdzania pamięci.",
+     "avoid": "Przecież musisz wiedzieć, kim jestem."
+    },
+    {
+     "id": "anger",
+     "title": "Osoba na mnie krzyczy",
+     "say": "Zostawię cię na chwilę w spokoju. Będę w pobliżu.",
+     "next": "Zmniejsz hałas, zachowaj bezpieczną odległość i odzywaj się ponownie dopiero, gdy napięcie opadnie.",
+     "why": "Tworzysz bezpieczny dystans, a jednocześnie przekazujesz spokojną obecność.",
+     "avoid": "Teraz wreszcie się uspokój."
+    },
+    {
+     "id": "daycare",
+     "title": "Dzienny dom opieki jest odrzucany",
+     "say": "Zaprowadzę cię tam i później znowu cię odbiorę. Możesz na to liczyć.",
+     "next": "Pożegnaj się krótko i życzliwie, podaj godzinę odbioru i poproś zespół o znajome powitanie.",
+     "why": "Za odmową często stoi lęk przed nowym lub przed porzuceniem. Pewna obietnica odbioru daje poczucie bezpieczeństwa.",
+     "avoid": "Musisz tam iść, ja też potrzebuję spokoju."
+    }
+   ]
+  },
+  "pt": {
+   "heading": "Situações comuns e o que ajuda",
+   "labels": {
+    "say": "Você pode dizer",
+    "next": "O que você pode fazer",
+    "why": "O que está por trás",
+    "avoid": "Melhor não:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Querer ir para casa",
+     "say": "Você sente falta da sua casa. Conte-me o que era particularmente bonito lá.",
+     "next": "Ofereça algo familiar, como chá, música calma ou um álbum de fotos.",
+     "why": "Este momento é frequentemente mais sobre segurança e familiaridade do que sobre o local real. Contradizer a pessoa pode criar pressão adicional.",
+     "avoid": "Mas você está em casa."
+    },
+    {
+     "id": "repeat",
+     "title": "A mesma pergunta continua aparecendo",
+     "say": "Você quer saber quando vamos sair. Eu te aviso a tempo.",
+     "next": "Escreva a resposta claramente em um pedaço de papel e aponte para ela quando a próxima pergunta for feita.",
+     "why": "A resposta pode não ter ficado na memória. Uma frase calma e sempre igual dá orientação sem causar culpa.",
+     "avoid": "Eu já te disse isso cinco vezes."
+    },
+    {
+     "id": "wash",
+     "title": "Recusa-se a tomar banho",
+     "say": "Você quer se refrescar na pia primeiro ou tomar banho depois?",
+     "next": "Aqueça o quarto antes e deixe a toalha e as roupas prontas em um local visível.",
+     "why": "O cuidado pessoal pode parecer estranho ou ameaçador. Uma pequena escolha ajuda a preservar o controle e a dignidade.",
+     "avoid": "Você tem que tomar banho agora."
+    },
+    {
+     "id": "evening",
+     "title": "A agitação começa à noite",
+     "say": "Está ficando agitado aqui. Vou ficar com você e vamos deixar tudo um pouco mais calmo.",
+     "next": "Desligue as luzes fortes e a televisão e ofereça uma atividade tranquila e conhecida.",
+     "why": "À noite, o cansaço, as sombras e muitos estímulos podem aumentar a insegurança. Orientação e calma frequentemente ajudam mais do que pressão.",
+     "avoid": "Agora você tem que dormir de uma vez."
+    },
+    {
+     "id": "keys",
+     "title": "Chaves ou dinheiro desapareceram",
+     "say": "Você está procurando suas chaves. Vamos procurar juntos nos lugares habituais.",
+     "next": "Verifique com calma dois lugares conhecidos onde as coisas costumam ficar e depois ofereça uma pausa.",
+     "why": "Buscar juntos leva o sentimento a sério e evita culpa.",
+     "avoid": "Você as perdeu de novo."
+    },
+    {
+     "id": "accuse",
+     "title": "Me acusam de roubo",
+     "say": "Você se preocupa com seu dinheiro. Vamos olhar juntos.",
+     "next": "Reconheça a preocupação e procure brevemente juntos em um local familiar.",
+     "why": "A preocupação parece real. Defender-se pode parecer mais resistência.",
+     "avoid": "Que absurdo, eu não roubo."
+    },
+    {
+     "id": "eat",
+     "title": "Comida é recusada",
+     "say": "Você quer algumas colheradas de sopa ou prefere um pouco de pão?",
+     "next": "Ofereça uma pequena porção e apenas duas opções familiares.",
+     "why": "Pequenas escolhas administráveis parecem menos avassaladoras.",
+     "avoid": "Você tem que comer algo."
+    },
+    {
+     "id": "drink",
+     "title": "Esquece-se de beber",
+     "say": "Vou tomar um copo com você. Você quer água ou chá?",
+     "next": "Coloque um copo favorito, claramente visível, ao alcance e tome um gole juntos.",
+     "why": "Fazer coisas juntos e fazer uma escolha simples cria menos pressão.",
+     "avoid": "Hoje você bebeu muito pouco."
+    },
+    {
+     "id": "night",
+     "title": "A pessoa se levanta à noite",
+     "say": "Ainda é noite. Estou aqui e vou com você um pouquinho.",
+     "next": "Use iluminação suave, acompanhe até o banheiro e depois de volta para a cama.",
+     "why": "A orientação calma fornece segurança sem iniciar uma discussão.",
+     "avoid": "Deite-se novamente imediatamente."
+    },
+    {
+     "id": "dress",
+     "title": "Vestir-se é recusado",
+     "say": "Você quer o suéter azul ou cinza?",
+     "next": "Deixe duas peças de roupa adequadas preparadas à vista e dê à pessoa tempo suficiente.",
+     "why": "Duas opções visíveis reduzem decisões e preservam a autodeterminação.",
+     "avoid": "Você não pode ficar de pijama."
+    },
+    {
+     "id": "work",
+     "title": "A pessoa quer ir trabalhar",
+     "say": "Sempre dá para contar com você. Antes de ir, você me ajuda aqui um instante?",
+     "next": "Ofereça uma tarefa com sentido que combine com a antiga profissão, por exemplo organizar papéis, consertar algo ou pôr a mesa.",
+     "why": "O trabalho muitas vezes dava propósito, estrutura e reconhecimento. Por trás desse desejo costuma estar a necessidade de se sentir útil.",
+     "avoid": "Mas você já se aposentou faz tempo."
+    },
+    {
+     "id": "car",
+     "title": "A pessoa quer dirigir o carro sozinha",
+     "say": "Você quer dirigir, eu entendo. Hoje eu dirijo, e você me mostra o caminho.",
+     "next": "Ofereça uma opção de viagem segura específica e coloque as chaves fora de vista se necessário.",
+     "why": "A necessidade de independência é compreensível; uma alternativa reduz a perda de prestígio.",
+     "avoid": "Você não pode mais dirigir."
+    },
+    {
+     "id": "recognize",
+     "title": "A pessoa não me reconhece",
+     "say": "Hoje estou aqui por você. Estou com você.",
+     "next": "Diga seu nome com calma, mantenha um pouco de distância e fale de algo familiar em vez de explicar a relação.",
+     "why": "Não ser reconhecido dói, mas não é rejeição. Carinho e calma dão segurança sem testar a memória.",
+     "avoid": "Você tem que saber quem eu sou."
+    },
+    {
+     "id": "anger",
+     "title": "A pessoa grita comigo",
+     "say": "Vou te deixar em paz um pouquinho. Fico aqui por perto.",
+     "next": "Reduza o ruído, mantenha uma distância segura e só fale novamente quando a tensão tiver diminuído.",
+     "why": "Você cria uma distância segura e, ao mesmo tempo, transmite uma presença calma.",
+     "avoid": "Agora se acalme de uma vez."
+    },
+    {
+     "id": "daycare",
+     "title": "O centro de dia é recusado",
+     "say": "Eu levo você até lá e depois volto para buscar você. Pode contar com isso.",
+     "next": "Faça uma despedida curta e gentil, diga a hora em que vai voltar e peça à equipe uma recepção familiar.",
+     "why": "Por trás da recusa costuma haver medo do novo ou do abandono. Uma promessa firme de voltar para buscar dá segurança.",
+     "avoid": "Você tem que ir, eu também preciso de descanso."
+    }
+   ]
+  },
+  "ro": {
+   "heading": "Situații frecvente și ce ajută",
+   "labels": {
+    "say": "Puteți spune",
+    "next": "Ce puteți face",
+    "why": "Ce se află în spate",
+    "avoid": "Mai bine nu:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Dorința de a merge acasă",
+     "say": "Ți-e dor de casa ta. Spune-mi ce era deosebit de frumos acolo.",
+     "next": "Oferiți ceva familiar, cum ar fi ceai, muzică calmă sau un album foto.",
+     "why": "Acest moment este adesea mai mult despre siguranță și familiaritate decât locația reală. Contrazicerea persoanei poate crea o presiune suplimentară.",
+     "avoid": "Dar ești acasă."
+    },
+    {
+     "id": "repeat",
+     "title": "Aceeași întrebare continuă să apară",
+     "say": "Vrei să știi când plecăm. Îți spun eu din timp.",
+     "next": "Scrieți răspunsul clar pe o foaie de hârtie și indicați-l când vi se va adresa următoarea întrebare.",
+     "why": "Este posibil ca răspunsul să nu fi rămas în memorie. O propoziție calmă, mereu aceeași, oferă orientare fără a provoca vinovăție.",
+     "avoid": "Ți-am spus deja asta de cinci ori."
+    },
+    {
+     "id": "wash",
+     "title": "Dușul este refuzat",
+     "say": "Vrei să te împrospătezi mai întâi la chiuvetă sau să faci un duș mai târziu?",
+     "next": "Încălziți camera dinainte și pregătiți prosopul și hainele într-un loc vizibil.",
+     "why": "Îngrijirea personală poate părea străină sau amenințătoare. O mică alegere ajută la păstrarea controlului și a demnității.",
+     "avoid": "Trebuie să faci duș acum."
+    },
+    {
+     "id": "evening",
+     "title": "Neliniștea începe seara",
+     "say": "Devine agitat aici. Rămân cu tine și facem puțin mai liniște aici.",
+     "next": "Opriți luminile puternice și televizorul și oferiți o activitate familiară și liniștită.",
+     "why": "Seara, oboseala, umbrele și mulți stimuli pot crește nesiguranța. Orientarea și calmul ajută adesea mai mult decât presiunea.",
+     "avoid": "În sfârșit trebuie să dormi acum."
+    },
+    {
+     "id": "keys",
+     "title": "Cheile sau banii au dispărut",
+     "say": "Îți cauți cheile. Să ne uităm împreună în locurile obișnuite.",
+     "next": "Verificați calm două locuri familiare unde se pun de obicei lucrurile, apoi oferiți o pauză.",
+     "why": "Căutarea împreună ia sentimentul în serios și evită vinovăția.",
+     "avoid": "Iar le-ai rătăcit."
+    },
+    {
+     "id": "accuse",
+     "title": "Mă acuză de furt",
+     "say": "Îți faci griji pentru banii tăi. Ne uităm împreună.",
+     "next": "Recunoașteți îngrijorarea și căutați împreună pe scurt într-o locație familiară.",
+     "why": "Îngrijorarea pare reală. Apărarea poate părea o rezistență suplimentară.",
+     "avoid": "Ce prostii, nu fur."
+    },
+    {
+     "id": "eat",
+     "title": "Mâncarea este refuzată",
+     "say": "Vrei câteva linguri de supă sau mai degrabă niște pâine?",
+     "next": "Oferiți o porție mică și doar două opțiuni familiare.",
+     "why": "Opțiunile mici și ușor de gestionat par mai puțin copleșitoare.",
+     "avoid": "Trebuie să mănânci ceva."
+    },
+    {
+     "id": "drink",
+     "title": "Uită să bea",
+     "say": "Beau și eu ceva cu tine. Vrei apă sau ceai?",
+     "next": "Puneți un pahar preferat, clar vizibil, la îndemână și luați o înghițitură împreună.",
+     "why": "A face lucruri împreună și a face o alegere simplă creează mai puțină presiune.",
+     "avoid": "Azi ai băut mult prea puțin."
+    },
+    {
+     "id": "night",
+     "title": "Persoana se ridică din pat noaptea",
+     "say": "Încă e noapte. Sunt aici și te însoțesc puțin.",
+     "next": "Folosiți lumină slabă, însoțiți persoana la toaletă și apoi înapoi în pat.",
+     "why": "Orientarea calmă oferă siguranță fără a începe o ceartă.",
+     "avoid": "Întinde-te imediat la loc."
+    },
+    {
+     "id": "dress",
+     "title": "Îmbrăcarea este refuzată",
+     "say": "Vrei puloverul albastru sau gri?",
+     "next": "Pregătiți la vedere două articole vestimentare potrivite și acordați persoanei suficient timp.",
+     "why": "Două opțiuni vizibile reduc deciziile și păstrează autodeterminarea.",
+     "avoid": "Nu poți sta în pijama."
+    },
+    {
+     "id": "work",
+     "title": "Persoana vrea să meargă la muncă",
+     "say": "Pe tine se poate conta mereu. Înainte să pleci, mă ajuți puțin aici?",
+     "next": "Oferiți o sarcină cu rost, potrivită fostei meserii, de exemplu sortarea unor hârtii, repararea a ceva sau așezarea mesei.",
+     "why": "Munca oferea adesea un rost, o structură și recunoaștere. În spatele dorinței se află adesea nevoia de a fi de folos.",
+     "avoid": "Doar ești de mult la pensie."
+    },
+    {
+     "id": "car",
+     "title": "Persoana dorește să conducă singură mașina",
+     "say": "Vrei să conduci tu, înțeleg. Azi conduc eu, iar tu îmi arăți drumul.",
+     "next": "Oferiți o variantă concretă și sigură de a ajunge acolo și, dacă este necesar, puneți cheile într-un loc unde nu se văd.",
+     "why": "Necesitatea de independență este de înțeles; o alternativă reduce pierderea feței.",
+     "avoid": "Nu mai poți conduce."
+    },
+    {
+     "id": "recognize",
+     "title": "Persoana nu mă recunoaște",
+     "say": "Astăzi sunt aici pentru tine. Sunt lângă tine.",
+     "next": "Spuneți-vă calm numele, păstrați puțină distanță și vorbiți despre ceva familiar în loc să explicați relația.",
+     "why": "Faptul că nu sunteți recunoscut doare, dar nu este o respingere. Căldura și calmul oferă siguranță fără a testa memoria.",
+     "avoid": "Doar trebuie să știi cine sunt."
+    },
+    {
+     "id": "anger",
+     "title": "Persoana strigă la mine",
+     "say": "Te las puțin în pace. Rămân aproape.",
+     "next": "Reduceți zgomotul, păstrați o distanță sigură și vorbiți din nou numai când tensiunea a scăzut.",
+     "why": "Creați o distanță de siguranță și, în același timp, transmiteți o prezență calmă.",
+     "avoid": "Acum calmează-te în sfârșit."
+    },
+    {
+     "id": "daycare",
+     "title": "Centrul de zi este refuzat",
+     "say": "Te duc acolo și te iau mai târziu înapoi. Te poți baza pe asta.",
+     "next": "Faceți despărțirea scurtă și prietenoasă, spuneți ora la care reveniți și rugați echipa pentru o primire familiară.",
+     "why": "În spatele refuzului se află adesea teama de nou sau de abandon. O promisiune fermă de revenire dă siguranță.",
+     "avoid": "Trebuie să mergi, și eu am nevoie de liniște."
+    }
+   ]
+  },
+  "ru": {
+   "heading": "Частые ситуации и что помогает",
+   "labels": {
+    "say": "Можно сказать",
+    "next": "Что вы можете сделать",
+    "why": "Что за этим стоит",
+    "avoid": "Лучше не говорить:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Желание уйти домой",
+     "say": "Ты скучаешь по дому. Расскажи, что там было особенно красиво.",
+     "next": "Предложите что-то знакомое, например чай, спокойную музыку или фотоальбом.",
+     "why": "В данный момент это часто больше связано с чувством безопасности и привычной обстановкой, чем с фактическим местоположением. Возражения могут создавать дополнительное давление.",
+     "avoid": "Ты же дома."
+    },
+    {
+     "id": "repeat",
+     "title": "Один и тот же вопрос продолжает повторяться",
+     "say": "Ты хочешь знать, когда мы поедем. Я скажу тебе заранее.",
+     "next": "Напишите ответ четко на листке бумаги и указывайте на него, когда зададут следующий вопрос.",
+     "why": "Возможно, ответ не сохранился в памяти. Спокойная, неизменная фраза помогает сориентироваться, не вызывая чувства вины.",
+     "avoid": "Я же тебе уже пять раз это говорил."
+    },
+    {
+     "id": "wash",
+     "title": "Отказ от душа",
+     "say": "Хочешь сначала освежиться у раковины или принять душ позже?",
+     "next": "Предварительно прогрейте комнату и разложите полотенце и одежду на видном месте.",
+     "why": "Гигиенические процедуры могут казаться чужими или угрожающими. Небольшой выбор помогает сохранить контроль и достоинство.",
+     "avoid": "Тебе нужно сейчас принять душ."
+    },
+    {
+     "id": "evening",
+     "title": "Беспокойство начинается вечером",
+     "say": "Становится немного неспокойно. Я останусь с тобой, и мы сделаем здесь чуть тише.",
+     "next": "Выключите яркий свет и телевизор и предложите знакомое спокойное занятие.",
+     "why": "Вечером усталость, тени и большое количество стимулов могут увеличивать неуверенность. Ориентация и спокойствие часто помогают больше, чем давление.",
+     "avoid": "Тебе наконец нужно сейчас поспать."
+    },
+    {
+     "id": "keys",
+     "title": "Ключи или деньги исчезли",
+     "say": "Ты ищешь свои ключи. Давай посмотрим вместе в обычных местах.",
+     "next": "Спокойно проверьте два знакомых места, куда обычно кладут вещи, а затем предложите сделать перерыв.",
+     "why": "Совместный поиск воспринимает чувство серьёзно и избегает чувства вины.",
+     "avoid": "Ты опять их потерял."
+    },
+    {
+     "id": "accuse",
+     "title": "Меня обвиняют в воровстве",
+     "say": "Ты беспокоишься о своих деньгах. Давай посмотрим вместе.",
+     "next": "Признайте тревогу и ненадолго поищите вместе в знакомом месте.",
+     "why": "Тревога ощущается реально. Оправдания могут восприниматься как ещё большее сопротивление.",
+     "avoid": "Какая ерунда, я не краду."
+    },
+    {
+     "id": "eat",
+     "title": "Отказ от еды",
+     "say": "Хочешь несколько ложек супа или лучше немного хлеба?",
+     "next": "Предложите небольшую порцию и только два знакомых варианта.",
+     "why": "Небольшой и понятный выбор меньше перегружает.",
+     "avoid": "Тебе нужно что-нибудь поесть."
+    },
+    {
+     "id": "drink",
+     "title": "Забывает пить",
+     "say": "Я тоже выпью стакан вместе с тобой. Хочешь воды или чаю?",
+     "next": "Поставьте любимый, хорошо видимый стакан в зоне досягаемости и выпейте глоток вместе.",
+     "why": "Совместные действия и простой выбор создают меньше давления.",
+     "avoid": "Ты сегодня выпил слишком мало."
+    },
+    {
+     "id": "night",
+     "title": "Человек встаёт ночью",
+     "say": "Ещё ночь. Я здесь и ненадолго составлю тебе компанию.",
+     "next": "Используйте приглушённое освещение, сопровождайте до туалета и обратно в кровать.",
+     "why": "Спокойная ориентация обеспечивает безопасность, не начиная ссору.",
+     "avoid": "Немедленно ложись обратно."
+    },
+    {
+     "id": "dress",
+     "title": "Отказ от одевания",
+     "say": "Ты хочешь синий или серый свитер?",
+     "next": "Приготовьте на видном месте две подходящие вещи и дайте человеку достаточно времени.",
+     "why": "Два видимых варианта сокращают количество решений и сохраняют способность к самостоятельному выбору.",
+     "avoid": "Тебе нельзя оставаться в пижаме."
+    },
+    {
+     "id": "work",
+     "title": "Человек хочет пойти на работу",
+     "say": "На тебя всегда можно положиться. Перед уходом поможешь мне тут немного?",
+     "next": "Предложите осмысленное дело, связанное с прежней профессией, например разобрать бумаги, что-нибудь починить или накрыть на стол.",
+     "why": "Работа часто давала цель, порядок и признание. За этим желанием часто стоит потребность приносить пользу.",
+     "avoid": "Ты же давно на пенсии."
+    },
+    {
+     "id": "car",
+     "title": "Человек хочет управлять автомобилем самостоятельно",
+     "say": "Ты хочешь сесть за руль, я понимаю. Сегодня поведу я, а ты подсказывай мне дорогу.",
+     "next": "Предложите конкретный безопасный вариант поездки и при необходимости уберите ключи из поля зрения.",
+     "why": "Потребность в независимости понятна; альтернатива уменьшает потерю лица.",
+     "avoid": "Ты больше не можешь водить машину."
+    },
+    {
+     "id": "recognize",
+     "title": "Человек меня не узнаёт",
+     "say": "Сегодня я здесь ради тебя. Я рядом.",
+     "next": "Спокойно назовите своё имя, держитесь на небольшом расстоянии и говорите о чём-то знакомом, а не объясняйте, кем вы приходитесь.",
+     "why": "Когда вас не узнают, это больно, но это не отказ от вас. Тепло и спокойствие дают чувство безопасности, не проверяя память.",
+     "avoid": "Ты же знаешь, кто я."
+    },
+    {
+     "id": "anger",
+     "title": "Человек кричит на меня",
+     "say": "Я ненадолго оставлю тебя в покое. Я буду рядом.",
+     "next": "Уменьшите шум, держитесь на безопасном расстоянии и говорите снова только после того, как напряжение спадет.",
+     "why": "Вы создаёте безопасную дистанцию и одновременно передаёте спокойное присутствие.",
+     "avoid": "Теперь наконец успокойся."
+    },
+    {
+     "id": "daycare",
+     "title": "Отказ ходить в дневной центр",
+     "say": "Я провожу тебя туда и потом снова заберу. Можешь на это рассчитывать.",
+     "next": "Прощайтесь коротко и дружелюбно, назовите время, когда вернётесь, и попросите сотрудников тепло встретить человека.",
+     "why": "За отказом часто стоит страх перед новым или перед одиночеством. Твёрдое обещание забрать даёт опору.",
+     "avoid": "Тебе надо туда идти, мне тоже нужен покой."
+    }
+   ]
+  },
+  "sk": {
+   "heading": "Časté situácie a čo pomáha",
+   "labels": {
+    "say": "Môžete povedať",
+    "next": "Čo môžete urobiť",
+    "why": "Čo za tým stojí",
+    "avoid": "Radšej nie:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Chcieť ísť domov",
+     "say": "Chýba ti domov. Povedz mi, čo tam bolo obzvlášť krásne.",
+     "next": "Ponúknite niečo známe, napríklad čaj, pokojnú hudbu alebo fotoalbum.",
+     "why": "Tento moment je často viac o bezpečí a známeho prostredia než o skutočnom mieste. Odporovanie môže vytvárať dodatočný tlak.",
+     "avoid": "Veď si doma."
+    },
+    {
+     "id": "repeat",
+     "title": "Tá istá otázka sa stále opakuje",
+     "say": "Chceš vedieť, kedy vyrazíme. Včas ti dám vedieť.",
+     "next": "Napíšte odpoveď jasne na papier a ukážte na ňu, keď bude položená ďalšia otázka.",
+     "why": "Odpoveď možno nezostala v pamäti. Pokojná, stále rovnaká veta poskytuje orientáciu bez vyvolania pocitu viny.",
+     "avoid": "Už som ti to povedal päťkrát."
+    },
+    {
+     "id": "wash",
+     "title": "Sprchovanie je odmietnuté",
+     "say": "Chceš sa najprv umyť pri umývadle alebo sa osprchovať neskôr?",
+     "next": "Vopred vykúrte miestnosť a pripravte uterák a oblečenie na viditeľné miesto.",
+     "why": "Osobná starostlivosť sa môže zdať neznáma alebo hrozivá. Malá voľba pomáha zachovať kontrolu a dôstojnosť.",
+     "avoid": "Teraz sa musíš osprchovať."
+    },
+    {
+     "id": "evening",
+     "title": "Nepokoj začína večer",
+     "say": "Začína byť nepokojne. Zostanem s tebou a spolu to tu trochu utíšime.",
+     "next": "Vypnite jasné svetlá a televízor a ponúknite známu, tichú aktivitu.",
+     "why": "Večer únava, tiene a množstvo podnetov môžu zvýšiť neistotu. Orientácia a pokoj často pomáhajú viac než tlak.",
+     "avoid": "Teraz konečne musíš spať."
+    },
+    {
+     "id": "keys",
+     "title": "Kľúče alebo peniaze zmizli",
+     "say": "Hľadáš kľúče. Poďme sa pozrieť spolu na obvyklých miestach.",
+     "next": "Pokojne skontrolujte dve známe miesta, kam sa veci zvyčajne odkladajú, a potom ponúknite prestávku.",
+     "why": "Spoločné hľadanie berie tento pocit vážne a vyhýba sa pocitu viny.",
+     "avoid": "Zase si ich stratil."
+    },
+    {
+     "id": "accuse",
+     "title": "Obviňujú ma z krádeže",
+     "say": "Bojíš sa o svoje peniaze. Pozrieme sa spolu.",
+     "next": "Uznajte obavu a krátko spolu hľadajte na známom mieste.",
+     "why": "Tá obava pôsobí skutočne. Obhajovanie sa môže pôsobiť ako ďalší odpor.",
+     "avoid": "Aké nezmysly, nekradnem."
+    },
+    {
+     "id": "eat",
+     "title": "Jedlo sa odmieta",
+     "say": "Chceš niekoľko lyžíc polievky alebo trochu chleba?",
+     "next": "Ponúknite malú porciu a len dve známe možnosti.",
+     "why": "Malý, prehľadný výber menej zaťažuje.",
+     "avoid": "Musíš niečo zjesť."
+    },
+    {
+     "id": "drink",
+     "title": "Zabúda piť",
+     "say": "Dám si s tebou pohár. Chceš vodu alebo čaj?",
+     "next": "Položte obľúbený, dobre viditeľný pohár na dosah a dajte si spolu dúšok.",
+     "why": "Robiť veci spolu a robiť jednoduché rozhodnutia vytvára menší tlak.",
+     "avoid": "Dnes si vypil príliš málo."
+    },
+    {
+     "id": "night",
+     "title": "Človek vstáva v noci",
+     "say": "Stále je noc. Som tu a chvíľu ťa budem sprevádzať.",
+     "next": "Používajte tlmené svetlo, sprevádzajte na toaletu a potom späť do postele.",
+     "why": "Pokojná orientácia poskytuje bezpečnosť bez začatia hádky.",
+     "avoid": "Hneď si zase ľahni."
+    },
+    {
+     "id": "dress",
+     "title": "Obliekanie je odmietnuté",
+     "say": "Chceš modrý alebo sivý sveter?",
+     "next": "Pripravte na viditeľné miesto dva vhodné kusy oblečenia a dajte človeku dostatok času.",
+     "why": "Dve viditeľné možnosti znižujú rozhodovanie a zachovávajú sebaurčenie.",
+     "avoid": "Nemôžeš zostať v pyžame."
+    },
+    {
+     "id": "work",
+     "title": "Osoba chce ísť do práce",
+     "say": "Na teba sa dá vždy spoľahnúť. Kým pôjdeš, pomôžeš mi tu chvíľku?",
+     "next": "Ponúknite zmysluplnú úlohu, ktorá zodpovedá bývalému povolaniu, napríklad triedenie papierov, opravu niečoho alebo prestieranie stola.",
+     "why": "Práca často dávala zmysel, poriadok a uznanie. Za týmto želaním sa často skrýva potreba byť niekomu na úžitok.",
+     "avoid": "Veď si už dávno na dôchodku."
+    },
+    {
+     "id": "car",
+     "title": "Osoba chce auto šoférovať sama",
+     "say": "Chceš šoférovať, rozumiem. Dnes šoférujem ja a ty mi ukazuješ cestu.",
+     "next": "Ponúknite konkrétnu možnosť bezpečného cestovania a kľúče, ak je to potrebné, odložte mimo dohľadu.",
+     "why": "Potreba nezávislosti je pochopiteľná; alternatíva znižuje stratu tváre.",
+     "avoid": "Už nemôžeš šoférovať."
+    },
+    {
+     "id": "recognize",
+     "title": "Osoba ma nespoznáva",
+     "say": "Dnes som tu pre teba. Som pri tebe.",
+     "next": "Pokojne povedzte svoje meno, držte si malý odstup a hovorte o niečom známom namiesto vysvetľovania vzťahu.",
+     "why": "Keď vás nespoznávajú, bolí to, ale nie je to odmietnutie. Vľúdnosť a pokoj dávajú istotu bez skúšania pamäti.",
+     "avoid": "Predsa musíš vedieť, kto som."
+    },
+    {
+     "id": "anger",
+     "title": "Ten človek na mňa kričí",
+     "say": "Na chvíľu ťa nechám na pokoji. Zostanem nablízku.",
+     "next": "Znížte hluk, udržujte bezpečnú vzdialenosť a znova hovorte, až keď napätie opadne.",
+     "why": "Vytvoríte bezpečný odstup a zároveň vyžarujete pokojnú prítomnosť.",
+     "avoid": "Teraz sa konečne upokoj."
+    },
+    {
+     "id": "daycare",
+     "title": "Denný stacionár je odmietaný",
+     "say": "Odprevadím ťa tam a neskôr si po teba zase prídem. Na to sa môžeš spoľahnúť.",
+     "next": "Rozlúčte sa krátko a vľúdne, povedzte čas vyzdvihnutia a požiadajte tím o známe privítanie.",
+     "why": "Za odmietaním často stojí strach z nového alebo z opustenia. Pevný sľub vyzdvihnutia dáva oporu.",
+     "avoid": "Musíš tam ísť, aj ja potrebujem pokoj."
+    }
+   ]
+  },
+  "sl": {
+   "heading": "Pogoste situacije in kaj pomaga",
+   "labels": {
+    "say": "Lahko rečete",
+    "next": "Kaj lahko storite",
+    "why": "Kaj je v ozadju",
+    "avoid": "Raje ne:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Želja iti domov",
+     "say": "Pogrešaš svoj dom. Povej mi, kaj ti je bilo tam še posebej lepo.",
+     "next": "Ponudite nekaj poznanega, na primer čaj, mirno glasbo ali foto album.",
+     "why": "Ta trenutek je pogosto bolj povezan z varnostjo in domačnostjo kot z dejansko lokacijo. Ugovarjanje lahko ustvari dodatni pritisk.",
+     "avoid": "Saj si doma."
+    },
+    {
+     "id": "repeat",
+     "title": "Isto vprašanje se nenehno pojavlja",
+     "say": "Želiš vedeti, kdaj gremo. Pravočasno ti povem.",
+     "next": "Odgovor jasno napišite na kos papirja in nanj pokažite, ko boste vprašani naslednje vprašanje.",
+     "why": "Odgovor morda ni ostal v spominu. Miren, vedno enak stavek nudi orientacijo, ne da bi povzročil občutek krivde.",
+     "avoid": "To sem ti že povedal petkrat."
+    },
+    {
+     "id": "wash",
+     "title": "Tuširanje je zavrnjeno",
+     "say": "Ali se želiš najprej osvežiti pri umivalniku ali se kasneje stuširati?",
+     "next": "Sobo vnaprej ogrejte ter brisačo in oblačila pripravite na vidnem mestu.",
+     "why": "Osebna nega se lahko zdi nepoznana ali grozeča. Majhna izbira pomaga ohraniti nadzor in dostojanstvo.",
+     "avoid": "Moraš se zdaj stuširati."
+    },
+    {
+     "id": "evening",
+     "title": "Nemir se začne zvečer",
+     "say": "Postaja le nemirno. Ostal bom s teboj in bomo tukaj stvari naredili nekoliko tišje.",
+     "next": "Izklopite močne luči in televizijo ter ponudite znano, tiho dejavnost.",
+     "why": "Zvečer lahko utrujenost, sence in številni dražljaji povečajo negotovost. Usmeritev in mir pogosto pomagata bolj kot pritisk.",
+     "avoid": "Končno moraš zdaj spati."
+    },
+    {
+     "id": "keys",
+     "title": "Ključi ali denar so izginili",
+     "say": "Iščeš svoje ključe. Poglejmo skupaj na običajnih mestih.",
+     "next": "Mirno preverite dve znani mesti, kamor se stvari običajno odložijo, in nato ponudite odmor.",
+     "why": "Skupno iskanje jemlje občutek resno in se izogiba krivdi.",
+     "avoid": "Spet si jih nekam založil."
+    },
+    {
+     "id": "accuse",
+     "title": "Obtožujejo me kraje",
+     "say": "Skrbi te zaradi denarja. Poglejmo skupaj.",
+     "next": "Priznajte skrb in skupaj na hitro poiščite na znanem mestu.",
+     "why": "Skrb se zdi resnična. Obramba se lahko zdi kot nadaljnji odpor.",
+     "avoid": "Kakšna neumnost, ne kradem."
+    },
+    {
+     "id": "eat",
+     "title": "Hrana je zavrnjena",
+     "say": "Želiš nekaj žlic juhe ali raje malo kruha?",
+     "next": "Ponudite majhno porcijo in le dve znani možnosti.",
+     "why": "Majhne, obvladljive možnosti se zdijo manj preplavljajoče.",
+     "avoid": "Moraš nekaj jesti."
+    },
+    {
+     "id": "drink",
+     "title": "Pozablja piti",
+     "say": "Popijva skupaj kozarec. Želiš vodo ali čaj?",
+     "next": "Najljubši, dobro viden kozarec postavite na doseg roke in skupaj popijte požirek.",
+     "why": "Skupno početje in preprosta izbira ustvarjata manj pritiska.",
+     "avoid": "Danes si spil veliko premalo."
+    },
+    {
+     "id": "night",
+     "title": "Oseba vstane ponoči",
+     "say": "Še vedno je noč. Tukaj sem in grem za kratek čas s tabo.",
+     "next": "Uporabite zatemnjeno svetlobo, spremljajte osebo do stranišča in nato nazaj v posteljo.",
+     "why": "Mirna usmeritev zagotavlja varnost, ne da bi sprožila prepir.",
+     "avoid": "Takoj se spet uleži."
+    },
+    {
+     "id": "dress",
+     "title": "Oblačenje je zavrnjeno",
+     "say": "Želiš moder ali siv pulover?",
+     "next": "Pripravite dve primerni oblačili, da sta jasno vidni, in dajte osebi dovolj časa.",
+     "why": "Dve vidni možnosti zmanjšujeta odločitve in ohranjata samoodločanje.",
+     "avoid": "Ne moreš ostati v pižami."
+    },
+    {
+     "id": "work",
+     "title": "Oseba želi iti v službo",
+     "say": "Nate se vedno lahko zanesem. Preden greš, mi malo pomagaš tukaj?",
+     "next": "Ponudite smiselno nalogo, ki ustreza nekdanjemu poklicu, na primer razvrščanje papirjev, popravilo česa ali pogrinjanje mize.",
+     "why": "Delo je pogosto dajalo smisel, red in priznanje. Za to željo pogosto stoji potreba, da je oseba potrebna.",
+     "avoid": "Saj si že dolgo v pokoju."
+    },
+    {
+     "id": "car",
+     "title": "Oseba želi sama voziti avto",
+     "say": "Želiš voziti, razumem. Danes vozim jaz, ti pa mi kažeš pot.",
+     "next": "Ponudite konkretno varno možnost prevoza in po potrebi pospravite ključe izpred oči.",
+     "why": "Potreba po neodvisnosti je razumljiva; alternativa zmanjša izgubo obraza.",
+     "avoid": "Ne moreš več voziti."
+    },
+    {
+     "id": "recognize",
+     "title": "Oseba me ne prepozna",
+     "say": "Danes sem tu zate. Ob tebi sem.",
+     "next": "Mirno povejte svoje ime, ohranite nekaj razdalje in govorite o nečem znanem, namesto da bi pojasnjevali odnos.",
+     "why": "Ko vas ne prepoznajo, to boli, vendar to ni zavrnitev. Toplina in mir dajeta varnost, ne da bi preizkušali spomin.",
+     "avoid": "Saj moraš vedeti, kdo sem."
+    },
+    {
+     "id": "anger",
+     "title": "Oseba kriči name",
+     "say": "Za trenutek te pustim pri miru. Ostanem v bližini.",
+     "next": "Zmanjšajte hrup, ohranite varno razdaljo in spet govorite šele, ko se napetost zmanjša.",
+     "why": "Ustvarite varno razdaljo in hkrati izražate mirno prisotnost.",
+     "avoid": "Zdaj se končno pomiri."
+    },
+    {
+     "id": "daycare",
+     "title": "Oseba zavrača dnevno varstvo",
+     "say": "Pospremim te tja in te pozneje spet poberem. Na to se lahko zaneseš.",
+     "next": "Poslovite se na kratko in prijazno, povejte, kdaj pridete nazaj, in prosite ekipo za domač sprejem.",
+     "why": "Za zavračanjem se pogosto skriva strah pred novim ali pred zapuščenostjo. Trdna obljuba vrnitve daje oporo.",
+     "avoid": "Moraš iti, tudi jaz potrebujem mir."
+    }
+   ]
+  },
+  "sq": {
+   "heading": "Situata të zakonshme dhe çfarë ndihmon",
+   "labels": {
+    "say": "Mund të thoni",
+    "next": "Çfarë mund të bëni",
+    "why": "Çfarë fshihet pas kësaj",
+    "avoid": "Më mirë jo:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Dëshira për të shkuar në shtëpi",
+     "say": "Të mungon shtëpia jote. Më trego çfarë ishte veçanërisht e bukur atje.",
+     "next": "Ofroni diçka të njohur, si çaj, muzikë të qetë ose një album fotografish.",
+     "why": "Ky moment shpesh ka më shumë të bëjë me sigurinë dhe njohjen se sa me vendndodhjen aktuale. Kundërshtimi mund të krijojë presion shtesë.",
+     "avoid": "Por ti je në shtëpi."
+    },
+    {
+     "id": "repeat",
+     "title": "E njëjta pyetje vazhdon të përsëritet",
+     "say": "Do të dish kur nisemi. Do të të them në kohë.",
+     "next": "Shkruani përgjigjen qartë në një letër dhe tregoni atë kur t'ju pyesin pyetjen tjetër.",
+     "why": "Përgjigjja mund të mos ketë mbetur në kujtesë. Një fjali e qetë dhe gjithmonë e njëjtë jep orientim pa shkaktuar ndjenjë faji.",
+     "avoid": "Ta kam thënë tashmë pesë herë."
+    },
+    {
+     "id": "wash",
+     "title": "Dushi refuzohet",
+     "say": "Dëshiron të freskohesh fillimisht te lavamani apo të bësh dush më vonë?",
+     "next": "Ngrohni paraprakisht dhomën dhe vendosni peshqirin dhe rrobat në një vend të dukshëm.",
+     "why": "Kujdesi personal mund të duket i panjohur ose kërcënues. Një zgjedhje e vogël ndihmon në ruajtjen e kontrollit dhe dinjitetit.",
+     "avoid": "Ti duhet të bësh dush tani."
+    },
+    {
+     "id": "evening",
+     "title": "Shqetësimi fillon në mbrëmje",
+     "say": "Po bëhet pak trazirë këtu. Do të rri me ty dhe do ta qetësojmë pak këtu.",
+     "next": "Fikni dritat e forta dhe televizorin dhe ofroni një aktivitet të njohur e të qetë.",
+     "why": "Në mbrëmje, lodhja, hijet dhe shumë stimuj mund të rrisin pasigurinë. Orientimi dhe qetësimi shpesh ndihmojnë më shumë sesa presioni.",
+     "avoid": "Tani duhet të flesh më në fund."
+    },
+    {
+     "id": "keys",
+     "title": "Çelësat ose paratë janë zhdukur",
+     "say": "Po kërkon çelësat e tu. Le të kërkojmë së bashku në vendet e zakonshme.",
+     "next": "Kontrolloni me qetësi dy vende të njohura ku zakonisht vendosen gjërat dhe pastaj ofroni një pushim.",
+     "why": "Kërkimi së bashku trajton ndjenjën seriozisht dhe shmang fajësimin.",
+     "avoid": "Përsëri i ke humbur."
+    },
+    {
+     "id": "accuse",
+     "title": "Më akuzojnë për vjedhje",
+     "say": "Po shqetësohesh për paratë e tua. Do të shikojmë së bashku.",
+     "next": "Pranojeni shqetësimin dhe kërkoni shkurt së bashku në një vend të njohur.",
+     "why": "Shqetësimi ndihet i vërtetë. Mbrojtja mund të duket si rezistencë e mëtejshme.",
+     "avoid": "Çfarë marrëzie, unë nuk vjedh."
+    },
+    {
+     "id": "eat",
+     "title": "Ushqimi refuzohet",
+     "say": "Dëshiron disa lugë supë apo pak bukë?",
+     "next": "Ofroni një pjesë të vogël dhe vetëm dy opsione të njohura.",
+     "why": "Zgjedhjet e vogla dhe të menaxhueshme duken më pak mbingarkuese.",
+     "avoid": "Ti duhet të hash diçka."
+    },
+    {
+     "id": "drink",
+     "title": "Harron të pijë",
+     "say": "Do të marr një gotë me ty. Dëshiron ujë apo çaj?",
+     "next": "Vendosni një gotë të preferuar e mirë të dukshme pranë dorës dhe pini së bashku një gllënjkë.",
+     "why": "Bërja e gjërave së bashku dhe marrja e një zgjedhjeje të thjeshtë krijon më pak presion.",
+     "avoid": "Sot ke pirë shumë pak."
+    },
+    {
+     "id": "night",
+     "title": "Personi ngrihet natën",
+     "say": "Është ende natë. Unë jam këtu dhe do të të shoqëroj për pak.",
+     "next": "Përdorni ndriçim të dobët, shoqërojeni në tualet dhe pastaj përsëri në shtrat.",
+     "why": "Orientimi i qetë siguron siguri pa filluar një debat.",
+     "avoid": "Shtrihu menjëherë përsëri."
+    },
+    {
+     "id": "dress",
+     "title": "Veshja refuzohet",
+     "say": "Dëshiron puloverin blu apo atë gri?",
+     "next": "Vendosni dy veshje të përshtatshme në vend të dukshëm dhe jepini personit mjaft kohë.",
+     "why": "Dy opsione të dukshme reduktojnë vendimet dhe ruajnë vetëvendosjen.",
+     "avoid": "Nuk mund të rrish me pizhame."
+    },
+    {
+     "id": "work",
+     "title": "Personi do të shkojë në punë",
+     "say": "Tek ti mund të mbështetem gjithmonë. Para se të shkosh, më ndihmon pak këtu?",
+     "next": "Ofroni një detyrë me kuptim që i përshtatet profesionit të dikurshëm, për shembull renditjen e letrave, rregullimin e diçkaje ose shtrimin e tryezës.",
+     "why": "Puna shpesh jepte qëllim, rregull dhe vlerësim. Pas kësaj dëshire shpesh qëndron nevoja për të ndihmuar dikë.",
+     "avoid": "Po ti je në pension prej kohësh."
+    },
+    {
+     "id": "car",
+     "title": "Personi dëshiron të ngasë makinën vetë",
+     "say": "Do të ngasësh vetë, e kuptoj. Sot ngas unë, dhe ti më tregon rrugën.",
+     "next": "Ofroni një mundësi konkrete dhe të sigurt udhëtimi dhe, nëse duhet, vendosini çelësat larg syve.",
+     "why": "Nevoja për pavarësi është e kuptueshme; një alternativë zvogëlon humbjen e dinjitetit.",
+     "avoid": "Nuk mund të ngasësh më makinë."
+    },
+    {
+     "id": "recognize",
+     "title": "Personi nuk më njeh",
+     "say": "Sot jam këtu për ty. Nuk je vetëm.",
+     "next": "Thuajeni me qetësi emrin tuaj, mbani pak distancë dhe flisni për diçka të njohur në vend që të shpjegoni lidhjen.",
+     "why": "Të mos ju njohin dhemb, por nuk është refuzim. Ngrohtësia dhe qetësia japin siguri pa e vënë në provë kujtesën.",
+     "avoid": "Duhet ta dish se kush jam."
+    },
+    {
+     "id": "anger",
+     "title": "Personi më bërtet",
+     "say": "Po të lë pak të qetë. Qëndroj këtu afër.",
+     "next": "Ulni zhurmën, mbani një distancë të sigurt, dhe flisni përsëri vetëm kur tensioni të ketë zbritur.",
+     "why": "Ju krijoni një distancë të sigurt dhe në të njëjtën kohë transmetoni një prani të qetë.",
+     "avoid": "Tani së fundmi qetësohu."
+    },
+    {
+     "id": "daycare",
+     "title": "Qendra ditore refuzohet",
+     "say": "Të çoj atje dhe më vonë vij të të marr. Mund të mbështetesh te kjo.",
+     "next": "Mbajeni përshëndetjen të shkurtër dhe miqësore, thoni orën kur do ktheheni dhe kërkojini ekipit një pritje të njohur.",
+     "why": "Pas refuzimit shpesh fshihet frika nga e reja ose nga braktisja. Një premtim i qartë për t’u kthyer jep siguri.",
+     "avoid": "Duhet të shkosh, edhe unë kam nevojë për qetësi."
+    }
+   ]
+  },
+  "sr": {
+   "heading": "Česte situacije i šta pomaže",
+   "labels": {
+    "say": "Možete reći",
+    "next": "Šta možete da uradite",
+    "why": "Šta stoji iza toga",
+    "avoid": "Bolje ne:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Želja za odlaskom kući",
+     "say": "Nedostaje ti tvoj dom. Reci mi šta je tamo bilo posebno lepo.",
+     "next": "Ponudite nešto poznato, kao što su čaj, mirna muzika ili foto-album.",
+     "why": "Ovaj trenutak je često više o bezbednosti i poznatosti nego o stvarnoj lokaciji. Protivrečenje može stvoriti dodatni pritisak.",
+     "avoid": "Pa kod kuće si."
+    },
+    {
+     "id": "repeat",
+     "title": "Isto pitanje se stalno ponavlja",
+     "say": "Hoćeš da znaš kada krećemo. Reći ću ti na vreme.",
+     "next": "Napišite odgovor jasno na papiru i pokažite na njega kada pitanje ponovo bude postavljeno.",
+     "why": "Odgovor možda nije ostao u pamćenju. Smirena, dosledna rečenica pruža orijentaciju bez izazivanja krivice.",
+     "avoid": "Već sam ti to rekao pet puta."
+    },
+    {
+     "id": "wash",
+     "title": "Tuširanje se odbija",
+     "say": "Hoćeš li se prvo osvežiti kod lavaboa ili se kasnije istuširati?",
+     "next": "Unapred zagrejte sobu i pripremite peškir i odeću na vidljivom mestu.",
+     "why": "Lična nega može delovati nepoznato ili preteće. Mali izbor pomaže u očuvanju kontrole i dostojanstva.",
+     "avoid": "Moraš sada da se istuširaš."
+    },
+    {
+     "id": "evening",
+     "title": "Nemir počinje uveče",
+     "say": "Upravo postaje nemirno. Ostaću s tobom i zajedno ćemo ovde malo smiriti stvari.",
+     "next": "Isključite jarka svetla i televizor i ponudite poznatu, mirnu aktivnost.",
+     "why": "Uveče, umor, senke i mnogi stimulusi mogu povećati nesigurnost. Orijentacija i mir često pomažu više nego pritisak.",
+     "avoid": "Konačno moraš sada da spavaš."
+    },
+    {
+     "id": "keys",
+     "title": "Ključevi ili novac su nestali",
+     "say": "Tražiš svoje ključeve. Hajde da pogledamo zajedno na uobičajenim mestima.",
+     "next": "Mirno proverite dva poznata mesta na kojima stvari obično stoje, a zatim ponudite pauzu.",
+     "why": "Zajedničko traženje ozbiljno shvata osećaje i izbegava krivicu.",
+     "avoid": "Opet si ih izgubio."
+    },
+    {
+     "id": "accuse",
+     "title": "Optužuju me za krađu",
+     "say": "Brineš zbog svog novca. Pogledaćemo zajedno.",
+     "next": "Priznajte zabrinutost i ukratko tražite zajedno na poznatom mestu.",
+     "why": "Briga deluje stvarno. Odbrana može delovati kao dodatni otpor.",
+     "avoid": "Kakva glupost, ne kradem."
+    },
+    {
+     "id": "eat",
+     "title": "Hrana je odbijena",
+     "say": "Da li želiš nekoliko kašika supe ili malo hleba?",
+     "next": "Ponudite malu porciju i samo dve poznate opcije.",
+     "why": "Mali i pregledan izbor manje opterećuje.",
+     "avoid": "Moraš nešto da pojedeš."
+    },
+    {
+     "id": "drink",
+     "title": "Zaboravlja da pije",
+     "say": "Popiću čašu sa tobom. Hoćeš li vodu ili čaj?",
+     "next": "Stavite omiljenu, jasno vidljivu čašu na dohvat ruke i popijte gutljaj zajedno.",
+     "why": "Raditi stvari zajedno i napraviti jednostavan izbor stvara manji pritisak.",
+     "avoid": "Danas si popio premalo."
+    },
+    {
+     "id": "night",
+     "title": "Osoba ustaje noću",
+     "say": "Još je noć. Ovde sam i kratko ću te pratiti.",
+     "next": "Koristite prigušeno svetlo, pratite do toaleta i zatim nazad u krevet.",
+     "why": "Smirena orijentacija pruža sigurnost bez započinjanja svađe.",
+     "avoid": "Odmah legni nazad."
+    },
+    {
+     "id": "dress",
+     "title": "Odbijeno oblačenje",
+     "say": "Hoćeš li plavi ili sivi džemper?",
+     "next": "Pripremite dva odgovarajuća komada odeće tako da se jasno vide i dajte osobi dovoljno vremena.",
+     "why": "Dve vidljive opcije smanjuju odluke i čuvaju samoodređenje.",
+     "avoid": "Ne možeš da ostaneš u pidžami."
+    },
+    {
+     "id": "work",
+     "title": "Osoba želi da ide na posao",
+     "say": "Na tebe se uvek mogu osloniti. Pre nego što odeš, hoćeš li mi malo pomoći ovde?",
+     "next": "Ponudite smislen zadatak koji odgovara ranijem zanimanju, na primer razvrstavanje papira, popravku nečega ili postavljanje stola.",
+     "why": "Posao je često davao svrhu, strukturu i priznanje. Iza te želje često stoji potreba da osoba bude potrebna.",
+     "avoid": "Pa ti si već odavno u penziji."
+    },
+    {
+     "id": "car",
+     "title": "Osoba želi sama da vozi automobil",
+     "say": "Želiš da voziš, razumem te. Danas vozim ja, a ti mi pokazuješ put.",
+     "next": "Ponudite specifičnu sigurnu opciju putovanja i, ako je potrebno, stavite ključeve izvan vidokruga.",
+     "why": "Potreba za nezavisnošću je razumljiva; alternativa smanjuje gubitak ugleda.",
+     "avoid": "Ti više ne možeš da voziš."
+    },
+    {
+     "id": "recognize",
+     "title": "Osoba me ne prepoznaje",
+     "say": "Danas sam tu za tebe. Uz tebe sam.",
+     "next": "Mirno recite svoje ime, držite malo razmaka i razgovarajte o nečemu poznatom umesto da objašnjavate odnos.",
+     "why": "Kada vas ne prepoznaju, to boli, ali to nije odbacivanje. Toplina i mir pružaju sigurnost bez proveravanja pamćenja.",
+     "avoid": "Pa moraš znati ko sam ja."
+    },
+    {
+     "id": "anger",
+     "title": "Osoba na mene viče",
+     "say": "Ostaviću te malo na miru. Ostajem u blizini.",
+     "next": "Smanjite buku, držite bezbednu udaljenost i ponovo govorite tek kada napetost popusti.",
+     "why": "Pravite sigurnu udaljenost i u isto vreme prenosite smireno prisustvo.",
+     "avoid": "Sada se konačno smiri."
+    },
+    {
+     "id": "daycare",
+     "title": "Dnevni boravak se odbija",
+     "say": "Odvešću te tamo i kasnije ću opet doći po tebe. Na to možeš da se osloniš.",
+     "next": "Neka oproštaj bude kratak i ljubazan, recite vreme preuzimanja i zamolite tim za poznat doček.",
+     "why": "Iza odbijanja često stoji strah od novog ili od napuštanja. Čvrsto obećanje povratka daje sigurnost.",
+     "avoid": "Moraš da ideš, i meni treba malo mira."
+    }
+   ]
+  },
+  "sv": {
+   "heading": "Vanliga situationer och vad som hjälper",
+   "labels": {
+    "say": "Det här kan du säga",
+    "next": "Vad du kan göra",
+    "why": "Vad som ligger bakom",
+    "avoid": "Hellre inte:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Vill åka hem",
+     "say": "Du saknar ditt hem. Berätta vad som var speciellt vackert där.",
+     "next": "Erbjud något bekant, som te, lugn musik eller ett fotoalbum.",
+     "why": "Detta ögonblick handlar ofta mer om säkerhet och det välbekanta än den faktiska platsen. Att säga emot kan skapa ytterligare press.",
+     "avoid": "Du är ju hemma."
+    },
+    {
+     "id": "repeat",
+     "title": "Samma fråga dyker upp hela tiden",
+     "say": "Du vill veta när vi åker. Jag säger till i god tid.",
+     "next": "Skriv svaret tydligt på ett papper och peka på det när du får nästa fråga.",
+     "why": "Svaret kanske inte har fastnat i minnet. En lugn mening som alltid är densamma ger orientering utan att väcka skuldkänslor.",
+     "avoid": "Jag har redan sagt det till dig fem gånger."
+    },
+    {
+     "id": "wash",
+     "title": "Dusch vägras",
+     "say": "Vill du fräscha upp dig vid handfatet först eller ta en dusch senare?",
+     "next": "Värm upp rummet i förväg och lägg fram handduken och kläderna på en synlig plats.",
+     "why": "Personlig vård kan kännas främmande eller hotfull. Ett litet val hjälper till att bevara kontroll och värdighet.",
+     "avoid": "Du måste ta en dusch nu."
+    },
+    {
+     "id": "evening",
+     "title": "Oro börjar på kvällen",
+     "say": "Det börjar bara bli oroligt. Jag stannar hos dig och vi gör det lite lugnare här.",
+     "next": "Släck starka lampor och TV:n och erbjud en välbekant, tyst aktivitet.",
+     "why": "På kvällen kan trötthet, skuggor och många stimuli öka osäkerheten. Orientering och lugn hjälper ofta mer än press.",
+     "avoid": "Du måste äntligen sova nu."
+    },
+    {
+     "id": "keys",
+     "title": "Nycklar eller pengar har försvunnit",
+     "say": "Du letar efter dina nycklar. Låt oss titta tillsammans på de vanliga ställena.",
+     "next": "Kontrollera lugnt två välbekanta ställen där sakerna brukar ligga och erbjud sedan en paus.",
+     "why": "Att söka tillsammans tar känslan på allvar och undviker skuld.",
+     "avoid": "Nu har du tappat bort dem igen."
+    },
+    {
+     "id": "accuse",
+     "title": "Jag är anklagad för stöld",
+     "say": "Du är orolig för dina pengar. Vi tittar tillsammans.",
+     "next": "Bekräfta oron och leta kort tillsammans på en välkänd plats.",
+     "why": "Oro känns verklig. Försvar kan verka som ytterligare motstånd.",
+     "avoid": "Vilket nonsens, jag stjäl inte."
+    },
+    {
+     "id": "eat",
+     "title": "Mat avböjs",
+     "say": "Vill du ha några skedar soppa eller lite bröd?",
+     "next": "Erbjud en liten portion och endast två välbekanta alternativ.",
+     "why": "Små, hanterbara val verkar mindre överväldigande.",
+     "avoid": "Du måste äta något."
+    },
+    {
+     "id": "drink",
+     "title": "Glömmer att dricka",
+     "say": "Jag tar ett glas med dig. Vill du ha vatten eller te?",
+     "next": "Placera ett favoritglas, tydligt synligt, inom räckhåll och ta en klunk tillsammans.",
+     "why": "Att göra saker tillsammans och göra ett enkelt val skapar mindre tryck.",
+     "avoid": "Du har druckit alldeles för lite i dag."
+    },
+    {
+     "id": "night",
+     "title": "Personen går upp på natten",
+     "say": "Det är fortfarande natt. Jag är här och följer dig en stund.",
+     "next": "Använd dämpad belysning, följ med till toaletten och tillbaka till sängen.",
+     "why": "Lugn orientering ger trygghet utan att starta ett gräl.",
+     "avoid": "Lägg dig igen med en gång."
+    },
+    {
+     "id": "dress",
+     "title": "Påklädning nekas",
+     "say": "Vill du ha den blå eller den grå tröjan?",
+     "next": "Lägg fram två passande klädesplagg så att de syns och ge personen gott om tid.",
+     "why": "Två synliga alternativ minskar beslut och bevarar självbestämmande.",
+     "avoid": "Du kan inte stanna i pyjamas."
+    },
+    {
+     "id": "work",
+     "title": "Personen vill gå till jobbet",
+     "say": "Du är alltid så pålitlig. Innan du går, kan du hjälpa mig här en stund?",
+     "next": "Erbjud en meningsfull uppgift som passar det tidigare yrket, till exempel att sortera papper, laga något eller duka bordet.",
+     "why": "Arbetet gav ofta en uppgift, struktur och uppskattning. Bakom önskan ligger ofta ett behov av att känna sig behövd.",
+     "avoid": "Du har ju varit pensionär länge."
+    },
+    {
+     "id": "car",
+     "title": "Personen vill köra bilen själv",
+     "say": "Du vill köra själv, det förstår jag. I dag kör jag, och du visar vägen.",
+     "next": "Erbjud ett specifikt säkert resealternativ och lägg nycklar utom synhåll om det behövs.",
+     "why": "Behovet av oberoende är förståeligt; ett alternativ minskar ansiktsförlusten.",
+     "avoid": "Du kan inte köra längre."
+    },
+    {
+     "id": "recognize",
+     "title": "Personen känner inte igen mig",
+     "say": "I dag är jag här för dig. Du är inte ensam.",
+     "next": "Säg lugnt ditt namn, håll lite avstånd och prata om något välbekant i stället för att förklara er relation.",
+     "why": "Det gör ont att inte bli igenkänd, men det är inget avvisande. Värme och lugn ger trygghet utan att pröva minnet.",
+     "avoid": "Du måste ju veta vem jag är."
+    },
+    {
+     "id": "anger",
+     "title": "Personen skriker på mig",
+     "say": "Jag låter dig vara i fred en stund. Jag stannar i närheten.",
+     "next": "Minska buller, håll ett säkert avstånd, och tala endast igen när spänningen har lagt sig.",
+     "why": "Du skapar ett säkert avstånd och förmedlar samtidigt en lugn närvaro.",
+     "avoid": "Nu får du lugna ner dig."
+    },
+    {
+     "id": "daycare",
+     "title": "Dagverksamheten avvisas",
+     "say": "Jag följer dig dit och hämtar dig igen senare. Det kan du lita på.",
+     "next": "Håll avskedet kort och vänligt, säg när du hämtar och be personalen om ett välbekant mottagande.",
+     "why": "Bakom vägran finns ofta rädsla för det nya eller för att bli lämnad ensam. Ett fast löfte om att bli hämtad ger trygghet.",
+     "avoid": "Du måste dit, jag behöver också lugn och ro."
+    }
+   ]
+  },
+  "th": {
+   "heading": "สถานการณ์ที่พบบ่อยและสิ่งที่ช่วยได้",
+   "labels": {
+    "say": "คุณพูดได้ว่า",
+    "next": "สิ่งที่คุณสามารถทำได้",
+    "why": "เบื้องหลังคืออะไร",
+    "avoid": "ไม่ควรพูดว่า:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "อยากกลับบ้าน",
+     "say": "คุณคิดถึงบ้านของคุณ บอกฉันว่าสิ่งใดสวยเป็นพิเศษที่นั่น",
+     "next": "เสนอสิ่งที่คุ้นเคย เช่น ชา เพลงสงบ หรืออัลบั้มรูปภาพ",
+     "why": "ช่วงเวลานี้มักเกี่ยวกับความปลอดภัยและความคุ้นเคยมากกว่าตำแหน่งที่แท้จริง การโต้แย้งอาจสร้างแรงกดดันเพิ่มเติม",
+     "avoid": "ก็คุณอยู่ที่บ้านแล้วนี่"
+    },
+    {
+     "id": "repeat",
+     "title": "คำถามเดียวกันยังคงถูกถามซ้ำ",
+     "say": "อยากรู้ว่าเราจะออกเดินทางเมื่อไหร่ใช่ไหม เดี๋ยวฉันบอกล่วงหน้านะ",
+     "next": "เขียนคำตอบให้ชัดเจนบนกระดาษและชี้ไปที่มันเมื่อถามคำถามถัดไป",
+     "why": "คำตอบอาจไม่ได้ถูกจดจำไว้ ประโยคที่สงบและเหมือนเดิมทุกครั้งช่วยให้รู้ทิศทางโดยไม่สร้างความรู้สึกผิด",
+     "avoid": "ฉันบอกคุณไปแล้วห้าครั้ง"
+    },
+    {
+     "id": "wash",
+     "title": "การอาบน้ำถูกปฏิเสธ",
+     "say": "คุณอยากล้างหน้าแต่งตัวที่อ่างล้างหน้าก่อนหรืออาบน้ำทีหลัง?",
+     "next": "อุ่นห้องก่อนและวางผ้าเช็ดตัวกับเสื้อผ้าในที่ที่มองเห็นได้",
+     "why": "การดูแลส่วนบุคคลอาจรู้สึกไม่คุ้นเคยหรือคุกคาม การเลือกเล็ก ๆ ช่วยรักษาการควบคุมและศักดิ์ศรี",
+     "avoid": "คุณต้องอาบน้ำตอนนี้"
+    },
+    {
+     "id": "evening",
+     "title": "อาการกระสับกระส่ายเริ่มในช่วงเย็น",
+     "say": "เริ่มรู้สึกวุ่นวายแล้ว ฉันจะอยู่กับคุณและเราจะทำให้ที่นี่สงบขึ้นเล็กน้อย",
+     "next": "ปิดไฟสว่างและโทรทัศน์และเสนอกิจกรรมเงียบที่คุ้นเคย",
+     "why": "ในตอนเย็น ความเหน็ดเหนื่อย เงามืด และสิ่งกระตุ้นหลายอย่างสามารถเพิ่มความรู้สึกไม่มั่นคง การชี้แนะแนวทางและความสงบมักช่วยได้มากกว่าความกดดัน",
+     "avoid": "คุณต้องนอนได้แล้วนะ"
+    },
+    {
+     "id": "keys",
+     "title": "กุญแจหรือเงินหายไป",
+     "say": "คุณกำลังหากุญแจของคุณ มาหามันด้วยกันในที่ที่คุ้นเคย",
+     "next": "ค่อยๆ ตรวจดูสองที่ที่คุ้นเคยซึ่งมักวางของไว้ แล้วเสนอให้พัก",
+     "why": "การค้นหาด้วยกันทำให้ความรู้สึกเป็นเรื่องสำคัญและหลีกเลี่ยงความรู้สึกผิด",
+     "avoid": "คุณทำมันหายอีกแล้ว"
+    },
+    {
+     "id": "accuse",
+     "title": "ฉันถูกกล่าวหาว่าขโมย",
+     "say": "คุณกังวลเกี่ยวกับเงินของคุณ เราจะดูด้วยกัน",
+     "next": "ยอมรับความกังวลและค้นหาสถานที่ที่คุ้นเคยด้วยกันอย่างสั้น ๆ",
+     "why": "ความกังวลรู้สึกจริง การป้องกันตัวอาจดูเหมือนการต่อต้านเพิ่มเติม",
+     "avoid": "เรื่องไร้สาระ ฉันไม่ได้ขโมย"
+    },
+    {
+     "id": "eat",
+     "title": "ปฏิเสธอาหาร",
+     "say": "คุณอยากตักซุปไม่กี่ช้อนหรือขนมปังบ้าง?",
+     "next": "เสนอเพียงส่วนเล็ก ๆ และมีทางเลือกที่คุ้นเคยเพียงสองอย่าง",
+     "why": "ตัวเลือกเล็ก ๆ ที่จัดการได้ดูเหมือนไม่หนักใจมาก",
+     "avoid": "คุณต้องกินอะไรสักหน่อย"
+    },
+    {
+     "id": "drink",
+     "title": "ลืมดื่มน้ำ",
+     "say": "ฉันจะดื่มแก้วหนึ่งกับคุณ คุณอยากดื่มน้ำหรือชา?",
+     "next": "วางแก้วโปรดที่มองเห็นได้ชัดในระยะเอื้อมถึงและจิบด้วยกัน",
+     "why": "การทำสิ่งต่าง ๆ ด้วยกันและการตัดสินใจง่าย ๆ สร้างความกดดันน้อยลง",
+     "avoid": "วันนี้คุณดื่มน้อยเกินไปมาก"
+    },
+    {
+     "id": "night",
+     "title": "บุคคลลุกขึ้นในเวลากลางคืน",
+     "say": "ยังเป็นกลางคืนอยู่ ฉันอยู่ที่นี่และจะอยู่กับคุณสักครู่",
+     "next": "ใช้แสงสลัว พาไปห้องน้ำ แล้วพากลับไปที่เตียง",
+     "why": "การช่วยให้เข้าใจสถานการณ์อย่างใจเย็นให้ความรู้สึกปลอดภัย โดยไม่เริ่มการโต้เถียง",
+     "avoid": "นอนลงทันที"
+    },
+    {
+     "id": "dress",
+     "title": "ปฏิเสธการแต่งตัว",
+     "say": "คุณต้องการเสื้อสเวตเตอร์สีน้ำเงินหรือสีเทา?",
+     "next": "เตรียมเสื้อผ้าที่เหมาะสมสองชิ้นวางไว้ให้เห็นชัด และให้เวลาเขาอย่างเพียงพอ",
+     "why": "ตัวเลือกที่มองเห็นได้สองตัวช่วยลดการตัดสินใจและรักษาการตัดสินใจด้วยตนเอง",
+     "avoid": "คุณไม่สามารถอยู่ในชุดนอนของคุณได้"
+    },
+    {
+     "id": "work",
+     "title": "บุคคลนั้นอยากไปทำงาน",
+     "say": "พึ่งพาคุณได้เสมอเลยนะ ก่อนไป ช่วยฉันตรงนี้สักครู่ได้ไหม",
+     "next": "ชวนทำงานที่มีความหมายและเข้ากับอาชีพเดิม เช่น จัดเรียงเอกสาร ซ่อมของเล็กน้อย หรือจัดโต๊ะอาหาร",
+     "why": "งานมักให้ทั้งบทบาท ความเป็นระเบียบ และการยอมรับ เบื้องหลังความต้องการนี้มักเป็นความต้องการรู้สึกว่าตนเองมีประโยชน์",
+     "avoid": "คุณเกษียณมานานแล้วนะ"
+    },
+    {
+     "id": "car",
+     "title": "บุคคลต้องการขับรถด้วยตัวเอง",
+     "say": "คุณอยากขับรถเอง ฉันเข้าใจนะ วันนี้ฉันขับเอง แล้วคุณช่วยบอกทางให้หน่อย",
+     "next": "เสนอทางเลือกการเดินทางที่ปลอดภัยและเฉพาะเจาะจง และหากจำเป็น ให้เก็บกุญแจไว้พ้นสายตา",
+     "why": "ความต้องการอิสระเป็นเรื่องที่เข้าใจได้; ทางเลือกอื่นช่วยลดความเสียหน้า",
+     "avoid": "คุณไม่สามารถขับรถได้อีกต่อไป"
+    },
+    {
+     "id": "recognize",
+     "title": "บุคคลนั้นจำฉันไม่ได้",
+     "say": "วันนี้ฉันอยู่ตรงนี้เพื่อคุณ คุณไม่ได้อยู่คนเดียว",
+     "next": "บอกชื่อของคุณอย่างใจเย็น เว้นระยะห่างเล็กน้อย และพูดถึงเรื่องที่คุ้นเคยแทนการอธิบายความสัมพันธ์",
+     "why": "การไม่ได้รับการจดจำเป็นเรื่องเจ็บปวด แต่ไม่ใช่การปฏิเสธ ความอบอุ่นและความสงบช่วยให้รู้สึกปลอดภัยโดยไม่ต้องทดสอบความจำ",
+     "avoid": "คุณต้องรู้สิว่าฉันเป็นใคร"
+    },
+    {
+     "id": "anger",
+     "title": "บุคคลตะโกนใส่ฉัน",
+     "say": "ฉันจะปล่อยให้อยู่เงียบๆ สักครู่นะ ฉันอยู่ใกล้ๆ นี่เอง",
+     "next": "ลดเสียงรบกวน รักษาระยะปลอดภัย และพูดต่อเมื่อความตึงเครียดลดลงแล้ว",
+     "why": "คุณสร้างระยะปลอดภัยและในเวลาเดียวกันส่งต่อความสงบในตัวเอง",
+     "avoid": "ตอนนี้สงบลงเสียที"
+    },
+    {
+     "id": "daycare",
+     "title": "ปฏิเสธการไปศูนย์ดูแลกลางวัน",
+     "say": "ฉันจะพาไปส่งและจะกลับมารับทีหลัง วางใจได้เลย",
+     "next": "บอกลาสั้น ๆ อย่างอ่อนโยน บอกเวลาที่จะมารับ และขอให้ทีมงานต้อนรับอย่างคุ้นเคย",
+     "why": "เบื้องหลังการปฏิเสธมักเป็นความกลัวสิ่งใหม่หรือกลัวถูกทิ้ง คำสัญญาที่แน่นอนว่าจะกลับมารับช่วยให้อุ่นใจ",
+     "avoid": "ต้องไปนะ ฉันก็ต้องการพักบ้างเหมือนกัน"
+    }
+   ]
+  },
+  "tr": {
+   "heading": "Sık yaşanan durumlar ve ne yardımcı olur",
+   "labels": {
+    "say": "Şunu söyleyebilirsiniz",
+    "next": "Yapabilecekleriniz",
+    "why": "Arkasında ne var",
+    "avoid": "Bunu söylemeyin:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Eve gitmek istemek",
+     "say": "Evini özlüyorsun. Orada özellikle neyin güzel olduğunu anlat bana.",
+     "next": "Tanıdık bir şey teklif edin, örneğin çay, sakin müzik veya bir fotoğraf albümü.",
+     "why": "Bu an genellikle asıl lokasyondan çok güvenlik ve tanıdıklık ile ilgilidir. Karşı çıkmak ek bir baskı yaratabilir.",
+     "avoid": "Ama evdesin."
+    },
+    {
+     "id": "repeat",
+     "title": "Aynı soru sürekli tekrar ediyor",
+     "say": "Ne zaman çıkacağımızı bilmek istiyorsun. Sana zamanında haber veririm.",
+     "next": "Cevabı bir kağıda net bir şekilde yazın ve sonraki soru sorulduğunda işaret edin.",
+     "why": "Cevap hafızada kalmamış olabilir. Sakin, hep aynı kalan bir cümle suçluluk duygusu yaratmadan yön gösterir.",
+     "avoid": "Bunu sana zaten beş kez söyledim."
+    },
+    {
+     "id": "wash",
+     "title": "Duş almayı reddediyor",
+     "say": "Önce lavabo başında ferahlamak mı istersin yoksa daha sonra duş almak mı?",
+     "next": "Odayı önceden ısıtın ve havlu ve giysileri görünür bir yere koyun.",
+     "why": "Kişisel bakım yabancı veya tehdit edici gelebilir. Küçük bir seçim kontrol ve onuru korumaya yardımcı olur.",
+     "avoid": "Şimdi duş almak zorundasın."
+    },
+    {
+     "id": "evening",
+     "title": "Huzursuzluk akşam başlar",
+     "say": "Sadece huzursuz olmaya başlıyor. Yanında kalacağım ve burayı biraz daha sakin hale getireceğiz.",
+     "next": "Parlak ışıkları ve televizyonu kapatın ve tanıdık, sessiz bir etkinlik sunun.",
+     "why": "Akşamları yorgunluk, gölgeler ve birçok uyaran güvensizlik duygusunu artırabilir. Yönlendirme ve sakinlik genellikle baskıdan daha çok yardımcı olur.",
+     "avoid": "Şimdi nihayet uyumak zorundasın."
+    },
+    {
+     "id": "keys",
+     "title": "Anahtarlar veya paralar kayboldu",
+     "say": "Anahtarlarını arıyorsun. Hadi birlikte her zamanki yerlere bakalım.",
+     "next": "Eşyaların genelde konduğu iki tanıdık yere sakince bakın ve ardından mola teklif edin.",
+     "why": "Birlikte arama yaparken duyguya önem verilir ve suçluluk hissinden kaçınılır.",
+     "avoid": "Onları yine kaybettin."
+    },
+    {
+     "id": "accuse",
+     "title": "Hırsızlıkla suçlanıyorum",
+     "say": "Paran için endişeleniyorsun. Birlikte bakacağız.",
+     "next": "Endişeyi kabul edin ve birlikte tanıdık bir yerde kısa bir arama yapın.",
+     "why": "Endişe gerçek gibi hissediliyor. Savunma, daha fazla direnç gibi görünebilir.",
+     "avoid": "Ne saçmalık, ben hırsızlık yapmıyorum."
+    },
+    {
+     "id": "eat",
+     "title": "Yemeği reddediyor",
+     "say": "Birkaç kaşık çorba mı yoksa biraz ekmek mi istersin?",
+     "next": "Küçük bir porsiyon ve sadece iki tanıdık seçenek sunun.",
+     "why": "Küçük, yönetilebilir seçenekler daha az göz korkutucu görünür.",
+     "avoid": "Bir şeyler yemek zorundasın."
+    },
+    {
+     "id": "drink",
+     "title": "İçmeyi unutuyor",
+     "say": "Seninle bir bardak içeceğim. Su mu istersin, çay mı?",
+     "next": "Sevdiği, iyi görünen bir bardağı uzanabileceği bir yere koyun ve birlikte bir yudum için.",
+     "why": "Birlikte bir şeyler yapmak ve basit bir seçim yapmak daha az baskı yaratır.",
+     "avoid": "Bugün çok az içtin."
+    },
+    {
+     "id": "night",
+     "title": "Kişi gece kalkıyor",
+     "say": "Hâlâ gece. Buradayım ve kısa bir süre seninle olacağım.",
+     "next": "Loş ışık kullanın, tuvalete eşlik edin ve sonra tekrar yatağa dönün.",
+     "why": "Sakin yönlendirme, tartışmayı başlatmadan güvenlik sağlar.",
+     "avoid": "Hemen tekrar uzan."
+    },
+    {
+     "id": "dress",
+     "title": "Giyinmeyi reddediyor",
+     "say": "Mavi mi yoksa gri kazak mı istersin?",
+     "next": "İki uygun giysiyi görünür bir yere hazırlayın ve kişiye yeterince zaman tanıyın.",
+     "why": "İki görünür seçenek kararları azaltır ve öz belirlemeyi korur.",
+     "avoid": "Pijamayla kalamazsın."
+    },
+    {
+     "id": "work",
+     "title": "Kişi işe gitmek istiyor",
+     "say": "Sana her zaman güvenilir. Gitmeden önce bana burada biraz yardım eder misin?",
+     "next": "Eski mesleğe uyan anlamlı bir görev önerin, örneğin kâğıtları ayırmak, bir şeyi tamir etmek ya da sofrayı kurmak.",
+     "why": "İş çoğu zaman bir görev, düzen ve takdir sağlardı. Bu isteğin ardında çoğu zaman işe yaradığını hissetme ihtiyacı vardır.",
+     "avoid": "Sen zaten çoktan emekli oldun."
+    },
+    {
+     "id": "car",
+     "title": "Kişi arabayı kendisi sürmek istiyor",
+     "say": "Kendin sürmek istiyorsun, anlıyorum. Bugün ben süreyim, sen de bana yolu göster.",
+     "next": "Belirli güvenli bir seyahat seçeneği teklif edin ve gerekirse anahtarları gözden uzak bir yere koyun.",
+     "why": "Bağımsızlık ihtiyacı anlaşılabilir; bir alternatif itibar kaybını azaltır.",
+     "avoid": "Artık araba süremezsin."
+    },
+    {
+     "id": "recognize",
+     "title": "Kişi beni tanımıyor",
+     "say": "Bugün senin için buradayım. Yalnız değilsin.",
+     "next": "Adınızı sakince söyleyin, biraz mesafe bırakın ve ilişkinizi açıklamak yerine tanıdık bir şeyden söz edin.",
+     "why": "Tanınmamak acı verir ama bu bir reddediliş değildir. Sıcaklık ve sakinlik, hafızayı sınamadan güven verir.",
+     "avoid": "Kim olduğumu bilmen lazım."
+    },
+    {
+     "id": "anger",
+     "title": "Kişi bana bağırıyor",
+     "say": "Seni biraz yalnız bırakıyorum. Yakınında olacağım.",
+     "next": "Gürültüyü azaltın, güvenli bir mesafe koruyun ve sadece gerginlik azaldığında tekrar konuşun.",
+     "why": "Güvenli bir mesafe oluşturuyorsunuz ve aynı zamanda sakin bir varlık iletiyorsunuz.",
+     "avoid": "Şimdi artık sakinleş."
+    },
+    {
+     "id": "daycare",
+     "title": "Gündüz bakım merkezi reddediliyor",
+     "say": "Seni oraya götüreceğim ve sonra yine alacağım. Buna güvenebilirsin.",
+     "next": "Vedalaşmayı kısa ve sıcak tutun, alma saatini söyleyin ve ekipten tanıdık bir karşılama isteyin.",
+     "why": "Reddin ardında çoğu zaman yeni şeylerden ya da yalnız bırakılmaktan duyulan korku vardır. Geri alınacağına dair net bir söz güven verir.",
+     "avoid": "Gitmek zorundasın, benim de biraz huzura ihtiyacım var."
+    }
+   ]
+  },
+  "uk": {
+   "heading": "Поширені ситуації і що допомагає",
+   "labels": {
+    "say": "Можна сказати",
+    "next": "Що ви можете зробити",
+    "why": "Що за цим стоїть",
+    "avoid": "Краще не казати:"
+   },
+   "situations": [
+    {
+     "id": "home",
+     "title": "Бажання піти додому",
+     "say": "Ти сумуєш за своїм домом. Розкажи, що там було особливо гарного.",
+     "next": "Запропонуйте щось знайоме, наприклад чай, спокійну музику або фотоальбом.",
+     "why": "Цей момент часто більше про безпеку та знайоме оточення, ніж про фактичне місцезнаходження. Заперечення може створювати додатковий тиск.",
+     "avoid": "Ти ж удома."
+    },
+    {
+     "id": "repeat",
+     "title": "Те саме питання повторюється знову й знову",
+     "say": "Ти хочеш знати, коли ми поїдемо. Я скажу тобі заздалегідь.",
+     "next": "Напишіть відповідь чітко на аркуші паперу і покажіть її, коли зададуть наступне питання.",
+     "why": "Відповідь могла не зберегтися в пам’яті. Спокійне, незмінне речення дає орієнтацію, не викликаючи почуття провини.",
+     "avoid": "Я вже говорив тобі це п’ять разів."
+    },
+    {
+     "id": "wash",
+     "title": "Відмова від душу",
+     "say": "Хочеш спершу освіжитися біля умивальника чи пізніше прийняти душ?",
+     "next": "Попередньо нагрійте кімнату і викладіть рушник та одяг у видимому місці.",
+     "why": "Догляд за тілом може відчуватися незнайомим або загрозливим. Малий вибір допомагає зберегти контроль і гідність.",
+     "avoid": "Тобі потрібно зараз прийняти душ."
+    },
+    {
+     "id": "evening",
+     "title": "Неспокій починається увечері",
+     "say": "Стає трохи неспокійно. Я залишуся з тобою, і ми зробимо тут трохи тихіше.",
+     "next": "Вимкніть яскраве світло та телевізор і запропонуйте знайоме, тихе заняття.",
+     "why": "Ввечері втома, тіні та багато стимулів можуть збільшувати невпевненість. Орієнтація та спокій часто допомагають більше, ніж тиск.",
+     "avoid": "Тобі нарешті потрібно зараз спати."
+    },
+    {
+     "id": "keys",
+     "title": "Ключі або гроші зникли",
+     "say": "Ти шукаєш свої ключі. Давай пошукаємо разом у звичних місцях.",
+     "next": "Спокійно перевірте два знайомі місця, куди зазвичай кладуть речі, а потім запропонуйте перерву.",
+     "why": "Спільний пошук серйозно ставиться до почуттів і уникає почуття провини.",
+     "avoid": "Ти знову їх загубив."
+    },
+    {
+     "id": "accuse",
+     "title": "Мене звинувачують у крадіжці",
+     "say": "Ти хвилюєшся за свої гроші. Ми подивимося разом.",
+     "next": "Визнайте занепокоєння та коротко пошукайте разом у знайомому місці.",
+     "why": "Тривога відчувається справжньою. Виправдання можуть сприйматися як ще більший опір.",
+     "avoid": "Яка нісенітниця, я нічого не краду."
+    },
+    {
+     "id": "eat",
+     "title": "Відмова від їжі",
+     "say": "Хочеш кілька ложок супу чи краще трохи хліба?",
+     "next": "Пропонуйте невелику порцію і лише два знайомі варіанти.",
+     "why": "Невеликий і зрозумілий вибір менше перевантажує.",
+     "avoid": "Тобі потрібно щось з'їсти."
+    },
+    {
+     "id": "drink",
+     "title": "Забуває пити",
+     "say": "Я вип’ю з тобою склянку. Ти хочеш воду чи чай?",
+     "next": "Поставте улюблений, добре видимий стакан у межах досяжності та випийте разом.",
+     "why": "Спільні дії та простий вибір створюють менше тиску.",
+     "avoid": "Ти сьогодні випив занадто мало."
+    },
+    {
+     "id": "night",
+     "title": "Людина встає вночі",
+     "say": "Ще ніч. Я тут і трохи побуду з тобою.",
+     "next": "Використовуйте тьмяне освітлення, супроводжуйте до туалету, а потім назад у ліжко.",
+     "why": "Спокійна орієнтація забезпечує безпеку без початку суперечки.",
+     "avoid": "Негайно лягай назад."
+    },
+    {
+     "id": "dress",
+     "title": "Відмова від одягання",
+     "say": "Ти хочеш синій чи сірий светр?",
+     "next": "Підготуйте на видному місці два підходящі предмети одягу й дайте людині достатньо часу.",
+     "why": "Два видимі варіанти зменшують кількість рішень і зберігають самовизначення.",
+     "avoid": "Ти не можеш залишатися в піжамі."
+    },
+    {
+     "id": "work",
+     "title": "Людина хоче піти на роботу",
+     "say": "На тебе завжди можна покластися. Перед виходом допоможеш мені тут трохи?",
+     "next": "Запропонуйте змістовну справу, пов’язану з колишньою професією, наприклад розібрати папери, щось полагодити чи накрити на стіл.",
+     "why": "Робота часто давала мету, порядок і визнання. За цим бажанням часто стоїть потреба приносити користь.",
+     "avoid": "Ти ж давно на пенсії."
+    },
+    {
+     "id": "car",
+     "title": "Людина хоче керувати автомобілем самостійно",
+     "say": "Ти хочеш сісти за кермо, я розумію. Сьогодні поведу я, а ти підказуй мені дорогу.",
+     "next": "Пропонуйте конкретний безпечний варіант подорожі і, якщо потрібно, приберіть ключі з поля зору.",
+     "why": "Потреба в незалежності зрозуміла; альтернатива зменшує втрату обличчя.",
+     "avoid": "Ти більше не можеш водити."
+    },
+    {
+     "id": "recognize",
+     "title": "Людина мене не впізнає",
+     "say": "Сьогодні я тут заради тебе. Я поруч.",
+     "next": "Спокійно назвіть своє ім’я, тримайтеся на невеликій відстані й говоріть про щось знайоме, а не пояснюйте, ким ви доводитеся.",
+     "why": "Коли вас не впізнають, це боляче, але це не відторгнення. Тепло й спокій дають відчуття безпеки, не перевіряючи пам’ять.",
+     "avoid": "Ти ж знаєш, хто я."
+    },
+    {
+     "id": "anger",
+     "title": "Людина кричить на мене",
+     "say": "Я ненадовго залишу тебе в спокої. Я буду поруч.",
+     "next": "Зменшіть шум, тримайте безпечну дистанцію і говоріть знову лише після того, як напруженість спаде.",
+     "why": "Ви створюєте безпечну дистанцію і водночас передаєте спокійну присутність.",
+     "avoid": "Тепер нарешті заспокойся."
+    },
+    {
+     "id": "daycare",
+     "title": "Відмова ходити до денного центру",
+     "say": "Я проведу тебе туди й пізніше знову заберу. На це можеш покластися.",
+     "next": "Прощайтеся коротко й привітно, назвіть час, коли повернетеся, і попросіть працівників тепло зустріти людину.",
+     "why": "За відмовою часто стоїть страх перед новим або перед самотністю. Тверда обіцянка забрати дає опору.",
+     "avoid": "Тобі треба туди йти, мені теж потрібен спокій."
+    }
+   ]
+  }
+ }
+}
