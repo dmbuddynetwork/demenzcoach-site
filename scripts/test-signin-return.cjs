@@ -29,6 +29,8 @@ await mountInlineSignup(document.querySelector('#offer'),{bonus:3,en:false,purpo
         if(u.pathname==='/__signin-test.html')return r.fulfill({contentType:'text/html',body:harness});
         if(u.pathname==='/abo/web-auth.js')return r.fulfill({contentType:'text/javascript',body:authModule});
         if(u.pathname==='/abo/google-auth.js')return r.fulfill({contentType:'text/javascript',body:googleModule});
+        // Diese Fälle prüfen die Rückkehr nach dem E-Mail-Link im selben Tab; die Weiterleitung in den Funnel hat einen eigenen Test.
+        if(u.pathname==='/abo/abo-config.js'){const f=await r.fetch();return r.fulfill({response:f,body:(await f.text()).replace('funnelAfterEmail: true','funnelAfterEmail: false')});}
         if(u.hostname.endsWith('cloudfunctions.net')){
           if(r.request().method()==='OPTIONS')return r.fulfill({status:204});
           assert.ok(u.pathname.endsWith('/access'),'No automatic AI/other backend requests');

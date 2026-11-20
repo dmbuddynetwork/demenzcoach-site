@@ -11,7 +11,7 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
   }),
   // Anmeldung mit Apple erst anzeigen, wenn die Apple-Services-ID in Firebase eingerichtet ist (docs/WEB_CHECKOUT.md, Schritt 3).
   // Web sign-in uses email links. Enable emailLink only after provider/domain preflight; no SMS UI.
-  signIn: Object.freeze({ apple: false, emailLink: true, google: true, offerAfterAnswer: true }),
+  signIn: Object.freeze({ apple: false, emailLink: true, funnelAfterEmail: true, google: true, offerAfterAnswer: true }),
   // Server-side normal-answer introduction. Enable only after backend/auth readiness checks.
   // GrowthBook is evaluated on the backend, never trusted for browser entitlements.
   translatorGate: Object.freeze({
@@ -23,3 +23,11 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
   snapshotLinks: Object.freeze({ enabled: true, mode: 'auto' }),
   appStoreURL: "https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_abo&mt=8"
 });
+
+// Vorschau der Variante „Funnel als Layer von unten“: ?anmeldung=funnel merkt sich die Wahl in diesem Tab, ?anmeldung=standard löscht sie.
+// Ohne Parameter bleibt es bei der normalen Anmeldung. Die Adresse wird später vom Übersetzer bereinigt, deshalb schon hier lesen.
+try {
+  const choice = new URLSearchParams(location.search).get("anmeldung");
+  if (choice === "funnel") sessionStorage.setItem("demenzcoach.anmeldungVariante.v1", "funnel");
+  else if (choice === "standard") sessionStorage.removeItem("demenzcoach.anmeldungVariante.v1");
+} catch { /* Ohne Speicher bleibt die normale Anmeldung. */ }
