@@ -243,9 +243,8 @@
       const pictures = { mama: "v-umarmung.webp", papa: "papa.webp", partner: "paar.webp", grosseltern: "grosseltern.webp" };
       const short = { mama: "Mutter", papa: "Vater", partner: "Partner", grosseltern: "Oma oder Opa" };
       return [
-        el("h1", { class: "start-center", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Persönliche Hilfe für schwierige Alltagssituationen" }),
+        el("h1", { class: preset ? "start-center" : "start-center start-hero", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Tipps und Tricks zum Ausdrucken" }),
         typed ? el("p", { class: "start-typed", text: `Deine Frage: „${typed}“` }) : null,
-        el("p", { class: "start-lead start-center", text: `Wähle, wobei du Unterstützung brauchst · dauert etwa ${Math.max(2, Math.round(questions / 7))} Minuten` }),
         el("h2", { class: "start-question start-center", text: "Für wen suchst du Hilfe?" }),
         el("div", { class: "start-pics" }, relations.filter((item) => pictures[item.key]).map((item) => el("button", {
           type: "button", class: "start-pic", "aria-label": item.label, onclick: () => choose(item)
@@ -982,8 +981,9 @@
     });
     $("count").textContent = done ? "" : sections[index]?.title ?? "";
     $("back").style.visibility = ["relation", "email", "newsletter"].includes(name) ? "hidden" : "visible";
-    $("progress").hidden = done;
-    $("count").hidden = done;
+    // Wie bei BetterMe: auf der allerersten Seite weder Abschnittsname noch Fortschrittsleiste.
+    $("progress").hidden = done || name === "relation";
+    $("count").hidden = done || name === "relation";
     // Rechtliche Links (AGB, Datenschutz, Impressum, Widerruf, Kündigen) stehen auf jedem Schritt unten, klein.
     $("footer").hidden = false;
     restart.hidden = name === "relation" || directMode;
