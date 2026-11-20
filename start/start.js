@@ -891,7 +891,7 @@
     // Kasse als Fenster auf dieser Seite (kasse.js, wie BetterMe/Yazio). Ohne das Modul wie bisher die Seite /abo/.
     const kasse = window.DemenzKasse;
     if (!kasse || !config.firebase?.apiKey) {
-      location.href = `../abo/?plan=${plan}&src=${src}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
+      (window.top !== window ? window.top.location : location).href = `/abo/?plan=${plan}&src=${src}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
       return;
     }
     const deal = plan === "yearly" && offer.offers ? deals?.forCheckout() : null;

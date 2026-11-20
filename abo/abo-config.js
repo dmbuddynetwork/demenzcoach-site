@@ -24,10 +24,18 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
   appStoreURL: "https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_abo&mt=8"
 });
 
-// Vorschau der Variante „Funnel als Layer von unten“: ?anmeldung=funnel merkt sich die Wahl in diesem Tab, ?anmeldung=standard löscht sie.
-// Ohne Parameter bleibt es bei der normalen Anmeldung. Die Adresse wird später vom Übersetzer bereinigt, deshalb schon hier lesen.
+// A/B-Test „Anmeldung“ (Daniel, 20. Nov 2026), 50/50 pro Tab-Sitzung:
+//   standard = Anmelde-Layer, danach Weiterleitung in den Web-Funnel; funnel = der Web-Funnel selbst kommt als Layer von unten.
+// ?anmeldung=funnel / ?anmeldung=standard legt die Variante fest (Vorschau). Automatisierte Browser bekommen immer „standard“.
+// Die Adresse wird später vom Übersetzer bereinigt, deshalb schon hier lesen. Kein Cookie, nur sessionStorage; Messen nur mit Einwilligung.
 try {
+  const key = "demenzcoach.anmeldungVariante.v1";
   const choice = new URLSearchParams(location.search).get("anmeldung");
-  if (choice === "funnel") sessionStorage.setItem("demenzcoach.anmeldungVariante.v1", "funnel");
-  else if (choice === "standard") sessionStorage.removeItem("demenzcoach.anmeldungVariante.v1");
+  if (choice === "funnel" || choice === "standard") sessionStorage.setItem(key, choice);
+  else if (!sessionStorage.getItem(key)) sessionStorage.setItem(key, !navigator.webdriver && Math.random() < 0.5 ? "funnel" : "standard");
 } catch { /* Ohne Speicher bleibt die normale Anmeldung. */ }
+
+// Läuft der Funnel als Layer (A/B-Test), kommt Stripe mit der Adresse /abo/ zurück in den Rahmen. Dann den ganzen Tab dorthin bringen.
+try {
+  if (self !== top && location.pathname.startsWith("/abo/") && top.location.origin === location.origin) top.location.replace(location.href);
+} catch { /* Fremder Rahmen: nichts tun. */ }

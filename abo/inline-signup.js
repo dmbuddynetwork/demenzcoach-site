@@ -105,6 +105,10 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     onContinue() { if (purpose === 'account') void retryReturn?.(); else sheet?.close('continue'); },
     onLater: later
   });
+  if (purpose !== 'account') {
+    // Messen: welche Variante gezeigt wurde (nur mit Einwilligung, keine Nutzerdaten). Danach zählt der Funnel mit entry=layer bzw. anmeldung.
+    try { window.DemenzConsent?.track?.('signup_variant_shown', { experiment_id: 'web-signup-funnel-layer-v1', variation_id: wantsFunnelLayer() ? 1 : 0 }); } catch { /* ohne Einwilligung nichts */ }
+  }
   if (purpose === 'account') card.replaceWith(view);
   else if (wantsFunnelLayer()) {
     // A/B-Variante: der Web-Funnel selbst kommt als Layer von unten, nicht die Anmeldung.
