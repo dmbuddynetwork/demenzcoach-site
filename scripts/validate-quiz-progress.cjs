@@ -8,7 +8,7 @@ const base=process.env.SITE_URL||'http://127.0.0.1:54929';
   await c.route('**/*',r=>new URL(r.request().url()).origin===new URL(base).origin?r.continue():r.abort());
   const p=await c.newPage();p.setDefaultTimeout(6000);const errors=[];p.on('pageerror',e=>errors.push(e.message));
   await p.goto(base+'/start/?src=qa_progress');
-  for(let i=0;i<40;i++){
+  for(let i=0;i<60;i++){
    const state=await p.locator('body').getAttribute('data-screen');if(state==='building')break;
    assert.equal(await p.locator('.start-ready,.start-build,[role="timer"]').count(),0,`no extra progress on ${state}`);
    const options=p.locator('#screen .start-option');

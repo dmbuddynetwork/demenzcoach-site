@@ -31,6 +31,30 @@
 
   const data = window.DEMENZ_PLAN_DATA;
   const { relations, situations, frequencies, burdens, storageKey } = data;
+  // Zusätzliche Fragen (Daniel, 20. Nov 2026: Länge und Zwischenstopps wie BetterMe, die Länge ist bewusst: Investition).
+  // Nur Alltag und Gefühle, nichts Medizinisches, keine Diagnose, kein Stadium. Antworten bleiben im Browser.
+  const opt = (...labels) => labels.map((label, index) => ({ key: String(index), label }));
+  const extra = {
+    age: opt("Unter 40", "40 bis 49", "50 bis 59", "60 bis 69", "70 oder älter"),
+    personAge: opt("Unter 70", "70 bis 79", "80 bis 89", "90 oder älter"),
+    reaction: opt("Wird traurig und weint", "Wird laut oder wütend", "Zieht sich zurück", "Wird unruhig und läuft herum", "Fragt immer wieder dasselbe"),
+    visits: opt("Jeden Tag", "Ein paar Mal pro Woche", "Selten", "Fast nie"),
+    outings: opt("Jeden Tag", "Ein paar Mal pro Woche", "Nur mit Begleitung", "Kaum noch"),
+    meals: opt("Gut", "Muss ans Essen erinnert werden", "Lehnt Essen oft ab", "Will ständig essen"),
+    helpreact: opt("Nimmt die Hilfe an", "Wehrt ab", "Wird ärgerlich", "Ganz unterschiedlich"),
+    feeling: opt("Ich bin erschöpft", "Ich fühle mich schuldig", "Ich bin traurig", "Ich bin wütend", "Ich lasse es schnell los"),
+    sleep: opt("Gut", "Mal so, mal so", "Eher schlecht", "Kaum"),
+    breaks: opt("Jeden Tag", "Ein paar Mal pro Woche", "Selten", "Fast nie"),
+    work: opt("Vollzeit", "Teilzeit", "Ich bin in Rente", "Ich bin nicht berufstätig"),
+    when: opt("Morgens", "Mittags", "Nachmittags", "Abends"),
+    joy: opt("Ein ruhiger Abend", "Weniger Streit", "Mehr gemeinsames Lachen", "Weniger schlechtes Gewissen", "Mehr Kraft für mich"),
+    moments: opt("Aufstehen und Anziehen", "Waschen und Duschen", "Essen und Trinken", "Spazieren und Rausgehen", "Besuch und Telefon", "Abend und Schlafengehen", "Nachts"),
+    calms: opt("Musik und Lieder", "Alte Fotos", "Ein Spaziergang", "Etwas zu essen oder zu trinken", "Eine Berührung oder Umarmung", "Eine Aufgabe zum Helfen", "Ich weiß es noch nicht"),
+    helpers: opt("Familie", "Freunde oder Nachbarn", "Pflegedienst", "Tagespflege", "Ich mache fast alles allein"),
+    learn: opt("Kurze Sätze zum Nachsprechen", "Kleine Erklärungen", "Beispiele aus dem Alltag", "Zum Vorlesen oder Ausdrucken")
+  };
+  const singleNames = ["age", "personAge", "reaction", "visits", "outings", "meals", "helpreact", "feeling", "sleep", "breaks", "work", "when", "joy"];
+  const multiNames = ["moments", "calms", "helpers", "learn"];
   const requestedContext = params.get("s") || params.get("m") || "";
   const contextCandidate = window.DemenzSituationContext?.resolve(requestedContext) || null;
   // Invalid or excluded keys use the existing general entry, never an invented situation.
@@ -38,7 +62,9 @@
   const directContext = directMode ? contextCandidate : null;
 
   const answers = { relation: null, name: "", situation: null, frequency: null, dayTime: null, duration: null, living: null,
-    tries: [], goal: null, burden: null, minutes: null, email: "" };
+    tries: [], goal: null, burden: null, minutes: null, email: "",
+    age: null, personAge: null, reaction: null, visits: null, outings: null, meals: null, helpreact: null, feeling: null, sleep: null,
+    breaks: null, work: null, when: null, joy: null, moments: [], calms: [], helpers: [], learn: [] };
   let plan = "yearly";
   let offer = { yearly: 6999, monthly: 1299, currency: "eur", trialDays: 7, offers: null };
   // Willkommenspreis (angebot.js): Preis vom Server; die Gültigkeit prüft die Kasse erneut.
@@ -127,11 +153,21 @@
   // Vom Übersetzer (Angebotskarte): der zuletzt eingegebene Satz bleibt nur in diesem Tab und wird nur angezeigt.
   let typed = "";
   try { typed = String(sessionStorage.getItem("demenzCoachKiOffen") || "").slice(0, 120); } catch { /* */ }
-  const flow = ["relation", "name", ...(preset ? [] : ["situation"]), "frequency", "dayTime", "thanks", "duration", "living",
-    "tries", "insight", "goal", "burden", "minutes", "how", "building", "email", "newsletter", "result", "reveal", "plan"];
+  // Fünf Abschnitte wie BetterMe („Mein Profil“ bis „Fast geschafft“), dazwischen Zwischenstopps (Infoseiten).
+  const sectionDefs = [
+    { title: "Über euch", steps: ["relation", "name", "age", "personAge", "hello", "living", "duration", "situation"] },
+    { title: "Euer Alltag", steps: ["frequency", "dayTime", "thanks", "moments", "reaction", "feelings", "visits", "outings", "meals",
+      "helpreact", "calms", "tries", "insight"] },
+    { title: "Du selbst", steps: ["feeling", "sleep", "breaks", "helpers", "self", "work"] },
+    { title: "Dein Ziel", steps: ["goal", "burden", "hope", "minutes", "learn", "when", "content", "step"] },
+    { title: "Fast geschafft", steps: ["joy", "motivate", "how"] }
+  ].map((section) => ({ ...section, steps: section.steps.filter((step) => !(preset && step === "situation")) }));
+  const flow = [...sectionDefs.flatMap((section) => section.steps), "building", "email", "newsletter", "result", "reveal", "plan"];
   const answerFor = { relation: "relation", situation: "situation", frequency: "frequency", dayTime: "dayTime", duration: "duration",
-    living: "living", goal: "goal", burden: "burden", minutes: "minutes" };
-  const interstitials = ["thanks", "insight", "how", "building", "email", "newsletter", "result", "reveal", "plan"];
+    living: "living", goal: "goal", burden: "burden", minutes: "minutes",
+    ...Object.fromEntries(singleNames.map((name) => [name, name])) };
+  const interstitials = ["thanks", "insight", "how", "hello", "feelings", "self", "hope", "content", "step", "motivate",
+    "building", "email", "newsletter", "result", "reveal", "plan"];
   const isQuestion = (name) => !interstitials.includes(name);
   const questions = flow.filter(isQuestion).length;
   const stepNumber = (name) => flow.slice(0, flow.indexOf(name) + 1).filter(isQuestion).length;
@@ -145,7 +181,8 @@
   const progressContext = JSON.stringify([source, preset?.key || ""]);
   const choiceSets = { relation: relations, situation: situations, frequency: frequencies,
     dayTime: data.dayTimes, duration: data.durations, living: data.livings,
-    goal: data.goals, burden: burdens, minutes: data.minutes };
+    goal: data.goals, burden: burdens, minutes: data.minutes, ...Object.fromEntries(singleNames.map((name) => [name, extra[name]])) };
+  const multiSets = Object.fromEntries(multiNames.map((name) => [name, extra[name]]));
   const forgetProgress = () => { clearTimeout(progressExpiryTimer); try { sessionStorage.removeItem(progressKey); } catch { /* privates Fenster */ } };
   function saveProgress(screen) {
     if (directMode) return;
@@ -155,8 +192,9 @@
       if (items.includes(answers[key])) choices[key] = answers[key].key;
     }
     const tries = answers.tries.filter(item => data.tries.includes(item)).map(item => item.key);
+    const multi = Object.fromEntries(Object.entries(multiSets).map(([key, items]) => [key, answers[key].filter(item => items.includes(item)).map(item => item.key)]));
     try {
-      sessionStorage.setItem(progressKey, JSON.stringify({ version: 1, at: Date.now(), context: progressContext, screen, choices, tries }));
+      sessionStorage.setItem(progressKey, JSON.stringify({ version: 1, at: Date.now(), context: progressContext, screen, choices, tries, multi }));
       clearTimeout(progressExpiryTimer);
       progressExpiryTimer = setTimeout(forgetProgress, progressMaxAge);
     } catch { /* ohne Speicher normal weiter */ }
@@ -173,6 +211,7 @@
     for (const [key, items] of Object.entries(choiceSets)) answers[key] = items.find(item => item.key === saved.choices[key]) || null;
     if (preset) answers.situation = preset;
     answers.tries = data.tries.filter(item => saved.tries.includes(item.key));
+    for (const [key, items] of Object.entries(multiSets)) answers[key] = items.filter(item => Array.isArray(saved.multi?.[key]) && saved.multi[key].includes(item.key));
     answers.name = answers.relation?.call || "";
     // Ergebnis und Angebot brauchen eine E-Mail; diese wird im Checkpoint nicht gespeichert.
     const screen = flow.indexOf(saved.screen) >= flow.indexOf("building") ? "email" : saved.screen;
@@ -194,7 +233,7 @@
       return [
         el("h1", { class: "start-center", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Persönliche Hilfe für schwierige Alltagssituationen" }),
         typed ? el("p", { class: "start-typed", text: `Deine Frage: „${typed}“` }) : null,
-        el("p", { class: "start-lead start-center", text: `Wähle, wobei du Unterstützung brauchst · ${questions} kurze Fragen` }),
+        el("p", { class: "start-lead start-center", text: `Wähle, wobei du Unterstützung brauchst · dauert etwa ${Math.max(2, Math.round(questions / 7))} Minuten` }),
         el("h2", { class: "start-question start-center", text: "Für wen suchst du Hilfe?" }),
         el("div", { class: "start-pics" }, relations.filter((item) => pictures[item.key]).map((item) => el("button", {
           type: "button", class: "start-pic", "aria-label": item.label, onclick: () => choose(item)
@@ -309,6 +348,51 @@
     reveal: () => revealScreen(),
     plan: () => planScreen()
   };
+
+  // Weitere Fragen: Einzelauswahl geht sofort weiter, Mehrfachauswahl mit „Weiter“ (wie BetterMe).
+  const person = () => forWho() || "die Person";
+  const singleTitles = {
+    age: () => "Wie alt bist du?",
+    personAge: () => `Wie alt ist ${person()} ungefähr?`,
+    reaction: () => `Wie reagiert ${person()} meistens, wenn es schwierig wird?`,
+    visits: () => `Wie oft hat ${person()} Besuch oder Gesellschaft?`,
+    outings: () => `Geht ${person()} noch nach draußen?`,
+    meals: () => "Wie läuft das Essen meistens?",
+    helpreact: () => `Wie reagiert ${person()}, wenn du hilfst?`,
+    feeling: () => "Wie geht es dir nach einem schwierigen Moment?",
+    sleep: () => "Wie gut schläfst du gerade?",
+    breaks: () => "Wie oft hast du Zeit für dich?",
+    work: () => "Bist du berufstätig?",
+    when: () => "Wann hast du am ehesten Zeit?",
+    joy: () => "Stell dir vor, es klappt besser. Worüber freust du dich am meisten?"
+  };
+  for (const name of singleNames) {
+    screens[name] = () => [el("h1", { text: singleTitles[name]() }), optionList(extra[name], answers[name], pick(name, name))];
+  }
+  const multiTitles = {
+    moments: () => "Bei welchen Momenten ist es am schwersten?",
+    calms: () => `Was beruhigt ${person()} manchmal?`,
+    helpers: () => "Wer hilft dir im Alltag?",
+    learn: () => "Wie lernst du am liebsten?"
+  };
+  for (const name of multiNames) {
+    screens[name] = () => [el("h1", { text: multiTitles[name]() }), el("p", { class: "start-lead", text: "Du kannst mehreres wählen." }),
+      multiList(extra[name], answers[name]), next(name)];
+  }
+  // Zwischenstopps (Zeichnung, kurze Überschrift, zwei Sätze). Keine erfundenen Zahlen, Logos oder Zitate.
+  const infoPages = {
+    hello: ["together.webp", "Du bist nicht allein", "Viele Angehörige suchen jeden Tag nach den richtigen Worten. Mit jeder Antwort wird dein Plan genauer."],
+    feelings: ["schritt-zurueck.webp", "Erst das Gefühl, dann die Fakten", "Hinter vielen Sätzen steckt ein Gefühl: Angst, Sehnsucht oder der Wunsch, gebraucht zu werden. Dein Plan zeigt dir, was dahinter stecken könnte."],
+    self: ["pause-tochter.webp", "Auch du zählst", "Wer sich kümmert, braucht selbst Pausen. Dein Plan hat kleine Hilfen für dich, die nur wenige Minuten brauchen."],
+    hope: ["ruhig-abend.webp", "Wir helfen dir, ruhig zu bleiben", "Mit passenden Sätzen wird es leichter, nicht zu streiten. Du bekommst jeden Tag einen Moment mit Sätzen zum Sagen."],
+    content: ["words.webp", "So entstehen deine Sätze", "Die Sätze stammen aus unseren Übersetzer-Seiten. Sie sind ruhig, einfach und ohne Vorwurf. Dein Plan wählt die aus, die zu eurem Alltag passen."],
+    step: ["ruhig-hilfe.webp", "Kleine Schritte reichen", "Du musst nicht alles auf einmal ändern. Dein Plan gibt dir jeden Tag einen kleinen Schritt, der in wenigen Minuten klappt."],
+    motivate: ["v-garten.webp", "Denk an einen guten Moment", "Gab es zuletzt einen Augenblick, der leichter war? Ein Lächeln, ein Lied, ein gemeinsamer Tee. Darauf baut dein Plan auf."]
+  };
+  for (const [name, [image, title, text]] of Object.entries(infoPages)) {
+    screens[name] = () => [el("img", { class: "start-art", src: `../assets/zeichnungen/${image}`, width: "600", height: "600", alt: "" }),
+      el("h1", { text: title }), el("p", { text }), next(name)];
+  }
 
   // ---- E-Mail vor dem Ergebnis (wie BetterMe und Yazio: Pflicht, direkt nach „Plan wird erstellt“) ----------
   // Die Adresse bleibt in diesem Tab, bis jemand ein Abo startet (dann geht sie an Stripe für Bestätigung und Rechnung).
@@ -773,12 +857,9 @@
     footerObserver = new MutationObserver(placePrivacySettings);
     footerObserver.observe(document.body, { childList: true });
   }
-  const sections = [
-    { title: "Über euch", steps: ["relation", "name", "situation", "frequency", "dayTime", "thanks"] },
-    { title: "Euer Alltag", steps: ["duration", "living", "tries", "insight"] },
-    { title: "Dein Ziel", steps: ["goal", "burden", "minutes", "how"] }
-  ].map((section) => ({ ...section, steps: section.steps.filter((step) => flow.includes(step)) }));
+  const sections = sectionDefs;
   const bars = sections.map(() => el("span", {}, el("i")));
+  $("progress").style.setProperty("--sections", String(sections.length));
   $("progress").replaceChildren(...bars);
   // Schrittzähler ohne Einwilligung (Daniel, 19. Nov 2026): Der Server zählt nur Schritt und Tag hoch.
   // Nichts wird im Browser gespeichert, nichts wird als Kennung, Quelle oder Antwort gesendet.

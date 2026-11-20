@@ -21,7 +21,7 @@ body:has(.start-page) { min-height: 100vh; min-height: 100svh; display: flex; fl
 .start-back { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: var(--purple); cursor: pointer; padding: 0; }
 /* Wie BetterMe: Abschnittsname über drei Balken, ein Balken je Abschnitt. */
 .start-count { margin: 0 0 6px; text-align: center; color: var(--ink-2); font-size: var(--small); font-weight: 600; }
-.start-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 24px; }
+.start-progress { display: grid; grid-template-columns: repeat(var(--sections, 3), 1fr); gap: 6px; margin: 0 0 24px; }
 .start-progress > span { height: 6px; background: var(--lav); border-radius: 999px; overflow: hidden; }
 .start-progress i { display: block; height: 100%; width: 0; background: var(--purple); border-radius: 999px; transition: width .3s ease; }
 .start-center { text-align: center; }
