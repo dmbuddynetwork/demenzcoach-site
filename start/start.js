@@ -21,6 +21,7 @@
   };
   const source = (params.get("src") || params.get("utm_source") || guessSource()).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 30) || "ads";
   const config = window.DEMENZ_ABO_CONFIG || {};
+  if (params.get("embed") === "1") document.documentElement.classList.add("start-embedded");
 
   const svg = (paths) => `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
   const icons = {
@@ -890,7 +891,7 @@
     // Kasse als Fenster auf dieser Seite (kasse.js, wie BetterMe/Yazio). Ohne das Modul wie bisher die Seite /abo/.
     const kasse = window.DemenzKasse;
     if (!kasse || !config.firebase?.apiKey) {
-      location.href = `../abo/?plan=${plan}&src=${src}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
+      (window.top !== window ? window.top.location : location).href = `/abo/?plan=${plan}&src=${src}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
       return;
     }
     const deal = plan === "yearly" && offer.offers ? deals?.forCheckout() : null;
@@ -1037,6 +1038,12 @@
 
   // Direkt-Angebot (z. B. vom Üben): eine schon bestätigte Konto-Adresse aus diesem Tab übernehmen, wie BetterMe nach der Anmeldung.
   if (directMode) { try { const known = sessionStorage.getItem("demenzCoachEmail") || ""; if (validEmail(known)) answers.email = known; } catch { /* */ } }
+  // Nach dem Absenden der Anmeldung: einmal ein kurzer Hinweis, dass der Link per E-Mail unterwegs ist.
+  import("/abo/funnel-after-signup.js").then(({ consumeFunnelWelcome }) => {
+    if (!consumeFunnelWelcome() || !$("welcome")) return;
+    $("welcome").hidden = false;
+    $("welcome-close").addEventListener("click", () => { $("welcome").hidden = true; });
+  }).catch(() => {});
   const resumed = directMode ? "plan" : restoreProgress();
   history.replaceState({ screen: resumed }, "", location.href);
   render(resumed);
