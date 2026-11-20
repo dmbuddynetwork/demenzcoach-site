@@ -30,6 +30,16 @@
     for (const child of children.flat()) if (child !== undefined && child !== null && child !== false) node.append(child);
     return node;
   };
+  const svg = (path, size) => {
+    const node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    node.setAttribute('viewBox', '0 0 24 24'); node.setAttribute('width', size); node.setAttribute('height', size);
+    node.setAttribute('aria-hidden', 'true'); node.setAttribute('focusable', 'false');
+    node.innerHTML = path;
+    return node;
+  };
+  const chevronPath = '<path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>';
+  const checkPath = '<path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>';
+  const bulbPath = '<path fill="currentColor" d="M12 2.5a7 7 0 0 0-4.2 12.6c.6.5 1 1.2 1 2V18h6.4v-.9c0-.8.4-1.5 1-2A7 7 0 0 0 12 2.5ZM9 19.5h6v.6A1.9 1.9 0 0 1 13.1 22h-2.2A1.9 1.9 0 0 1 9 20.1v-.6Z"/>';
   const top = () => root.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
   const upper = (text) => text ? text[0].toLocaleUpperCase() + text.slice(1) : text;
   const shuffle = (list) => { const copy = [...list]; for (let i = copy.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; } return copy; };
@@ -153,9 +163,11 @@
     const feedback = state.feedback;
     if (!feedback || state.busy || state.done) return null;
     const good = feedback.rating === 'good';
-    return h('div', { class: `sim-feedback is-${feedback.rating}`, role: 'status' },
-      h('p', { class: 'sim-verdict', text: ui.verdict[feedback.rating] }),
-      good ? h('p', { text: feedback.why }) : h('p', {}, ui.better, ' ', h('q', { text: feedback.better })));
+    return h('div', { class: `sim-feedback ${good ? 'is-good' : 'is-hint'}`, role: 'status' },
+      h('span', { class: 'sim-fb-icon', 'aria-hidden': 'true' }, svg(good ? checkPath : bulbPath, 24)),
+      h('div', {},
+        h('p', { class: 'sim-verdict', text: ui.verdict[feedback.rating] }),
+        good ? h('p', { text: feedback.why }) : h('p', {}, ui.better, ' ', h('q', { text: feedback.better }))));
   };
 
   const personBubble = () => {
@@ -178,7 +190,13 @@
     form.addEventListener('submit', (event) => { event.preventDefault(); say(field.value); });
     return h('section', { class: 'sim-answer', 'aria-labelledby': 'sim-ask' },
       h('h2', { id: 'sim-ask', text: ui.ask }),
-      state.choices.map((choice) => h('button', { type: 'button', class: 'sim-choice', onclick: () => say(choice), text: choice })),
+      state.choices.map((choice, index) => {
+        const mark = 'ABC'[index];
+        return h('button', { type: 'button', class: 'sim-choice', 'aria-label': `${ui.answer} ${mark}: ${choice}`, onclick: () => say(choice) },
+          h('span', { class: 'sim-mark', 'aria-hidden': 'true', text: mark }),
+          h('span', { class: 'sim-choice-text', text: choice }),
+          svg(chevronPath, 20));
+      }),
       state.writing
         ? form
         : h('button', { type: 'button', class: 'sim-textbutton', text: ui.ownOpen, onclick: () => { state.writing = true; render(); root.querySelector('#sim-say')?.focus(); } }));
