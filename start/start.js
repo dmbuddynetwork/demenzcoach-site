@@ -1054,12 +1054,6 @@
 
   // Direkt-Angebot (z. B. vom Üben): eine schon bestätigte Konto-Adresse aus diesem Tab übernehmen, wie BetterMe nach der Anmeldung.
   if (directMode) { try { const known = sessionStorage.getItem("demenzCoachEmail") || ""; if (validEmail(known)) answers.email = known; } catch { /* */ } }
-  // Nach dem Absenden der Anmeldung: einmal ein kurzer Hinweis, dass der Link per E-Mail unterwegs ist.
-  import("/abo/funnel-after-signup.js").then(({ consumeFunnelWelcome }) => {
-    if (!consumeFunnelWelcome() || !$("welcome")) return;
-    $("welcome").hidden = false;
-    $("welcome-close").addEventListener("click", () => { $("welcome").hidden = true; });
-  }).catch(() => {});
   const resumed = directMode ? "plan" : restoreProgress();
   history.replaceState({ screen: resumed }, "", location.href);
   render(resumed);

@@ -44,13 +44,9 @@ await mountInlineSignup(document.querySelector('#offer'),{bonus:3,en:false,purpo
         await p.goto(`${preview.origin}/abo/konto.html?returnTo=${returnTo}&intent=signin`);
         await submit(p);
         await p.waitForURL(`${preview.origin}/start/?src=anmeldung`);
-        await p.locator('#welcome').waitFor({ state: 'visible' });
-        assert.match(await p.locator('#welcome').innerText(), /Anmeldelink ist unterwegs/);
+        await p.locator('#screen').waitFor(); assert.equal(await p.locator('#welcome').count(), 0, 'kein Zusatztext im Funnel');
         assert.equal(await p.evaluate(() => Boolean(localStorage.getItem('demenzcoach.emailLinkAttempt.v1'))), true, 'Anmeldeversuch bleibt für den E-Mail-Link gespeichert');
-        assert.equal(await p.evaluate(() => sessionStorage.getItem('demenzcoach.funnelWelcome.v1')), null, 'Hinweis wird nur einmal gezeigt');
         if (shots && name === 'Konto-Link') await p.screenshot({ path: path.join(shots, 'funnel-nach-anmeldung-handy.png') });
-        await p.reload(); await p.locator('#screen').waitFor();
-        assert.equal(await p.locator('#welcome').isVisible(), false, 'nach Neuladen kein Hinweis mehr');
         report.cases.push(name);
       } finally { await c.close(); }
     }
@@ -58,7 +54,7 @@ await mountInlineSignup(document.querySelector('#offer'),{bonus:3,en:false,purpo
     { const { c, p } = await open();
       try {
         await p.goto(preview.origin + '/__funnel-test.html'); await p.getByRole('dialog').waitFor(); await submit(p, 'Kostenlos freischalten');
-        await p.waitForURL(`${preview.origin}/start/?src=anmeldung`); await p.locator('#welcome').waitFor({ state: 'visible' }); report.cases.push('Übersetzer-Karte');
+        await p.waitForURL(`${preview.origin}/start/?src=anmeldung`); await p.locator('#screen').waitFor(); report.cases.push('Übersetzer-Karte');
       } finally { await c.close(); } }
     // 3 Kauf und Plan (/abo/) und englische Seiten: bleiben, kein Funnel.
     for (const [name, returnTo] of [['nach Kauf (abo)', '%2Fabo%2F&intent=link']]) {
