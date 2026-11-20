@@ -500,7 +500,7 @@ function translatorReturn() {
     const link = document.createElement("a");
     link.className = "abo-button";
     link.href = path;
-    link.textContent = "Zurück zum Übersetzer";
+    link.textContent = /gespraeche-ueben|practice-conversations/u.test(path) ? "Zurück zum Üben" : "Zurück zum Übersetzer";
     const first = $(section).querySelector(".abo-button");
     first?.classList.add("abo-button-light");
     $(section).insertBefore(link, first);

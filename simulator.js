@@ -1,7 +1,7 @@
 // Gespräche üben (Deutsch und Englisch). Ein Schritt pro Bildschirm:
 // 1. Situation wählen (Bild) oder eigene schreiben.  2. Die Person sagt etwas, du tippst einen von drei Sätzen an.
 // 3. Kurze Rückmeldung, die Person antwortet. Nach höchstens fünf Sätzen: Ende.
-// Ab dem zweiten Satz: kostenlose Anmeldung (siehe „Anmeldung“).
+// Ab dem zweiten Satz: kostenlose Anmeldung (siehe „Anmeldung“). Ab der zweiten Übung: Paywall (siehe „Paywall“).
 // Gesendet wird nur die Situation, der bisherige Verlauf und die Sprache. Der Server speichert nichts.
 // Statistik (nach Einwilligung) bekommt nur feste Wörter und Zahlen, nie eingetippte Texte.
 (() => {
@@ -57,7 +57,7 @@
     return best?.situation ?? null;
   };
 
-  const fresh = () => ({ person: null, turns: [], mood: 'unsure', round: 0, choices: [], feedback: null, busy: false, done: false, wrapUp: null, error: null, safety: null, offTopic: false, writing: false, good: 0, pending: null, tried: [], waiting: null });
+  const fresh = () => ({ person: null, turns: [], mood: 'unsure', round: 0, choices: [], feedback: null, busy: false, done: false, wrapUp: null, error: null, safety: null, offTopic: false, writing: false, good: 0, pending: null, tried: [], waiting: null, counted: false });
   const state = { view: 'home', showAll: false, session: 0, sit: null, ...fresh() };
 
   // ---------- Verbindung zur KI ----------
@@ -92,6 +92,7 @@
 
   // ---------- Ablauf ----------
   const begin = async (sit) => {
+    if (practicesDone() >= freePractices && !(await member())) return paywall();
     state.session += 1;
     const session = state.session;
     Object.assign(state, { view: 'scene', sit, ...fresh(), busy: true });
@@ -141,6 +142,7 @@
     if (result.kind === 'off_topic') { state.offTopic = true; return render(); }
     // Wie bei Lern-Apps: erst die Rückmeldung unten, die Person antwortet erst nach „Weiter“.
     state.pending = { result, before };
+    if (!state.counted) { state.counted = true; countPractice(); }
     if (state.round >= freeRounds) loadAuth().catch(() => {});
     track('simulator_turn', { round: state.round, rating: result.feedback.rating, mood: result.mood });
     render();
@@ -208,6 +210,26 @@
     card?.remove();
     if (state.waiting === text) { state.waiting = null; say(text, true); }
   };
+  // ---------- Paywall ----------
+  // Die erste Übung ist frei (mit Anmeldung ab dem zweiten Satz). Jede weitere Übung braucht eine Mitgliedschaft.
+  // Gezählt wird eine Übung, sobald ihre erste Rückmeldung da war. Der Zähler liegt nur auf diesem Gerät.
+  const practiceKey = 'demenzcoach.simulatorPractices.v1';
+  const freePractices = 1;
+  const practicesDone = () => { try { return Number(localStorage.getItem(practiceKey)) || 0; } catch { return 0; } };
+  const countPractice = () => { try { localStorage.setItem(practiceKey, String(practicesDone() + 1)); } catch { /* privat: zählt nicht */ } };
+  const member = async () => {
+    try {
+      if (!window.DEMENZ_ABO_CONFIG) await import('/abo/abo-config.js');
+      const { subscriberState } = await import('/abo/konto.js');
+      return ['active', 'error'].includes(await subscriberState(window.DEMENZ_ABO_CONFIG));
+    } catch { return true; }
+  };
+  const paywall = () => {
+    track('simulator_paywall_shown', { practices: practicesDone() });
+    try { localStorage.setItem('demenzCoachKi', JSON.stringify({ returnTo: location.pathname })); } catch { /* */ }
+    location.assign('/abo/?src=web_simulator');
+  };
+
   window.addEventListener('demenz-auth-changed', async () => {
     const text = state.waiting;
     if (!text || !(await signedIn()) || state.waiting !== text) return;
