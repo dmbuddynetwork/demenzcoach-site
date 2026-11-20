@@ -132,7 +132,8 @@ const mobileLayout = window.matchMedia('(max-width: 720px)');
 // - Werbung messen: Meta- und TikTok-Pixel. Nur auf Seiten mit <body data-marketing-pixels>
 //   und nur, wenn unten Pixel-IDs eingetragen sind; sonst fragt der Banner nur nach Statistik.
 // Ohne Einwilligung lädt nichts davon. Eingetippte Texte gehen nie an diese Dienste.
-const marketingPixelIDs = { meta: '', tiktok: '' };
+// Meta-Datensatz „Demenz Coach Web“ (Viral Growth Ventures GmbH, angelegt 20. Nov 2026). Die ID ist öffentlich.
+const marketingPixelIDs = { meta: '1128575813395953', tiktok: '' };
 
 const websiteAnalytics = (() => {
   const measurementID = 'G-5NRN1EMJDC';
@@ -309,15 +310,35 @@ const websiteAnalytics = (() => {
 
   // Werbe-Ereignisse (z. B. Lead, InitiateCheckout, Purchase): nur feste Namen und Zahlen, nie Texte.
   const metaStandard = new Set(['PageView', 'ViewContent', 'Lead', 'CompleteRegistration', 'InitiateCheckout', 'AddPaymentInfo', 'Purchase', 'Subscribe', 'StartTrial']);
-  const trackMarketing = (name, parameters = {}) => {
+  // options.eventID: dieselbe ID sendet der Server per Conversions API, Meta zählt das Ereignis dann nur einmal.
+  const trackMarketing = (name, parameters = {}, options = {}) => {
     if (!marketingOnPage || readMarketing() !== 'granted') return;
     loadPixels();
-    window.fbq?.(metaStandard.has(name) ? 'track' : 'trackCustom', name, parameters);
+    const eventOptions = options.eventID ? { eventID: String(options.eventID) } : undefined;
+    if (eventOptions) window.fbq?.(metaStandard.has(name) ? 'track' : 'trackCustom', name, parameters, eventOptions);
+    else window.fbq?.(metaStandard.has(name) ? 'track' : 'trackCustom', name, parameters);
     window.ttq?.track?.(name === 'Purchase' ? 'CompletePayment' : name, parameters);
   };
 
+  // Für den Server-Abgleich beim Kauf (Meta Conversions API): nur mit Werbe-Einwilligung, nur die Browser-Kennungen
+  // von Meta (fbp, fbc). Ohne Einwilligung ist das Ergebnis leer und die Kasse sendet nichts davon.
+  const metaContext = () => {
+    if (!marketingOnPage || !marketingPixelIDs.meta || readMarketing() !== 'granted') return {};
+    const cookie = (name) => {
+      const match = document.cookie.split(';').map((item) => item.trim()).find((item) => item.startsWith(`${name}=`));
+      return match ? decodeURIComponent(match.slice(name.length + 1)) : '';
+    };
+    let fbc = cookie('_fbc');
+    if (!fbc) {
+      const clickID = new URLSearchParams(location.search).get('fbclid');
+      if (clickID) fbc = `fb.1.${Date.now()}.${clickID}`;
+    }
+    const fbp = cookie('_fbp');
+    return { meta: { consent: true, ...(fbp ? { fbp } : {}), ...(fbc ? { fbc } : {}) } };
+  };
+
   const clearSessionChoices = () => { sessionChoice = {}; };
-  return { clearSessionChoices, startStatistics, stopStatistics, deny, denyMarketing, grant, grantMarketing, loadPixels, loadTag, marketingOnPage, readConsent, readMarketing, track, trackMarketing };
+  return { clearSessionChoices, startStatistics, stopStatistics, deny, denyMarketing, grant, grantMarketing, loadPixels, loadTag, marketingOnPage, metaContext, readConsent, readMarketing, track, trackMarketing };
 })();
 
 const fallbackAnalyticsCopy = usesEnglish
@@ -490,7 +511,8 @@ window.DemenzConsent = {
   marketing: () => websiteAnalytics.marketingOnPage && websiteAnalytics.readMarketing() === 'granted',
   open: showConsentBanner,
   track: websiteAnalytics.track,
-  trackMarketing: websiteAnalytics.trackMarketing
+  trackMarketing: websiteAnalytics.trackMarketing,
+  metaContext: websiteAnalytics.metaContext
 };
 
 window.DemenzTeller = createTellerExperiment({
