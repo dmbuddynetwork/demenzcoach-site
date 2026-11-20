@@ -121,7 +121,15 @@ export default {
       if(generatorTarget?.assetPath){
         const assetURL=new URL(generatorTarget.assetPath,url.origin);
         const response=await env.ASSETS.fetch(assetURL,request);
-        if(response.ok||response.status===304)return response;
+        if(response.ok||response.status===304){
+          // Goal states (/auswahl/, /verstehen/, /tipps/) serve the sentence page itself. Google picked some of
+          // them as their own canonical (Search Console 20 Nov 2026), so they say noindex and only the sentence
+          // page is indexed.
+          if(url.pathname===generatorTarget.canonicalPath)return response;
+          const headers=new Headers(response.headers);
+          headers.set('X-Robots-Tag','noindex, follow');
+          return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+        }
         // A missing app asset fails closed; no language-home or arbitrary-path fallback.
         return new Response('Not found',{status:404,headers:{'Content-Type':'text/plain;charset=utf-8'}});
       }
