@@ -258,7 +258,7 @@ const page = (language) => {
   <link rel="sitemap" type="application/xml" href="${baseURL}/sitemap.xml">
   <link rel="stylesheet" href="/translator.css">
   <link rel="stylesheet" href="/einfach.css">
-  <link rel="stylesheet" href="/simulator.css?v=20261120h">
+  <link rel="stylesheet" href="/simulator.css?v=20261120i">
   <script>${font}</script>
   <script type="application/ld+json">${json(schema)}</script>
 </head>
@@ -298,7 +298,7 @@ const page = (language) => {
   <script>window.demenzCoachSiteLocale=${json(language === "en" ? { menuOpen: "Open menu", menuClose: "Close menu", privacyURL: "/privacy-en.html" } : { menuOpen: "Menü öffnen", menuClose: "Menü schließen", privacyURL: "/datenschutz.html" })};</script>
   <script src="/lovable-home.js?v=20261108a"></script>
   <script type="application/json" id="sim-data">${json(data)}</script>
-  <script src="/simulator.js?v=20261120h"></script>
+  <script src="/simulator.js?v=20261120i"></script>
 </body>
 </html>
 `;

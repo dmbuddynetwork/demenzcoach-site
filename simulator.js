@@ -229,6 +229,9 @@
     track('simulator_paywall_shown', { practices: practicesDone() });
     try {
       localStorage.setItem('demenzCoachKi', JSON.stringify({ returnTo: location.pathname }));
+      // Bildpaar der geübten Situation für „Jetzt / Dein Ziel“ auf der Angebotsseite.
+      const done = state.sit?.picture || state.sit;
+      if (done?.image?.src && done.afterImage?.src) sessionStorage.setItem('demenzCoachSimPair', JSON.stringify({ before: done.image.src, after: done.afterImage.src }));
       const user = (await loadAuth()).currentUser;
       if (user?.emailVerified && user.email) sessionStorage.setItem('demenzCoachEmail', user.email);
     } catch { /* ohne Adresse fragt die Angebotsseite selbst */ }
