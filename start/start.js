@@ -790,20 +790,37 @@
     const includedList = el("ul", { class: "start-included", role: "list" }, included.map(([icon, title, text]) =>
       el("li", {}, [el("span", { class: "start-included-icon", html: icon }), el("span", {}, [el("strong", { text: title }), el("span", { text })])])));
 
-    // Bilder aus dem Plan wie BetterMe: echte Bildschirme in Handy-Rahmen, seitlich wischbar.
+    // Bilder aus dem Plan wie BetterMe: echte Bildschirme in hellen Handy-Rahmen. Das mittlere Handy ist groß, die Nachbarn schauen
+    // seitlich hervor, darunter Punkte. Wischen oder auf ein Nachbar-Handy tippen.
     const shotList = [
-      ["ueben-waehlen", "Situation wählen, Antwort finden"],
-      ["ueben-rueckmeldung", "Sofort eine Rückmeldung"],
-      ["ueben-geschafft", "Geschafft: die Person wird ruhig"],
-      ["app-result", "Passende Sätze für den Moment"],
-      ["app-plan", "Jeden Tag ein kleiner Schritt"],
-      ["app-help", "Soforthilfe, wenn es schwierig wird"]
+      ["ueben-waehlen", "Antwort wählen"],
+      ["ueben-rueckmeldung", "Sofort Rückmeldung"],
+      ["ueben-geschafft", "Die Person wird ruhig"],
+      ["app-result", "Passende Sätze"],
+      ["app-plan", "Jeden Tag ein Schritt"],
+      ["app-help", "Soforthilfe"]
     ];
-    const shots = el("div", { class: "start-shots", role: "list", "aria-label": "Bilder aus dem Plan" }, shotList.map(([file, caption]) =>
-      el("figure", { role: "listitem" }, [
-        el("span", { class: "start-phone" }, [el("img", { src: `/assets/angebot/${file}.webp`, width: "360", height: "740", loading: "lazy", decoding: "async", alt: caption })]),
-        el("figcaption", { text: caption })
-      ])));
+    const slides = shotList.map(([file, caption], index) => el("figure", { class: index === 0 ? "is-on" : "" }, [
+      el("span", { class: "start-phone" }, [el("img", { src: `/assets/angebot/${file}.webp`, width: "720", height: "1566", loading: index < 2 ? "eager" : "lazy", decoding: "async", alt: caption })]),
+      el("figcaption", { text: caption })
+    ]));
+    const dots = shotList.map((_, index) => el("button", { type: "button", class: index === 0 ? "is-on" : "", "aria-label": `Bild ${index + 1} von ${shotList.length}` }));
+    const track = el("div", { class: "start-shots-track" }, slides);
+    const goTo = (index) => track.scrollTo({ left: slides[index].offsetLeft - (track.clientWidth - slides[index].offsetWidth) / 2, behavior: "smooth" });
+    let shotFrame = 0;
+    track.addEventListener("scroll", () => {
+      cancelAnimationFrame(shotFrame);
+      shotFrame = requestAnimationFrame(() => {
+        const middle = track.scrollLeft + track.clientWidth / 2;
+        let active = 0;
+        slides.forEach((slide, index) => { if (Math.abs(slide.offsetLeft + slide.offsetWidth / 2 - middle) < Math.abs(slides[active].offsetLeft + slides[active].offsetWidth / 2 - middle)) active = index; });
+        slides.forEach((slide, index) => slide.classList.toggle("is-on", index === active));
+        dots.forEach((dot, index) => dot.classList.toggle("is-on", index === active));
+      });
+    }, { passive: true });
+    slides.forEach((slide, index) => slide.addEventListener("click", () => goTo(index)));
+    dots.forEach((dot, index) => dot.addEventListener("click", () => goTo(index)));
+    const shots = el("div", { class: "start-shots", role: "region", "aria-label": "Bilder aus dem Plan" }, [track, el("div", { class: "start-shots-dots" }, dots)]);
 
     // Übungsplan für 7 Tage (nur vom Üben): je Tag eine Situation. Tag 1 ist die gerade geübte Situation und ist geschafft.
     const weekDays = [
