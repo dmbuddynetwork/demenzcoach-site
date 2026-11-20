@@ -243,7 +243,7 @@
       const pictures = { mama: "v-umarmung.webp", papa: "papa.webp", partner: "paar.webp", grosseltern: "grosseltern.webp" };
       const short = { mama: "Mutter", papa: "Vater", partner: "Partner", grosseltern: "Oma oder Opa" };
       return [
-        el("h1", { class: preset ? "start-center" : "start-center start-hero", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Dein persönlicher Plan für ruhige Gespräche" }),
+        el("h1", { class: preset ? "start-center" : "start-center start-hero", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Tipps und Tricks zum Ausdrucken" }),
         typed ? el("p", { class: "start-typed", text: `Deine Frage: „${typed}“` }) : null,
         el("h2", { class: "start-question start-center", text: "Für wen suchst du Hilfe?" }),
         el("div", { class: "start-pics" }, relations.filter((item) => pictures[item.key]).map((item) => el("button", {

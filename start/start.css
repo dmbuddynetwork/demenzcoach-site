@@ -386,3 +386,5 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 /* Einstieg wie BetterMe: Versprechen in Großbuchstaben, darunter nur die erste Frage. */
 .start-hero { text-transform: uppercase; letter-spacing: .01em; }
 .start-hero + .start-question, .start-hero ~ .start-question { color: var(--ink-2); text-transform: uppercase; font-weight: 600; }
+/* Marke im Kopf: App-Symbol mit Namen daneben, auch auf dem Handy (die gemeinsame Navigation blendet ihn sonst aus). */
+.start-page .start-top.dc-navigation-host .abo-brand > span { display: inline; font-size: 1.125rem; }
