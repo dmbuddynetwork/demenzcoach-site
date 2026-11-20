@@ -981,8 +981,9 @@
     });
     $("count").textContent = done ? "" : sections[index]?.title ?? "";
     $("back").style.visibility = ["relation", "email", "newsletter"].includes(name) ? "hidden" : "visible";
-    $("progress").hidden = done;
-    $("count").hidden = done;
+    // Wie bei BetterMe: auf der allerersten Seite weder Abschnittsname noch Fortschrittsleiste.
+    $("progress").hidden = done || name === "relation";
+    $("count").hidden = done || name === "relation";
     // Rechtliche Links (AGB, Datenschutz, Impressum, Widerruf, Kündigen) stehen auf jedem Schritt unten, klein.
     $("footer").hidden = false;
     restart.hidden = name === "relation" || directMode;
