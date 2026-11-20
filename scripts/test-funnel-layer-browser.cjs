@@ -34,7 +34,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           if (variant === 'funnel') {
             const dialog = p.locator('dialog.dc-funnel-layer'); await dialog.waitFor();
             const frame = p.frameLocator('iframe.dc-funnel-layer-frame');
-            await frame.getByRole('heading', { name: /Persönliche Hilfe für schwierige Alltagssituationen/ }).waitFor();
+            await frame.getByRole('heading', { name: /Sag in schwierigen Momenten das Richtige/ }).waitFor();
             await p.waitForTimeout(500);
             const box = await dialog.boundingBox();
             assert.ok(Math.abs(box.y + box.height - view.h) < 2, 'Layer sitzt unten');
