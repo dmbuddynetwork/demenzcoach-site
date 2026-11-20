@@ -56,7 +56,7 @@
     return best?.situation ?? null;
   };
 
-  const fresh = () => ({ person: null, turns: [], mood: 'unsure', round: 0, choices: [], feedback: null, busy: false, done: false, wrapUp: null, error: null, safety: null, offTopic: false, writing: false, good: 0 });
+  const fresh = () => ({ person: null, turns: [], mood: 'unsure', round: 0, choices: [], feedback: null, busy: false, done: false, wrapUp: null, error: null, safety: null, offTopic: false, writing: false, good: 0, pending: null, tried: [] });
   const state = { view: 'home', showAll: false, session: 0, sit: null, ...fresh() };
 
   // ---------- Verbindung zur KI ----------
@@ -120,8 +120,8 @@
     const text = value.replace(/\s+/g, ' ').trim().slice(0, 200);
     if (!text || state.busy || state.done || state.turns.at(-1)?.from !== 'person') return;
     const session = state.session;
-    const before = { choices: state.choices, feedback: state.feedback };
-    Object.assign(state, { busy: true, error: null, feedback: null, choices: [], writing: false, said: text });
+    const before = { choices: state.choices };
+    Object.assign(state, { busy: true, error: null, choices: [], writing: false });
     state.turns = [...state.turns, { from: 'you', text }];
     state.round += 1;
     render();
@@ -132,19 +132,45 @@
       // Satz zurücknehmen, damit man ihn noch einmal sagen kann.
       state.turns = state.turns.slice(0, -1);
       state.round -= 1;
-      Object.assign(state, { error: result.reason, choices: before.choices, feedback: before.feedback, writing: before.choices.length === 0 });
+      Object.assign(state, { error: result.reason, choices: before.choices, writing: before.choices.length === 0 });
       return render();
     }
     if (result.kind === 'safety') { state.safety = result.message; return render(); }
     if (result.kind === 'off_topic') { state.offTopic = true; return render(); }
+    // Wie bei Lern-Apps: erst die Rückmeldung unten, die Person antwortet erst nach „Weiter“.
+    state.pending = { result, before };
+    track('simulator_turn', { round: state.round, rating: result.feedback.rating, mood: result.mood });
+    render();
+    root.querySelector('.sim-bar .button')?.focus({ preventScroll: true });
+  };
+
+  const next = () => {
+    const { result } = state.pending;
+    state.pending = null;
+    state.tried = [];
     state.mood = result.mood;
     state.turns = [...state.turns, { from: 'person', text: result.reaction }];
-    state.feedback = result.feedback;
     if (result.feedback.rating === 'good') state.good += 1;
     state.choices = result.done ? [] : shuffle(result.choices);
-    if (result.done) { state.done = true; state.wrapUp = result.wrapUp; }
-    track('simulator_turn', { round: state.round, rating: result.feedback.rating, mood: result.mood });
-    if (result.done) track('simulator_done', { final_mood: result.mood, rounds: state.round, good_count: state.good, situation_key: state.sit.key || 'free' });
+    if (result.done) {
+      state.done = true;
+      state.wrapUp = result.wrapUp;
+      track('simulator_done', { final_mood: result.mood, rounds: state.round, good_count: state.good, situation_key: state.sit.key || 'free' });
+    }
+    render();
+    top();
+  };
+
+  // Nochmal versuchen: dieselbe Stelle, dieselben Sätze, der gewählte Satz ist ausgegraut.
+  const retry = () => {
+    const { before } = state.pending;
+    const said = state.turns.at(-1)?.text;
+    state.pending = null;
+    state.turns = state.turns.slice(0, -1);
+    state.round -= 1;
+    state.choices = before.choices;
+    if (said) state.tried = [...state.tried, said];
+    track('simulator_retry', { round: state.round + 1 });
     render();
     top();
   };
@@ -159,15 +185,21 @@
     return h('img', { class: 'sim-picture', src: image.src, width: image.width, height: image.height, alt: '' });
   };
 
-  const feedbackBox = () => {
-    const feedback = state.feedback;
-    if (!feedback || state.busy || state.done) return null;
+  const feedbackBar = () => {
+    if (!state.pending) return null;
+    const feedback = state.pending.result.feedback;
     const good = feedback.rating === 'good';
-    return h('div', { class: `sim-feedback ${good ? 'is-good' : 'is-hint'}`, role: 'status' },
-      h('span', { class: 'sim-fb-icon', 'aria-hidden': 'true' }, svg(good ? checkPath : bulbPath, 24)),
-      h('div', {},
-        h('p', { class: 'sim-verdict', text: ui.verdict[feedback.rating] }),
-        good ? h('p', { text: feedback.why }) : h('p', {}, ui.better, ' ', h('q', { text: feedback.better }))));
+    return h('div', { class: `sim-bar ${good ? 'is-good' : 'is-hint'}`, role: 'dialog', 'aria-labelledby': 'sim-verdict' },
+      h('div', { class: 'sim-bar-inner' },
+        h('div', { class: 'sim-bar-head' },
+          h('span', { class: 'sim-fb-icon', 'aria-hidden': 'true' }, svg(good ? checkPath : bulbPath, 24)),
+          h('div', {},
+            h('p', { class: 'sim-verdict', id: 'sim-verdict', text: ui.verdict[feedback.rating] }),
+            good ? h('p', { text: feedback.why }) : h('p', {}, ui.better, ' ', h('q', { text: feedback.better })))),
+        good
+          ? h('button', { type: 'button', class: 'button', text: ui.next, onclick: next })
+          : [h('button', { type: 'button', class: 'button', text: ui.tryAgain, onclick: retry }),
+            h('button', { type: 'button', class: 'sim-light', text: ui.next, onclick: next })]));
   };
 
   const personBubble = () => {
@@ -179,12 +211,19 @@
         h('div', { class: 'sim-bubble is-person is-wait', role: 'status', 'aria-label': ui.wait }, h('span', { class: 'sim-dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')))
       ];
     }
+    if (state.pending) {
+      const previous = state.turns.at(-2);
+      return [
+        previous ? h('div', { class: 'sim-line' }, h('p', { class: 'sim-who', text: fill(ui.says, { who }) }), h('div', { class: 'sim-bubble is-person', text: previous.text })) : null,
+        h('div', { class: 'sim-bubble is-you', text: last.text })
+      ];
+    }
     if (!last || last.from !== 'person') return null;
     return h('div', { class: 'sim-line' }, h('p', { class: 'sim-who', text: fill(ui.says, { who }) }), h('div', { class: 'sim-bubble is-person', text: last.text }));
   };
 
   const answerArea = () => {
-    if (state.busy || state.done || state.turns.at(-1)?.from !== 'person') return null;
+    if (state.busy || state.done || state.pending || state.turns.at(-1)?.from !== 'person') return null;
     const field = h('textarea', { id: 'sim-say', rows: '2', maxlength: '200', placeholder: ui.ownPlaceholder, enterkeyhint: 'send', 'aria-label': ui.ownLabel });
     const form = h('form', { class: 'sim-own', autocomplete: 'off' }, field, h('button', { class: 'button', type: 'submit', text: ui.sayButton }));
     form.addEventListener('submit', (event) => { event.preventDefault(); say(field.value); });
@@ -192,7 +231,8 @@
       h('h2', { id: 'sim-ask', text: ui.ask }),
       state.choices.map((choice, index) => {
         const mark = 'ABC'[index];
-        return h('button', { type: 'button', class: 'sim-choice', 'aria-label': `${ui.answer} ${mark}: ${choice}`, onclick: () => say(choice) },
+        const tried = state.tried.includes(choice);
+        return h('button', { type: 'button', class: `sim-choice${tried ? ' is-tried' : ''}`, disabled: tried || undefined, 'aria-label': `${ui.answer} ${mark}: ${choice}`, onclick: () => say(choice) },
           h('span', { class: 'sim-mark', 'aria-hidden': 'true', text: mark }),
           h('span', { class: 'sim-choice-text', text: choice }),
           svg(chevronPath, 20));
@@ -226,7 +266,7 @@
         h('p', { text: state.safety || ui.offTopic }),
         h('button', { type: 'button', class: 'button', text: ui.other, onclick: home }))];
     }
-    return [back, feedbackBox(), picture(), personBubble(), errorNote(), doneArea(), answerArea()];
+    return [back, picture(), personBubble(), errorNote(), doneArea(), answerArea(), feedbackBar()];
   };
 
   const start = () => {
@@ -254,6 +294,7 @@
   function render() {
     root.replaceChildren(...(state.view === 'home' ? start() : scene()).flat().filter(Boolean));
     document.body.classList.toggle('sim-playing', state.view === 'scene');
+    document.body.classList.toggle('sim-bar-open', Boolean(state.pending) && state.view === 'scene');
   }
 
   // Direkter Einstieg über #situation=<key>.
