@@ -262,3 +262,48 @@ body[data-screen="plan"] .start-page { padding-top: 0; }
 .start-prize-code { margin-top: 6px; padding: 4px 10px; border-radius: 8px; background: #fff; font-size: var(--small); }
 .start-ticket-body .start-clock-soft b, .start-ticket-body .start-clock-soft i { font-size: 1.4rem; }
 .start-ticket-body .start-clock-soft { padding: 8px 10px; }
+
+/* BetterMe-Farben (Daniel, 20. Nov 2026: „nimm auch die Farben hier“): cremiger Grund, beige Karten, grünes Gutschein-Ticket.
+   Lila bleibt nur für Knöpfe und Gewähltes. */
+body[data-screen="plan"] { background: #fcf9f3; }
+body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
+.start-head .start-clock b { font-size: 2.1rem; }
+.start-head-button { padding: 10px 22px; }
+.start-hero-pics { background: #f2ede5; }
+.start-hero-pics img { height: 190px; }
+.start-hero-tabs { color: var(--ink); }
+.start-hero-tabs span + span { color: var(--ink); }
+.start-level { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 8px; }
+.start-level i { height: 6px; border-radius: 2px; background: #e4ded3; }
+.start-plan-title { font-size: 2rem; }
+.start-ticket { position: relative; background: #e8edd5; overflow: visible; }
+.start-ticket::before, .start-ticket::after { content: ""; position: absolute; top: 56px; width: 18px; height: 18px; border-radius: 50%; background: #fcf9f3; }
+.start-ticket::before { left: -9px; } .start-ticket::after { right: -9px; }
+.start-ticket-title { color: var(--ink); border-bottom: 2px dashed rgba(255, 255, 255, .95); }
+.start-ticket-title svg { color: #8db255; }
+.start-ticket-check { color: #6f9a3c; }
+.start-ticket-body .start-clock-soft { background: #d6e4b5; }
+.start-ticket-body .start-clock-soft b, .start-ticket-body .start-clock-soft i { color: #7da142; }
+.start-ticket-body .start-clock-soft small { color: #5c7a2c; }
+.start-tier { background: #f4efe8; }
+.start-fine { background: #fffdf8; border-color: #e7e1d6; }
+.start-pay li { background: #fffdf8; border-color: #e7e1d6; }
+.start-big-title { margin: 36px 0 16px; font-size: 1.9rem; line-height: 1.15; }
+.start-included { list-style: none; margin: 0 0 24px; padding: 0; }
+.start-included li { display: grid; grid-template-columns: 52px 1fr; gap: 14px; align-items: start; padding: 16px 0; border-bottom: 1px solid #e7e1d6; }
+.start-included li:last-child { border-bottom: 0; }
+.start-included-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 12px; background: #f2ede5; color: var(--ink); }
+.start-included-icon svg { width: 28px; height: 28px; }
+.start-included strong { display: block; font-size: 1.1875rem; line-height: 1.3; }
+.start-included li > span:last-child > span { display: block; color: var(--ink-2); }
+.start-faq details { background: none; border: 0; border-bottom: 1px solid #e7e1d6; border-radius: 0; margin: 0; }
+.start-faq summary { padding: 18px 0; font-size: 1.1875rem; }
+.start-faq details p { padding: 0 0 18px; }
+.start-guarantee-card { background: #f4efe8; border: 0; border-radius: 22px; padding: 28px 20px; }
+.start-guarantee-card svg { color: #6f9a3c; }
+.start-guarantee-card p { text-align: left; }
+.start-ticket-code { font-size: 1rem; overflow-wrap: normal; word-break: keep-all; }
+.start-faq summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.start-faq summary::-webkit-details-marker { display: none; }
+.start-faq summary::after { content: ""; flex: none; width: 10px; height: 10px; margin-right: 4px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg); transition: transform .2s; }
+.start-faq details[open] summary::after { transform: rotate(-135deg); }

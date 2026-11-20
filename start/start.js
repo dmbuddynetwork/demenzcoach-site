@@ -24,6 +24,8 @@
     andere: svg('<circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/>'),
     lock: svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
     shield: svg('<path d="M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6z"/><path d="m9 12 2 2 4-4"/>'),
+    chat: svg('<path d="M4 5.5h16v10H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/>'),
+    calendar: svg('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16M8.5 3v4M15.5 3v4"/><path d="m9 14.5 2 2 4-4"/>'),
     gift: svg('<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18v-.5A1.5 1.5 0 0 0 19.5 7h-15A1.5 1.5 0 0 0 3 8.5z"/><path d="M12 7v13"/><path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z"/>')
   };
 
@@ -44,6 +46,7 @@
   const deals = window.DemenzAngebot;
   let dealAsked = false;
   let reservationEnded = false;
+  const clockStops = [];
   // Geld-zurück-Garantie (Daniel, 9. Nov 2026): 30 Tage ab der ersten Zahlung, Bedingungen auf /abo/garantie.html.
   const guaranteeDays = 30;
   // Gutscheincode wie BetterMe („testi_nov26“: Name plus Monat). Nur eine Bezeichnung für den echten Willkommenspreis,
@@ -472,6 +475,17 @@
   // Oben eine feste Leiste mit Probezeit und Knopf, konkrete Situationsvorschau,
   // Rabatt-Box, Tarife mit Preis pro Tag, Knopf, sicher bezahlen, was du bekommst, Probezeit, FAQ, Tarife noch einmal.
   // Keine erfundenen Bewertungen, Nutzerzahlen oder unbelegte zeitliche Verknappung.
+  // Bildpaar vom Üben (sessionStorage, nur Pfade zu unseren eigenen Zeichnungen).
+  function simulatorPair() {
+    if (!directMode || source !== "simulator") return null;
+    const fallback = { before: "/assets/zeichnungen/nach-hause.webp", after: "/assets/zeichnungen/nach-hause-ruhig.webp" };
+    try {
+      const value = JSON.parse(sessionStorage.getItem("demenzCoachSimPair") || "null");
+      const ok = (path) => typeof path === "string" && /^\/assets\/zeichnungen\/[a-z0-9-]+\.webp$/u.test(path);
+      return value && ok(value.before) && ok(value.after) ? { before: value.before, after: value.after } : fallback;
+    } catch { return fallback; }
+  }
+
   function planScreen() {
     const s = chosen();
     if (validEmail(answers.email) && offer.offers?.intro && deals && !dealAsked && !reservationEnded) {
@@ -489,7 +503,7 @@
     const name = forWho();
     // Labels wie BetterMe („GET MY PLAN“, „MOST POPULAR“). Statt „Beliebtester“ (ohne Verkaufszahlen nicht belegbar, UWG)
     // steht auf dem Jahresplan „Bester Preis“: belegbar, weil er pro Tag am günstigsten ist.
-    const ctaText = directMode && validEmail(answers.email) ? "Weiter zur Zahlung" : "Persönliche Hilfe starten";
+    const ctaText = "Plan anfordern";
 
     const tables = [];
     const select = (key) => {
@@ -529,10 +543,23 @@
       el("span", {}, [el("strong", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }), " ", el("a", { href: "/abo/garantie.html", text: "Bedingungen" })])]);
     const scrollToPlans = () => document.querySelector(".start-tiers")?.scrollIntoView({ behavior: "smooth", block: "center" });
 
-    // Fester Kopf: sachliche Probezeit oder gewählter Plan, daneben der Knopf zu den Tarifen.
+    // Uhr nur mit echtem Ende: die Reservierung des Willkommenspreises vom Server (angebot.js, an die E-Mail gebunden).
+    // Läuft sie ab, verschwindet der Sonderpreis wirklich. Ohne Reservierung gibt es keine Uhr.
+    for (const stop of clockStops.splice(0)) stop();
+    const clock = (soft) => {
+      if (!deal) return null;
+      const minutes = el("b", { text: "--" }), seconds = el("b", { text: "--" });
+      const node = el("span", { class: `start-clock${soft ? " start-clock-soft" : ""}`, role: "timer", "aria-label": "Zeit für den Willkommenspreis" }, [
+        minutes, el("i", { text: ":" }), seconds, el("small", { text: "Minuten" }), el("small"), el("small", { text: "Sekunden" })]);
+      clockStops.push(deals.countdown(deal, (text) => { const [m, sec] = text.split(":"); minutes.textContent = m.padStart(2, "0"); seconds.textContent = sec; },
+        () => { deals.drop(deal.kind); reservationEnded = true; if (current === "plan") render("plan"); }));
+      return node;
+    };
+
+    // Fester Kopf wie BetterMe: links die Uhr (oder die Probezeit), rechts „Plan anfordern“.
     const head = el("div", { class: "start-head" }, [
-      el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewähltes Abo" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
-      el("button", { type: "button", class: "start-head-button", text: "Abo ansehen", onclick: scrollToPlans })
+      clock(false) || el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewähltes Abo" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
+      el("button", { type: "button", class: "start-head-button", text: "Plan anfordern", onclick: scrollToPlans })
     ]);
 
     // Nur tatsächlich vorhandene Hilfen zeigen. Keine Vorher-/Nachher-Wirkung versprechen.
@@ -555,60 +582,69 @@
       ["Ist das eine medizinische Beratung?", "Nein. Demenz Coach hilft bei Worten und Alltag. Es ersetzt keinen ärztlichen Rat. Im Notfall 112."],
       ["Was passiert mit meinen Antworten?", "Sie bleiben auf deinem Gerät. Wir senden sie nicht und speichern sie nicht."]
     ];
-    // Gutschein-Ticket mit dem bestätigten Einführungspreis, ohne Zeitdruck.
+    // Gutschein-Ticket wie BetterMe: Code und daneben die echte Restzeit der Reservierung.
     const ticket = () => (deal ? el("div", { class: "start-ticket" }, [
       el("p", { class: "start-ticket-title" }, [el("span", { html: icons.gift }), "Promo-Code angewendet!"]),
       el("div", { class: "start-ticket-body" }, [
         el("p", { class: "start-ticket-code" }, [el("span", { class: "start-ticket-check", text: "✓" }), promoCode()]),
-        el("p", { class: "start-ticket-code", text: euro(firstYear) })
+        clock(true) || el("p", { class: "start-ticket-code", text: euro(firstYear) })
       ])
     ]) : null);
+
+    // Vom Üben (src=simulator): „Jetzt / Dein Ziel“ wie BetterMe, mit dem Bildpaar der geübten Situation (aufgeregt / ruhig).
+    const pair = simulatorPair();
+    const level = (filled) => el("span", { class: "start-level", "aria-hidden": "true" }, [1, 2, 3].map((n) => el("i", { class: n <= filled ? "on" : "" })));
+    const row = (label, value, filled) => el("div", { class: "start-hero-row" }, [el("span", { text: label }), el("strong", { text: value }), filled ? level(filled) : null]);
+    const hero = pair ? el("div", { class: "start-hero" }, [
+      el("div", { class: "start-hero-pics" }, [
+        el("p", { class: "start-hero-tabs" }, [el("span", { text: "Jetzt" }), el("span", { text: "Dein Ziel" })]),
+        el("img", { src: pair.before, width: "480", height: "420", alt: "Jetzt: die Person ist aufgeregt" }),
+        el("img", { src: pair.after, width: "480", height: "420", alt: "Dein Ziel: die Person ist ruhig" })
+      ]),
+      el("div", { class: "start-hero-rows" }, [
+        el("div", {}, [row("Im Gespräch", "Angespannt"), row("Du fühlst dich", "Unsicher", 1)]),
+        el("div", {}, [row("Im Gespräch", "Ruhig"), row("Du fühlst dich", "Sicher", 3)])
+      ])
+    ]) : null;
+
+    // Was im Plan steckt: Zeilen mit Symbol, Titel und einer Zeile darunter (wie BetterMe „Was ist in deinem Plan enthalten“).
+    const included = [
+      [icons.chat, "Gespräche üben", "Eine KI spielt die Person. Du übst, was du sagen kannst."],
+      [icons.wiederholt, "Passende Sätze", "Für die Situation, die dich gerade beschäftigt"],
+      [icons.nachhause, "Viele Alltagssituationen", "Zum Nachschauen, mit Zeichnungen"],
+      [icons.mutter, "Ein Blatt für Helfer", "Über die Person, zum Ausfüllen und Weitergeben"],
+      [icons.calendar, "Wochenplan", "Kleine Schritte für jede Woche"]
+    ];
+    if (answers.burden?.key === "kraft") included.push([icons.shield, "Kleine Hilfen für dich", "Damit du selbst Kraft behältst"]);
+    const includedList = el("ul", { class: "start-included", role: "list" }, included.map(([icon, title, text]) =>
+      el("li", {}, [el("span", { class: "start-included-icon", html: icon }), el("span", {}, [el("strong", { text: title }), el("span", { text })])])));
+
+    const offerBlock = () => [ticket(), table(), cta(), fine(), payments()];
 
     return [
       head,
       reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
-      el("h1", { class: "start-center start-plan-title", text: directContext ? `Hilfe bei „${directContext.title}“` : "Passende Worte für euren Alltag" }),
-      el("p", { class: "start-lead", text: name ? `Persönliche Hilfe für schwierige Alltagssituationen mit ${name}.` : "Persönliche Hilfe für schwierige Alltagssituationen." }),
-      preview,
+      hero,
+      el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Übungsplan für Gespräche ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : (name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!") }),
+      pair ? null : preview,
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
-      ticket(),
-      table(),
-      cta(),
-      fine(),
-      payments(),
-      guarantee(),
-      el("h2", { class: "start-section start-center", text: "Diese Hilfen gehören dazu" }),
-      el("img", { class: "start-art", src: "../assets/zeichnungen/v-tanzen.webp", width: "600", height: "650", alt: "" }),
-      el("ul", { class: "start-checks", role: "list" }, gets.map((text) => el("li", { text }))),
-      hasSpecificPlan ? el("div", { class: "start-card" }, [
+      ...offerBlock(),
+      el("h2", { class: "start-section start-center start-big-title", text: "Was ist in deinem Plan enthalten" }),
+      includedList,
+      hasSpecificPlan && !pair ? el("div", { class: "start-card" }, [
         el("h2", { text: `Wenn „${s.quote}“ fällt` }),
         el("p", { class: "start-small", text: "Probier heute einen dieser Sätze:" }),
         el("ul", { class: "start-say", role: "list" }, s.say.map((line) => el("li", { text: `„${line}“` })))
-      ]) : el("div", { class: "start-card" }, [
-        el("h2", { text: "Für eure eigene Situation" }),
-        el("p", { text: "Beschreibe, was gerade schwierig ist, oder öffne die vorhandene Situationshilfe." }),
-        el("a", { href: directContext?.href || "/de/#translator-input", text: "Zur kostenlosen Situationshilfe" })
-      ]),
-      offer.trialDays > 0 ? el("div", { class: "start-risk" }, [
-        el("h2", { text: "Ohne Risiko testen" }),
-        el("ol", { class: "start-timeline", role: "list" }, [
-          el("li", {}, [el("strong", { text: "Heute" }), el("span", { text: "Alles freigeschaltet. Du zahlst 0,00 €." })]),
-          el("li", {}, [el("strong", { text: dateText(inDays(offer.trialDays)) }), el("span", { "data-start-price": "", text: `Dein Abo beginnt: ${priceText(plan)}. Vorher online kündbar.` })])
-        ])
       ]) : null,
-      el("h2", { class: "start-section start-center", text: "Häufige Fragen" }),
-      el("div", { class: "start-faq" }, faq.map(([question, answer]) => el("details", {}, [el("summary", { text: question }), el("p", { text: answer })]))),
-      el("h2", { class: "start-section start-center", text: name ? `Persönliche Hilfe für ${name}` : "Persönliche Hilfe für euren Alltag" }),
-      ticket(),
-      table(),
-      cta(),
-      fine(),
-      payments(),
+      el("h2", { class: "start-section start-center start-big-title", text: "Häufig gestellte Fragen" }),
+      el("div", { class: "start-faq" }, faq.map(([question, answer], index) => el("details", index === 0 ? { open: "" } : {}, [el("summary", { text: question }), el("p", { text: answer })]))),
+      el("h2", { class: "start-section start-center start-big-title", text: pair ? "Ruhiger reden. Ab heute üben." : "Starte heute mit deinem Plan" }),
+      ...offerBlock(),
       el("div", { class: "start-guarantee-card" }, [
         el("span", { html: icons.shield }),
-        el("h2", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }),
+        el("h2", { text: `${guaranteeDays}-Tage-Geld-zurück-Garantie` }),
         el("p", { text: `Hilft dir der Plan nicht, bekommst du dein Geld zurück. Wähle innerhalb von ${guaranteeDays} Tagen nach der ersten Zahlung unter „Verträge hier kündigen“ die Geld-zurück-Garantie. Wir erstatten den vollen Betrag, das Abo endet sofort.` }),
-        el("a", { href: "/abo/garantie.html", text: "Bedingungen der Garantie" })
+        el("p", {}, ["Weitere Infos und Bedingungen findest du hier: ", el("a", { href: "/abo/garantie.html", text: "Geld-zurück-Garantie" }), "."])
       ]),
       el("p", { class: "start-small start-legal" }, [
         `${offer.trialDays > 0 ? `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft` : "Das Abo beginnt sofort und läuft"} zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende.${deal ? " Der Sonderpreis gilt für das erste Jahr des Jahresplans." : ""} Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
