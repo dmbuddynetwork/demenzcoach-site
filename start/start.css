@@ -382,3 +382,7 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-embedded .abo-footer { display: none; }
 .start-embedded .start-top .dc-navigation-menu { display: none; }
 .start-embedded .start-top { min-height: 40px; }
+
+/* Einstieg wie BetterMe: Versprechen in Großbuchstaben, darunter nur die erste Frage. */
+.start-hero { text-transform: uppercase; letter-spacing: .01em; }
+.start-hero + .start-question, .start-hero ~ .start-question { color: var(--ink-2); text-transform: uppercase; font-weight: 600; }
