@@ -177,6 +177,7 @@ export async function open(options) {
       token,
       body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
         ...window.DemenzTeller?.attribution(),
+        ...window.DemenzConsent?.metaContext?.(),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
     if (!requireCurrentAccount()) return;
