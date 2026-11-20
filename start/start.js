@@ -19,7 +19,22 @@
     if (/musical_ly|BytedanceWebview|TikTok/iu.test(agent) || /tiktok\.com$/u.test(from)) return "tiktok_app";
     return "ads";
   };
-  const source = (params.get("src") || params.get("utm_source") || guessSource()).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 30) || "ads";
+  // Kampagnen-Framework (Daniel, 20. Nov 2026): /start/?k=<kampagne>&a=<anzeige> füllt Überschrift, Frage und Moment aus
+  // kampagnen/kampagnen.json (erzeugt: kampagnen/data.js). Entwürfe nur mit &vorschau=1, pausierte gar nicht.
+  // Ohne Kampagne bleibt alles wie bisher. Die Adresse behält k und a, jeder Schritt trägt sie mit.
+  const clean = (value, max = 30) => String(value || "").toLowerCase().replace(/[^a-z0-9-]/gu, "").slice(0, max);
+  const kampagnenDaten = window.DEMENZ_KAMPAGNEN || { standard: {}, kampagnen: [] };
+  const vorschau = params.get("vorschau") === "1";
+  let kampagne = null, anzeige = "";
+  (() => {
+    const id = clean(params.get("k")), ad = clean(params.get("a"), 12);
+    let found = kampagnenDaten.kampagnen.find((item) => item.id === id && (item.status === "aktiv" || vorschau)) || null;
+    // Vorschau in der Verwaltung: ungespeicherte Änderungen kommen als JSON im Adress-Anker (#v=…), nur mit vorschau=1.
+    if (vorschau) { try { const hash = new URLSearchParams(location.hash.slice(1)).get("v"); if (hash && hash.length < 20000) found = { ...(found || {}), ...JSON.parse(hash), id: id || "vorschau" }; } catch { /* Hash ungültig */ } }
+    if (found) { kampagne = found; anzeige = ad; }
+  })();
+  const landing = { ...(kampagnenDaten.standard || {}), ...(kampagne?.landing || {}) };
+  const source = (params.get("src") || params.get("utm_source") || kampagne?.src || guessSource()).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 30) || "ads";
   const config = window.DEMENZ_ABO_CONFIG || {};
   if (params.get("embed") === "1") document.documentElement.classList.add("start-embedded");
 
@@ -104,7 +119,7 @@
   // Messen nur über die gemeinsame Einwilligung der Website (lovable-home.js, DemenzConsent):
   // GA4 nur mit Statistik-, Meta/TikTok nur mit Werbe-Einwilligung. Nie Antworten, Namen oder E-Mail senden.
   const track = (name, marketing) => {
-    try { window.DemenzConsent?.track?.(name, { entry: source }); } catch { /* ohne Einwilligung nichts */ }
+    try { window.DemenzConsent?.track?.(name, { entry: source, ...(kampagne ? { kampagne: kampagne.id, anzeige: anzeige || "" } : {}) }); } catch { /* ohne Einwilligung nichts */ }
     try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing); } catch { /* */ }
   };
 
@@ -159,7 +174,7 @@
   // Aufbau wie die umsatzstärksten Web-Funnels (Noom, BetterMe): erst kennenlernen (11 kurze Fragen), dazwischen
   // Bestätigung und eine echte Zahl, „Plan wird erstellt“, E-Mail vor dem Ergebnis, Ergebnis mit Zeitstrahl, dann
   // eine lange Angebotsseite. Anzeige und Seite passen zusammen: ?m=<moment> setzt den Moment, die Frage entfällt.
-  const preset = situations.find((item) => item.say && item.key === params.get("m")) || null;
+  const preset = situations.find((item) => item.say && item.key === (params.get("m") || landing.moment)) || null;
   if (preset) answers.situation = preset;
   if (directMode) answers.situation = directContext?.planKey ? situations.find(item => item.key === directContext.planKey) || null : null;
   // Vom Übersetzer (Angebotskarte): der zuletzt eingegebene Satz bleibt nur in diesem Tab und wird nur angezeigt.
@@ -243,9 +258,11 @@
       const pictures = { mama: "v-umarmung.webp", papa: "papa.webp", partner: "paar.webp", grosseltern: "grosseltern.webp" };
       const short = { mama: "Mutter", papa: "Vater", partner: "Partner", grosseltern: "Oma oder Opa" };
       return [
-        el("h1", { class: preset ? "start-center" : "start-center start-hero", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Tipps und Tricks zum Ausdrucken" }),
+        el("h1", { class: (kampagne ? landing.grossbuchstaben !== false : !preset) ? "start-center start-hero" : "start-center",
+          text: kampagne ? landing.ueberschrift : preset ? `Was sagen bei „${bare(preset.quote)}“?` : landing.ueberschrift || "Tipps und Tricks zum Ausdrucken" }),
         typed ? el("p", { class: "start-typed", text: `Deine Frage: „${typed}“` }) : null,
-        el("h2", { class: "start-question start-center", text: "Für wen suchst du Hilfe?" }),
+        landing.unterzeile ? el("p", { class: "start-lead start-center", text: landing.unterzeile }) : null,
+        el("h2", { class: "start-question start-center", text: landing.frage || "Für wen suchst du Hilfe?" }),
         el("div", { class: "start-pics" }, relations.filter((item) => pictures[item.key]).map((item) => el("button", {
           type: "button", class: "start-pic", "aria-label": item.label, onclick: () => choose(item)
         }, [el("img", { src: `../assets/zeichnungen/${pictures[item.key]}`, alt: "", width: "200", height: "180" }),
@@ -901,7 +918,7 @@
         dayTime: answers.dayTime?.key ?? null, goal: answers.goal?.key ?? null, savedAt: new Date().toISOString().slice(0, 10)
       }));
     } catch { /* privater Modus: Plan startet dann mit dem häufigsten Moment */ }
-    const campaign = (params.get("utm_campaign") || "").toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
+    const campaign = (params.get("utm_campaign") || (kampagne && kampagne.id !== "vorschau" ? kampagne.id : "")).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
     const src = directMode ? `direkt_${source}`.slice(0, 40) : `quiz_${source}${preset ? `_${preset.key}` : ""}`.slice(0, 40);
     // Kasse als Fenster auf dieser Seite (kasse.js, wie BetterMe/Yazio). Ohne das Modul wie bisher die Seite /abo/.
     const kasse = window.DemenzKasse;

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Kampagnen verwalten</title>
+<style>
+  :root { --bg:#F6F5F2; --card:#fff; --ink:#1d1b24; --ink2:#5b5868; --purple:#47408C; --lav:#ECE9F7; --line:#dedbe8; --ok:#1f7a4d; --warn:#b3261e; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.5 system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--ink); }
+  header { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; padding:14px 20px; background:var(--card); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+  header h1 { font-size:1.15rem; margin:0; }
+  button, .btn { font:inherit; font-weight:600; border:0; border-radius:10px; padding:9px 14px; background:var(--purple); color:#fff; cursor:pointer; }
+  button.light { background:var(--lav); color:var(--purple); }
+  button.small { padding:5px 10px; font-size:.875rem; }
+  button.danger { background:#fbe9e7; color:var(--warn); }
+  .layout { display:grid; grid-template-columns:260px minmax(0,1fr) 340px; gap:16px; padding:16px 20px; align-items:start; }
+  @media (max-width:1100px) { .layout { grid-template-columns:1fr; } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; }
+  .list button.item { width:100%; text-align:left; background:var(--card); color:var(--ink); border:1px solid var(--line); margin-bottom:8px; display:block; }
+  .list button.item[aria-current="true"] { border-color:var(--purple); background:var(--lav); }
+  .chip { display:inline-block; font-size:.75rem; font-weight:700; border-radius:99px; padding:1px 9px; margin-left:6px; background:#eee; }
+  .chip.aktiv { background:#dff3e8; color:var(--ok); } .chip.entwurf { background:#fff1cc; color:#8a6100; } .chip.pausiert { background:#e6e4ee; color:var(--ink2); }
+  label { display:block; font-weight:600; margin:12px 0 4px; }
+  label small { font-weight:400; color:var(--ink2); }
+  input[type=text], select, textarea { width:100%; font:inherit; padding:9px 10px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); }
+  textarea { min-height:76px; resize:vertical; }
+  .count { float:right; font-size:.8rem; color:var(--ink2); } .count.over { color:var(--warn); font-weight:700; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; } @media (max-width:560px) { .row { grid-template-columns:1fr; } }
+  h2 { font-size:1.05rem; margin:0 0 4px; } h3 { font-size:1rem; margin:0; }
+  .ad { border:1px solid var(--line); border-radius:12px; padding:12px; margin:12px 0; background:#fcfbfe; }
+  .ad-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .problems { margin:0; padding:0; list-style:none; } .problems li { padding:6px 10px; border-radius:8px; margin-bottom:6px; background:#fbe9e7; color:var(--warn); font-size:.9rem; }
+  .ok { padding:6px 10px; border-radius:8px; background:#dff3e8; color:var(--ok); font-weight:600; }
+  .link { display:flex; gap:8px; align-items:center; margin:6px 0; } .link code { flex:1; min-width:0; overflow-wrap:anywhere; font-size:.78rem; background:var(--bg); padding:6px 8px; border-radius:8px; }
+  .phone { width:320px; max-width:100%; height:640px; margin:10px auto 0; border:8px solid #2b2733; border-radius:30px; overflow:hidden; background:#fff; } .phone iframe { width:100%; height:100%; border:0; }
+  .hint { color:var(--ink2); font-size:.875rem; margin:4px 0 0; }
+  .toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#2b2733; color:#fff; padding:8px 16px; border-radius:99px; opacity:0; transition:opacity .2s; pointer-events:none; } .toast.on { opacity:1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kampagnen verwalten</h1>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="light" id="csv">Anzeigen als CSV</button>
+    <button id="save">kampagnen.json herunterladen</button>
+  </div>
+</header>
+<div class="layout">
+  <nav class="card list" aria-label="Kampagnen">
+    <h2>Kampagnen</h2>
+    <div id="list"></div>
+    <button class="light" id="neu" style="width:100%">+ Neue Kampagne</button>
+    <p class="hint">Jede Kampagne hat eine eigene Landingpage und eigene Anzeigen. Entwürfe sind nur mit Vorschau sichtbar.</p>
+  </nav>
+  <main id="editor" class="card" aria-live="polite"></main>
+  <aside>
+    <div class="card"><h2>Vorschau Landingpage</h2><p class="hint" id="previewHint"></p><div class="phone"><iframe id="preview" title="Vorschau"></iframe></div></div>
+    <div class="card" style="margin-top:16px"><h2>Prüfung</h2><div id="check"></div></div>
+  </aside>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script src="/kampagnen/regeln.js"></script>
+<script>
+(function () {
+  'use strict';
+  var R = window.DemenzKampagnenRegeln, L = R.LIMITS, daten, aktuell = 0, timer;
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); };
+  var toast = function (t) { var el = $('toast'); el.textContent = t; el.classList.add('on'); setTimeout(function () { el.classList.remove('on'); }, 1600); };
+  function kopieren(text) { (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { toast('Kopiert'); }, function () { window.prompt('Zum Kopieren:', text); }); }
+  function feld(label, pfad, wert, max, opts) {
+    opts = opts || {};
+    var zaehler = max ? '<span class="count' + (String(wert || '').length > max ? ' over' : '') + '">' + String(wert || '').length + '/' + max + '</span>' : '';
+    var control = opts.lang ? '<textarea data-p="' + pfad + '">' + esc(wert) + '</textarea>' : '<input type="text" data-p="' + pfad + '" value="' + esc(wert) + '">';
+    return '<label>' + esc(label) + (opts.hint ? ' <small>' + esc(opts.hint) + '</small>' : '') + zaehler + control + '</label>';
+  }
+  function auswahl(label, pfad, wert, optionen) {
+    return '<label>' + esc(label) + '<select data-p="' + pfad + '">' + optionen.map(function (o) { return '<option' + (o === wert ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select></label>';
+  }
+  function setze(pfad, wert) {
+    var teile = pfad.split('.'), ziel = daten.kampagnen[aktuell];
+    for (var i = 0; i < teile.length - 1; i++) ziel = ziel[/^\d+$/.test(teile[i]) ? +teile[i] : teile[i]];
+    ziel[teile[teile.length - 1]] = wert;
+  }
+  function liste() {
+    $('list').innerHTML = daten.kampagnen.map(function (k, i) { return '<button class="item" data-i="' + i + '" aria-current="' + (i === aktuell) + '">' + esc(k.name) + '<span class="chip ' + esc(k.status) + '">' + esc(k.status) + '</span></button>'; }).join('');
+  }
+  function editor() {
+    var k = daten.kampagnen[aktuell]; if (!k) { $('editor').innerHTML = '<p>Noch keine Kampagne.</p>'; return; }
+    var lp = k.landing, h = '';
+    h += '<h2>Kampagne</h2><div class="row">' + feld('Name (nur intern)', 'name', k.name, L.name) + auswahl('Status', 'status', k.status, R.STATUS) + '</div>';
+    h += '<div class="row">' + auswahl('Kanal', 'kanal', k.kanal, R.KANAELE) + feld('Kennung (id)', 'id', k.id, 30, { hint: 'a-z, 0-9, Bindestrich' }) + '</div>';
+    h += feld('Zielgruppe', 'zielgruppe', k.zielgruppe, 0, { lang: true });
+    h += '<h2 style="margin-top:22px">Landingpage</h2>';
+    h += feld('Überschrift', 'landing.ueberschrift', lp.ueberschrift, L.ueberschrift);
+    h += feld('Zeile darunter', 'landing.unterzeile', lp.unterzeile, L.unterzeile, { hint: 'leer lassen = weniger ist mehr' });
+    h += feld('Erste Frage', 'landing.frage', lp.frage, L.frage);
+    h += '<div class="row">' + auswahl('Moment (vorbelegt)', 'landing.moment', lp.moment || '', [''].concat(R.MOMENTE)) + auswahl('Großbuchstaben', 'landing.grossbuchstaben', lp.grossbuchstaben !== false ? 'Ja' : 'Nein', ['Ja', 'Nein']) + '</div>';
+    h += '<h2 style="margin-top:22px">Anzeigen</h2>';
+    h += (k.anzeigen || []).map(function (a, i) {
+      var p = 'anzeigen.' + i + '.';
+      return '<div class="ad"><div class="ad-head"><h3>Anzeige ' + esc(a.id) + '</h3><button class="danger small" data-del="' + i + '">Entfernen</button></div>' +
+        '<div class="row">' + feld('Kennung', p + 'id', a.id, 12) + auswahl('Format', p + 'format', a.format, R.FORMATE) + '</div>' +
+        feld('Text', p + 'text', a.text, L.text, { lang: true }) +
+        '<div class="row">' + feld('Titel', p + 'titel', a.titel, L.titel) + feld('Beschreibung', p + 'beschreibung', a.beschreibung, L.beschreibung) + '</div>' +
+        '<div class="row">' + feld('Knopf', p + 'knopf', a.knopf, L.knopf) + feld('Bildidee', p + 'bildidee', a.bildidee, 0) + '</div></div>';
+    }).join('') + '<button class="light" id="neueAnzeige">+ Anzeige</button>';
+    h += '<h2 style="margin-top:22px">Tracking-Links</h2><p class="hint">Diese Links in die Anzeige eintragen. Kanal, Kampagne und Anzeige werden darüber gezählt.</p>';
+    h += (k.anzeigen || []).map(function (a) { var u = R.link(k, a.id); return '<div class="link"><strong>' + esc(a.id) + '</strong><code>' + esc(u) + '</code><button class="light small" data-copy="' + esc(u) + '">Kopieren</button></div>'; }).join('');
+    h += '<div class="link"><strong>Vorschau</strong><code>' + esc(R.link(k, '').replace('/start/?', '/start/?vorschau=1&')) + '</code><button class="light small" data-copy="' + esc(R.link(k, '').replace('/start/?', '/start/?vorschau=1&')) + '">Kopieren</button></div>';
+    h += '<p style="margin-top:22px"><button class="light small" id="dup">Kampagne duplizieren</button> <button class="danger small" id="del">Kampagne löschen</button></p>';
+    $('editor').innerHTML = h;
+  }
+  function pruefen() {
+    var f = R.pruefe(daten);
+    $('check').innerHTML = f.length ? '<ul class="problems">' + f.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join('') + '</ul>' : '<p class="ok">Alle Regeln erfüllt</p>';
+    $('save').disabled = f.length > 0; $('save').style.opacity = f.length ? .5 : 1;
+  }
+  function vorschau() {
+    var k = daten.kampagnen[aktuell]; if (!k) return;
+    var v = encodeURIComponent(JSON.stringify({ landing: k.landing, src: k.tracking && k.tracking.src || k.kanal }));
+    $('previewHint').textContent = 'Zeigt auch ungespeicherte Änderungen.';
+    $('preview').src = '/start/?k=' + encodeURIComponent(k.id) + '&vorschau=1&embed=1&t=' + Date.now() + '#v=' + v;
+  }
+  function alles(neuVorschau) { liste(); pruefen(); if (neuVorschau) vorschau(); }
+  function csvZelle(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
+  function download(name, text, typ) { var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: typ })); a.download = name; a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000); }
+  document.addEventListener('input', function (e) {
+    var p = e.target.getAttribute && e.target.getAttribute('data-p'); if (!p) return;
+    var v = e.target.value; if (p === 'landing.grossbuchstaben') v = v === 'Ja';
+    if (p === 'landing.moment' && v === '') v = '';
+    setze(p, v);
+    var max = { 'name': L.name, 'landing.ueberschrift': L.ueberschrift, 'landing.unterzeile': L.unterzeile, 'landing.frage': L.frage }[p];
+    var z = e.target.parentNode.querySelector('.count'); if (z) { var m = max || +z.textContent.split('/')[1]; z.textContent = String(v).length + '/' + m; z.classList.toggle('over', String(v).length > m); }
+    if (p === 'name' || p === 'status') liste();
+    pruefen(); clearTimeout(timer); timer = setTimeout(vorschau, 500);
+  });
+  document.addEventListener('change', function (e) { var p = e.target.getAttribute && e.target.getAttribute('data-p'); if (p && /^(kanal|status|id|anzeigen\.\d+\.id)$/.test(p)) { editor(); alles(false); } });
+  document.addEventListener('click', function (e) {
+    var t = e.target, k = daten.kampagnen[aktuell];
+    if (t.dataset.i) { aktuell = +t.dataset.i; editor(); alles(true); }
+    else if (t.dataset.copy) kopieren(t.dataset.copy);
+    else if (t.dataset.del) { k.anzeigen.splice(+t.dataset.del, 1); editor(); alles(false); }
+    else if (t.id === 'neueAnzeige') { k.anzeigen.push({ id: 'a' + (k.anzeigen.length + 1), format: 'feed', text: '', titel: '', beschreibung: '', knopf: 'Mehr dazu', bildidee: '' }); editor(); alles(false); }
+    else if (t.id === 'neu') { daten.kampagnen.push({ id: 'neu-' + (daten.kampagnen.length + 1), name: 'Neue Kampagne', status: 'entwurf', kanal: 'meta', zielgruppe: '', landing: { ueberschrift: daten.standard.ueberschrift, unterzeile: '', frage: daten.standard.frage, moment: '', grossbuchstaben: true }, anzeigen: [], tracking: { src: 'meta', utm_campaign: 'neu-' + (daten.kampagnen.length + 1) }, notizen: '' }); aktuell = daten.kampagnen.length - 1; editor(); alles(true); }
+    else if (t.id === 'dup') { var c = JSON.parse(JSON.stringify(k)); c.id = (k.id + '-2').slice(0, 30); c.name = k.name + ' (Kopie)'; c.status = 'entwurf'; c.tracking.utm_campaign = c.id; daten.kampagnen.push(c); aktuell = daten.kampagnen.length - 1; editor(); alles(true); }
+    else if (t.id === 'del') { if (window.confirm('Kampagne „' + k.name + '“ wirklich löschen?')) { daten.kampagnen.splice(aktuell, 1); aktuell = 0; editor(); alles(true); } }
+    else if (t.id === 'save') { daten.kampagnen.forEach(function (c) { c.tracking = c.tracking || {}; c.tracking.src = c.tracking.src || c.kanal; c.tracking.utm_campaign = c.id; }); download('kampagnen.json', JSON.stringify(daten, null, 2) + '\n', 'application/json'); toast('Heruntergeladen. Datei in kampagnen/ ersetzen, dann node scripts/build-campaigns.mjs'); }
+    else if (t.id === 'csv') {
+      var kopf = ['Kampagne', 'Status', 'Kanal', 'Anzeige', 'Format', 'Text', 'Titel', 'Beschreibung', 'Knopf', 'Ziel-URL', 'Bildidee'];
+      var zeilen = [kopf.map(csvZelle).join(',')];
+      daten.kampagnen.forEach(function (c) { (c.anzeigen || []).forEach(function (a) { zeilen.push([c.name, c.status, c.kanal, a.id, a.format, a.text, a.titel, a.beschreibung, a.knopf, R.link(c, a.id), a.bildidee].map(csvZelle).join(',')); }); });
+      download('anzeigen.csv', '﻿' + zeilen.join('\n'), 'text/csv'); toast('CSV heruntergeladen');
+    }
+  });
+  fetch('/kampagnen/kampagnen.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) { daten = d; editor(); alles(true); }).catch(function () { $('editor').innerHTML = '<p>kampagnen.json konnte nicht geladen werden.</p>'; });
+})();
+</script>
+</body>
+</html>
