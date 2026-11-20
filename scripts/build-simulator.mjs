@@ -52,8 +52,7 @@ const copy = {
     ogLocale: "de_DE",
     ogImage: `${baseURL}/assets/og-de.webp`,
     h1: "Gespräche üben",
-    intro: "Du sprichst mit einer erfundenen Person. Sie reagiert auf jeden Satz. So übst du, was du im echten Moment sagen kannst.",
-    steps: ["Situation wählen", "Satz sagen", "Rückmeldung lesen"],
+    intro: "Wähle eine Situation. Eine KI spielt die Person. Du übst, was du sagen kannst.",
     siteName: "Demenz Coach",
     home: "/de/",
     brandLabel: "Demenz Coach App Startseite",
@@ -62,6 +61,7 @@ const copy = {
     fontLabel: "Schrift größer",
     appNav: "Zur App",
     translatorHref: "/de/demenz-uebersetzer/",
+    translatorName: "Demenz-Übersetzer",
     trainerHref: "/de/demenz-uebersetzer/gespraechstrainer.html",
     planHref: "/start/?src=ueben",
     termsHref: "/nutzungsbedingungen.html",
@@ -72,77 +72,44 @@ const copy = {
     app: "https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&mt=8&ct=",
     infoTitle: "Warum üben hilft",
     info: [
-      "In belastenden Momenten fallen uns oft zuerst Erklärungen und Korrekturen ein. Wer typische Situationen vorher durchspielt, hat eher einen kurzen, wertschätzenden Satz bereit.",
-      "Hier übst du ohne Druck. Die Person im Spiel ist erfunden. Dein Satz kann nichts kaputt machen. Jede Rückmeldung zeigt dir, wie ein Satz wirken kann und was du als Nächstes versuchen kannst.",
-      "Die Rückmeldungen sind Beispiele, keine Regeln. Was passt, hängt von der Person und eurer Beziehung ab."
+      "Im Stress fallen uns oft zuerst Erklärungen und Korrekturen ein. Wer vorher übt, hat eher einen ruhigen Satz bereit. Die Person hier ist erfunden. Du kannst nichts falsch machen."
     ],
-    howTitle: "So funktioniert es",
+    howTitle: "So geht es",
     how: [
-      "Du wählst eine Situation oder beschreibst eure eigene. Die Person sagt ihren ersten Satz.",
-      "Du schreibst, was du sagen würdest, oder tippst einen Vorschlag an.",
-      "Die Person reagiert. Du siehst, wie es ihr geht, und liest eine kurze Rückmeldung zu deinem Satz.",
-      "Nach höchstens fünf Sätzen siehst du, was geholfen hat und was du das nächste Mal probieren kannst."
+      "Wähle eine Situation.",
+      "Tippe an, was du sagen würdest.",
+      "Du siehst, ob es hilft. Die Person antwortet."
     ],
     safetyTitle: "Sicherheit zuerst",
-    safety: "Das ist eine Übung mit einer erfundenen Person. Sie ersetzt keine ärztliche Beratung. Bei plötzlichen Veränderungen, Stürzen, Schmerzen, Atemnot oder Gefahr: Notruf 112, ärztlicher Bereitschaftsdienst 116 117.",
+    safety: "Nur eine Übung. Kein ärztlicher Rat. Bei Schmerzen, Sturz, Atemnot oder Gefahr: Notruf 112, Bereitschaftsdienst 116 117.",
     noscript: "Der Gesprächs-Simulator braucht JavaScript. Situationen und Sätze ohne Übung findest du im Demenz-Übersetzer.",
     ui: {
-      pickTitle: "Wähle eine Situation",
-      addressLabel: "Du sprichst die Person an mit:",
-      more: "{count} weitere Situationen",
-      freeLabel: "Oder beschreibe eure Situation",
+      more: "Mehr Situationen",
+      freeLabel: "Oder schreibe eure Situation:",
       freePlaceholder: "Zum Beispiel: Mama will nachts zur Arbeit.",
-      freeButton: "Üben starten",
-      freeTooShort: "Bitte beschreibe die Situation in einem kurzen Satz.",
-      freeNote: "Es gelten die",
-      termsLink: "Nutzungsbedingungen",
-      and: "und",
+      freeButton: "Üben",
+      freeTooShort: "Bitte schreibe einen kurzen Satz.",
+      freeNote: "Der Text wird nicht gespeichert.",
       privacyLink: "Datenschutz",
-      freeNoteEnd: "(inkl. KI). Der Text geht nur für diese Übung an den Server und wird nicht gespeichert.",
-      disclaimer: "Übung mit einer erfundenen Person. Eine KI spielt sie und kann Fehler machen. Allgemeine Hinweise ohne Gewähr, kein Ersatz für ärztlichen Rat.",
-      practicing: "Du übst",
       back: "Andere Situation",
-      restart: "Neu beginnen",
-      moodTitle: "So geht es der Person",
-      moods: { upset: "Aufgewühlt", unsure: "Unsicher", calmer: "Ruhiger", calm: "Ruhig" },
-      says: "{who} sagt:",
       thePerson: "Die Person",
-      you: "Du sagst:",
-      thinking: "{who} überlegt …",
-      preparing: "Die Situation wird vorbereitet …",
-      sayLabel: "Was sagst du?",
-      sayLabelRound: "Was sagst du? (Satz {round} von {max})",
-      sayPlaceholder: "Schreibe deinen Satz …",
+      says: "{who} sagt:",
+      wait: "Die Person antwortet …",
+      ask: "Was sagst du?",
+      ownOpen: "Eigenen Satz schreiben",
+      ownLabel: "Dein Satz",
+      ownPlaceholder: "Schreibe deinen Satz …",
       sayButton: "Sagen",
-      choicesTitle: "Oder tippe einen Satz an:",
-      choicesLoading: "Sätze zur Auswahl werden geladen …",
-      choicesRetry: "Sätze neu laden",
-      feedbackLabel: "Rückmeldung zu deinem Satz",
-      verdict: { good: "Das hilft.", ok: "Geht so.", tricky: "Eher ungünstig." },
-      betterGood: "Das passt auch:",
-      betterOther: "Besser:",
-      save: "Merken",
-      saved: "Gemerkt",
-      doneTitle: { calm: "Das Gespräch ist ruhig geworden.", calmer: "Das Gespräch ist ruhiger geworden.", unsure: "Das Gespräch ist noch unsicher.", upset: "Das Gespräch ist noch aufgewühlt. Das passiert. Dafür übst du." },
-      doneStats: "{good} von {total} Sätzen haben geholfen.",
-      workedTitle: "Das hat geholfen",
-      nextTitle: "Das nächste Mal",
-      again: "Dieselbe Situation nochmal",
-      other: "Andere Situation üben",
-      real: "Eure echte Situation im Übersetzer",
-      appTitle: "Üben und nachschlagen in der App",
-      appText: "In der App beschreibst du eure Lage und bekommst passende Sätze. Kostenlos laden.",
-      appButton: "Kostenlos im App Store",
-      planLink: "Persönlichen Plan ansehen",
-      busy: "Gerade üben viele Menschen. Bitte versuche es in einer Minute noch einmal.",
-      unavailable: "Die Übung ist gerade nicht erreichbar. Bitte versuche es gleich noch einmal.",
-      retry: "Noch einmal versuchen",
-      fallbackBefore: "Eine Übung ohne KI findest du im",
-      fallbackLink: "Gesprächstrainer",
-      safetyTitle: "Wichtig",
-      offTopicMore: "Für eure eigenen Fragen hilft der",
-      translatorLink: "Demenz-Übersetzer",
-      offTopic: "Das ist keine Gesprächssituation mit der Person. Beschreibe bitte, was die Person sagt oder tut. Zum Beispiel: Mama will nachts zur Arbeit."
+      verdict: { good: "Gut gemacht.", ok: "Geht so.", tricky: "Lieber anders." },
+      better: "Besser:",
+      doneTitle: { calm: "Geschafft! {who} ist ruhig.", calmer: "Gut! {who} ist ruhiger.", unsure: "Gut geübt. Das war schwer.", upset: "Gut geübt. Das war schwer." },
+      again: "Nochmal üben",
+      other: "Andere Situation",
+      app: "Mehr Sätze in der App",
+      busy: "Gerade üben viele. Bitte versuche es gleich noch einmal.",
+      unavailable: "Das Üben geht gerade nicht. Bitte versuche es gleich noch einmal.",
+      retry: "Nochmal versuchen",
+      offTopic: "Das können wir hier nicht üben. Schreibe, was die Person sagt oder tut. Zum Beispiel: Mama will nachts zur Arbeit."
     }
   },
   en: {
@@ -155,8 +122,7 @@ const copy = {
     ogLocale: "en_US",
     ogImage: `${baseURL}/assets/og-en.webp`,
     h1: "Practice conversations",
-    intro: "You talk with an invented person. They react to every sentence. This is how you practise what you can say in the real moment.",
-    steps: ["Pick a situation", "Say a sentence", "Read the feedback"],
+    intro: "Pick a situation. An AI plays the person. You practise what to say.",
     siteName: "Dementia Coach",
     home: "/en/",
     brandLabel: "Dementia Coach App home",
@@ -165,6 +131,7 @@ const copy = {
     fontLabel: "Larger text",
     appNav: "Get the app",
     translatorHref: "/en/dementia-translator/",
+    translatorName: "Dementia Translator",
     trainerHref: "/en/dementia-translator/",
     planHref: "",
     termsHref: "/terms-en.html",
@@ -175,77 +142,44 @@ const copy = {
     app: "https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&mt=8&ct=",
     infoTitle: "Why practising helps",
     info: [
-      "In stressful moments, explanations and corrections often come to mind first. If you play through typical situations beforehand, a short, appreciative sentence is easier to find.",
-      "Here you practise without pressure. The person in the game is invented. Your sentence cannot break anything. Every piece of feedback shows how a sentence can land and what to try next.",
-      "The feedback gives examples, not rules. What fits depends on the person and your relationship."
+      "Under stress, explanations and corrections come to mind first. If you practise beforehand, a calm sentence is easier to find. The person here is invented. You cannot do anything wrong."
     ],
     howTitle: "How it works",
     how: [
-      "You pick a situation or describe your own. The person says their first sentence.",
-      "You write what you would say, or tap a suggestion.",
-      "The person reacts. You see how they feel and read short feedback on your sentence.",
-      "After at most five sentences you see what helped and what to try next time."
+      "Pick a situation.",
+      "Tap what you would say.",
+      "You see if it helps. The person answers."
     ],
     safetyTitle: "Safety first",
-    safety: "This is practice with an invented person. It does not replace medical advice. For sudden changes, falls, pain, trouble breathing or danger, call your local emergency number.",
+    safety: "Practice only. Not medical advice. For pain, a fall, trouble breathing or danger, call your local emergency number.",
     noscript: "The conversation simulator needs JavaScript. You can find situations and sentences without practice in the Dementia Translator.",
     ui: {
-      pickTitle: "Pick a situation",
-      addressLabel: "",
-      more: "{count} more situations",
-      freeLabel: "Or describe your situation",
+      more: "More situations",
+      freeLabel: "Or write your situation:",
       freePlaceholder: "For example: Mom wants to go to work at night.",
-      freeButton: "Start practising",
-      freeTooShort: "Please describe the situation in a short sentence.",
-      freeNote: "Our",
-      termsLink: "terms of use",
-      and: "and",
-      privacyLink: "privacy policy",
-      freeNoteEnd: "(incl. AI) apply. The text goes to the server only for this practice and is not stored.",
-      disclaimer: "Practice with an invented person. An AI plays them and can make mistakes. General information without guarantee, not a substitute for medical advice.",
-      practicing: "You practise",
+      freeButton: "Practise",
+      freeTooShort: "Please write a short sentence.",
+      freeNote: "The text is not stored.",
+      privacyLink: "Privacy",
       back: "Other situation",
-      restart: "Start over",
-      moodTitle: "How the person feels",
-      moods: { upset: "Upset", unsure: "Unsure", calmer: "Calmer", calm: "Calm" },
-      says: "{who} says:",
       thePerson: "The person",
-      you: "You say:",
-      thinking: "{who} is thinking …",
-      preparing: "Preparing the situation …",
-      sayLabel: "What do you say?",
-      sayLabelRound: "What do you say? (Sentence {round} of {max})",
-      sayPlaceholder: "Write your sentence …",
+      says: "{who} says:",
+      wait: "The person is answering …",
+      ask: "What do you say?",
+      ownOpen: "Write your own sentence",
+      ownLabel: "Your sentence",
+      ownPlaceholder: "Write your sentence …",
       sayButton: "Say it",
-      choicesTitle: "Or tap a sentence:",
-      choicesLoading: "Loading suggestions …",
-      choicesRetry: "Reload suggestions",
-      feedbackLabel: "Feedback on your sentence",
-      verdict: { good: "That helps.", ok: "So-so.", tricky: "Rather unhelpful." },
-      betterGood: "This works too:",
-      betterOther: "Better:",
-      save: "Save",
-      saved: "Saved",
-      doneTitle: { calm: "The conversation became calm.", calmer: "The conversation became calmer.", unsure: "The conversation is still unsure.", upset: "The conversation is still upset. That happens. That is what you practise for." },
-      doneStats: "{good} of {total} sentences helped.",
-      workedTitle: "What helped",
-      nextTitle: "Next time",
-      again: "Same situation again",
-      other: "Practise another situation",
-      real: "Your real situation in the translator",
-      appTitle: "Practise and look things up in the app",
-      appText: "In the app you describe your situation and get fitting sentences. Free to download.",
-      appButton: "Free on the App Store",
-      planLink: "",
-      busy: "Many people are practising right now. Please try again in a minute.",
-      unavailable: "The practice is not available right now. Please try again shortly.",
+      verdict: { good: "Well done.", ok: "So-so.", tricky: "Better not." },
+      better: "Better:",
+      doneTitle: { calm: "Well done! {who} is calm.", calmer: "Good! {who} is calmer.", unsure: "Good practice. That was hard.", upset: "Good practice. That was hard." },
+      again: "Practise again",
+      other: "Other situation",
+      app: "More sentences in the app",
+      busy: "Many people are practising. Please try again in a moment.",
+      unavailable: "Practice is not available right now. Please try again in a moment.",
       retry: "Try again",
-      fallbackBefore: "You can find sentences without AI in the",
-      fallbackLink: "Dementia Translator",
-      safetyTitle: "Important",
-      offTopicMore: "For your own questions, try the",
-      translatorLink: "Dementia Translator",
-      offTopic: "That is not a conversation with the person. Please describe what the person says or does. For example: Mom wants to go to work at night."
+      offTopic: "We cannot practise that here. Write what the person says or does. For example: Mom wants to go to work at night."
     }
   }
 };
@@ -318,7 +252,7 @@ const page = (language) => {
   <link rel="sitemap" type="application/xml" href="${baseURL}/sitemap.xml">
   <link rel="stylesheet" href="/translator.css">
   <link rel="stylesheet" href="/einfach.css">
-  <link rel="stylesheet" href="/simulator.css?v=20261120b">
+  <link rel="stylesheet" href="/simulator.css?v=20261120c">
   <script>${font}</script>
   <script type="application/ld+json">${json(schema)}</script>
 </head>
@@ -334,10 +268,9 @@ const page = (language) => {
     <section class="sim-hero">
       <h1>${escape(c.h1)}</h1>
       <p>${escape(c.intro)}</p>
-      <ol class="sim-steps">${c.steps.map((step) => `<li>${escape(step)}</li>`).join("")}</ol>
     </section>
-    <div id="sim" aria-live="off">
-      <noscript><p>${escape(c.noscript)} <a href="${c.translatorHref}">${escape(c.ui.fallbackLink)}</a></p></noscript>
+    <div id="sim" aria-live="polite">
+      <noscript><p>${escape(c.noscript)} <a href="${c.translatorHref}">${escape(c.translatorName)}</a></p></noscript>
     </div>
     <section class="sim-info" aria-labelledby="sim-how-title">
       <h2 id="sim-how-title">${escape(c.howTitle)}</h2>
@@ -359,8 +292,7 @@ const page = (language) => {
   <script>window.demenzCoachSiteLocale=${json(language === "en" ? { menuOpen: "Open menu", menuClose: "Close menu", privacyURL: "/privacy-en.html" } : { menuOpen: "Menü öffnen", menuClose: "Menü schließen", privacyURL: "/datenschutz.html" })};</script>
   <script src="/lovable-home.js?v=20261108a"></script>
   <script type="application/json" id="sim-data">${json(data)}</script>
-  <script src="/demenz-uebersetzer/translator-saved.js"></script>
-  <script src="/simulator.js?v=20261120b"></script>
+  <script src="/simulator.js?v=20261120c"></script>
 </body>
 </html>
 `;
