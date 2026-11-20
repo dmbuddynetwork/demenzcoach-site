@@ -27,3 +27,13 @@ Nichtmedizinisch (keine Diagnose, Therapie, Medikamente, Wirkversprechen). Keine
 
 ## Schutz (Daniel, 20. Nov 2026: alle Admin-Sachen geschützt)
 Alles unter `/intern/` (Verwaltung und `kampagnen.json` mit Notizen, Zielgruppen und Entwürfen) verlangt ein Passwort. Das prüft der Worker (`internGate` in `cloudflare-worker.js`), bevor eine Datei ausgeliefert wird. Das Passwort steht als Secret `INTERN_PASSWORD` im Cloudflare-Worker `dementiacoachapp` (Settings, Variables and Secrets), mindestens 16 Zeichen, nie im Repo. Benutzername `team` (oder Secret `INTERN_USER`). Fehlt das Secret, bleibt die Verwaltung gesperrt (503). Frei ist nur die Geräte-Markierung `/intern/` (speichert nur ein Merkzeichen im eigenen Browser). Öffentlich sind außerdem `regeln.js` (nur Regeln) und `data.js` (nur aktive Kampagnen).
+
+## Auswertung in GA4 (ohne eigene Dimension)
+
+Die GA4-Property hat das Limit von 50 Dimensionen auf Ereignisebene erreicht. Darum läuft die Auswertung über eingebaute Dimensionen:
+
+- Kampagne = **Sitzungskampagne** (`utm_campaign`)
+- Anzeige = **Sitzungs-Anzeigeninhalt** (`utm_content`)
+- Kanal = **Sitzungsquelle / -medium** (`utm_source`, `utm_medium`)
+
+Die Tracking-Links der Verwaltung tragen alle vier Werte. Ein Link nur mit `?k=…&a=…` bekommt sie von `start/kampagne-utm.js` ergänzt, bevor GA lädt (nicht in der Vorschau). Neue Kampagnen brauchen deshalb keine Einrichtung in GA4. Bericht: Berichte → Akquisition → Zugriffsquelle, Dimension „Sitzungskampagne“; Ereignisse (Quiz-Start, E-Mail, Kauf) per Exploration mit derselben Dimension.
