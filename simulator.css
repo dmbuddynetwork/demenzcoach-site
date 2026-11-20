@@ -47,23 +47,30 @@ body.sim-page .sim-dots i:nth-child(3) { animation-delay: .4s; }
 @keyframes sim-dot { 0%, 80%, 100% { opacity: .3; transform: none; } 40% { opacity: 1; transform: translateY(-3px); } }
 @media (prefers-reduced-motion: reduce) { body.sim-page .sim-dots i { animation: none; opacity: .7; } }
 
-/* Rückmeldung: Symbol, ein Wort, ein Satz (wie das Ergebnis im Lernen der App) */
-body.sim-page .sim-feedback { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; padding: 16px; border-radius: 18px; }
-body.sim-page .sim-feedback p { margin: 0; }
-body.sim-page .sim-feedback q { quotes: "„" "“"; font-weight: 700; }
-html[lang^="en"] body.sim-page .sim-feedback q { quotes: "“" "”"; }
-body.sim-page .sim-fb-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; }
+/* Rückmeldung: Leiste unten wie bei Lern-Apps (Symbol, ein Wort, ein Satz, Knopf) */
+body.sim-page.sim-bar-open { padding-bottom: 300px; }
+body.sim-page .sim-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(30, 25, 60, .08); box-shadow: 0 -8px 24px rgba(30, 25, 60, .10); animation: sim-up .22s ease-out; }
+body.sim-page .sim-bar-inner { display: grid; gap: 12px; max-width: 40rem; margin: 0 auto; }
+body.sim-page .sim-bar-head { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; }
+body.sim-page .sim-bar p { margin: 0; }
+body.sim-page .sim-bar q { quotes: "„" "“"; font-weight: 700; }
+html[lang^="en"] body.sim-page .sim-bar q { quotes: "“" "”"; }
+body.sim-page .sim-fb-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #fff; }
 body.sim-page .sim-verdict { font-size: 1.25rem !important; font-weight: 800; margin-bottom: 2px !important; }
-body.sim-page .sim-feedback.is-good { background: #e7f4ea; color: #1d5e33; }
-body.sim-page .sim-feedback.is-good .sim-fb-icon { background: #fff; color: #1d7a42; }
-body.sim-page .sim-feedback.is-hint { background: var(--e-lav); color: var(--e-text); }
-body.sim-page .sim-feedback.is-hint .sim-fb-icon { background: #fff; color: var(--e-purple); }
+body.sim-page .sim-bar.is-good { background: #e7f4ea; color: #1d5e33; }
+body.sim-page .sim-bar.is-good .sim-fb-icon { color: #1d7a42; }
+body.sim-page .sim-bar.is-hint { background: #efedf8; color: var(--e-text); }
+body.sim-page .sim-bar.is-hint .sim-fb-icon { color: var(--e-purple); }
+body.sim-page .sim-bar.is-hint .sim-light { background: #fff; }
+@keyframes sim-up { from { transform: translateY(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { body.sim-page .sim-bar { animation: none; } }
 
 /* Antworten: wie die Antwortzeilen im Lernen der App (Buchstabe, Text, Pfeil) */
 body.sim-page .sim-answer { display: grid; gap: 10px; margin-top: 4px; }
 body.sim-page .sim-answer h2 { margin-bottom: 2px !important; }
 body.sim-page .sim-choice { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 64px; padding: 16px; background: #fff; color: var(--e-text); border: 1px solid var(--e-line); border-radius: 18px; font: inherit; font-weight: 400; line-height: 1.35; text-align: left; cursor: pointer; }
 body.sim-page .sim-choice:hover { border-color: var(--e-purple); }
+body.sim-page .sim-choice.is-tried { opacity: .45; text-decoration: line-through; cursor: default; }
 body.sim-page .sim-choice:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 2px; }
 body.sim-page .sim-mark { flex: 0 0 32px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--e-lav); color: var(--e-purple); font-size: var(--e-small) !important; font-weight: 800; }
 body.sim-page .sim-choice-text { flex: 1 1 auto; min-width: 0; }
