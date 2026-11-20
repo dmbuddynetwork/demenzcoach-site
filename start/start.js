@@ -791,7 +791,7 @@
       el("li", {}, [el("span", { class: "start-included-icon", html: icon }), el("span", {}, [el("strong", { text: title }), el("span", { text })])])));
 
     // Bilder aus dem Plan wie BetterMe: echte Bildschirme in hellen Handy-Rahmen. Das mittlere Handy ist groß, die Nachbarn schauen
-    // seitlich hervor, darunter Punkte. Wischen oder auf ein Nachbar-Handy tippen.
+    // seitlich hervor, darunter Punkte, kein Text (Daniel 20. Nov: „kleiner wie bei BetterMe, ohne Text darunter“). Der Text bleibt als Alt-Text.
     const shotList = [
       ["ueben-waehlen", "Antwort wählen"],
       ["ueben-rueckmeldung", "Sofort Rückmeldung"],
@@ -801,8 +801,7 @@
       ["app-help", "Soforthilfe"]
     ];
     const slides = shotList.map(([file, caption], index) => el("figure", { class: index === 0 ? "is-on" : "" }, [
-      el("span", { class: "start-phone" }, [el("img", { src: `/assets/angebot/${file}.webp`, width: "720", height: "1566", loading: index < 2 ? "eager" : "lazy", decoding: "async", alt: caption })]),
-      el("figcaption", { text: caption })
+      el("span", { class: "start-phone" }, [el("img", { src: `/assets/angebot/${file}.webp`, width: "720", height: "1566", loading: index < 3 ? "eager" : "lazy", decoding: "async", alt: caption })])
     ]));
     const dots = shotList.map((_, index) => el("button", { type: "button", class: index === 0 ? "is-on" : "", "aria-label": `Bild ${index + 1} von ${shotList.length}` }));
     const track = el("div", { class: "start-shots-track" }, slides);
