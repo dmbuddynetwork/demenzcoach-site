@@ -914,3 +914,12 @@ body.einfach .e-loc-situations > h2 { font-size: 1.5rem; margin-bottom: 12px; }
 body.einfach .e-loc-situation p { margin: 0 0 8px; }
 body.einfach .e-loc-label { margin: 12px 0 4px !important; color: var(--e-purple); font-weight: 700; font-size: var(--e-small); }
 body.einfach .e-loc-say { padding: 12px 16px; background: var(--e-bg); border: 1px solid var(--e-line); border-radius: 18px; font-weight: 700; }
+
+/* Situation pages: calm "Warum …?" block below the answer (scripts/enrich-situation-schema.mjs). */
+body.einfach .situation-more { margin: 24px 0; text-align: start; }
+body.einfach .situation-more h2 { margin: 0 0 12px; font-size: 1.5rem; }
+body.einfach .situation-more h3 { margin: 20px 0 8px; font-size: 1.125rem; color: var(--e-purple); }
+body.einfach .situation-more p { margin: 0 0 8px; }
+body.einfach .situation-more ul { margin: 0; padding-inline-start: 1.2em; }
+body.einfach .situation-more li { margin: 0 0 8px; }
+body.einfach .situation-more .situation-more-guide { margin-top: 16px; }
