@@ -37,12 +37,12 @@ async function offer(page, moment) {
   await page.goto(`${base}/start/${moment ? '?m=' + moment : ''}`);
   await page.locator('.consent-decline').click();
   const visited = [];
-  for (let step = 0; step < 30; step += 1) {
+  for (let step = 0; step < 80; step += 1) {
     visited.push(await page.locator('body').getAttribute('data-screen'));
     if (await page.locator('.start-tiers').count()) return;
     if (await page.locator('#email').count()) {
       await page.locator('#email').fill('synthetic@example.invalid');
-      await page.getByRole('button', { name: 'Meinen Plan ansehen', exact: true }).click();
+      await page.getByRole('button', { name: 'Weiter', exact: true }).click();
     } else if (await page.getByRole('button', { name: 'Kein Interesse', exact: true }).count()) {
       await page.getByRole('button', { name: 'Kein Interesse', exact: true }).click();
     } else if (await page.getByRole('button', { name: 'Überspringen', exact: true }).count()) {
@@ -141,9 +141,9 @@ test('questionnaire preserves the chosen moment through offer, plan selection an
   const { context, page, errors } = await pageFor();
   try {
     await offer(page, 'nachhause');
-    assert.equal(await page.locator('#screen h1').innerText(), 'Passende Worte für euren Alltag');
+    assert.match(await page.locator('#screen h1').innerText(), /Dein Plan ist bereit!/);
     assert.ok((await page.locator('#screen .start-card').first().innerText()).includes('Ich will nach Hause.'));
-    assert.equal(await page.locator('.start-hero').count(), 0, 'No unproven before/after improvement graphic');
+    assert.equal(await page.locator('.start-hero').count(), 1, 'Jetzt/Dein Ziel pair of drawings like BetterMe (illustration only)');
     assert.ok((await page.locator('[data-start-fine]').first().innerText()).includes('verlängert sich'));
     await fits(page);
     await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
