@@ -8,7 +8,18 @@
 (() => {
   const $ = (id) => document.getElementById(id);
   const params = new URLSearchParams(location.search);
-  const source = (params.get("src") || params.get("utm_source") || "ads").toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 30) || "ads";
+  // Quelle: erst src/utm_source. Ohne beides aus dem App-Browser erkennen (Facebook, Instagram und TikTok entfernen den Referrer,
+  // der Besuch liefe sonst als „direkt“). Es wird nichts gespeichert, nur der Name der Quelle als Text benutzt.
+  const guessSource = () => {
+    const agent = navigator.userAgent || "";
+    let from = "";
+    try { from = new URL(document.referrer).hostname; } catch { /* kein Referrer */ }
+    if (/FBAN|FBAV|FB_IAB|FBIOS/u.test(agent) || /(^|\.)facebook\.com$|(^|\.)fb\.com$|^l\.facebook\.com$/u.test(from)) return "fb_app";
+    if (/Instagram/u.test(agent) || /(^|\.)instagram\.com$/u.test(from)) return "ig_app";
+    if (/musical_ly|BytedanceWebview|TikTok/iu.test(agent) || /tiktok\.com$/u.test(from)) return "tiktok_app";
+    return "ads";
+  };
+  const source = (params.get("src") || params.get("utm_source") || guessSource()).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 30) || "ads";
   const config = window.DEMENZ_ABO_CONFIG || {};
 
   const svg = (paths) => `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
@@ -31,6 +42,30 @@
 
   const data = window.DEMENZ_PLAN_DATA;
   const { relations, situations, frequencies, burdens, storageKey } = data;
+  // Zusätzliche Fragen (Daniel, 20. Nov 2026: Länge und Zwischenstopps wie BetterMe, die Länge ist bewusst: Investition).
+  // Nur Alltag und Gefühle, nichts Medizinisches, keine Diagnose, kein Stadium. Antworten bleiben im Browser.
+  const opt = (...labels) => labels.map((label, index) => ({ key: String(index), label }));
+  const extra = {
+    age: opt("Unter 40", "40 bis 49", "50 bis 59", "60 bis 69", "70 oder älter"),
+    personAge: opt("Unter 70", "70 bis 79", "80 bis 89", "90 oder älter"),
+    reaction: opt("Wird traurig und weint", "Wird laut oder wütend", "Zieht sich zurück", "Wird unruhig und läuft herum", "Fragt immer wieder dasselbe"),
+    visits: opt("Jeden Tag", "Ein paar Mal pro Woche", "Selten", "Fast nie"),
+    outings: opt("Jeden Tag", "Ein paar Mal pro Woche", "Nur mit Begleitung", "Kaum noch"),
+    meals: opt("Gut", "Muss ans Essen erinnert werden", "Lehnt Essen oft ab", "Will ständig essen"),
+    helpreact: opt("Nimmt die Hilfe an", "Wehrt ab", "Wird ärgerlich", "Ganz unterschiedlich"),
+    feeling: opt("Ich bin erschöpft", "Ich fühle mich schuldig", "Ich bin traurig", "Ich bin wütend", "Ich lasse es schnell los"),
+    sleep: opt("Gut", "Mal so, mal so", "Eher schlecht", "Kaum"),
+    breaks: opt("Jeden Tag", "Ein paar Mal pro Woche", "Selten", "Fast nie"),
+    work: opt("Vollzeit", "Teilzeit", "Ich bin in Rente", "Ich bin nicht berufstätig"),
+    when: opt("Morgens", "Mittags", "Nachmittags", "Abends"),
+    joy: opt("Ein ruhiger Abend", "Weniger Streit", "Mehr gemeinsames Lachen", "Weniger schlechtes Gewissen", "Mehr Kraft für mich"),
+    moments: opt("Aufstehen und Anziehen", "Waschen und Duschen", "Essen und Trinken", "Spazieren und Rausgehen", "Besuch und Telefon", "Abend und Schlafengehen", "Nachts"),
+    calms: opt("Musik und Lieder", "Alte Fotos", "Ein Spaziergang", "Etwas zu essen oder zu trinken", "Eine Berührung oder Umarmung", "Eine Aufgabe zum Helfen", "Ich weiß es noch nicht"),
+    helpers: opt("Familie", "Freunde oder Nachbarn", "Pflegedienst", "Tagespflege", "Ich mache fast alles allein"),
+    learn: opt("Kurze Sätze zum Nachsprechen", "Kleine Erklärungen", "Beispiele aus dem Alltag", "Zum Vorlesen oder Ausdrucken")
+  };
+  const singleNames = ["age", "personAge", "reaction", "visits", "outings", "meals", "helpreact", "feeling", "sleep", "breaks", "work", "when", "joy"];
+  const multiNames = ["moments", "calms", "helpers", "learn"];
   const requestedContext = params.get("s") || params.get("m") || "";
   const contextCandidate = window.DemenzSituationContext?.resolve(requestedContext) || null;
   // Invalid or excluded keys use the existing general entry, never an invented situation.
@@ -38,7 +73,9 @@
   const directContext = directMode ? contextCandidate : null;
 
   const answers = { relation: null, name: "", situation: null, frequency: null, dayTime: null, duration: null, living: null,
-    tries: [], goal: null, burden: null, minutes: null, email: "" };
+    tries: [], goal: null, burden: null, minutes: null, email: "",
+    age: null, personAge: null, reaction: null, visits: null, outings: null, meals: null, helpreact: null, feeling: null, sleep: null,
+    breaks: null, work: null, when: null, joy: null, moments: [], calms: [], helpers: [], learn: [] };
   let plan = "yearly";
   let offer = { yearly: 6999, monthly: 1299, currency: "eur", trialDays: 7, offers: null };
   // Willkommenspreis (angebot.js): Preis vom Server; die Gültigkeit prüft die Kasse erneut.
@@ -127,11 +164,21 @@
   // Vom Übersetzer (Angebotskarte): der zuletzt eingegebene Satz bleibt nur in diesem Tab und wird nur angezeigt.
   let typed = "";
   try { typed = String(sessionStorage.getItem("demenzCoachKiOffen") || "").slice(0, 120); } catch { /* */ }
-  const flow = ["relation", "name", ...(preset ? [] : ["situation"]), "frequency", "dayTime", "thanks", "duration", "living",
-    "tries", "insight", "goal", "burden", "minutes", "how", "building", "email", "newsletter", "result", "reveal", "plan"];
+  // Fünf Abschnitte wie BetterMe („Mein Profil“ bis „Fast geschafft“), dazwischen Zwischenstopps (Infoseiten).
+  const sectionDefs = [
+    { title: "Über euch", steps: ["relation", "name", "age", "personAge", "hello", "living", "duration", "situation"] },
+    { title: "Euer Alltag", steps: ["frequency", "dayTime", "thanks", "moments", "reaction", "feelings", "visits", "outings", "meals",
+      "helpreact", "calms", "tries", "insight"] },
+    { title: "Du selbst", steps: ["feeling", "sleep", "breaks", "helpers", "self", "work"] },
+    { title: "Dein Ziel", steps: ["goal", "burden", "hope", "minutes", "learn", "when", "content", "step"] },
+    { title: "Fast geschafft", steps: ["joy", "motivate", "how"] }
+  ].map((section) => ({ ...section, steps: section.steps.filter((step) => !(preset && step === "situation")) }));
+  const flow = [...sectionDefs.flatMap((section) => section.steps), "building", "email", "newsletter", "result", "reveal", "plan"];
   const answerFor = { relation: "relation", situation: "situation", frequency: "frequency", dayTime: "dayTime", duration: "duration",
-    living: "living", goal: "goal", burden: "burden", minutes: "minutes" };
-  const interstitials = ["thanks", "insight", "how", "building", "email", "newsletter", "result", "reveal", "plan"];
+    living: "living", goal: "goal", burden: "burden", minutes: "minutes",
+    ...Object.fromEntries(singleNames.map((name) => [name, name])) };
+  const interstitials = ["thanks", "insight", "how", "hello", "feelings", "self", "hope", "content", "step", "motivate",
+    "building", "email", "newsletter", "result", "reveal", "plan"];
   const isQuestion = (name) => !interstitials.includes(name);
   const questions = flow.filter(isQuestion).length;
   const stepNumber = (name) => flow.slice(0, flow.indexOf(name) + 1).filter(isQuestion).length;
@@ -145,7 +192,8 @@
   const progressContext = JSON.stringify([source, preset?.key || ""]);
   const choiceSets = { relation: relations, situation: situations, frequency: frequencies,
     dayTime: data.dayTimes, duration: data.durations, living: data.livings,
-    goal: data.goals, burden: burdens, minutes: data.minutes };
+    goal: data.goals, burden: burdens, minutes: data.minutes, ...Object.fromEntries(singleNames.map((name) => [name, extra[name]])) };
+  const multiSets = Object.fromEntries(multiNames.map((name) => [name, extra[name]]));
   const forgetProgress = () => { clearTimeout(progressExpiryTimer); try { sessionStorage.removeItem(progressKey); } catch { /* privates Fenster */ } };
   function saveProgress(screen) {
     if (directMode) return;
@@ -155,8 +203,9 @@
       if (items.includes(answers[key])) choices[key] = answers[key].key;
     }
     const tries = answers.tries.filter(item => data.tries.includes(item)).map(item => item.key);
+    const multi = Object.fromEntries(Object.entries(multiSets).map(([key, items]) => [key, answers[key].filter(item => items.includes(item)).map(item => item.key)]));
     try {
-      sessionStorage.setItem(progressKey, JSON.stringify({ version: 1, at: Date.now(), context: progressContext, screen, choices, tries }));
+      sessionStorage.setItem(progressKey, JSON.stringify({ version: 1, at: Date.now(), context: progressContext, screen, choices, tries, multi }));
       clearTimeout(progressExpiryTimer);
       progressExpiryTimer = setTimeout(forgetProgress, progressMaxAge);
     } catch { /* ohne Speicher normal weiter */ }
@@ -173,6 +222,7 @@
     for (const [key, items] of Object.entries(choiceSets)) answers[key] = items.find(item => item.key === saved.choices[key]) || null;
     if (preset) answers.situation = preset;
     answers.tries = data.tries.filter(item => saved.tries.includes(item.key));
+    for (const [key, items] of Object.entries(multiSets)) answers[key] = items.filter(item => Array.isArray(saved.multi?.[key]) && saved.multi[key].includes(item.key));
     answers.name = answers.relation?.call || "";
     // Ergebnis und Angebot brauchen eine E-Mail; diese wird im Checkpoint nicht gespeichert.
     const screen = flow.indexOf(saved.screen) >= flow.indexOf("building") ? "email" : saved.screen;
@@ -194,7 +244,7 @@
       return [
         el("h1", { class: "start-center", text: preset ? `Was sagen bei „${bare(preset.quote)}“?` : "Persönliche Hilfe für schwierige Alltagssituationen" }),
         typed ? el("p", { class: "start-typed", text: `Deine Frage: „${typed}“` }) : null,
-        el("p", { class: "start-lead start-center", text: `Wähle, wobei du Unterstützung brauchst · ${questions} kurze Fragen` }),
+        el("p", { class: "start-lead start-center", text: `Wähle, wobei du Unterstützung brauchst · dauert etwa ${Math.max(2, Math.round(questions / 7))} Minuten` }),
         el("h2", { class: "start-question start-center", text: "Für wen suchst du Hilfe?" }),
         el("div", { class: "start-pics" }, relations.filter((item) => pictures[item.key]).map((item) => el("button", {
           type: "button", class: "start-pic", "aria-label": item.label, onclick: () => choose(item)
@@ -291,16 +341,32 @@
       next("how")
     ],
     building: () => {
-      // Diese Angaben sind schon vorhanden. Hier läuft keine Planberechnung.
+      // Ehrlicher Lade-Ring: Es wird nichts berechnet. Die Angaben sind schon da und werden nur nacheinander gezeigt.
       const selected = [
         ["Situation", bare(chosen().quote)],
         ["Tageszeit", answers.dayTime?.text],
         ["Dein Ziel", answers.goal?.text]
       ].filter(([, value]) => value);
+      const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const ring = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      ring.setAttribute("viewBox", "0 0 100 100");
+      ring.setAttribute("class", "start-ring" + (still ? " is-done" : ""));
+      ring.setAttribute("aria-hidden", "true");
+      ring.innerHTML = '<circle class="start-ring-bg" cx="50" cy="50" r="42"/><circle class="start-ring-fg" cx="50" cy="50" r="42"/>';
+      const rows = selected.map(([label, value], index) => el("div", { class: "start-summary-row" + (still ? " is-shown" : ""), style: `--i:${index}` }, [el("dt", { text: label }), el("dd", { text: value })]));
+      const button = el("button", { type: "button", class: "abo-button start-next start-build-next", text: "Weiter", onclick: () => go(after("building"), { replace: true }) });
+      if (!still) {
+        rows.forEach((row, index) => setTimeout(() => row.classList.add("is-shown"), 700 + index * 900));
+        setTimeout(() => ring.classList.add("is-done"), 700 + selected.length * 900);
+        button.classList.add("is-waiting");
+        setTimeout(() => button.classList.remove("is-waiting"), 700 + selected.length * 900);
+      }
       return [
-        el("h1", { class: "start-center", text: "Deine Angaben im Überblick" }),
-        el("dl", { class: "start-summary" }, selected.flatMap(([label, value]) => [el("dt", { text: label }), el("dd", { text: value })])),
-        el("button", { type: "button", class: "abo-button start-next", text: "Weiter", onclick: () => go(after("building"), { replace: true }) })
+        el("div", { class: "start-ring-wrap" }, [ring]),
+        el("h1", { class: "start-center", text: "Wir legen deine Antworten zusammen" }),
+        el("p", { class: "start-lead start-center", text: "Das sind deine Angaben bisher. Als Nächstes zeigen wir dir das Ergebnis." }),
+        el("dl", { class: "start-summary" }, rows),
+        button
       ];
     },
     email: () => emailScreen(),
@@ -309,6 +375,51 @@
     reveal: () => revealScreen(),
     plan: () => planScreen()
   };
+
+  // Weitere Fragen: Einzelauswahl geht sofort weiter, Mehrfachauswahl mit „Weiter“ (wie BetterMe).
+  const person = () => forWho() || "die Person";
+  const singleTitles = {
+    age: () => "Wie alt bist du?",
+    personAge: () => `Wie alt ist ${person()} ungefähr?`,
+    reaction: () => `Wie reagiert ${person()} meistens, wenn es schwierig wird?`,
+    visits: () => `Wie oft hat ${person()} Besuch oder Gesellschaft?`,
+    outings: () => `Geht ${person()} noch nach draußen?`,
+    meals: () => "Wie läuft das Essen meistens?",
+    helpreact: () => `Wie reagiert ${person()}, wenn du hilfst?`,
+    feeling: () => "Wie geht es dir nach einem schwierigen Moment?",
+    sleep: () => "Wie gut schläfst du gerade?",
+    breaks: () => "Wie oft hast du Zeit für dich?",
+    work: () => "Bist du berufstätig?",
+    when: () => "Wann hast du am ehesten Zeit?",
+    joy: () => "Stell dir vor, es klappt besser. Worüber freust du dich am meisten?"
+  };
+  for (const name of singleNames) {
+    screens[name] = () => [el("h1", { text: singleTitles[name]() }), optionList(extra[name], answers[name], pick(name, name))];
+  }
+  const multiTitles = {
+    moments: () => "Bei welchen Momenten ist es am schwersten?",
+    calms: () => `Was beruhigt ${person()} manchmal?`,
+    helpers: () => "Wer hilft dir im Alltag?",
+    learn: () => "Wie lernst du am liebsten?"
+  };
+  for (const name of multiNames) {
+    screens[name] = () => [el("h1", { text: multiTitles[name]() }), el("p", { class: "start-lead", text: "Du kannst mehreres wählen." }),
+      multiList(extra[name], answers[name]), next(name)];
+  }
+  // Zwischenstopps (Zeichnung, kurze Überschrift, zwei Sätze). Keine erfundenen Zahlen, Logos oder Zitate.
+  const infoPages = {
+    hello: ["together.webp", "Du bist nicht allein", "Viele Angehörige suchen jeden Tag nach den richtigen Worten. Mit jeder Antwort wird dein Plan genauer."],
+    feelings: ["schritt-zurueck.webp", "Erst das Gefühl, dann die Fakten", "Hinter vielen Sätzen steckt ein Gefühl: Angst, Sehnsucht oder der Wunsch, gebraucht zu werden. Dein Plan zeigt dir, was dahinter stecken könnte."],
+    self: ["pause-tochter.webp", "Auch du zählst", "Wer sich kümmert, braucht selbst Pausen. Dein Plan hat kleine Hilfen für dich, die nur wenige Minuten brauchen."],
+    hope: ["ruhig-abend.webp", "Wir helfen dir, ruhig zu bleiben", "Mit passenden Sätzen wird es leichter, nicht zu streiten. Du bekommst jeden Tag einen Moment mit Sätzen zum Sagen."],
+    content: ["words.webp", "So entstehen deine Sätze", "Die Sätze stammen aus unseren Übersetzer-Seiten. Sie sind ruhig, einfach und ohne Vorwurf. Dein Plan wählt die aus, die zu eurem Alltag passen."],
+    step: ["ruhig-hilfe.webp", "Kleine Schritte reichen", "Du musst nicht alles auf einmal ändern. Dein Plan gibt dir jeden Tag einen kleinen Schritt, der in wenigen Minuten klappt."],
+    motivate: ["v-garten.webp", "Denk an einen guten Moment", "Gab es zuletzt einen Augenblick, der leichter war? Ein Lächeln, ein Lied, ein gemeinsamer Tee. Darauf baut dein Plan auf."]
+  };
+  for (const [name, [image, title, text]] of Object.entries(infoPages)) {
+    screens[name] = () => [el("img", { class: "start-art", src: `../assets/zeichnungen/${image}`, width: "600", height: "600", alt: "" }),
+      el("h1", { text: title }), el("p", { text }), next(name)];
+  }
 
   // ---- E-Mail vor dem Ergebnis (wie BetterMe und Yazio: Pflicht, direkt nach „Plan wird erstellt“) ----------
   // Die Adresse bleibt in diesem Tab, bis jemand ein Abo startet (dann geht sie an Stripe für Bestätigung und Rechnung).
@@ -358,7 +469,7 @@
   // Brevo-Liste „Demenz-Übersetzer (DE)“ mit Double-Opt-in. Gesendet wird nur die E-Mail-Adresse.
   const brevoFormURL = "https://dec91d68.sibforms.com/serve/MUIFALjTPrtulR3_pbWZasFlp2rp0I3qK7mXYVC3KPxVznmdzl5zJcBcHNQiuQXilaqGKzd7Y81EDGqt0Ho9tpwQ03SIAGBPrNlnZmT4-JP71DtgDYfd8GrQ11Bg7dNW8tibwtNvt9az78pC4_-kaczKbgGgb_IXoNCZKWhxM8olcup0XJhMqKiLQmUhpO6tpo4UNTUP3JXYHknJrg==";
   function newsletterScreen() {
-    const yes = el("button", { type: "button", class: "abo-button", text: "Ja, gern", onclick: async () => {
+    const yes = el("button", { type: "button", class: "abo-button", text: "Ja, ich bin dabei", onclick: async () => {
       yes.disabled = true;
       const body = new FormData();
       body.append("EMAIL", answers.email);
@@ -384,21 +495,39 @@
   function resultScreen() {
     if (!completed) { completed = true; track("quiz_complete", "Lead"); window.DemenzTeller?.stage("complete"); }
     const s = chosen();
+    const name = forWho();
+    // Kurve „Jetzt → Nach 4 Wochen“ wie BetterMe („dein Plan ist bereit“). Nur Veranschaulichung, ausdrücklich keine Messung.
+    const svgNS = "http://www.w3.org/2000/svg";
+    const chart = document.createElementNS(svgNS, "svg");
+    chart.setAttribute("viewBox", "0 0 320 170");
+    chart.setAttribute("class", "start-graph");
+    chart.setAttribute("role", "img");
+    chart.setAttribute("aria-label", "Veranschaulichung: Sicherheit im Gespräch steigt von Woche 1 bis Woche 4");
+    chart.innerHTML = '<defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#47408c" stop-opacity=".25"/><stop offset="1" stop-color="#47408c" stop-opacity="0"/></linearGradient></defs>'
+      + '<g stroke="#d9d6ee" stroke-width="1"><path d="M30 20H300M30 60H300M30 100H300M30 140H300"/></g>'
+      + '<path d="M30 130C100 126 150 100 200 70S270 32 300 28V140H30Z" fill="url(#gfill)"/>'
+      + '<path class="start-graph-line" d="M30 130C100 126 150 100 200 70S270 32 300 28" fill="none" stroke="#47408c" stroke-width="4" stroke-linecap="round"/>'
+      + '<circle cx="30" cy="130" r="7" fill="#fff" stroke="#47408c" stroke-width="4"/><circle cx="300" cy="28" r="8" fill="#47408c"/>'
+      + '<g font-family="system-ui,sans-serif" font-size="11" fill="#5b5870" text-anchor="middle"><text x="30" y="162">Jetzt</text><text x="97" y="162">Woche 1</text><text x="164" y="162">Woche 2</text><text x="231" y="162">Woche 3</text><text x="291" y="162">Woche 4</text></g>';
     return [
-      el("h1", { text: "Passende Worte für euren Alltag" }),
-      el("p", { class: "start-lead", text: answers.situation?.say
-        ? "Wir beginnen mit der Situation, die dich gerade beschäftigt."
-        : "Hier siehst du ein Beispiel. Deine eigene Situation kannst du im Übersetzer beschreiben." }),
+      el("h1", { text: name ? `${name}: Dein Plan ist bereit!` : "Dein Plan ist bereit!" }),
+      el("div", { class: "start-graph-card" }, [
+        el("p", { class: "start-graph-title", text: "Sicherheit im Gespräch" }),
+        chart,
+        el("p", { class: "start-small", text: "Dieses Diagramm dient der Veranschaulichung. Es ist keine Messung und kein Versprechen. Wie schnell es hilft, ist bei jedem anders." })
+      ]),
+      el("ul", { class: "start-chips", role: "list" }, [
+        el("li", { text: "Für den Einstieg geeignet" }),
+        el("li", { text: "An deine Antworten angepasst" })
+      ]),
       el("div", { class: "start-card" }, [
         el("p", { class: "start-small", text: answers.situation?.say ? "Deine gewählte Situation" : "Ein Beispiel für die Hilfe" }),
         el("h2", { text: `„${s.quote}“` }),
         el("p", { class: "plan-label", text: "Ein Satz zum Ausprobieren" }),
-        el("ul", { class: "start-say", role: "list" }, [el("li", { text: `„${s.say[0]}“` })]),
-        el("p", { class: "plan-label", text: "Ein kleiner nächster Schritt" }),
-        el("p", { text: s.tip })
+        el("ul", { class: "start-say", role: "list" }, [el("li", { text: `„${s.say[0]}“` })])
       ]),
       el("p", { class: "start-small", text: "Satzideen, nächste Schritte und weitere Alltagssituationen zum Nachschauen. Der Wochenplan ist eine zusätzliche Hilfe." }),
-      el("button", { type: "button", class: "abo-button", text: "Zum Angebot", onclick: () => go(after("result")) })
+      el("button", { type: "button", class: "abo-button", text: "Weiter", onclick: () => go(after("result")) })
     ];
   }
 
@@ -602,13 +731,15 @@
 
     // Vom Üben (src=simulator): „Jetzt / Dein Ziel“ wie BetterMe, mit dem Bildpaar der geübten Situation (aufgeregt / ruhig).
     const pair = simulatorPair();
+    // Bildpaar „Jetzt / Dein Ziel“ wie BetterMe auch für den Fragebogen (Zeichnungen, keine Messwerte).
+    const heroPics = pair || (!directMode ? { before: "/assets/zeichnungen/nach-hause.webp", after: "/assets/zeichnungen/nach-hause-ruhig.webp" } : null);
     const level = (filled) => el("span", { class: "start-level", "aria-hidden": "true" }, [1, 2, 3].map((n) => el("i", { class: n <= filled ? "on" : "" })));
     const row = (label, value, filled) => el("div", { class: "start-hero-row" }, [el("span", { text: label }), el("strong", { text: value }), filled ? level(filled) : null]);
-    const hero = pair ? el("div", { class: "start-hero" }, [
+    const hero = heroPics ? el("div", { class: "start-hero" }, [
       el("div", { class: "start-hero-pics" }, [
         el("p", { class: "start-hero-tabs" }, [el("span", { text: "Jetzt" }), el("span", { text: "Dein Ziel" })]),
-        el("img", { src: pair.before, width: "480", height: "420", alt: "Jetzt: die Person ist aufgeregt" }),
-        el("img", { src: pair.after, width: "480", height: "420", alt: "Dein Ziel: die Person ist ruhig" })
+        el("img", { src: heroPics.before, width: "480", height: "420", alt: "Jetzt: die Person ist aufgeregt" }),
+        el("img", { src: heroPics.after, width: "480", height: "420", alt: "Dein Ziel: die Person ist ruhig" })
       ]),
       el("div", { class: "start-hero-rows" }, [
         el("div", {}, [row("Im Gespräch", "Angespannt"), row("Du fühlst dich", "Unsicher", 1)]),
@@ -670,9 +801,10 @@
       reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
       hero,
       el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Übungsplan für Gespräche ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : (name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!") }),
-      pair ? null : preview,
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
+      // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
       ...offerBlock(),
+      pair ? null : preview,
       el("h2", { class: "start-section start-center start-big-title", text: "Was ist in deinem Plan enthalten" }),
       shots,
       includedList,
@@ -773,12 +905,9 @@
     footerObserver = new MutationObserver(placePrivacySettings);
     footerObserver.observe(document.body, { childList: true });
   }
-  const sections = [
-    { title: "Über euch", steps: ["relation", "name", "situation", "frequency", "dayTime", "thanks"] },
-    { title: "Euer Alltag", steps: ["duration", "living", "tries", "insight"] },
-    { title: "Dein Ziel", steps: ["goal", "burden", "minutes", "how"] }
-  ].map((section) => ({ ...section, steps: section.steps.filter((step) => flow.includes(step)) }));
+  const sections = sectionDefs;
   const bars = sections.map(() => el("span", {}, el("i")));
+  $("progress").style.setProperty("--sections", String(sections.length));
   $("progress").replaceChildren(...bars);
   // Schrittzähler ohne Einwilligung (Daniel, 19. Nov 2026): Der Server zählt nur Schritt und Tag hoch.
   // Nichts wird im Browser gespeichert, nichts wird als Kennung, Quelle oder Antwort gesendet.

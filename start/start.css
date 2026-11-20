@@ -21,7 +21,7 @@ body:has(.start-page) { min-height: 100vh; min-height: 100svh; display: flex; fl
 .start-back { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: var(--purple); cursor: pointer; padding: 0; }
 /* Wie BetterMe: Abschnittsname über drei Balken, ein Balken je Abschnitt. */
 .start-count { margin: 0 0 6px; text-align: center; color: var(--ink-2); font-size: var(--small); font-weight: 600; }
-.start-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 24px; }
+.start-progress { display: grid; grid-template-columns: repeat(var(--sections, 3), 1fr); gap: 6px; margin: 0 0 24px; }
 .start-progress > span { height: 6px; background: var(--lav); border-radius: 999px; overflow: hidden; }
 .start-progress i { display: block; height: 100%; width: 0; background: var(--purple); border-radius: 999px; transition: width .3s ease; }
 .start-center { text-align: center; }
@@ -328,3 +328,32 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-faq summary::-webkit-details-marker { display: none; }
 .start-faq summary::after { content: ""; flex: none; width: 10px; height: 10px; margin-right: 4px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg); transition: transform .2s; }
 .start-faq details[open] summary::after { transform: rotate(-135deg); }
+
+/* Lade-Ring (ehrlich: nur Anzeige der vorhandenen Angaben) */
+.start-ring-wrap { display: grid; place-items: center; margin: 4px 0 14px; }
+.start-ring { width: 96px; height: 96px; transform: rotate(-90deg); }
+.start-ring circle { fill: none; stroke-width: 8; }
+.start-ring-bg { stroke: var(--lav); }
+.start-ring-fg { stroke: var(--purple); stroke-linecap: round; stroke-dasharray: 264; stroke-dashoffset: 264; animation: start-ring-fill 3.6s ease-in-out forwards; }
+.start-ring.is-done .start-ring-fg { stroke-dashoffset: 0; animation: none; }
+@keyframes start-ring-fill { to { stroke-dashoffset: 0; } }
+.start-summary-row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; opacity: 0; transform: translateY(6px); transition: opacity .4s ease, transform .4s ease; }
+.start-summary-row.is-shown { opacity: 1; transform: none; }
+.start-build-next.is-waiting { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .start-ring-fg { animation: none; stroke-dashoffset: 0; } .start-summary-row { opacity: 1; transform: none; transition: none; } }
+
+/* Ergebnis-Kurve (Veranschaulichung) */
+.start-graph-card { background: #fff; border: 1px solid var(--lav); border-radius: 16px; padding: 14px 14px 12px; margin: 0 0 14px; }
+.start-graph-title { margin: 0 0 6px; font-weight: 700; color: var(--purple); }
+.start-graph { width: 100%; height: auto; display: block; }
+.start-graph-line { stroke-dasharray: 420; stroke-dashoffset: 420; animation: start-graph-draw 1.6s ease-out .2s forwards; }
+@keyframes start-graph-draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .start-graph-line { animation: none; stroke-dashoffset: 0; } }
+.start-chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 14px; }
+.start-chips li { background: var(--lav); color: var(--purple); border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: var(--small); }
+
+/* Kopf wie BetterMe: kein „Anmelden“, Menü nur als schlichter Burger */
+.start-top .dc-navigation-account { display: none; }
+.start-top .dc-navigation-menu > summary { border: 0; background: transparent; box-shadow: none; padding: 0; min-width: 44px; min-height: 44px; display: grid; place-items: center; font-size: 0; color: var(--purple); }
+.start-top .dc-navigation-menu > summary::before { content: ""; width: 22px; height: 2px; background: currentColor; border-radius: 2px; box-shadow: 0 -7px 0 currentColor, 0 7px 0 currentColor; }
+.start-top .dc-navigation-menu > summary::after, .start-top .dc-navigation-menu > summary::marker { content: none; display: none; }

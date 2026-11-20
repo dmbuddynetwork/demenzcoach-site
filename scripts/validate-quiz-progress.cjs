@@ -8,9 +8,9 @@ const base=process.env.SITE_URL||'http://127.0.0.1:54929';
   await c.route('**/*',r=>new URL(r.request().url()).origin===new URL(base).origin?r.continue():r.abort());
   const p=await c.newPage();p.setDefaultTimeout(6000);const errors=[];p.on('pageerror',e=>errors.push(e.message));
   await p.goto(base+'/start/?src=qa_progress');
-  for(let i=0;i<40;i++){
+  for(let i=0;i<60;i++){
    const state=await p.locator('body').getAttribute('data-screen');if(state==='building')break;
-   assert.equal(await p.locator('.start-ready,.start-build,[role="timer"]').count(),0,`no extra progress on ${state}`);
+   assert.equal(await p.locator('.start-ready,.start-ring,[role="timer"]').count(),0,`no extra progress on ${state}`);
    const options=p.locator('#screen .start-option');
    if(await options.count()){
     await options.first().click();
@@ -19,9 +19,9 @@ const base=process.env.SITE_URL||'http://127.0.0.1:54929';
    await p.waitForFunction(state=>document.body.dataset.screen!==state,state);
   }
   assert.equal(await p.locator('body').getAttribute('data-screen'),'building');
-  assert.equal(await p.locator('#screen h1').innerText(),'Deine Angaben im Überblick');
+  assert.equal(await p.locator('#screen h1').innerText(),'Wir legen deine Antworten zusammen');
   assert.equal(await p.locator('.start-summary dd').count(),3);
-  assert.doesNotMatch(await p.locator('#screen').innerText(),/Plan wird erstellt|\d+\s*%|Analysier|Zusammenstell/iu);
+  assert.doesNotMatch(await p.locator('#screen').innerText(),/Plan wird erstellt|\d+\s*%|Analysier|berechnet/iu);
   await p.clock.install();await p.clock.fastForward(6000);
   assert.equal(await p.locator('body').getAttribute('data-screen'),'building','no timed automatic advancement');
   await p.getByRole('button',{name:'Weiter',exact:true}).click();
