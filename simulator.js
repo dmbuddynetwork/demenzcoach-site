@@ -1,0 +1,246 @@
+// Gespräche üben (Deutsch und Englisch). Ein Schritt pro Bildschirm:
+// 1. Situation wählen (Bild) oder eigene schreiben.  2. Die Person sagt etwas, du tippst einen von drei Sätzen an.
+// 3. Kurze Rückmeldung, die Person antwortet. Nach höchstens fünf Sätzen: Ende.
+// Gesendet wird nur die Situation, der bisherige Verlauf und die Sprache. Der Server speichert nichts.
+// Statistik (nach Einwilligung) bekommt nur feste Wörter und Zahlen, nie eingetippte Texte.
+(() => {
+  const root = document.getElementById('sim');
+  const dataElement = document.getElementById('sim-data');
+  if (!root || !dataElement) return;
+  const data = JSON.parse(dataElement.textContent);
+  const ui = data.ui;
+  const english = data.lang === 'en';
+  const moods = ['upset', 'unsure', 'calmer', 'calm'];
+  const local = ['localhost', '127.0.0.1'].includes(location.hostname);
+  // Nur zum Testen auf dem eigenen Rechner darf die Adresse der KI überschrieben werden.
+  const endpoint = (local && new URLSearchParams(location.search).get('api')) || data.endpoint;
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+
+  const track = (name, parameters) => { if (typeof websiteAnalytics !== 'undefined') websiteAnalytics.track(name, parameters); };
+  const fill = (text, values = {}) => text.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ''));
+  const h = (tag, props = {}, ...children) => {
+    const node = document.createElement(tag);
+    for (const [name, value] of Object.entries(props)) {
+      if (value === undefined || value === null || value === false) continue;
+      if (name === 'class') node.className = value;
+      else if (name === 'text') node.textContent = value;
+      else if (name.startsWith('on')) node.addEventListener(name.slice(2), value);
+      else node.setAttribute(name, value === true ? '' : value);
+    }
+    for (const child of children.flat()) if (child !== undefined && child !== null && child !== false) node.append(child);
+    return node;
+  };
+  const top = () => root.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+  const upper = (text) => text ? text[0].toLocaleUpperCase() + text.slice(1) : text;
+  const shuffle = (list) => { const copy = [...list]; for (let i = copy.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; } return copy; };
+
+  // Eigene Beschreibung: das Bild der Situation mit den meisten gemeinsamen Wortanfängen, sonst zwei Hände.
+  const stopwords = new Set(['ich', 'du', 'er', 'sie', 'es', 'wir', 'ihr', 'der', 'die', 'das', 'und', 'oder', 'mein', 'meine', 'meinen', 'meinem', 'meiner', 'dein', 'deine',
+    'sein', 'seine', 'ihre', 'will', 'wollen', 'mama', 'papa', 'mutter', 'vater', 'oma', 'opa', 'sagt', 'sagen', 'nachts', 'immer', 'wieder', 'dann', 'wenn', 'nicht', 'mich', 'mir',
+    'with', 'that', 'this', 'what', 'when', 'wants', 'mother', 'father', 'says', 'again', 'always', 'have', 'from', 'about', 'they', 'then', 'will', 'does', 'doesn']);
+  const words = (text) => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(/[^a-z0-9]+/).filter((word) => word.length >= 4 && !stopwords.has(word)).map((word) => word.slice(0, 5));
+  const vocab = data.situations.map((situation) => ({ situation, stems: new Set(words([situation.says, ...situation.kw].join(' '))) }));
+  const pictureFor = (text) => {
+    const found = words(text);
+    const best = vocab.map(({ situation, stems }) => ({ situation, score: found.filter((stem) => stems.has(stem)).length })).filter((item) => item.score > 0).sort((a, b) => b.score - a.score)[0];
+    return best?.situation ?? null;
+  };
+
+  const fresh = () => ({ person: null, turns: [], mood: 'unsure', round: 0, choices: [], feedback: null, busy: false, done: false, wrapUp: null, error: null, safety: null, offTopic: false, writing: false, good: 0 });
+  const state = { view: 'home', showAll: false, session: 0, sit: null, ...fresh() };
+
+  // ---------- Verbindung zur KI ----------
+  const call = async (body) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 32000);
+    try {
+      const response = await fetch(endpoint, { method: 'POST', mode: 'cors', credentials: 'omit', referrerPolicy: 'no-referrer',
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: controller.signal });
+      if (response.status === 429) return { kind: 'error', reason: 'busy' };
+      if (!response.ok) return { kind: 'error', reason: 'unavailable' };
+      const value = await response.json();
+      const text = (item, min, max) => typeof item === 'string' && [...item.trim()].length >= min && [...item.trim()].length <= max;
+      if (value?.kind === 'off_topic') return { kind: 'off_topic' };
+      if (value?.kind === 'safety') return text(value.message, 5, 1200) ? { kind: 'safety', message: value.message } : { kind: 'error', reason: 'unavailable' };
+      const valid = value?.kind === 'sim' && text(value.reaction, 2, 220) && moods.includes(value.mood) && Array.isArray(value.choices) && value.choices.length === 3
+        && value.choices.every((choice) => text(choice, 3, 140)) && text(value.person?.label, 3, 30)
+        && (value.phase !== 'turn' || (['good', 'ok', 'tricky'].includes(value.feedback?.rating) && text(value.feedback?.why, 5, 340) && text(value.feedback?.better, 3, 180)))
+        && (value.done !== true || (text(value.wrapUp?.worked, 5, 340) && text(value.wrapUp?.nextTime, 5, 340)));
+      return valid ? value : { kind: 'error', reason: 'unavailable' };
+    } catch {
+      return { kind: 'error', reason: 'unavailable' };
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+  const requestBody = () => ({
+    situation: state.sit.text, mode: state.sit.mode, ...(state.sit.who ? { who: state.sit.who } : {}),
+    turns: state.turns.map(({ from, text }) => ({ from, text })),
+    ...(state.turns.at(-1)?.from === 'you' ? { mood: state.mood } : {}), ...(english ? { language: 'en' } : {})
+  });
+
+  // ---------- Ablauf ----------
+  const begin = async (sit) => {
+    state.session += 1;
+    const session = state.session;
+    Object.assign(state, { view: 'scene', sit, ...fresh(), busy: true });
+    if (sit.mode === 'line') state.turns = [{ from: 'person', text: sit.text }];
+    track('simulator_start', { situation_key: sit.key || 'free', mode: sit.mode });
+    render();
+    top();
+    const result = await call(requestBody());
+    if (session !== state.session) return;
+    state.busy = false;
+    if (result.kind === 'safety') state.safety = result.message;
+    else if (result.kind === 'off_topic') state.offTopic = true;
+    else if (result.kind === 'error') { state.error = result.reason; state.writing = sit.mode === 'line'; }
+    else {
+      state.person = result.person;
+      state.mood = result.mood;
+      state.choices = shuffle(result.choices);
+      if (sit.mode === 'description') {
+        state.turns = [{ from: 'person', text: result.reaction }];
+        sit.picture ||= pictureFor(sit.text);
+      }
+    }
+    render();
+  };
+
+  const say = async (value) => {
+    const text = value.replace(/\s+/g, ' ').trim().slice(0, 200);
+    if (!text || state.busy || state.done || state.turns.at(-1)?.from !== 'person') return;
+    const session = state.session;
+    const before = { choices: state.choices, feedback: state.feedback };
+    Object.assign(state, { busy: true, error: null, feedback: null, choices: [], writing: false, said: text });
+    state.turns = [...state.turns, { from: 'you', text }];
+    state.round += 1;
+    render();
+    const result = await call(requestBody());
+    if (session !== state.session) return;
+    state.busy = false;
+    if (result.kind === 'error') {
+      // Satz zurücknehmen, damit man ihn noch einmal sagen kann.
+      state.turns = state.turns.slice(0, -1);
+      state.round -= 1;
+      Object.assign(state, { error: result.reason, choices: before.choices, feedback: before.feedback, writing: before.choices.length === 0 });
+      return render();
+    }
+    if (result.kind === 'safety') { state.safety = result.message; return render(); }
+    if (result.kind === 'off_topic') { state.offTopic = true; return render(); }
+    state.mood = result.mood;
+    state.turns = [...state.turns, { from: 'person', text: result.reaction }];
+    state.feedback = result.feedback;
+    if (result.feedback.rating === 'good') state.good += 1;
+    state.choices = result.done ? [] : shuffle(result.choices);
+    if (result.done) { state.done = true; state.wrapUp = result.wrapUp; }
+    track('simulator_turn', { round: state.round, rating: result.feedback.rating, mood: result.mood });
+    if (result.done) track('simulator_done', { final_mood: result.mood, rounds: state.round, good_count: state.good, situation_key: state.sit.key || 'free' });
+    render();
+    top();
+  };
+
+  const home = () => { state.session += 1; state.view = 'home'; render(); top(); };
+
+  // ---------- Bausteine ----------
+  const picture = () => {
+    const base = state.sit.picture || state.sit;
+    const calm = state.mood === 'calm' && base.afterImage;
+    const image = calm ? base.afterImage : (base.image || { src: data.fallbackImage, width: 480, height: 420 });
+    return h('img', { class: 'sim-picture', src: image.src, width: image.width, height: image.height, alt: '' });
+  };
+
+  const feedbackBox = () => {
+    const feedback = state.feedback;
+    if (!feedback || state.busy || state.done) return null;
+    const good = feedback.rating === 'good';
+    return h('div', { class: `sim-feedback is-${feedback.rating}`, role: 'status' },
+      h('p', { class: 'sim-verdict', text: ui.verdict[feedback.rating] }),
+      good ? h('p', { text: feedback.why }) : h('p', {}, ui.better, ' ', h('q', { text: feedback.better })));
+  };
+
+  const personBubble = () => {
+    const who = upper(state.person?.label) || ui.thePerson;
+    const last = state.turns.at(-1);
+    if (state.busy) {
+      return [
+        state.turns.length && last?.from === 'you' ? h('div', { class: 'sim-bubble is-you', text: last.text }) : null,
+        h('div', { class: 'sim-bubble is-person is-wait', role: 'status', 'aria-label': ui.wait }, h('span', { class: 'sim-dots', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')))
+      ];
+    }
+    if (!last || last.from !== 'person') return null;
+    return h('div', { class: 'sim-line' }, h('p', { class: 'sim-who', text: fill(ui.says, { who }) }), h('div', { class: 'sim-bubble is-person', text: last.text }));
+  };
+
+  const answerArea = () => {
+    if (state.busy || state.done || state.turns.at(-1)?.from !== 'person') return null;
+    const field = h('textarea', { id: 'sim-say', rows: '2', maxlength: '200', placeholder: ui.ownPlaceholder, enterkeyhint: 'send', 'aria-label': ui.ownLabel });
+    const form = h('form', { class: 'sim-own', autocomplete: 'off' }, field, h('button', { class: 'button', type: 'submit', text: ui.sayButton }));
+    form.addEventListener('submit', (event) => { event.preventDefault(); say(field.value); });
+    return h('section', { class: 'sim-answer', 'aria-labelledby': 'sim-ask' },
+      h('h2', { id: 'sim-ask', text: ui.ask }),
+      state.choices.map((choice) => h('button', { type: 'button', class: 'sim-choice', onclick: () => say(choice), text: choice })),
+      state.writing
+        ? form
+        : h('button', { type: 'button', class: 'sim-textbutton', text: ui.ownOpen, onclick: () => { state.writing = true; render(); root.querySelector('#sim-say')?.focus(); } }));
+  };
+
+  const errorNote = () => state.error ? h('div', { class: 'sim-note', role: 'alert' },
+    h('p', { text: state.error === 'busy' ? ui.busy : ui.unavailable }),
+    state.turns.length === 0 ? h('button', { type: 'button', class: 'button', text: ui.retry, onclick: () => begin(state.sit) }) : null) : null;
+
+  const doneArea = () => {
+    if (!state.done) return null;
+    const who = upper(state.person?.label) || ui.thePerson;
+    const calm = ['calm', 'calmer'].includes(state.mood);
+    return h('section', { class: 'sim-done', 'aria-labelledby': 'sim-done-title' },
+      h('h2', { id: 'sim-done-title', text: fill(ui.doneTitle[state.mood], { who }) }),
+      h('p', { text: calm ? state.wrapUp.worked : state.wrapUp.nextTime }),
+      h('button', { type: 'button', class: 'button', text: ui.again, onclick: () => begin(state.sit) }),
+      h('button', { type: 'button', class: 'sim-light', text: ui.other, onclick: home }),
+      h('a', { class: 'sim-textbutton', href: data.appHref, 'data-store-link': 'simulator-done', onclick: () => track('simulator_cta_click', { target: 'app' }), text: ui.app }));
+  };
+
+  // ---------- Bildschirme ----------
+  const scene = () => {
+    const back = h('button', { type: 'button', class: 'sim-back', onclick: home, text: ui.back });
+    if (state.safety || state.offTopic) {
+      return [back, h('div', { class: `sim-note${state.safety ? ' is-safety' : ''}`, role: 'alert' },
+        h('p', { text: state.safety || ui.offTopic }),
+        h('button', { type: 'button', class: 'button', text: ui.other, onclick: home }))];
+    }
+    return [back, feedbackBox(), picture(), personBubble(), errorNote(), doneArea(), answerArea()];
+  };
+
+  const start = () => {
+    const shown = state.showAll ? data.situations : data.situations.slice(0, data.firstCount);
+    const tiles = h('div', { class: 'sim-tiles' }, shown.map((situation) => h('button', { type: 'button', class: 'sim-tile', onclick: () => begin({ key: situation.key, text: situation.says, mode: 'line', who: situation.who, image: situation.image, afterImage: situation.afterImage }) },
+      h('img', { src: situation.image.src, width: situation.image.width, height: situation.image.height, alt: '', loading: 'lazy' }),
+      h('span', { text: situation.says }))));
+    const field = h('textarea', { id: 'sim-free', rows: '2', maxlength: '200', placeholder: ui.freePlaceholder, enterkeyhint: 'go' });
+    const hint = h('p', { class: 'sim-hint', role: 'status' });
+    const form = h('form', { class: 'sim-free', autocomplete: 'off' },
+      h('label', { for: 'sim-free', text: ui.freeLabel }), field, hint,
+      h('button', { class: 'button', type: 'submit', text: ui.freeButton }),
+      h('p', { class: 'sim-small' }, ui.freeNote, ' ', h('a', { href: data.privacyHref, text: ui.privacyLink })));
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const text = field.value.replace(/\s+/g, ' ').trim();
+      if ([...text].length < 3) { hint.textContent = ui.freeTooShort; field.focus(); return; }
+      begin({ key: '', text, mode: 'description', picture: null });
+    });
+    return [tiles,
+      state.showAll ? null : h('button', { type: 'button', class: 'sim-light', text: ui.more, onclick: () => { state.showAll = true; render(); } }),
+      form];
+  };
+
+  function render() {
+    root.replaceChildren(...(state.view === 'home' ? start() : scene()).flat().filter(Boolean));
+    document.body.classList.toggle('sim-playing', state.view === 'scene');
+  }
+
+  // Direkter Einstieg über #situation=<key>.
+  const key = decodeURIComponent(location.hash.replace(/^#situation=/, ''));
+  const direct = location.hash.startsWith('#situation=') ? data.situations.find((situation) => situation.key === key) : null;
+  if (direct) begin({ key: direct.key, text: direct.says, mode: 'line', who: direct.who, image: direct.image, afterImage: direct.afterImage });
+  else render();
+})();
