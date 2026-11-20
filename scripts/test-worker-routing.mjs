@@ -18,6 +18,9 @@ const assetPaths = new Set([
   "/datenschutz.html",
   "/abo/kuendigen.html",
   "/demenz-uebersetzer/index.html",
+  "/intern/index.html",
+  "/intern/kampagnen/index.html",
+  "/intern/kampagnen/kampagnen.json",
   "/404.html"
 ]);
 
@@ -245,4 +248,36 @@ test('reciprocal language metadata uses direct canonicals; unmapped English byte
       assert.ok(germanHTML.includes('<link rel="canonical" href="' + target + '">'), 'direct canonical target');
     }
   }
+});
+
+// Verwaltung (/intern/…) nur mit Passwort; ohne Secret immer gesperrt; Geräte-Markierung /intern/ frei.
+const gated = (path, { secret, auth, method = "GET" } = {}) => worker.fetch(
+  new Request(`https://dementiacoachapp.com${path}`, { method, headers: auth ? { Authorization: auth } : {} }),
+  { ...env, ...(secret ? { INTERN_PASSWORD: secret } : {}) });
+const basic = (user, password) => "Basic " + Buffer.from(`${user}:${password}`).toString("base64");
+const SECRET = "ein-langes-geheimes-passwort";
+test("Verwaltung ohne Secret: gesperrt (503), nie offen", async () => {
+  for (const p of ["/intern/kampagnen/", "/intern/kampagnen/kampagnen.json", "/intern/kampagnen/index.html"]) {
+    const r = await gated(p); assert.equal(r.status, 503, p); assert.match(r.headers.get("Cache-Control"), /no-store/); assert.match(r.headers.get("X-Robots-Tag"), /noindex/);
+    assert.ok(!(await r.text()).includes("asset:"));
+  }
+  assert.equal((await gated("/intern/kampagnen/", { secret: "zu-kurz", auth: basic("team", "zu-kurz") })).status, 503, "zu kurzes Secret zählt als nicht gesetzt");
+});
+test("Verwaltung mit Secret: ohne oder mit falschen Zugangsdaten 401", async () => {
+  for (const auth of [undefined, "Basic", "Bearer abc", basic("team", "falsch"), basic("admin", SECRET), basic("", ""), basic("team", SECRET + "x"), "Basic %%%"]) {
+    const r = await gated("/intern/kampagnen/kampagnen.json", { secret: SECRET, auth }); assert.equal(r.status, 401, String(auth));
+    assert.match(r.headers.get("WWW-Authenticate"), /^Basic realm=/); assert.ok(!(await r.text()).includes("asset:"));
+  }
+});
+test("Verwaltung mit richtigen Zugangsdaten: Datei wird ausgeliefert, auch mit Umlaut-Passwort", async () => {
+  const r = await gated("/intern/kampagnen/", { secret: SECRET, auth: basic("team", SECRET) }); assert.equal(r.status, 200); assert.equal(await r.text(), "asset:/intern/kampagnen/index.html");
+  const j = await gated("/intern/kampagnen/kampagnen.json", { secret: SECRET, auth: basic("team", SECRET) }); assert.equal(j.status, 200);
+  const umlaut = "geheimes-Passwort-Ünicode-123"; assert.equal((await gated("/intern/kampagnen/", { secret: umlaut, auth: basic("team", umlaut) })).status, 200);
+});
+test("Verwaltung: Schreibweisen umgehen das Tor nicht", async () => {
+  for (const p of ["/intern", "//intern/kampagnen/", "/INTERN/kampagnen/", "/intern%2Fkampagnen/", "/intern/kampagnen/kampagnen.json?x=1", "/Intern/Kampagnen/"]) assert.equal((await gated(p, { secret: SECRET })).status, 401, p);
+  assert.equal((await gated("/intern/kampagnen/", { secret: SECRET, auth: basic("team", SECRET), method: "POST" })).status, 405);
+});
+test("Geräte-Markierung /intern/ bleibt frei, ohne Passwort", async () => {
+  for (const p of ["/intern/", "/intern/index.html"]) { const r = await gated(p); assert.equal(r.status, 200, p); }
 });

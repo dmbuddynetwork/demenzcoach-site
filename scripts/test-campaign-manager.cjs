@@ -4,9 +4,10 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const { createPreviewServer } = require('./generator-preview.cjs');
 const shots = process.env.KAMPAGNEN_SHOTS || '';
 (async () => {
-  const preview = await createPreviewServer(); const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH }); const report = [];
+  const PASSWORT = 'test-passwort-nur-lokal-123'; const preview = await createPreviewServer({ internPassword: PASSWORT }); const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROME_PATH }); const report = [];
   try {
-    const c = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true }); c.setDefaultTimeout(8000);
+    const ohne = await browser.newContext(); const r401 = await ohne.request.get(preview.origin + '/intern/kampagnen/kampagnen.json'); assert.equal(r401.status(), 401, 'ohne Passwort gesperrt'); assert.equal((await ohne.request.get(preview.origin + '/intern/kampagnen/')).status(), 401); await ohne.close(); report.push('ohne Passwort 401');
+    const c = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true, httpCredentials: { username: 'team', password: PASSWORT } }); c.setDefaultTimeout(8000);
     await c.addInitScript(() => { try { localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied'); localStorage.setItem('demenzcoach.marketingConsent.v1', 'denied'); } catch {} });
     await c.route('**/*', r => new URL(r.request().url()).origin === preview.origin ? r.continue() : r.abort());
     const p = await c.newPage(); const errors = []; p.on('pageerror', e => errors.push(e.message));
@@ -40,7 +41,7 @@ const shots = process.env.KAMPAGNEN_SHOTS || '';
     assert.equal(dl2.suggestedFilename(), 'kampagnen.json'); report.push('Export CSV und JSON');
     assert.deepEqual(errors, []);
     // Handy
-    const m = await browser.newContext({ viewport: { width: 390, height: 844 } }); await m.route('**/*', r => new URL(r.request().url()).origin === preview.origin ? r.continue() : r.abort());
+    const m = await browser.newContext({ viewport: { width: 390, height: 844 }, httpCredentials: { username: 'team', password: PASSWORT } }); await m.route('**/*', r => new URL(r.request().url()).origin === preview.origin ? r.continue() : r.abort());
     const q = await m.newPage(); await q.goto(preview.origin + '/intern/kampagnen/'); await q.locator('#list .item').first().waitFor();
     assert.ok(await q.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'kein horizontales Scrollen am Handy'); report.push('Handy ohne Seitwärts-Scrollen');
     console.log(JSON.stringify({ ok: true, cases: report }));

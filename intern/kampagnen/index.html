@@ -155,7 +155,7 @@
       download('anzeigen.csv', '﻿' + zeilen.join('\n'), 'text/csv'); toast('CSV heruntergeladen');
     }
   });
-  fetch('/kampagnen/kampagnen.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) { daten = d; editor(); alles(true); }).catch(function () { $('editor').innerHTML = '<p>kampagnen.json konnte nicht geladen werden.</p>'; });
+  fetch('/intern/kampagnen/kampagnen.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) { daten = d; editor(); alles(true); }).catch(function () { $('editor').innerHTML = '<p>kampagnen.json konnte nicht geladen werden.</p>'; });
 })();
 </script>
 </body>

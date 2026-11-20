@@ -80,9 +80,43 @@ export const tellerTarget = (request, random = () => crypto.getRandomValues(new 
   return target.toString();
 };
 
+// Verwaltung (/intern/…): nur mit Passwort. Das Passwort steht als Secret INTERN_PASSWORD im Cloudflare-Worker, nie im Repo.
+// Fehlt das Secret oder ist es zu kurz, bleibt alles gesperrt (503), nie offen. Nur die Geräte-Markierung /intern/ ist frei,
+// sie speichert nur ein Merkzeichen im eigenen Browser. Antworten werden nie zwischengespeichert und nie indexiert.
+const INTERN_OPEN = new Set(['/intern/', '/intern/index.html']);
+// Prüfung auf der bereinigten Adresse (Groß-/Kleinschreibung, doppelte Schrägstriche, %2F), damit keine Schreibweise das Tor umgeht.
+const normalizePath = (pathname) => { let p = pathname; try { p = decodeURIComponent(p); } catch { /* unverändert prüfen */ } return p.replace(/\/{2,}/g, '/').toLowerCase(); };
+export const isInternPath = (pathname) => { const p = normalizePath(pathname); return p === '/intern' || p.startsWith('/intern/'); };
+const sha256 = async (text) => new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)));
+const sameBytes = (a, b) => { let diff = a.length ^ b.length; for (let i = 0; i < Math.max(a.length, b.length); i++) diff |= (a[i] || 0) ^ (b[i] || 0); return diff === 0; };
+export const internGate = async (request, env) => {
+  const { pathname } = new URL(request.url);
+  if (!isInternPath(pathname) || INTERN_OPEN.has(pathname)) return null;
+  const headers = { 'Cache-Control': 'private, no-store, max-age=0', 'CDN-Cache-Control': 'no-store', 'Cloudflare-CDN-Cache-Control': 'no-store',
+    'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'no-referrer', 'Content-Type': 'text/plain;charset=utf-8' };
+  const secret = String(env?.INTERN_PASSWORD || '');
+  if (secret.length < 16) return new Response('Die Verwaltung ist noch nicht freigeschaltet.', { status: 503, headers });
+  if (!['GET', 'HEAD'].includes(request.method)) return new Response(null, { status: 405, headers: { ...headers, Allow: 'GET, HEAD' } });
+  let user = '', password = '';
+  const match = /^Basic ([A-Za-z0-9+/=]+)$/.exec(request.headers.get('Authorization') || '');
+  if (match) {
+    try {
+      const decoded = new TextDecoder().decode(Uint8Array.from(atob(match[1]), (c) => c.charCodeAt(0)));
+      const cut = decoded.indexOf(':'); user = decoded.slice(0, cut); password = decoded.slice(cut + 1);
+    } catch { /* ungültig: bleibt leer */ }
+  }
+  const expectedUser = String(env?.INTERN_USER || 'team');
+  const okUser = sameBytes(await sha256(user), await sha256(expectedUser));
+  const okPassword = sameBytes(await sha256(password), await sha256(secret));
+  if (match && okUser && okPassword) return null;
+  return new Response('Anmeldung nötig.', { status: 401, headers: { ...headers, 'WWW-Authenticate': 'Basic realm="Demenz Coach intern", charset="UTF-8"' } });
+};
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const blocked = await internGate(request, env);
+    if (blocked) return blocked;
     if (url.pathname === '/teller/liste.html') {
       return new Response(null, { status: 301, headers: { Location: 'https://dementiacoachapp.com/de/demenz-alltagstipps.html', 'Referrer-Policy': 'no-referrer' } });
     }

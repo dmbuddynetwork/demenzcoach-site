@@ -20,7 +20,7 @@
     return "ads";
   };
   // Kampagnen-Framework (Daniel, 20. Nov 2026): /start/?k=<kampagne>&a=<anzeige> füllt Überschrift, Frage und Moment aus
-  // kampagnen/kampagnen.json (erzeugt: kampagnen/data.js). Entwürfe nur mit &vorschau=1, pausierte gar nicht.
+  // intern/kampagnen/kampagnen.json (geschützt; öffentlich nur kampagnen/data.js mit den aktiven). Entwürfe zeigt nur die Vorschau der Verwaltung (&vorschau=1 mit #v=…).
   // Ohne Kampagne bleibt alles wie bisher. Die Adresse behält k und a, jeder Schritt trägt sie mit.
   const clean = (value, max = 30) => String(value || "").toLowerCase().replace(/[^a-z0-9-]/gu, "").slice(0, max);
   const kampagnenDaten = window.DEMENZ_KAMPAGNEN || { standard: {}, kampagnen: [] };
