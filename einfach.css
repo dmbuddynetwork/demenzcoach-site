@@ -923,3 +923,9 @@ body.einfach .situation-more p { margin: 0 0 8px; }
 body.einfach .situation-more ul { margin: 0; padding-inline-start: 1.2em; }
 body.einfach .situation-more li { margin: 0 0 8px; }
 body.einfach .situation-more .situation-more-guide { margin-top: 16px; }
+
+/* Nachfrage/Neue-Situation input (Daniel 20 Nov: "Eingabe Feld ist zu klein"): field full width and taller,
+   "Antwort finden" as a big full-width button below. Same as the iOS app. */
+body.einfach form.translator-chat-form { flex-direction: column; align-items: stretch; gap: 10px; }
+body.einfach input.translator-chat-input { flex: none; width: 100% !important; height: 60px; min-height: 60px; padding: 0 18px; border: 2px solid var(--e-purple, #47408C); border-radius: 16px; font-size: 1.25rem !important; line-height: 1.3 !important; }
+body.einfach button.translator-chat-send { flex: none; width: 100%; max-width: none; min-width: 0; height: 56px; min-height: 56px; padding: 0 16px; border-radius: 16px; font-size: 1.125rem !important; font-weight: 700; white-space: nowrap; }
