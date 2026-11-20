@@ -1,7 +1,7 @@
 // Kampagnen-Framework: Regeln, Aktualität von data.js, Landingpage je Kampagne, Tracking-Felder. Nur lokale Testdaten.
 const assert = require('node:assert/strict'), fs = require('node:fs'), { execFileSync } = require('node:child_process');
 const regeln = require('../kampagnen/regeln.js');
-const daten = JSON.parse(fs.readFileSync(__dirname + '/../kampagnen/kampagnen.json', 'utf8'));
+const daten = JSON.parse(fs.readFileSync(__dirname + '/../intern/kampagnen/kampagnen.json', 'utf8'));
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const { createPreviewServer } = require('./generator-preview.cjs');
 (async () => {
@@ -35,7 +35,9 @@ const { createPreviewServer } = require('./generator-preview.cjs');
   s = await open('?k=tipps-druck&a=a1'); assert.equal(await h1(s.p), 'Tipps und Tricks zum Ausdrucken'); await s.c.close(); report.push('aktive Kampagne');
   s = await open('?k=nach-hause&a=a1'); assert.equal(await h1(s.p), 'Tipps und Tricks zum Ausdrucken', 'Entwurf ohne vorschau bleibt unsichtbar'); await s.c.close(); report.push('Entwurf versteckt');
   s = await open('?k=gibt-es-nicht'); assert.equal(await h1(s.p), 'Tipps und Tricks zum Ausdrucken'); await s.c.close(); report.push('unbekannte Kampagne');
-  s = await open('?k=nach-hause&a=a1&vorschau=1', true);
+  const entwurf = daten.kampagnen.find(k => k.id === 'nach-hause');
+  assert.ok(!fs.readFileSync(__dirname + '/../kampagnen/data.js', 'utf8').includes('nach-hause'), 'Entwürfe stehen nicht in der öffentlichen data.js');
+  s = await open('?k=nach-hause&a=a1&vorschau=1#v=' + encodeURIComponent(JSON.stringify({ landing: entwurf.landing, src: entwurf.kanal })), true);
   assert.equal(await h1(s.p), 'Was sagst du, wenn sie nach Hause will?');
   await s.p.locator('.start-pic').first().click();
   await s.p.waitForFunction(() => window.__events.length > 0);

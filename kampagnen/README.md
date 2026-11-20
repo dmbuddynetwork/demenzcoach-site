@@ -3,7 +3,7 @@
 Daniel, 20. Nov 2026: Landingpages und Anzeigen sollen je Kampagne mit passendem Text flexibel gefüllt, verwaltet und gezählt werden.
 
 ```
-kampagnen.json  ──►  scripts/build-campaigns.mjs  ──►  data.js  ──►  /start/?k=<kampagne>&a=<anzeige>
+intern/kampagnen/kampagnen.json ──►  scripts/build-campaigns.mjs  ──►  data.js  ──►  /start/?k=<kampagne>&a=<anzeige>
    (Quelle)            (prüft mit regeln.js)          (öffentlich)        (Landingpage + Tracking)
         ▲
         └── /intern/kampagnen/  (Verwaltung: bearbeiten, Vorschau, Links, CSV)
@@ -11,9 +11,9 @@ kampagnen.json  ──►  scripts/build-campaigns.mjs  ──►  data.js  ─�
 
 ## Ablauf für eine neue Kampagne
 1. `/intern/kampagnen/` öffnen, „+ Neue Kampagne“. Überschrift, Frage, Moment und Anzeigen eintragen. Die Vorschau zeigt die Seite sofort, die Prüfung meldet Regelverstöße.
-2. „kampagnen.json herunterladen“ und die Datei in `kampagnen/` ersetzen.
+2. „kampagnen.json herunterladen“ und die Datei in `intern/kampagnen/` ersetzen.
 3. `node scripts/build-campaigns.mjs` (prüft und erzeugt `data.js`), dann Pull Request. Der Merge schaltet live.
-4. Status `aktiv` schaltet die Landingpage frei. `entwurf` ist nur mit `&vorschau=1` sichtbar, `pausiert` gar nicht.
+4. Status `aktiv` schaltet die Landingpage frei. `entwurf` und `pausiert` sind nie öffentlich (nicht in `data.js`); Entwürfe sieht man nur in der Vorschau der Verwaltung.
 5. Die Tracking-Links je Anzeige stehen in der Verwaltung (Kanal, Kampagne und Anzeige als feste Kennungen).
 
 ## Was eine Kampagne steuert
@@ -24,3 +24,6 @@ Jedes Ereignis in `/start/` trägt `entry` (Quelle), `kampagne` und `anzeige` (n
 
 ## Regeln (`regeln.js`, gelten in der Verwaltung und im Build)
 Nichtmedizinisch (keine Diagnose, Therapie, Medikamente, Wirkversprechen). Keine erfundenen Belege (Prozent, Millionen, Nutzerzahlen, Sterne, Testsieger) und keine falsche Dringlichkeit („nur heute“). Längen: Überschrift 70, Zeile 90, Frage 60, Anzeigentext 200, Titel 40, Beschreibung 40, Knopf 25 Zeichen.
+
+## Schutz (Daniel, 20. Nov 2026: alle Admin-Sachen geschützt)
+Alles unter `/intern/` (Verwaltung und `kampagnen.json` mit Notizen, Zielgruppen und Entwürfen) verlangt ein Passwort. Das prüft der Worker (`internGate` in `cloudflare-worker.js`), bevor eine Datei ausgeliefert wird. Das Passwort steht als Secret `INTERN_PASSWORD` im Cloudflare-Worker `dementiacoachapp` (Settings, Variables and Secrets), mindestens 16 Zeichen, nie im Repo. Benutzername `team` (oder Secret `INTERN_USER`). Fehlt das Secret, bleibt die Verwaltung gesperrt (503). Frei ist nur die Geräte-Markierung `/intern/` (speichert nur ein Merkzeichen im eigenen Browser). Öffentlich sind außerdem `regeln.js` (nur Regeln) und `data.js` (nur aktive Kampagnen).
