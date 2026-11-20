@@ -1,6 +1,7 @@
 // Gespräche üben (Deutsch und Englisch). Ein Schritt pro Bildschirm:
 // 1. Situation wählen (Bild) oder eigene schreiben.  2. Die Person sagt etwas, du tippst einen von drei Sätzen an.
 // 3. Kurze Rückmeldung, die Person antwortet. Nach höchstens fünf Sätzen: Ende.
+// Ab dem zweiten Satz: kostenlose Anmeldung (siehe „Anmeldung“).
 // Gesendet wird nur die Situation, der bisherige Verlauf und die Sprache. Der Server speichert nichts.
 // Statistik (nach Einwilligung) bekommt nur feste Wörter und Zahlen, nie eingetippte Texte.
 (() => {
@@ -56,7 +57,7 @@
     return best?.situation ?? null;
   };
 
-  const fresh = () => ({ person: null, turns: [], mood: 'unsure', round: 0, choices: [], feedback: null, busy: false, done: false, wrapUp: null, error: null, safety: null, offTopic: false, writing: false, good: 0, pending: null, tried: [] });
+  const fresh = () => ({ person: null, turns: [], mood: 'unsure', round: 0, choices: [], feedback: null, busy: false, done: false, wrapUp: null, error: null, safety: null, offTopic: false, writing: false, good: 0, pending: null, tried: [], waiting: null });
   const state = { view: 'home', showAll: false, session: 0, sit: null, ...fresh() };
 
   // ---------- Verbindung zur KI ----------
@@ -116,9 +117,10 @@
     render();
   };
 
-  const say = async (value) => {
+  const say = async (value, allowed = false) => {
     const text = value.replace(/\s+/g, ' ').trim().slice(0, 200);
     if (!text || state.busy || state.done || state.turns.at(-1)?.from !== 'person') return;
+    if (!allowed && state.round >= freeRounds && !(await signedIn())) return askSignup(text);
     const session = state.session;
     const before = { choices: state.choices };
     Object.assign(state, { busy: true, error: null, choices: [], writing: false });
@@ -139,6 +141,7 @@
     if (result.kind === 'off_topic') { state.offTopic = true; return render(); }
     // Wie bei Lern-Apps: erst die Rückmeldung unten, die Person antwortet erst nach „Weiter“.
     state.pending = { result, before };
+    if (state.round >= freeRounds) loadAuth().catch(() => {});
     track('simulator_turn', { round: state.round, rating: result.feedback.rating, mood: result.mood });
     render();
     root.querySelector('.sim-bar .button')?.focus({ preventScroll: true });
@@ -174,6 +177,44 @@
     render();
     top();
   };
+
+  // ---------- Anmeldung ----------
+  // Das erste Ergebnis ist frei. Ab dem zweiten Satz braucht man ein kostenloses Konto (Google oder E-Mail-Link).
+  // Die Anmeldung kommt aus /abo/ (dieselbe wie beim Übersetzer). Ohne erreichbare Anmeldung geht das Üben weiter.
+  const freeRounds = 1;
+  let authPromise;
+  const loadAuth = () => (authPromise ||= (async () => {
+    if (!window.DEMENZ_ABO_CONFIG) await import('/abo/abo-config.js');
+    const { webAuth } = await import('/abo/web-auth.js');
+    return (await webAuth({ anonymous: false })).auth;
+  })().catch((error) => { authPromise = null; throw error; }));
+  const signedIn = async () => {
+    try { const user = (await loadAuth()).currentUser; return Boolean(user && user.isAnonymous === false); } catch { return true; }
+  };
+  const askSignup = async (text) => {
+    state.waiting = text;
+    track('simulator_signup_shown', { round: state.round + 1 });
+    let card;
+    try {
+      if (!window.DEMENZ_ABO_CONFIG) await import('/abo/abo-config.js');
+      const { mountInlineSignup } = await import('/abo/inline-signup.js');
+      card = h('section', { hidden: true });
+      document.body.append(card);
+      await mountInlineSignup(card, { bonus: 3, en: english, purpose: 'invitation', creditActive: false, returnTo: location.pathname,
+        returnFocus: root.querySelector('.sim-choice'), canPresent: ({ auth }) => !auth.currentUser || auth.currentUser.isAnonymous === true });
+    } catch { /* Anmeldung gerade nicht erreichbar: weiter üben. */ }
+    // Kein Fenster geöffnet (schon angemeldet oder Fehler): direkt weiter.
+    if (card && !card.isConnected && document.querySelector('.dc-signup-sheet')) return;
+    card?.remove();
+    if (state.waiting === text) { state.waiting = null; say(text, true); }
+  };
+  window.addEventListener('demenz-auth-changed', async () => {
+    const text = state.waiting;
+    if (!text || !(await signedIn()) || state.waiting !== text) return;
+    state.waiting = null;
+    track('simulator_signup_done', { round: state.round + 1 });
+    say(text, true);
+  });
 
   const home = () => { state.session += 1; state.view = 'home'; render(); top(); };
 
