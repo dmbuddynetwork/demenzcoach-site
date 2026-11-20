@@ -351,3 +351,9 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 @media (prefers-reduced-motion: reduce) { .start-graph-line { animation: none; stroke-dashoffset: 0; } }
 .start-chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 14px; }
 .start-chips li { background: var(--lav); color: var(--purple); border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: var(--small); }
+
+/* Kopf wie BetterMe: kein „Anmelden“, Menü nur als schlichter Burger */
+.start-top .dc-navigation-account { display: none; }
+.start-top .dc-navigation-menu > summary { border: 0; background: transparent; box-shadow: none; padding: 0; min-width: 44px; min-height: 44px; display: grid; place-items: center; font-size: 0; color: var(--purple); }
+.start-top .dc-navigation-menu > summary::before { content: ""; width: 22px; height: 2px; background: currentColor; border-radius: 2px; box-shadow: 0 -7px 0 currentColor, 0 7px 0 currentColor; }
+.start-top .dc-navigation-menu > summary::after, .start-top .dc-navigation-menu > summary::marker { content: none; display: none; }
