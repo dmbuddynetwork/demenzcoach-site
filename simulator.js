@@ -224,10 +224,15 @@
       return ['active', 'error'].includes(await subscriberState(window.DEMENZ_ABO_CONFIG));
     } catch { return true; }
   };
-  const paywall = () => {
+  // Wie BetterMe: die Angebotsseite ist die Paywall, die Zahlung öffnet sich auf derselben Seite (/start/?direkt=1, kasse.js).
+  const paywall = async () => {
     track('simulator_paywall_shown', { practices: practicesDone() });
-    try { localStorage.setItem('demenzCoachKi', JSON.stringify({ returnTo: location.pathname })); } catch { /* */ }
-    location.assign('/abo/?src=web_simulator');
+    try {
+      localStorage.setItem('demenzCoachKi', JSON.stringify({ returnTo: location.pathname }));
+      const user = (await loadAuth()).currentUser;
+      if (user?.emailVerified && user.email) sessionStorage.setItem('demenzCoachEmail', user.email);
+    } catch { /* ohne Adresse fragt die Angebotsseite selbst */ }
+    location.assign('/start/?direkt=1&src=simulator');
   };
 
   window.addEventListener('demenz-auth-changed', async () => {

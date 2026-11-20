@@ -789,6 +789,8 @@
     }).catch(() => {});
   }
 
+  // Direkt-Angebot (z. B. vom Üben): eine schon bestätigte Konto-Adresse aus diesem Tab übernehmen, wie BetterMe nach der Anmeldung.
+  if (directMode) { try { const known = sessionStorage.getItem("demenzCoachEmail") || ""; if (validEmail(known)) answers.email = known; } catch { /* */ } }
   const resumed = directMode ? "plan" : restoreProgress();
   history.replaceState({ screen: resumed }, "", location.href);
   render(resumed);
