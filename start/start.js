@@ -615,6 +615,36 @@
     } catch { return fallback; }
   }
 
+  // Stimmen von Angehörigen (stimmen.js): Karten zum Wischen mit „Mehr lesen“, wie BetterMe „Ergebnisse, auf die wir stolz sind“.
+  // Echte Texte, Vornamen mit Zustimmung (Daniel, 20. Nov 2026). Keine Sterne, keine Zahlen, kein Wirkungsversprechen.
+  function voices() {
+    const all = Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : [];
+    if (!all.length) return null;
+    const featured = [0, 2, 3, 5, 10, 48, 49, 8].map((index) => all[index]).filter(Boolean);
+    const card = (voice, clamp) => {
+      const text = el("p", { class: clamp ? "start-voice-text is-clamped" : "start-voice-text", text: `„${voice.text}“` });
+      const parts = [el("strong", { text: `${voice.name}, ${voice.rolle}` }), text];
+      if (clamp && voice.text.length > 150) {
+        const more = el("button", { type: "button", class: "abo-link-button", text: "Mehr lesen", "aria-expanded": "false", onclick: () => {
+          const open = text.classList.toggle("is-clamped") === false;
+          more.textContent = open ? "Weniger" : "Mehr lesen";
+          more.setAttribute("aria-expanded", String(open));
+        } });
+        parts.push(more);
+      }
+      return el(clamp ? "figure" : "li", { class: "start-voice", ...(clamp ? { role: "listitem" } : {}) }, parts);
+    };
+    return el("section", { class: "start-voices", "aria-label": "Stimmen von Angehörigen" }, [
+      el("h2", { class: "start-section start-center start-big-title", text: "Das sagen Angehörige" }),
+      el("div", { class: "start-voice-row", role: "list" }, featured.map((voice) => card(voice, true))),
+      el("details", { class: "start-voices-all" }, [
+        el("summary", { text: `Alle ${all.length} Stimmen lesen` }),
+        el("ul", { role: "list" }, all.map((voice) => card(voice, false)))
+      ]),
+      el("p", { class: "start-small", text: "Stimmen von Angehörigen, die Demenz Coach ausprobiert haben. Vornamen mit Zustimmung. Einzelne Erfahrungen, kein Versprechen für dein Ergebnis." })
+    ]);
+  }
+
   function planScreen() {
     const s = chosen();
     if (validEmail(answers.email) && offer.offers?.intro && deals && !dealAsked && !reservationEnded) {
@@ -818,6 +848,7 @@
         el("p", { class: "start-small", text: "Probier heute einen dieser Sätze:" }),
         el("ul", { class: "start-say", role: "list" }, s.say.map((line) => el("li", { text: `„${line}“` })))
       ]) : null,
+      voices(),
       el("h2", { class: "start-section start-center start-big-title", text: "Häufig gestellte Fragen" }),
       el("div", { class: "start-faq" }, faq.map(([question, answer], index) => el("details", index === 0 ? { open: "" } : {}, [el("summary", { text: question }), el("p", { text: answer })]))),
       el("h2", { class: "start-section start-center start-big-title", text: pair ? "Ruhiger reden. Ab heute üben." : "Starte heute mit deinem Plan" }),
