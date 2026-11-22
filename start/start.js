@@ -182,19 +182,19 @@
   try { typed = String(sessionStorage.getItem("demenzCoachKiOffen") || "").slice(0, 120); } catch { /* */ }
   // Fünf Abschnitte wie BetterMe („Mein Profil“ bis „Fast geschafft“), dazwischen Zwischenstopps (Infoseiten).
   const sectionDefs = [
-    { title: "Über euch", steps: ["relation", "name", "age", "personAge", "hello", "living", "duration", "situation"] },
+    { title: "Über euch", steps: ["relation", "age", "personAge", "hello", "living", "duration", "situation"] },
     { title: "Euer Alltag", steps: ["frequency", "dayTime", "thanks", "moments", "reaction", "feelings", "visits", "outings", "meals",
       "helpreact", "calms", "tries", "insight"] },
     { title: "Du selbst", steps: ["feeling", "sleep", "breaks", "helpers", "self", "work"] },
     { title: "Dein Ziel", steps: ["goal", "burden", "hope", "minutes", "learn", "when", "content", "step"] },
     { title: "Fast geschafft", steps: ["joy", "motivate", "how"] }
   ].map((section) => ({ ...section, steps: section.steps.filter((step) => !(preset && step === "situation")) }));
-  const flow = [...sectionDefs.flatMap((section) => section.steps), "building", "email", "newsletter", "result", "reveal", "plan"];
+  const flow = [...sectionDefs.flatMap((section) => section.steps), "building", "email", "newsletter", "name", "result", "reveal", "plan"];
   const answerFor = { relation: "relation", situation: "situation", frequency: "frequency", dayTime: "dayTime", duration: "duration",
     living: "living", goal: "goal", burden: "burden", minutes: "minutes",
     ...Object.fromEntries(singleNames.map((name) => [name, name])) };
   const interstitials = ["thanks", "insight", "how", "hello", "feelings", "self", "hope", "content", "step", "motivate",
-    "building", "email", "newsletter", "result", "reveal", "plan"];
+    "building", "email", "newsletter", "name", "result", "reveal", "plan"];
   const isQuestion = (name) => !interstitials.includes(name);
   const questions = flow.filter(isQuestion).length;
   const stepNumber = (name) => flow.slice(0, flow.indexOf(name) + 1).filter(isQuestion).length;
@@ -997,7 +997,7 @@
       bars[number].firstChild.style.width = `${Math.round(share * 100)}%`;
     });
     $("count").textContent = done ? "" : sections[index]?.title ?? "";
-    $("back").style.visibility = ["relation", "email", "newsletter"].includes(name) ? "hidden" : "visible";
+    $("back").style.visibility = ["relation", "email", "newsletter", "name"].includes(name) ? "hidden" : "visible";
     // Wie bei BetterMe: auf der allerersten Seite weder Abschnittsname noch Fortschrittsleiste.
     $("progress").hidden = done || name === "relation";
     $("count").hidden = done || name === "relation";
@@ -1052,7 +1052,7 @@
     }
     let name = event.state?.screen || "relation";
     if (!flow.includes(name)) name = "relation";
-    if (["building", "email", "newsletter"].includes(name)) name = "how";
+    if (["building", "email", "newsletter", "name"].includes(name)) name = "how";
     if (name === "reveal") name = "result";
     // Ohne Antwort zurück auf die erste offene Frage.
     const open = flow.slice(0, flow.indexOf(name)).find((step) => answerFor[step] && !answers[answerFor[step]]);
