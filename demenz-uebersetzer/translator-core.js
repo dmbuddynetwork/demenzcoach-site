@@ -249,11 +249,38 @@ function webSafetyInput(value) {
         .sort((a, b) => b.score - a.score);
     };
 
+    // Ausholen bei der Pflege (Daniel, 23. Nov. 2026): „Er schlägt nach mir, wenn ich ihn wasche“ bekommt die
+    // Hilfeantwort ohne den Kasten „Erst die Sicherheit“. Dieselben Regeln wie in der API (backend/server.mjs,
+    // careHitPhrase / careHitContext / careHitStaysUrgent): nur mit Pflegebezug und ohne Gegenstand, Verletzung,
+    // Drohung oder anderes Opfer. „schlägt mich“, „geschlagen“, Bisse, Messer usw. lösen den Kasten weiter aus.
+    const careHitPhrases = ['schlaegt nach mir', 'schlaegt nach uns', 'schlaegt um sich', 'schlaegt wild um sich'];
+    const careHitContext = [
+      'waschen', 'gewaschen', 'waschlappen', 'ihn wasche', 'sie wasche', 'haare wasche', 'dusch', 'baden', 'badewanne',
+      'anzieh', 'beim ausziehen', 'ihn ausziehen', 'sie ausziehen', 'beim umziehen', 'ihn umziehe', 'sie umziehe',
+      'ankleid', 'windel', 'zaehne putzen', 'zahnbuerste', 'kaemmen', 'rasier', 'toilette', 'eincrem', 'beim pflegen'
+    ];
+    const careHitStaysUrgent = [
+      'stock', 'schere', 'gabel', 'flasche', 'hammer', 'gegenstand', 'werkzeug', 'schirm', 'kruecke', 'teller',
+      'lampe', 'beil', 'axt', 'faust', 'rasierer', 'wirft', 'geworfen', 'schmeiss', 'stuhl', 'kerze', 'kochend',
+      'anzuend', 'blut', 'verletz', 'wunde', 'fleck', 'gebrochen', 'bruch', 'blau', 'prell', 'beule', 'schmerz',
+      'ausgeschlagen', 'aufgeschlagen', 'verdreh', 'verbrenn', 'verbrueh', 'brandwunde', 'trifft', 'getroffen',
+      'boxt', 'ohrfeig', 'kneift', 'gekniffen', 'knallt', 'schubs', 'gestossen', 'stoesst', 'tritt', 'getreten',
+      'kratz', 'beisst', 'gebissen', 'geschlagen', 'umbring', 'umgebracht', 'bringt mich um', 'bringe mich um',
+      'toeten', 'getoetet', 'todesangst', 'um mein leben', 'droht', 'bedroht', 'zurueckschl', 'einsperr',
+      'eingesperrt', 'festgehalten', 'geschuettelt', 'kind', 'enkel', 'baby', 'tochter', 'sohn', 'schwester',
+      'bruder', 'nachbar', 'einschliess', 'angst vor ihm', 'angst vor ihr', 'gestuerzt'
+    ];
+    const withoutCareHit = (normalized) => {
+      if (!careHitContext.some((cue) => normalized.includes(cue))
+        || careHitStaysUrgent.some((cue) => normalized.includes(cue))) return normalized;
+      return careHitPhrases.reduce((value, phrase) => value.split(phrase).join(' '), normalized);
+    };
+
     const hasSafetySignal = (text, keywords) => {
       // Mask validated absence spans only for this lookup; ranking/rendering/API keep the raw input.
       const lookup = webSafetyInput(text);
       if (existingRespiratoryCue.test(lookup.normalize("NFC").trim().replace(/\s+/gu, " "))) return true;
-      const normalized = normalize(lookup);
+      const normalized = withoutCareHit(normalize(lookup));
       return keywords.some((keyword) => {
         if (keyword === 'luftnot') {
           return [...normalized.matchAll(/ luftnot/g)].some(match =>
