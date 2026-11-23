@@ -230,6 +230,7 @@ body[data-screen="plan"] .start-page { padding-top: 0; }
 .start-hero-row strong { font-size: 1.0625rem; color: var(--ink); }
 .start-hero-rows .start-level i.on { background: var(--ink); }
 .start-hero-rows > div:last-child .start-level i.on { background: var(--purple); }
+.start-result-line { margin: -6px 0 16px; padding: 10px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; font-size: 1rem; line-height: 1.4; }
 .start-plan-title { margin: 22px 0 18px; font-size: 1.9rem; line-height: 1.15; }
 
 .start-ticket { margin: 0 0 16px; border-radius: 18px; background: var(--lav); overflow: hidden; }

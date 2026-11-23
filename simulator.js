@@ -232,6 +232,10 @@
       // Bildpaar der geübten Situation für „Jetzt / Dein Ziel“ auf der Angebotsseite.
       const done = state.sit?.picture || state.sit;
       if (done?.image?.src && done.afterImage?.src) sessionStorage.setItem('demenzCoachSimPair', JSON.stringify({ before: done.image.src, after: done.afterImage.src }));
+      // Ein Satz zum Ergebnis der Übung (Rückmeldung dieser Übung) für die Angebotsseite. Nur auf Deutsch, nur im Tab.
+      const line = !english && state.done ? (['calm', 'calmer'].includes(state.mood) ? state.wrapUp?.worked : state.wrapUp?.nextTime) : '';
+      if (typeof line === 'string' && line.length >= 5 && line.length <= 340) sessionStorage.setItem('demenzCoachSimResult', JSON.stringify({ calm: ['calm', 'calmer'].includes(state.mood), text: line }));
+      else sessionStorage.removeItem('demenzCoachSimResult');
       const user = (await loadAuth()).currentUser;
       if (user?.emailVerified && user.email) sessionStorage.setItem('demenzCoachEmail', user.email);
     } catch { /* ohne Adresse fragt die Angebotsseite selbst */ }

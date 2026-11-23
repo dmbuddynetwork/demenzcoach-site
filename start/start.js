@@ -455,6 +455,7 @@
       answers.email = value;
       try { sessionStorage.setItem("demenzCoachEmail", value); } catch { /* */ }
       track(directMode ? "direct_offer_email" : "quiz_email_submit");
+      countDirect("direct_email");
       if (directMode) {
         // The existing contact requirement remains before checkout. Reserve an intro
         // only with this validated address, then let the visitor review the real price.
@@ -551,6 +552,9 @@
   // ---- Enthüllung des Willkommenspreises (wie BetterMe: Rubbellos vor der Preisseite) -----------------------
   // Alle bekommen denselben Preis; das Rubbeln deckt ihn nur auf (kein Gewinnspiel, keine Zufallsbehauptung).
   // Beim Öffnen wird der Einführungspreis für diese E-Mail angefragt (angebot.js).
+  const revealAutoMs = 6000;
+  const revealAfterMs = 2500;
+  let revealTimer = 0;
   function revealScreen() {
     const intro = offer.offers?.intro;
     const deal = deals?.current();
@@ -572,12 +576,19 @@
     const canvas = el("canvas", { class: "start-scratch", width: "600", height: "300", "aria-hidden": "true" });
     const button = el("button", { type: "button", class: "abo-button", text: "Aufdecken" });
     let revealed = false;
+    // Wie bei BetterMe geht es nach etwa 6 Sekunden von selbst zum Angebot weiter (Daniel, 23. Nov 2026).
+    // Wer erst spät aufdeckt, bekommt danach noch einen Moment, den Preis zu sehen. Kein Text dazu, keine Frist.
+    const shownAt = Date.now();
+    const advance = () => { if (current === "reveal") go("plan", { replace: true }); };
+    const schedule = (delay) => { clearTimeout(revealTimer); revealTimer = setTimeout(advance, delay); };
+    schedule(revealAutoMs);
     const reveal = () => {
       if (revealed) return;
       revealed = true;
       canvas.classList.add("start-scratch-gone");
       button.textContent = "Weiter zum Angebot";
       track("quiz_reveal");
+      schedule(Math.max(revealAutoMs - (Date.now() - shownAt), revealAfterMs));
     };
     button.addEventListener("click", () => { if (revealed) go("plan", { replace: true }); else reveal(); });
     // Rubbelfläche: lila Schicht, die mit Finger oder Maus weggerieben wird; ab etwa 45 % ist alles frei.
@@ -630,6 +641,16 @@
       const ok = (path) => typeof path === "string" && /^\/assets\/zeichnungen\/[a-z0-9-]+\.webp$/u.test(path);
       return value && ok(value.before) && ok(value.after) ? { before: value.before, after: value.after } : fallback;
     } catch { return fallback; }
+  }
+
+  // Ein Satz zum Ergebnis der gerade geübten Situation (simulator.js legt ihn im Tab ab). Nur Text, ohne Formatierung.
+  function simulatorResult() {
+    if (!directMode || source !== "simulator") return null;
+    try {
+      const value = JSON.parse(sessionStorage.getItem("demenzCoachSimResult") || "null");
+      const text = typeof value?.text === "string" ? value.text.trim() : "";
+      return text.length >= 5 && text.length <= 340 ? { calm: value.calm === true, text } : null;
+    } catch { return null; }
   }
 
   // Stimmen von Angehörigen (stimmen.js): Karten zum Wischen mit „Mehr lesen“, wie BetterMe „Ergebnisse, auf die wir stolz sind“.
@@ -708,7 +729,7 @@
       tables.push(group);
       return group;
     };
-    const cta = () => el("button", { type: "button", class: "abo-button start-cta", text: ctaText, onclick: checkout });
+    const cta = () => el("button", { type: "button", class: "abo-button start-cta", text: ctaText, onclick: () => { countDirect("direct_cta"); checkout(); } });
     const fineText = () => (offer.trialDays > 0
       ? `Heute zahlst du 0,00 €. Kündige ich nicht vor Ablauf der ${offer.trialDays} Tage, kostet das Abo danach ${priceText(plan)} und verlängert sich, bis ich kündige. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`
       : `Du zahlst ${priceText(plan)}, bis du kündigst. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`);
@@ -778,6 +799,7 @@
 
     // Vom Üben (src=simulator): „Jetzt / Dein Ziel“ wie BetterMe, mit dem Bildpaar der geübten Situation (aufgeregt / ruhig).
     const pair = simulatorPair();
+    const result = pair ? simulatorResult() : null;
     // Bildpaar „Jetzt / Dein Ziel“ wie BetterMe auch für den Fragebogen (Zeichnungen, keine Messwerte).
     const heroPics = pair || (!directMode ? { before: "/assets/zeichnungen/nach-hause.webp", after: "/assets/zeichnungen/nach-hause-ruhig.webp" } : null);
     const level = (filled) => el("span", { class: "start-level", "aria-hidden": "true" }, [1, 2, 3].map((n) => el("i", { class: n <= filled ? "on" : "" })));
@@ -864,6 +886,7 @@
       reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
       hero,
       el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Übungsplan für Gespräche ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : (name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!") }),
+      result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null,
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
       ...offerBlock(),
@@ -904,6 +927,8 @@
   function checkout() {
     if (directMode && !validEmail(answers.email)) { go("email"); return; }
     track(directMode ? "direct_offer_checkout" : "quiz_checkout", "InitiateCheckout");
+    // Eine schon bestätigte Konto-Adresse zählt als E-Mail, auch ohne den E-Mail-Schritt.
+    countDirect("direct_email");
     // Für „Mein Plan“ nach dem Kauf: bleibt in diesem Browser, wird nie gesendet.
     try {
       if (directMode) {
@@ -922,6 +947,7 @@
     const src = directMode ? `direkt_${source}`.slice(0, 40) : `quiz_${source}${preset ? `_${preset.key}` : ""}`.slice(0, 40);
     // Kasse als Fenster auf dieser Seite (kasse.js, wie BetterMe/Yazio). Ohne das Modul wie bisher die Seite /abo/.
     const kasse = window.DemenzKasse;
+    countDirect("direct_kasse");
     if (!kasse || !config.firebase?.apiKey) {
       (window.top !== window ? window.top.location : location).href = `/abo/?plan=${plan}&src=${src}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
       return;
@@ -976,15 +1002,30 @@
   // Schrittzähler ohne Einwilligung (Daniel, 19. Nov 2026): Der Server zählt nur Schritt und Tag hoch.
   // Nichts wird im Browser gespeichert, nichts wird als Kennung, Quelle oder Antwort gesendet.
   const countEndpoint = `${String(config.translatorGate?.endpoint || "").replace(/\/v1\/translator-web$/u, "")}/v1/quiz-count`;
-  const countStep = (name) => {
-    if (!/^https:/u.test(countEndpoint)) return;
+  // Testläufe (src=test oder utm_source=test in der Adresse) und eigene Geräte (Merkzeichen von /intern/, nur gelesen)
+  // zählen nicht. Nichts davon wird hier gespeichert.
+  const noCount = (() => {
+    if ([params.get("src"), params.get("utm_source")].some((value) => String(value || "").trim().toLowerCase() === "test")) return true;
+    try { return localStorage.getItem("demenzcoach.internal.v1") === "1"; } catch { return false; }
+  })();
+  const countEvent = (step) => {
+    if (noCount || !/^https:/u.test(countEndpoint)) return;
     try {
-      fetch(countEndpoint, { method: "POST", body: JSON.stringify({ step: directMode ? "direct" : name }), keepalive: true,
+      fetch(countEndpoint, { method: "POST", body: JSON.stringify({ step }), keepalive: true,
         credentials: "omit", referrerPolicy: "no-referrer", headers: { "Content-Type": "text/plain" } }).catch(() => {});
     } catch { /* Zählen darf den Fragebogen nie stören */ }
   };
+  const countStep = (name) => countEvent(directMode ? "direct" : name);
+  // Direkt-Angebot: Tipp auf den Hauptknopf, E-Mail, Kasse. Je Seitenaufruf höchstens einmal je Schritt (nur im Speicher).
+  const directCounted = new Set();
+  const countDirect = (step) => {
+    if (!directMode || directCounted.has(step)) return;
+    directCounted.add(step);
+    countEvent(step);
+  };
   function render(name) {
     current = name;
+    clearTimeout(revealTimer);
     countStep(name);
     const screen = $("screen");
     screen.replaceChildren(...screens[name]().filter(Boolean));
