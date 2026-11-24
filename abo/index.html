@@ -78,15 +78,15 @@
       <p class="abo-muted" id="hosted-checkout-status" role="status" hidden>Die sichere Zahlungsseite von Stripe wird geöffnet …</p>
       <button class="abo-button" type="button" id="hosted-checkout-retry" hidden>Erneut versuchen</button>
       <div id="pay-block" hidden>
-        <!-- Zahlungsfelder zuerst; Preis/Laufzeit bleiben vor sämtlichen auslösenden Zahlungsknöpfen. -->
-        <div id="payment-element"></div>
+        <!-- Preis/Laufzeit stehen vor sämtlichen auslösenden Zahlungsknöpfen. Apple Pay und Google Pay zuerst, Kartenfelder darunter. -->
         <div class="abo-summary" role="group" aria-label="Preis und Laufzeit">
           <p id="pay-summary"></p>
           <p id="pay-terms"></p>
         </div>
         <div id="express-checkout"></div>
-        <p class="abo-divider" id="express-divider" hidden>oder</p>
-        <p id="pay-summary-short" hidden></p>
+        <p class="abo-divider" id="express-divider" hidden>oder anders bezahlen</p>
+        <div id="payment-element"></div>
+        <p id="pay-summary-short"></p>
         <button class="abo-button" type="button" id="pay-button" disabled>Zahlungspflichtig abonnieren</button>
         <p class="abo-checkout-email" id="signed-in-as"></p>
         <div class="abo-checkout-details">
