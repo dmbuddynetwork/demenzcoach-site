@@ -20,12 +20,8 @@ const state = {
   auth: null,
   firebase: null,
   user: null,
-  checkout: null,
   checkoutAttempt: null,
   checkoutGeneration: 0,
-  checkoutReady: false,
-  checkoutElements: [],
-  confirming: false,
   step: "plan"
 };
 
@@ -34,25 +30,12 @@ function invalidateCheckout() {
   state.checkoutAttempt?.paymentWindow?.discard();
   state.checkoutGeneration += 1;
   state.checkoutAttempt = null;
-  state.checkout = null;
-  state.checkoutReady = false;
   $("hosted-checkout-status").hidden = true;
   $("hosted-checkout-retry").hidden = true;
-  state.confirming = false;
-  $("pay-button").disabled = true;
-  for (const element of state.checkoutElements) {
-    try { element.unmount?.(); } catch { /* Already detached. */ }
-  }
-  state.checkoutElements = [];
-  for (const id of ["payment-element", "express-checkout", "pay-summary", "pay-terms", "pay-summary-short", "pay-trial-note"]) $(id).replaceChildren();
-  $("express-divider").hidden = true;
 }
 function currentAttempt(attempt) {
   return state.checkoutAttempt === attempt && attempt?.generation === state.checkoutGeneration
     && attempt.plan === state.plan && attempt.user === state.user && state.step === "pay" && !$("step-pay").hidden;
-}
-function currentCheckout(attempt, checkout) {
-  return Boolean(checkout && currentAttempt(attempt) && state.checkout === checkout);
 }
 function show(step) {
   invalidateCheckout();
@@ -125,8 +108,7 @@ function renderPrices() {
 async function loadOffer() {
   try {
     state.offer = await api("/config");
-    // Daniel, 24. Nov 2026: gehostete Stripe-Seite statt eigenem Formular, sobald der Server sie ankündigt.
-    if (state.offer?.hostedFallback === true) state.offer.checkoutMode = "hosted";
+    // Daniel, 24. Nov 2026: kein eigenes Zahlungsformular. Die Zahlung läuft immer auf der gehosteten Stripe-Seite.
     renderPrices();
     renderPlans();
   } catch {
@@ -135,7 +117,7 @@ async function loadOffer() {
 }
 $("plan-next").addEventListener("click", async () => {
   if (currentAttempt(state.checkoutAttempt)) { state.checkoutAttempt.paymentWindow?.focus(); return; }
-  const preparedWindow = state.user?.email && state.offer?.checkoutMode === "hosted" ? reserveCheckoutWindow(window) : undefined;
+  const preparedWindow = state.user?.email ? reserveCheckoutWindow(window) : undefined;
   track("begin_checkout", { plan: state.plan, source: state.source }, { event: "InitiateCheckout" });
   try {
     await ensureFirebase();
@@ -218,12 +200,9 @@ function goToPay(preparedWindow) {
     return;
   }
   show("pay");
-  const who = state.user.isAnonymous ? "" : (state.user.email || "");
-  $("signed-in-as").textContent = who ? `Angemeldet als ${who}` : "";
   if (state.user.email) return startCheckout(undefined, preparedWindow);
   preparedWindow?.discard();
   $("email-block").hidden = false;
-  $("pay-block").hidden = true;
   // E-Mail aus dem Fragebogen (nur in diesem Tab gemerkt) vorausfüllen.
   try { if (!$("email").value) $("email").value = sessionStorage.getItem("demenzCoachEmail") || ""; } catch { /* */ }
 }
@@ -240,15 +219,11 @@ async function startCheckout(email, preparedWindow) {
     return;
   }
   invalidateCheckout();
-  const paymentWindow = preparedWindow !== undefined ? preparedWindow : state.offer?.checkoutMode === "hosted" ? reserveCheckoutWindow(window) : null;
+  const paymentWindow = preparedWindow !== undefined ? preparedWindow : reserveCheckoutWindow(window);
   const attempt = { generation: state.checkoutGeneration, plan: state.plan, user: state.user, paymentWindow };
   state.checkoutAttempt = attempt;
   $("email-block").hidden = true;
-  $("pay-block").hidden = state.offer?.checkoutMode === "hosted";
-  $("hosted-checkout-status").hidden = state.offer?.checkoutMode !== "hosted";
-  $("pay-button").disabled = true;
-  const receiptEmail = email || attempt.user.email;
-  if (receiptEmail) $("signed-in-as").textContent = `Bestätigung und Zugang an ${receiptEmail}`;
+  $("hosted-checkout-status").hidden = false;
   try {
     const token = await attempt.user.getIdToken();
     if (!currentAttempt(attempt)) throw new Error("checkout_attempt_changed");
@@ -258,7 +233,7 @@ async function startCheckout(email, preparedWindow) {
     const session = await api("/session", {
       method: "POST",
       token,
-      body: { plan: attempt.plan, checkoutMode: "hosted", ...(state.offer?.hostedFallback === true ? { hostedFallback: true } : {}), termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+      body: { plan: attempt.plan, checkoutMode: "hosted", hostedFallback: true, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...window.DemenzConsent?.metaContext?.(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
@@ -282,11 +257,7 @@ async function startCheckout(email, preparedWindow) {
       }
       return;
     }
-    paymentWindow?.discard();
-    $("hosted-checkout-status").hidden = true;
-    $("pay-block").hidden = false;
-    renderSummary(session.trialDays, session.firstYear);
-    await mountStripe(session.clientSecret, attempt);
+    throw new Error("hosted_checkout_unavailable");
   } catch (error) {
     paymentWindow?.discard();
     if (!currentAttempt(attempt)) {
@@ -312,7 +283,6 @@ async function startCheckout(email, preparedWindow) {
     if (error.code === "terms_outdated") return fail("Die Seite ist nicht mehr aktuell. Bitte lade sie neu.");
     if (error.code === "email_required") {
       $("email-block").hidden = false;
-      $("pay-block").hidden = true;
       return fail("Bitte gib eine gültige E-Mail-Adresse ein.");
     }
     const retry = $("hosted-checkout-retry");
@@ -324,108 +294,6 @@ async function startCheckout(email, preparedWindow) {
     fail(error.code === "checkout_window_closed" ? "Das Zahlungsfenster wurde geschlossen. Du kannst die Zahlung erneut öffnen." : "Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
   }
 }
-
-// Wesentliche Preis- und Laufzeitangaben bleiben vor allen Zahlungsbuttons sichtbar.
-// Erläuterungen zur Probezeit und weiterführende Links folgen unter den Buttons.
-function renderSummary(trialDays, firstYear = null) {
-  const price = state.offer?.plans?.[state.plan];
-  const period = state.plan === "yearly" ? "Jahr" : "Monat";
-  const recurring = price ? `${euro(price.amount, price.currency)}/${period}` : "";
-  const deal = Number.isInteger(firstYear) && price ? euro(firstYear, price.currency) : null;
-  let summary;
-  if (trialDays > 0) {
-    const start = new Date(Date.now() + trialDays * 86_400_000);
-    summary = deal
-      ? `Heute 0,00 €. Ab ${dateText(start)}: ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
-      : `Heute 0,00 €. Ab ${dateText(start)}: ${recurring}. Inkl. MwSt.`;
-  } else {
-    summary = deal
-      ? `Heute ${deal} im 1. Jahr, danach ${recurring}. Inkl. MwSt.`
-      : `Heute ${price ? euro(price.amount, price.currency) : ""} für 1 ${period}, danach ${recurring}. Inkl. MwSt.`;
-  }
-  $("pay-summary").textContent = summary;
-  const terms = state.plan === "yearly"
-    ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist."
-    : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.";
-  $("pay-summary-short").textContent = `${summary} ${terms}`;
-  $("pay-terms").textContent = terms;
-  $("pay-trial-note").hidden = !(trialDays > 0);
-  $("pay-trial-note").textContent = trialDays > 0 ? `${trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
-}
-
-// Stripe.js erst laden, wenn jemand wirklich bezahlen will (nicht schon beim Betrachten der Angebote).
-function loadStripe() {
-  if (window.Stripe) return Promise.resolve();
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "https://js.stripe.com/dahlia/stripe.js"; // gleiche Version wie die Checkout-Session (ui_mode elements), v3 kennt initCheckout nicht
-    script.onload = resolve;
-    script.onerror = () => reject(new Error("stripe.js failed"));
-    document.head.append(script);
-  });
-}
-
-async function mountStripe(clientSecret, attempt) {
-  await loadStripe();
-  if (!currentAttempt(attempt)) return;
-  const stripe = window.Stripe(state.offer.publishableKey, { locale: "de" });
-  const appearance = {
-    theme: "stripe",
-    variables: { colorPrimary: "#47408c", colorText: "#1d1b24", colorBackground: "#ffffff", fontSizeBase: "16px", fontSizeSm: "14px", spacingUnit: "3px", borderRadius: "10px" }
-  };
-  const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
-  const checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
-  if (!currentAttempt(attempt)) return;
-  state.checkout = checkout;
-  const express = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" }, buttonHeight: 52, layout: { maxColumns: 1, maxRows: 0, overflow: "never" } });
-  express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
-    if (!currentCheckout(attempt, checkout)) return;
-    $("express-divider").hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean);
-  });
-  express.on("confirm", () => confirmPayment(attempt, checkout));
-  const payment = checkout.createPaymentElement({ layout: "tabs", wallets: { link: "never" } });
-  state.checkoutElements = [express, payment];
-  express.mount("#express-checkout");
-  payment.on("ready", () => {
-    if (!currentCheckout(attempt, checkout)) return;
-    state.checkoutReady = true;
-    $("pay-button").disabled = state.confirming;
-  });
-  payment.on("loaderror", () => {
-    if (!currentCheckout(attempt, checkout)) return;
-    state.checkoutReady = false;
-    $("pay-button").disabled = true;
-    fail("Die Zahlungsarten konnten nicht geladen werden. Wähle dein Angebot bitte erneut.");
-  });
-  payment.mount("#payment-element");
-}
-
-async function confirmPayment(attempt = state.checkoutAttempt, checkout = state.checkout) {
-  if (!currentCheckout(attempt, checkout) || !state.checkoutReady || state.confirming) return;
-  state.confirming = true;
-  $("pay-button").disabled = true;
-  try {
-    const loaded = await checkout.loadActions?.();
-    // A plan change/retry while actions load invalidates this exact session.
-    if (!currentCheckout(attempt, checkout) || !state.checkoutReady) return;
-    if (loaded?.type === "error") {
-      fail(loaded.error?.message || "Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
-      return;
-    }
-    const actions = loaded?.actions ?? checkout;
-    const result = await actions.confirm();
-    if (!currentCheckout(attempt, checkout)) return;
-    if (result?.type === "error" || result?.error) fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
-  } catch {
-    if (currentCheckout(attempt, checkout)) fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
-  } finally {
-    if (currentCheckout(attempt, checkout)) {
-      state.confirming = false;
-      $("pay-button").disabled = !state.checkoutReady;
-    }
-  }
-}
-$("pay-button").addEventListener("click", () => confirmPayment());
 
 // Preserve the paid guest UID by linking email in the same Firebase account.
 async function offerAccountLink() {

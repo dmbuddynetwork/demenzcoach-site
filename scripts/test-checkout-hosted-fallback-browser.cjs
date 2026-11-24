@@ -1,5 +1,5 @@
-// Daniel, 24. Nov 2026: kein eigenes eingebettetes Stripe-Formular. Kündigt der Server die gehostete Seite an, geht die Kasse im
-// selben Tab zu Stripe, ohne Stripe.js zu laden. Nur Test-Daten, keine echten Konten oder Zahlungen.
+// Daniel, 24. Nov 2026: kein eigenes eingebettetes Stripe-Formular. Die Kasse fordert immer die gehostete Seite und geht im
+// selben Tab zu Stripe, ohne Stripe.js zu laden; ohne E-Mail liefert Stripe oder Apple Pay sie nach. Nur Test-Daten, keine echten Konten oder Zahlungen.
 const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '..');
@@ -18,7 +18,7 @@ const server = http.createServer((req, res) => { try {
   let browser, cases = 0;
   try {
     browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
-    for (const withEmail of [true, false]) for (const announced of [true, false]) {
+    for (const withEmail of [true, false]) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
       const page = await context.newPage(), sessions = [], stripeScripts = [], popups = [];
       page.on('popup', p => popups.push(p));
@@ -32,7 +32,7 @@ const server = http.createServer((req, res) => { try {
         if (url.hostname === 'js.stripe.com') { stripeScripts.push(req.url()); return route.abort(); }
         if (url.hostname === 'checkout.stripe.com') return route.fulfill({ contentType: 'text/html', body: '<h1>Stripe hosted fixture</h1>' });
         if (url.hostname.endsWith('cloudfunctions.net')) {
-          if (url.pathname.endsWith('/config')) return route.fulfill({ headers, json: { checkoutMode: 'elements', ...(announced ? { hostedFallback: true, walletEmail: true } : {}), plans: { yearly: { amount: 6999, currency: 'eur' }, monthly: { amount: 1299, currency: 'eur' } }, trialDays: 7, textVersions: { terms: 'fx' }, publishableKey: 'pk_test_fx' } });
+          if (url.pathname.endsWith('/config')) return route.fulfill({ headers, json: { checkoutMode: 'elements', hostedFallback: true, walletEmail: true, plans: { yearly: { amount: 6999, currency: 'eur' }, monthly: { amount: 1299, currency: 'eur' } }, trialDays: 7, textVersions: { terms: 'fx' }, publishableKey: 'pk_test_fx' } });
           if (url.pathname.endsWith('/session')) {
             sessions.push({ body: req.postDataJSON() });
             return route.fulfill({ headers, json: req.postDataJSON().hostedFallback ? { checkoutMode: 'hosted', url: 'https://checkout.stripe.com/c/pay/cs_fx', trialDays: 7, plan: 'yearly', firstYear: null } : { clientSecret: 'cs_fx_secret', trialDays: 7, plan: 'yearly', firstYear: null } });
@@ -47,21 +47,13 @@ const server = http.createServer((req, res) => { try {
         if (await decline.count()) await decline.click();
         await page.evaluate(async withEmail => { const k = await import('/abo/kasse.js'); const b = document.createElement('button'); b.id = 'fx-open'; b.textContent = 'Plan starten'; b.style.cssText = 'position:fixed;top:8px;left:8px;z-index:5'; b.onclick = () => k.open({ plan: 'yearly', ...(withEmail ? { email: 'fixture@example.invalid' } : {}), source: 'hosted-test' }); document.body.append(b); }, withEmail);
         await page.locator('#fx-open').click();
-        if (announced) {
-          await page.waitForURL('https://checkout.stripe.com/**');
-          assert.equal(sessions.length, 1);
-          assert.equal(sessions[0].body.hostedFallback, true);
-          assert.equal(sessions[0].body.emailLater, withEmail ? undefined : true, 'ohne E-Mail: Stripe oder Apple Pay liefert sie');
-          assert.equal(sessions[0].body.email, withEmail ? 'fixture@example.invalid' : undefined);
-          assert.deepEqual(stripeScripts, [], 'kein eingebettetes Stripe.js');
-          assert.equal(popups.length, 0, 'selber Tab, kein Pop-up');
-        } else {
-          await page.getByRole('dialog').waitFor();
-          for (let i = 0; i < 50 && !sessions.length; i++) await page.waitForTimeout(100);
-          assert.equal(sessions.length, 1);
-          assert.equal(sessions[0].body.hostedFallback, undefined, 'ohne Ankündigung bleibt alles wie bisher');
-          assert.equal(sessions[0].body.emailLater, undefined);
-        }
+        await page.waitForURL('https://checkout.stripe.com/**');
+        assert.equal(sessions.length, 1);
+        assert.equal(sessions[0].body.hostedFallback, true);
+        assert.equal(sessions[0].body.emailLater, withEmail ? undefined : true, 'ohne E-Mail: Stripe oder Apple Pay liefert sie');
+        assert.equal(sessions[0].body.email, withEmail ? 'fixture@example.invalid' : undefined);
+        assert.deepEqual(stripeScripts, [], 'kein eingebettetes Stripe.js');
+        assert.equal(popups.length, 0, 'selber Tab, kein Pop-up');
         cases++;
       } finally { await context.close(); }
     }
