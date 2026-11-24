@@ -81,6 +81,7 @@ function renderPlans() {
   const trialDays = state.offer?.trialDays ?? 7;
   $("trial-note").hidden = trialDays === 0;
   $("trial-note").textContent = `${trialDays} Tage kostenlos. Jetzt wird nichts berechnet.`;
+  renderQuick();
 }
 for (const button of document.querySelectorAll("[data-plan]")) {
   button.addEventListener("click", () => { invalidateCheckout(); state.plan = button.dataset.plan; renderPlans(); });
@@ -133,6 +134,100 @@ $("plan-next").addEventListener("click", async () => {
 });
 $("have-account").addEventListener("click", () => { refreshEmailEntry(); show("account"); });
 for (const back of document.querySelectorAll("[data-back]")) back.addEventListener("click", () => show(back.dataset.back));
+
+// --- Apple-Pay-Vorfahrt (Test, nur mit ?ap=1) -----------------------------------------------------
+// Wie Tolan: Auf dem iPhone steht der Apple-Pay-Knopf schon auf der Angebotsseite, ein Tipp öffnet das Apple-Pay-Fenster.
+// Es ist nur der Express-Knopf von Stripe, kein Kartenformular (Daniel, 24. Nov 2026). Preis, Laufzeit und Kündigung stehen
+// direkt über dem Knopf (§ 312j BGB). Alle anderen Geräte und Zahlarten gehen wie bisher über die gehostete Stripe-Seite.
+const quick = { enabled: params.get("ap") === "1", slots: {}, timer: null, dead: false };
+const quickSupported = () => { try { return window.ApplePaySession?.canMakePayments?.() === true; } catch { return false; } };
+function loadStripe() {
+  if (window.Stripe) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://js.stripe.com/dahlia/stripe.js"; // gleiche Version wie die Checkout-Session (ui_mode elements)
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("stripe.js failed"));
+    document.head.append(script);
+  });
+}
+function quickSummary(plan, trialDays, firstYear) {
+  const price = state.offer?.plans?.[plan];
+  if (!price) return "";
+  const period = plan === "yearly" ? "Jahr" : "Monat";
+  const recurring = `${euro(price.amount, price.currency)}/${period}`;
+  const deal = Number.isInteger(firstYear) ? euro(firstYear, price.currency) : null;
+  const terms = plan === "yearly" ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist." : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.";
+  if (trialDays > 0) {
+    const start = new Date(Date.now() + trialDays * 86_400_000);
+    return `${deal ? `Heute 0,00 €. Ab ${dateText(start)}: ${deal} im 1. Jahr, danach ${recurring}.` : `Heute 0,00 €. Ab ${dateText(start)}: ${recurring}.`} Inkl. MwSt. ${terms}`;
+  }
+  return `${deal ? `Heute ${deal} im 1. Jahr, danach ${recurring}.` : `Heute ${euro(price.amount, price.currency)}, danach ${recurring}.`} Inkl. MwSt. ${terms}`;
+}
+function hideQuick() {
+  quick.dead = true;
+  $("quick-pay").hidden = true;
+  $("plan-next").textContent = "Weiter";
+}
+function renderQuick() {
+  if (!quick.enabled || quick.dead || !state.offer || !quickSupported()) return;
+  $("quick-pay").hidden = false;
+  $("plan-next").textContent = "Mit Karte oder PayPal weiter";
+  for (const plan of ["yearly", "monthly"]) $(`quick-slot-${plan}`).hidden = plan !== state.plan;
+  const deal = state.plan === "yearly" && currentDeal();
+  $("quick-summary").textContent = quickSummary(state.plan, state.offer.trialDays ?? 7, deal ? deal.firstYear : null);
+  clearTimeout(quick.timer);
+  quick.timer = setTimeout(() => mountQuick(state.plan), 400);
+}
+async function mountQuick(plan) {
+  if (quick.slots[plan] || quick.dead) return;
+  quick.slots[plan] = { pending: true };
+  try {
+    await ensureFirebase();
+    // Das Gast-Konto trägt den Kauf, wie beim Weiter-Knopf.
+    if (!state.user) state.user = (await state.firebase.signInAnonymously(state.auth)).user;
+    const user = state.user;
+    const token = await user.getIdToken();
+    const deal = plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
+    await window.DemenzTeller?.ready;
+    const session = await api("/session", {
+      method: "POST",
+      token,
+      body: { plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+        ...window.DemenzTeller?.attribution(),
+        ...(state.offer?.walletEmail === true ? { emailLater: true } : {}), ...(deal ? { offer: deal } : {}) }
+    });
+    if (!session.clientSecret) throw new Error("no_client_secret");
+    await loadStripe();
+    const stripe = window.Stripe(state.offer.publishableKey, { locale: "de" });
+    const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
+    const checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance: { theme: "stripe", variables: { colorPrimary: "#47408c", borderRadius: "10px" } } } });
+    const express = checkout.createExpressCheckoutElement({
+      buttonType: { applePay: "subscribe" }, buttonHeight: 52, layout: { maxColumns: 1, maxRows: 1, overflow: "never" },
+      paymentMethods: { applePay: "always", googlePay: "never", link: "never", paypal: "never", amazonPay: "never", klarna: "never" }
+    });
+    express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
+      if (!paymentMethods || !paymentMethods.applePay) hideQuick();
+      else track("apple_pay_quick_shown", { plan, source: state.source });
+    });
+    express.on("confirm", async () => {
+      track("apple_pay_quick_confirm", { plan, source: state.source });
+      try {
+        const loaded = await checkout.loadActions?.();
+        const result = await (loaded?.actions ?? checkout).confirm();
+        if (result?.type === "error" || result?.error) fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
+      } catch {
+        fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
+      }
+    });
+    express.mount($(`quick-slot-${plan}`));
+  } catch (error) {
+    delete quick.slots[plan];
+    // Rate-Limit, bereits ein Abo oder ein Fehler: still auf den normalen Weg zurück, nichts blockieren.
+    hideQuick();
+    if (error?.code === "already_subscribed") show("already");
+  }
+}
 
 // --- Schritt 2: Konto (Firebase Auth, dasselbe Projekt wie die App) ---------------------------------
 async function ensureFirebase() {
