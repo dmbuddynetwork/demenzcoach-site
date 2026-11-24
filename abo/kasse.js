@@ -173,11 +173,17 @@ export async function open(options) {
     await window.DemenzTeller?.ready;
     const token = await user.getIdToken();
     if (!requireCurrentAccount()) return;
+    // Daniel, 24. Nov 2026: kein eigenes eingebettetes Stripe-Formular, es sieht schlecht aus. Kündigt der Server die gehostete
+    // Stripe-Seite an, geht es im selben Tab dorthin. Apple Pay und Google Pay stehen dort oben, die E-Mail kommt von Stripe.
+    const hosted = publicConfig.hostedFallback === true;
+    if (hosted) loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
     const session = await api("/session", {
       method: "POST",
       token,
       body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
         ...window.DemenzTeller?.attribution(),
+        ...(hosted ? { hostedFallback: true } : {}),
+        ...(hosted && publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
     if (!requireCurrentAccount()) return;

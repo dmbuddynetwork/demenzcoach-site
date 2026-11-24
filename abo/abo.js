@@ -125,6 +125,8 @@ function renderPrices() {
 async function loadOffer() {
   try {
     state.offer = await api("/config");
+    // Daniel, 24. Nov 2026: gehostete Stripe-Seite statt eigenem Formular, sobald der Server sie ankündigt.
+    if (state.offer?.hostedFallback === true) state.offer.checkoutMode = "hosted";
     renderPrices();
     renderPlans();
   } catch {
@@ -256,7 +258,7 @@ async function startCheckout(email, preparedWindow) {
     const session = await api("/session", {
       method: "POST",
       token,
-      body: { plan: attempt.plan, checkoutMode: "hosted", termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+      body: { plan: attempt.plan, checkoutMode: "hosted", ...(state.offer?.hostedFallback === true ? { hostedFallback: true } : {}), termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
