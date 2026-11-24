@@ -46,20 +46,16 @@ export const getRedirectResult=async()=>null; export const signInAnonymously=asy
         if (url.pathname.endsWith('/config')) return route.fulfill({ json: config, headers: { 'Access-Control-Allow-Origin': '*' } });
         if (url.pathname.endsWith('/session')) {
           bodies.push(req.postDataJSON());
-          return route.fulfill({ json: { clientSecret: 'fixture', trialDays: 7 }, headers: { 'Access-Control-Allow-Origin': '*' } });
+          return route.fulfill({ json: { checkoutMode: 'hosted', url: 'https://checkout.stripe.com/c/pay/cs_fixture', trialDays: 7 }, headers: { 'Access-Control-Allow-Origin': '*' } });
         }
         return route.fulfill({ json: {}, headers: { 'Access-Control-Allow-Origin': '*' } });
       }
+      if (url.hostname === 'checkout.stripe.com') return route.fulfill({ contentType: 'text/html', body: '<h1>Stripe hosted fixture</h1>' });
       if (url.hostname === 'www.googletagmanager.com') return route.fulfill({ contentType: 'text/javascript', body: '' });
       return route.abort();
     });
-    await context.addInitScript(() => {
-      window.Stripe = () => ({ initCheckoutElementsSdk: async () => ({
-        createExpressCheckoutElement: () => ({ on() {}, mount() {} }),
-        createPaymentElement: () => ({ mount() {} }),
-        loadActions: async () => ({ confirm: async () => { throw Error('No payments in this test'); } })
-      }) });
-    });
+    // Die Zahlung läuft im selben Tab auf der gehosteten Stripe-Seite (hier ein Platzhalter), nie in einem Pop-up.
+    await context.addInitScript(() => { window.open = () => null; });
     const page = await context.newPage();
     page.setDefaultTimeout(8000);
     page.on('pageerror', e => errors.push(e.message));
@@ -111,20 +107,21 @@ export const getRedirectResult=async()=>null; export const signInAnonymously=asy
       }
       assert.equal(await page.locator('body').getAttribute('data-screen'), 'result');
       await page.waitForFunction(name => (window.dataLayer || []).some(e => e[0] === 'event' && e[1] === name), `teller_${arm}_complete`);
-      // Exercise actual embedded checkout request builder with synthetic auth and payment SDK.
+      // Exercise the actual checkout request builder with synthetic auth; the hosted Stripe page is a fixture.
       await page.evaluate(() => DemenzKasse.open({ plan:'yearly',email:'fixture@example.invalid',source:'quiz_home',campaign:'original' }));
-      await page.waitForFunction(() => document.querySelector('.kasse button.abo-button')?.disabled === false);
+      await page.waitForURL('https://checkout.stripe.com/**');
       assert.equal(bodies.at(-1).source, 'teller_' + arm); assert.equal(bodies.at(-1).campaign, 'teller_v1');
       assert.equal(bodies.at(-1).variant, arm === 'website' ? 'a' : 'b');
       await page.goto(origin + '/abo/');
       await page.locator('#plan-next').click();
-      await page.waitForFunction(() => document.querySelector('#pay-button')?.disabled === false);
+      await page.waitForURL('https://checkout.stripe.com/**');
       assert.equal(bodies.at(-1).source, 'teller_' + arm); assert.equal(bodies.at(-1).variant, arm === 'website' ? 'a' : 'b');
+      await page.goto(origin + '/abo/');
       await page.locator('.consent-settings').click(); await page.locator('.consent-decline').click();
       assert.equal(await page.evaluate(() => localStorage.getItem('demenzcoach.teller.v1')), null);
       assert.equal((await context.cookies()).some(c => c.name === 'dc_teller_v1'), false);
       await page.goto(origin + '/abo/'); await page.locator('#plan-next').click();
-      await page.waitForFunction(() => document.querySelector('#pay-button')?.disabled === false);
+      await page.waitForURL('https://checkout.stripe.com/**');
       assert.equal(bodies.at(-1).variant, undefined); assert.notEqual(bodies.at(-1).campaign, 'teller_v1');
       assert.equal(JSON.stringify(await page.evaluate(() => window.dataLayer || [])).includes('fixture@example.invalid'), false);
     }
