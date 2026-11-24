@@ -125,6 +125,8 @@ function renderPrices() {
 async function loadOffer() {
   try {
     state.offer = await api("/config");
+    // Daniel, 24. Nov 2026: gehostete Stripe-Seite statt eigenem Formular, sobald der Server sie ankündigt.
+    if (state.offer?.hostedFallback === true) state.offer.checkoutMode = "hosted";
     renderPrices();
     renderPlans();
   } catch {
@@ -256,7 +258,7 @@ async function startCheckout(email, preparedWindow) {
     const session = await api("/session", {
       method: "POST",
       token,
-      body: { plan: attempt.plan, checkoutMode: "hosted", termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
+      body: { plan: attempt.plan, checkoutMode: "hosted", ...(state.offer?.hostedFallback === true ? { hostedFallback: true } : {}), termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
@@ -341,10 +343,11 @@ function renderSummary(trialDays, firstYear = null) {
       : `Heute ${price ? euro(price.amount, price.currency) : ""} für 1 ${period}, danach ${recurring}. Inkl. MwSt.`;
   }
   $("pay-summary").textContent = summary;
-  $("pay-summary-short").textContent = summary;
-  $("pay-terms").textContent = state.plan === "yearly"
+  const terms = state.plan === "yearly"
     ? "1 Jahr Mindestlaufzeit; danach unbefristet, mit 1 Monat Kündigungsfrist."
     : "Verlängert sich monatlich; jederzeit zum Monatsende kündbar.";
+  $("pay-summary-short").textContent = `${summary} ${terms}`;
+  $("pay-terms").textContent = terms;
   $("pay-trial-note").hidden = !(trialDays > 0);
   $("pay-trial-note").textContent = trialDays > 0 ? `${trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
 }
@@ -373,7 +376,7 @@ async function mountStripe(clientSecret, attempt) {
   const checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
   if (!currentAttempt(attempt)) return;
   state.checkout = checkout;
-  const express = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
+  const express = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" }, buttonHeight: 52, layout: { maxColumns: 1, maxRows: 0, overflow: "never" } });
   express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
     if (!currentCheckout(attempt, checkout)) return;
     $("express-divider").hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean);

@@ -121,3 +121,6 @@ legend { font-weight: 700; margin: 0 0 8px; padding: 0; }
 .kasse-loading { margin: 0 0 14px; color: var(--ink-2); font-size: 1rem; }
 
 #pay-block input, #pay-block select, .kasse-card input, .kasse-card select { font-size: 1rem; }
+
+/* Kurzfassung von Preis und Laufzeit direkt über dem Bestellknopf (Karte). */
+#pay-summary-short { font-weight: 600; margin: 12px 0; font-size: .875rem; line-height: 1.3; }
