@@ -133,7 +133,7 @@ const mobileLayout = window.matchMedia('(max-width: 720px)');
 //   und nur, wenn unten Pixel-IDs eingetragen sind; sonst fragt der Banner nur nach Statistik.
 // Ohne Einwilligung lädt nichts davon. Eingetippte Texte gehen nie an diese Dienste.
 // Meta-Datensatz „Demenz Coach Web“ (Viral Growth Ventures GmbH, angelegt 20. Nov 2026). Die ID ist öffentlich.
-const marketingPixelIDs = { meta: '1128575813395953', tiktok: '' };
+const marketingPixelIDs = { meta: '1159455413225262', tiktok: '' };
 
 const websiteAnalytics = (() => {
   const measurementID = 'G-5NRN1EMJDC';
