@@ -389,3 +389,9 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-hero + .start-question, .start-hero ~ .start-question { color: var(--ink-2); text-transform: uppercase; font-weight: 600; }
 /* Marke im Kopf: App-Symbol mit Namen daneben, auch auf dem Handy (die gemeinsame Navigation blendet ihn sonst aus). */
 .start-page .start-top.dc-navigation-host .abo-brand > span { display: inline; font-size: 1.125rem; }
+
+/* Apple Pay vorn (Test mit ?ap=1): Preis und Laufzeit direkt über dem Express-Knopf, darunter "oder" zur Karte. */
+.start-ap { margin: 6px 0 4px; }
+.start-ap .start-ap-fine { margin: 10px 0; }
+.start-ap-slot { min-height: 56px; margin: 0 0 8px; }
+.start-ap-or { margin: 4px 0 10px; text-align: center; font-size: var(--small); color: var(--ink-2); }

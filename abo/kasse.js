@@ -145,5 +145,76 @@ export async function open(options) {
   }
 }
 
+// --- Apple Pay direkt auf der Angebotsseite (Test mit ?ap=1, Daniel 24. Nov 2026: wie Tolan, ein Tipp) -------------------
+// Nur der Express-Knopf von Stripe, kein Kartenformular. Geräte ohne Apple Pay sehen nichts und lösen weder Stripe.js noch eine Sitzung aus.
+const quickSessions = new Map();
+const quickSupported = () => { try { return window.ApplePaySession?.canMakePayments?.() === true; } catch { return false; } };
+function loadStripeScript() {
+  if (window.Stripe) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://js.stripe.com/dahlia/stripe.js"; // gleiche Version wie die Checkout-Session (ui_mode elements)
+    script.onload = resolve;
+    script.onerror = () => reject(new Error("stripe.js failed"));
+    document.head.append(script);
+  });
+}
+// mountApplePay(slot, { plan, email, offer, source, campaign, track, onUnavailable }) -> Promise<boolean> (true = Knopf sichtbar)
+export async function mountApplePay(slot, options) {
+  if (!quickSupported()) return false;
+  const key = `${options.plan}|${options.offer?.kind ?? ""}|${options.email ?? ""}`;
+  try {
+    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+    publicConfig = loadedConfig;
+    await window.DemenzTeller?.ready;
+    if (!quickSessions.has(key)) {
+      quickSessions.set(key, (async () => {
+        const token = await user.getIdToken();
+        const session = await api("/session", {
+          method: "POST",
+          token,
+          body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
+            ...window.DemenzTeller?.attribution(),
+            ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
+            ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
+        });
+        if (!session.clientSecret) throw new Error("no_client_secret");
+        return session.clientSecret;
+      })());
+      quickSessions.get(key).catch(() => quickSessions.delete(key));
+    }
+    const clientSecret = await quickSessions.get(key);
+    await loadStripeScript();
+    const stripe = window.Stripe(publicConfig.publishableKey, { locale: "de" });
+    const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
+    const checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { theme: "stripe", variables: { colorPrimary: "#47408c", borderRadius: "999px" } } } });
+    const express = checkout.createExpressCheckoutElement({
+      buttonType: { applePay: "subscribe" }, buttonHeight: 56, layout: { maxColumns: 1, maxRows: 1, overflow: "never" },
+      paymentMethods: { applePay: "always", googlePay: "never", link: "never", paypal: "never", amazonPay: "never", klarna: "never" }
+    });
+    const visible = new Promise((resolve) => {
+      express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
+        if (paymentMethods?.applePay) { options.track?.("apple_pay_quick_shown"); resolve(true); } else resolve(false);
+      });
+    });
+    express.on("confirm", async () => {
+      options.track?.("apple_pay_quick_confirm");
+      try {
+        const loaded = await checkout.loadActions?.();
+        const result = await (loaded?.actions ?? checkout).confirm();
+        if (result?.type === "error" || result?.error) options.onError?.(result.error?.message || "Die Zahlung hat nicht geklappt.");
+      } catch {
+        options.onError?.("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
+      }
+    });
+    express.mount(slot);
+    return await visible;
+  } catch (problem) {
+    quickSessions.delete(key);
+    options.onUnavailable?.(problem);
+    return false;
+  }
+}
+
 export const isOpen = () => Boolean(sheet);
-window.DemenzKasse = Object.freeze({ open, close, isOpen });
+window.DemenzKasse = Object.freeze({ open, close, isOpen, mountApplePay });

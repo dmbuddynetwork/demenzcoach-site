@@ -703,11 +703,13 @@
     const ctaText = "Plan anfordern";
 
     const tables = [];
+    const applePayHooks = [];
     const select = (key) => {
       plan = key;
       for (const table of tables) for (const card of table.querySelectorAll("[data-plan]")) card.setAttribute("aria-checked", String(card.dataset.plan === key));
       for (const node of document.querySelectorAll("[data-start-price]")) node.textContent = `Dein Abo beginnt: ${priceText(plan)}. Vorher online kündbar.`;
       for (const node of document.querySelectorAll("[data-start-fine]")) node.textContent = fineText();
+      for (const hook of applePayHooks) hook();
     };
     // Tarifkarte wie BetterMe: Kreis, Name groß, alter Preis → neuer Preis, rechts groß der Tagespreis.
     const tier = (key, title, line, cents, days, was, band) => el("button", { type: "button", class: "start-tier", role: "radio", "data-plan": key, "aria-checked": String(plan === key), onclick: () => select(key) }, [
@@ -842,13 +844,13 @@
       el("span", { class: "start-phone" }, [el("img", { src: `/assets/angebot/${file}.webp`, width: "720", height: "1566", loading: index < 3 ? "eager" : "lazy", decoding: "async", alt: caption })])
     ]));
     const dots = shotList.map((_, index) => el("button", { type: "button", class: index === 0 ? "is-on" : "", "aria-label": `Bild ${index + 1} von ${shotList.length}` }));
-    const track = el("div", { class: "start-shots-track" }, slides);
-    const goTo = (index) => track.scrollTo({ left: slides[index].offsetLeft - (track.clientWidth - slides[index].offsetWidth) / 2, behavior: "smooth" });
+    const shotsTrack = el("div", { class: "start-shots-track" }, slides);
+    const goTo = (index) => shotsTrack.scrollTo({ left: slides[index].offsetLeft - (shotsTrack.clientWidth - slides[index].offsetWidth) / 2, behavior: "smooth" });
     let shotFrame = 0;
-    track.addEventListener("scroll", () => {
+    shotsTrack.addEventListener("scroll", () => {
       cancelAnimationFrame(shotFrame);
       shotFrame = requestAnimationFrame(() => {
-        const middle = track.scrollLeft + track.clientWidth / 2;
+        const middle = shotsTrack.scrollLeft + shotsTrack.clientWidth / 2;
         let active = 0;
         slides.forEach((slide, index) => { if (Math.abs(slide.offsetLeft + slide.offsetWidth / 2 - middle) < Math.abs(slides[active].offsetLeft + slides[active].offsetWidth / 2 - middle)) active = index; });
         slides.forEach((slide, index) => slide.classList.toggle("is-on", index === active));
@@ -857,7 +859,7 @@
     }, { passive: true });
     slides.forEach((slide, index) => slide.addEventListener("click", () => goTo(index)));
     dots.forEach((dot, index) => dot.addEventListener("click", () => goTo(index)));
-    const shots = el("div", { class: "start-shots", role: "region", "aria-label": "Bilder aus dem Plan" }, [track, el("div", { class: "start-shots-dots" }, dots)]);
+    const shots = el("div", { class: "start-shots", role: "region", "aria-label": "Bilder aus dem Plan" }, [shotsTrack, el("div", { class: "start-shots-dots" }, dots)]);
 
     // Übungsplan für 7 Tage (nur vom Üben): je Tag eine Situation. Tag 1 ist die gerade geübte Situation und ist geschafft.
     const weekDays = [
@@ -879,7 +881,34 @@
         el("span", { class: "start-week-mark", "aria-label": index === 0 ? "Geschafft" : "", text: index === 0 ? "✓" : "" })
       ]))) : null;
 
-    const offerBlock = () => [ticket(), table(), cta(), fine(), payments()];
+    // Apple Pay vorn, wie Tolan (Test nur mit ?ap=1, Daniel 24. Nov 2026): Preis und Laufzeit stehen direkt über dem Knopf (§ 312j BGB),
+    // ein Tipp öffnet das Apple-Pay-Fenster. Nur auf dem oberen Angebot; Geräte ohne Apple Pay sehen nichts, die Karte bleibt der Knopf „Plan anfordern“.
+    const applePay = (lowerFine) => {
+      if (params.get("ap") !== "1" || !window.DemenzKasse?.mountApplePay || !config.firebase?.apiKey) return null;
+      const slots = { yearly: el("div", { class: "start-ap-slot", id: "start-ap-yearly", hidden: "" }), monthly: el("div", { class: "start-ap-slot", id: "start-ap-monthly", hidden: "" }) };
+      const note = el("p", { class: "start-fine start-ap-fine", "data-start-fine": "", text: fineText() });
+      const box = el("div", { class: "start-ap", hidden: "" }, [note, slots.yearly, slots.monthly, el("p", { class: "start-ap-or", text: "oder mit Karte zahlen" })]);
+      const mounted = {};
+      const mount = (key) => {
+        if (mounted[key]) return;
+        mounted[key] = true;
+        const meta = checkoutMeta();
+        window.DemenzKasse.mountApplePay(slots[key], { plan: key, email: answers.email || undefined, offer: key === "yearly" && offer.offers ? deals?.forCheckout() : null,
+          source: meta.src, campaign: meta.campaign, track: (name) => track(name), onError: (message) => { note.textContent = message; } })
+          .then((shown) => { if (shown) { box.hidden = false; lowerFine.hidden = true; slots[key].dataset.ready = "1"; sync(); } else mounted[key] = false; });
+      };
+      const sync = () => {
+        slots.yearly.hidden = plan !== "yearly" || slots.yearly.dataset.ready !== "1";
+        slots.monthly.hidden = plan !== "monthly" || slots.monthly.dataset.ready !== "1";
+      };
+      applePayHooks.push(() => { sync(); setTimeout(() => { if (document.body.contains(box)) mount(plan); }, 400); });
+      setTimeout(() => { if (document.body.contains(box)) mount(plan); }, 400);
+      return box;
+    };
+    const offerBlock = (first) => {
+      const lowerFine = fine(); // steht bei sichtbarem Apple-Pay-Knopf schon über dem Knopf, nicht doppelt
+      return [ticket(), table(), first ? applePay(lowerFine) : null, cta(), lowerFine, payments()];
+    };
 
     return [
       head,
@@ -889,7 +918,7 @@
       result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null,
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
-      ...offerBlock(),
+      ...offerBlock(true),
       pair ? null : preview,
       el("h2", { class: "start-section start-center start-big-title", text: "Was ist in deinem Plan enthalten" }),
       shots,
@@ -924,6 +953,12 @@
     ];
   }
 
+  function checkoutMeta() {
+    const campaign = (params.get("utm_campaign") || (kampagne && kampagne.id !== "vorschau" ? kampagne.id : "")).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
+    const src = directMode ? `direkt_${source}`.slice(0, 40) : `quiz_${source}${preset ? `_${preset.key}` : ""}`.slice(0, 40);
+    return { campaign, src };
+  }
+
   function checkout() {
     if (directMode && !validEmail(answers.email)) { go("email"); return; }
     track(directMode ? "direct_offer_checkout" : "quiz_checkout", "InitiateCheckout");
@@ -943,8 +978,7 @@
         dayTime: answers.dayTime?.key ?? null, goal: answers.goal?.key ?? null, savedAt: new Date().toISOString().slice(0, 10)
       }));
     } catch { /* privater Modus: Plan startet dann mit dem häufigsten Moment */ }
-    const campaign = (params.get("utm_campaign") || (kampagne && kampagne.id !== "vorschau" ? kampagne.id : "")).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
-    const src = directMode ? `direkt_${source}`.slice(0, 40) : `quiz_${source}${preset ? `_${preset.key}` : ""}`.slice(0, 40);
+    const { campaign, src } = checkoutMeta();
     // Kasse als Fenster auf dieser Seite (kasse.js, wie BetterMe/Yazio). Ohne das Modul wie bisher die Seite /abo/.
     const kasse = window.DemenzKasse;
     countDirect("direct_kasse");
