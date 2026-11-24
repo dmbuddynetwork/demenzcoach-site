@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "standard": {
+    "ueberschrift": "Tipps und Tricks zum Ausdrucken",
+    "unterzeile": "",
+    "frage": "Für wen suchst du Hilfe?",
+    "moment": "",
+    "grossbuchstaben": true
+  },
+  "kampagnen": [
+    {
+      "id": "tipps-druck",
+      "name": "Tipps und Tricks zum Ausdrucken",
+      "status": "aktiv",
+      "kanal": "meta",
+      "zielgruppe": "Angehörige, die etwas Konkretes für den Kühlschrank wollen",
+      "landing": {
+        "ueberschrift": "Tipps und Tricks zum Ausdrucken",
+        "unterzeile": "",
+        "frage": "Für wen suchst du Hilfe?",
+        "moment": "",
+        "grossbuchstaben": true
+      },
+      "anzeigen": [
+        {
+          "id": "a1",
+          "format": "feed",
+          "text": "Die roten Teller, der Zettel am Kühlschrank, der Satz, der Ruhe bringt. Alltagstricks für Angehörige. Zum Ausdrucken.",
+          "titel": "Tipps und Tricks zum Ausdrucken",
+          "beschreibung": "Für den Alltag mit Demenz",
+          "knopf": "Mehr dazu",
+          "bildidee": "Zeichnung roter Teller auf gedecktem Tisch"
+        }
+      ],
+      "tracking": {
+        "src": "meta",
+        "utm_campaign": "tipps-druck"
+      },
+      "notizen": "Entspricht dem aktuellen Standard-Einstieg."
+    },
+    {
+      "id": "nach-hause",
+      "name": "Ich will nach Hause",
+      "status": "entwurf",
+      "kanal": "meta",
+      "zielgruppe": "Angehörige, deren Mutter oder Vater ständig nach Hause will",
+      "landing": {
+        "ueberschrift": "Was sagst du, wenn sie nach Hause will?",
+        "unterzeile": "",
+        "frage": "Für wen suchst du Hilfe?",
+        "moment": "nachhause",
+        "grossbuchstaben": true
+      },
+      "anzeigen": [
+        {
+          "id": "a1",
+          "format": "feed",
+          "text": "„Ich will nach Hause.“ Und sie ist schon zu Hause. Was jetzt? Drei Sätze, die weiterhelfen.",
+          "titel": "Was sagst du jetzt?",
+          "beschreibung": "Passende Worte für diesen Moment",
+          "knopf": "Mehr dazu",
+          "bildidee": "Zeichnung: Frau steht mit Mantel in der Tür"
+        },
+        {
+          "id": "a2",
+          "format": "story",
+          "text": "Sie will nach Hause. Du weißt nicht, was du sagen sollst. Hier sind Worte, die helfen.",
+          "titel": "Ich will nach Hause",
+          "beschreibung": "Worte für schwere Momente",
+          "knopf": "Mehr dazu",
+          "bildidee": "Zeichnung: zwei Personen im Flur"
+        }
+      ],
+      "tracking": {
+        "src": "meta",
+        "utm_campaign": "nach-hause"
+      },
+      "notizen": "Entwurf. Texte vor Livegang mit Daniel abstimmen."
+    },
+    {
+      "id": "wer-sind-sie",
+      "name": "Erkennt mich nicht",
+      "status": "entwurf",
+      "kanal": "meta",
+      "zielgruppe": "Angehörige, die nicht mehr erkannt werden",
+      "landing": {
+        "ueberschrift": "Was sagst du, wenn er dich nicht mehr erkennt?",
+        "unterzeile": "",
+        "frage": "Für wen suchst du Hilfe?",
+        "moment": "wer",
+        "grossbuchstaben": true
+      },
+      "anzeigen": [
+        {
+          "id": "a1",
+          "format": "feed",
+          "text": "„Wer sind Sie?“ Das tut weh. Du musst es nicht erklären. Diese Worte helfen dir im Moment.",
+          "titel": "Wenn er dich nicht erkennt",
+          "beschreibung": "Was du sagen kannst",
+          "knopf": "Mehr dazu",
+          "bildidee": "Zeichnung: Tochter und Vater am Tisch"
+        }
+      ],
+      "tracking": {
+        "src": "meta",
+        "utm_campaign": "wer-sind-sie"
+      },
+      "notizen": "Entwurf."
+    },
+    {
+      "id": "geld-weg",
+      "name": "Geld wurde gestohlen",
+      "status": "entwurf",
+      "kanal": "meta",
+      "zielgruppe": "Angehörige, die zu Unrecht beschuldigt werden",
+      "landing": {
+        "ueberschrift": "Sie sagt, du hast ihr Geld gestohlen?",
+        "unterzeile": "",
+        "frage": "Für wen suchst du Hilfe?",
+        "moment": "geld",
+        "grossbuchstaben": true
+      },
+      "anzeigen": [
+        {
+          "id": "a1",
+          "format": "feed",
+          "text": "„Du hast mein Geld gestohlen!“ Streiten bringt nichts. Diese Sätze nehmen den Druck raus.",
+          "titel": "Zu Unrecht beschuldigt?",
+          "beschreibung": "Passende Worte für den Moment",
+          "knopf": "Mehr dazu",
+          "bildidee": "Zeichnung: Handtasche und Geldbeutel"
+        }
+      ],
+      "tracking": {
+        "src": "meta",
+        "utm_campaign": "geld-weg"
+      },
+      "notizen": "Entwurf."
+    },
+    {
+      "id": "duschen",
+      "name": "Will nicht duschen",
+      "status": "entwurf",
+      "kanal": "tiktok",
+      "zielgruppe": "Angehörige, bei denen Waschen zum Streit wird",
+      "landing": {
+        "ueberschrift": "Er will nicht duschen? So klappt es ruhiger",
+        "unterzeile": "",
+        "frage": "Für wen suchst du Hilfe?",
+        "moment": "waschen",
+        "grossbuchstaben": true
+      },
+      "anzeigen": [
+        {
+          "id": "a1",
+          "format": "reel",
+          "text": "Jeden Morgen Streit ums Duschen? Mit diesen Worten wird es ruhiger.",
+          "titel": "Ums Duschen streiten?",
+          "beschreibung": "Worte, die helfen",
+          "knopf": "Mehr dazu",
+          "bildidee": "Zeichnung: warmes Bad, Handtuch bereit"
+        }
+      ],
+      "tracking": {
+        "src": "tiktok",
+        "utm_campaign": "duschen"
+      },
+      "notizen": "Entwurf."
+    }
+  ]
+}

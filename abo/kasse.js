@@ -106,7 +106,7 @@ export async function open(options) {
   const trialNote = el("p", { hidden: "" });
   let loadingTimer = null;
   const short = el("p", { class: "kasse-short", hidden: "" });
-  const divider = el("p", { class: "abo-divider", text: "oder", hidden: "" });
+  const divider = el("p", { class: "abo-divider", text: "oder anders bezahlen", hidden: "" });
   const express = el("div", { id: "kasse-express" });
   const payment = el("div", { id: "kasse-payment" });
   const payButton = el("button", { type: "button", class: "abo-button", disabled: "", hidden: "", text: "Zahlungspflichtig abonnieren" });
@@ -115,9 +115,10 @@ export async function open(options) {
   const card = el("div", { class: "kasse-card" }, [
     el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": "Schließen", text: "×", onclick: () => close() })]),
     error,
-    loading, payment,
+    loading,
+    // Apple Pay und Google Pay stehen oben, direkt unter Preis und Laufzeit (wie bei Tolan, BetterMe, Yazio). Die Kartenfelder folgen darunter.
     el("div", { class: "abo-summary", role: "group", "aria-label": "Preis und Laufzeit", hidden: "" }, [summary, terms]),
-    express, divider, short, payButton, emailLine,
+    express, divider, payment, short, payButton, emailLine,
     el("div", { class: "abo-checkout-details" }, [trialNote, el("p", {}, ["Online kündbar, ohne Anmeldung (", el("a", { href: "/abo/kuendigen.html", text: "Verträge hier kündigen" }), "). 30 Tage ",
         el("a", { href: "/abo/garantie.html", target: "_blank", text: "Geld-zurück-Garantie" }), ". Es gelten die ",
         el("a", { href: "/nutzungsbedingungen.html", target: "_blank", text: "Nutzungsbedingungen" }), ". ",
@@ -172,12 +173,18 @@ export async function open(options) {
     await window.DemenzTeller?.ready;
     const token = await user.getIdToken();
     if (!requireCurrentAccount()) return;
+    // Daniel, 24. Nov 2026: kein eigenes eingebettetes Stripe-Formular, es sieht schlecht aus. Kündigt der Server die gehostete
+    // Stripe-Seite an, geht es im selben Tab dorthin. Apple Pay und Google Pay stehen dort oben, die E-Mail kommt von Stripe.
+    const hosted = publicConfig.hostedFallback === true;
+    if (hosted) loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
     const session = await api("/session", {
       method: "POST",
       token,
       body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
         ...window.DemenzTeller?.attribution(),
         ...window.DemenzConsent?.metaContext?.(),
+        ...(hosted ? { hostedFallback: true } : {}),
+        ...(hosted && publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
         ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
     });
     if (!requireCurrentAccount()) return;
@@ -188,7 +195,8 @@ export async function open(options) {
     const price = publicConfig.plans[options.plan];
     const text = summaryText(options.plan, price, session.trialDays, session.firstYear);
     summary.textContent = text;
-    short.textContent = text;
+    short.textContent = `${text} ${termsText(options.plan)}`;
+    short.hidden = false; // § 312j Abs. 2 BGB: Preis und Laufzeit stehen auch direkt über dem Bestellknopf der Kartenzahlung.
     terms.textContent = termsText(options.plan);
     trialNote.hidden = !(session.trialDays > 0);
     trialNote.textContent = session.trialDays > 0 ? `${session.trialDays} Tage kostenlos testen. Kündigst du vorher, zahlst du nichts.` : "";
@@ -198,7 +206,7 @@ export async function open(options) {
     const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
     checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance: { ...appearance, rules: { ".Input": { padding: "12px" }, ".Tab": { padding: "10px 8px" }, ".TabLabel": { fontSize: "14px" } } } } });
     if (!requireCurrentAccount()) return;
-    const expressElement = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" } });
+    const expressElement = checkout.createExpressCheckoutElement({ buttonType: { applePay: "subscribe", googlePay: "subscribe" }, buttonHeight: 52, layout: { maxColumns: 1, maxRows: 0, overflow: "never" } });
     expressElement.on("availablepaymentmethodschange", ({ paymentMethods }) => { divider.hidden = !paymentMethods || !Object.values(paymentMethods).some(Boolean); });
     expressElement.on("confirm", () => confirm());
     expressElement.mount(express);

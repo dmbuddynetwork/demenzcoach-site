@@ -11,7 +11,7 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
   }),
   // Anmeldung mit Apple erst anzeigen, wenn die Apple-Services-ID in Firebase eingerichtet ist (docs/WEB_CHECKOUT.md, Schritt 3).
   // Web sign-in uses email links. Enable emailLink only after provider/domain preflight; no SMS UI.
-  signIn: Object.freeze({ apple: false, emailLink: true, google: true, offerAfterAnswer: true }),
+  signIn: Object.freeze({ apple: false, emailLink: true, funnelAfterEmail: true, google: true, offerAfterAnswer: true }),
   // Server-side normal-answer introduction. Enable only after backend/auth readiness checks.
   // GrowthBook is evaluated on the backend, never trusted for browser entitlements.
   translatorGate: Object.freeze({
@@ -23,3 +23,19 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
   snapshotLinks: Object.freeze({ enabled: true, mode: 'auto' }),
   appStoreURL: "https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_abo&mt=8"
 });
+
+// A/B-Test „Anmeldung“ (Daniel, 20. Nov 2026), 50/50 pro Tab-Sitzung:
+//   standard = Anmelde-Layer, danach Weiterleitung in den Web-Funnel; funnel = der Web-Funnel selbst kommt als Layer von unten.
+// ?anmeldung=funnel / ?anmeldung=standard legt die Variante fest (Vorschau). Automatisierte Browser bekommen immer „standard“.
+// Die Adresse wird später vom Übersetzer bereinigt, deshalb schon hier lesen. Kein Cookie, nur sessionStorage; Messen nur mit Einwilligung.
+try {
+  const key = "demenzcoach.anmeldungVariante.v1";
+  const choice = new URLSearchParams(location.search).get("anmeldung");
+  if (choice === "funnel" || choice === "standard") sessionStorage.setItem(key, choice);
+  else if (!sessionStorage.getItem(key)) sessionStorage.setItem(key, !navigator.webdriver && Math.random() < 0.5 ? "funnel" : "standard");
+} catch { /* Ohne Speicher bleibt die normale Anmeldung. */ }
+
+// Läuft der Funnel als Layer (A/B-Test), kommt Stripe mit der Adresse /abo/ zurück in den Rahmen. Dann den ganzen Tab dorthin bringen.
+try {
+  if (self !== top && location.pathname.startsWith("/abo/") && top.location.origin === location.origin) top.location.replace(location.href);
+} catch { /* Fremder Rahmen: nichts tun. */ }

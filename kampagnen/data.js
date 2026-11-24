@@ -1,0 +1,2 @@
+// Erzeugt von scripts/build-campaigns.mjs aus intern/kampagnen/kampagnen.json (nur aktive Kampagnen). Nicht von Hand ändern.
+window.DEMENZ_KAMPAGNEN = {"version":1,"standard":{"ueberschrift":"Tipps und Tricks zum Ausdrucken","unterzeile":"","frage":"Für wen suchst du Hilfe?","moment":"","grossbuchstaben":true},"kampagnen":[{"id":"tipps-druck","status":"aktiv","kanal":"meta","src":"meta","landing":{"ueberschrift":"Tipps und Tricks zum Ausdrucken","unterzeile":"","frage":"Für wen suchst du Hilfe?","moment":"","grossbuchstaben":true}}]};

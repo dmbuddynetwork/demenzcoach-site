@@ -14,6 +14,8 @@
     // GitHub Pages). Damit Cloudflare sie nicht direkt ausliefert, läuft für genau diese Adressen
     // der Worker zuerst und antwortet mit 301 auf /de/ bzw. /xx/ (Liste wie HOME_LANGUAGES im Worker).
     "run_worker_first": [
+      // Verwaltung: der Worker prüft das Passwort, bevor irgendeine Datei ausgeliefert wird (siehe internGate).
+      "/intern", "/intern/*",
       "/teller", "/teller/", "/teller/index.html",
       "/teller/liste.html",
       "/de/", "/de/index.html",

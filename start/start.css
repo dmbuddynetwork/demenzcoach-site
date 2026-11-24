@@ -21,7 +21,7 @@ body:has(.start-page) { min-height: 100vh; min-height: 100svh; display: flex; fl
 .start-back { width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; color: var(--purple); cursor: pointer; padding: 0; }
 /* Wie BetterMe: Abschnittsname über drei Balken, ein Balken je Abschnitt. */
 .start-count { margin: 0 0 6px; text-align: center; color: var(--ink-2); font-size: var(--small); font-weight: 600; }
-.start-progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 0 0 24px; }
+.start-progress { display: grid; grid-template-columns: repeat(var(--sections, 3), 1fr); gap: 6px; margin: 0 0 24px; }
 .start-progress > span { height: 6px; background: var(--lav); border-radius: 999px; overflow: hidden; }
 .start-progress i { display: block; height: 100%; width: 0; background: var(--purple); border-radius: 999px; transition: width .3s ease; }
 .start-center { text-align: center; }
@@ -230,6 +230,7 @@ body[data-screen="plan"] .start-page { padding-top: 0; }
 .start-hero-row strong { font-size: 1.0625rem; color: var(--ink); }
 .start-hero-rows .start-level i.on { background: var(--ink); }
 .start-hero-rows > div:last-child .start-level i.on { background: var(--purple); }
+.start-result-line { margin: -6px 0 16px; padding: 10px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; font-size: 1rem; line-height: 1.4; }
 .start-plan-title { margin: 22px 0 18px; font-size: 1.9rem; line-height: 1.15; }
 
 .start-ticket { margin: 0 0 16px; border-radius: 18px; background: var(--lav); overflow: hidden; }
@@ -290,12 +291,17 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-ticket-body .start-clock-soft small { color: #5c7a2c; }
 .start-tier { background: #f4efe8; }
 .start-fine { background: #fffdf8; border-color: #e7e1d6; }
-.start-shots { display: flex; gap: 14px; margin: 0 -16px 8px; padding: 4px 16px 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-.start-shots::-webkit-scrollbar { display: none; }
-.start-shots figure { flex: 0 0 200px; margin: 0; scroll-snap-align: start; }
-.start-phone { display: block; padding: 6px; border-radius: 28px; background: #1d1b26; box-shadow: 0 6px 18px rgba(40, 30, 10, .14); }
-.start-phone img { display: block; width: 100%; height: auto; aspect-ratio: 360 / 740; object-fit: cover; object-position: top; border-radius: 22px; background: #fff; }
-.start-shots figcaption { margin-top: 10px; font-size: 1rem; font-weight: 700; line-height: 1.3; text-align: center; }
+.start-shots { margin: 0 -16px 20px; }
+.start-shots-track { display: flex; gap: 12px; padding: 8px calc(50% - 90px) 4px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.start-shots-track::-webkit-scrollbar { display: none; }
+.start-shots figure { flex: 0 0 180px; margin: 0; scroll-snap-align: center; cursor: pointer; transform: scale(.9); transition: transform .25s ease; }
+.start-shots figure.is-on { transform: none; cursor: default; }
+.start-phone { display: block; padding: 6px; border-radius: 32px; background: #e9e2d6; box-shadow: inset 0 0 0 1px #d8cfbf, 0 10px 24px rgba(60, 45, 20, .12); }
+.start-phone img { display: block; width: 100%; height: auto; aspect-ratio: 720 / 1566; border-radius: 26px; background: #fff; }
+.start-shots-dots { display: flex; justify-content: center; width: max-content; margin: 14px auto 0; padding: 0 6px; border-radius: 999px; background: #f2ede5; }
+.start-shots-dots button { width: 22px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; }
+.start-shots-dots button::before { content: ""; display: block; width: 8px; height: 8px; margin: auto; border-radius: 50%; background: #d8cfbf; transition: width .2s ease; }
+.start-shots-dots button.is-on::before { background: var(--ink); }
 .start-weekcard { margin: 8px 0 24px; padding: 18px 14px 8px; border-radius: 20px; background: #f2ede5; }
 .start-weekcard h2 { margin: 0 0 12px; font-size: 1.375rem; text-align: center; }
 .start-weekbar { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; margin: 0 0 14px; font-size: .9375rem; font-weight: 700; color: var(--ink-2); }
@@ -328,3 +334,58 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-faq summary::-webkit-details-marker { display: none; }
 .start-faq summary::after { content: ""; flex: none; width: 10px; height: 10px; margin-right: 4px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg); transition: transform .2s; }
 .start-faq details[open] summary::after { transform: rotate(-135deg); }
+
+/* Lade-Ring (ehrlich: nur Anzeige der vorhandenen Angaben) */
+.start-ring-wrap { display: grid; place-items: center; margin: 4px 0 14px; }
+.start-ring { width: 96px; height: 96px; transform: rotate(-90deg); }
+.start-ring circle { fill: none; stroke-width: 8; }
+.start-ring-bg { stroke: var(--lav); }
+.start-ring-fg { stroke: var(--purple); stroke-linecap: round; stroke-dasharray: 264; stroke-dashoffset: 264; animation: start-ring-fill 3.6s ease-in-out forwards; }
+.start-ring.is-done .start-ring-fg { stroke-dashoffset: 0; animation: none; }
+@keyframes start-ring-fill { to { stroke-dashoffset: 0; } }
+.start-summary-row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; opacity: 0; transform: translateY(6px); transition: opacity .4s ease, transform .4s ease; }
+.start-summary-row.is-shown { opacity: 1; transform: none; }
+.start-build-next.is-waiting { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .start-ring-fg { animation: none; stroke-dashoffset: 0; } .start-summary-row { opacity: 1; transform: none; transition: none; } }
+
+/* Ergebnis-Kurve (Veranschaulichung) */
+.start-graph-card { background: #fff; border: 1px solid var(--lav); border-radius: 16px; padding: 14px 14px 12px; margin: 0 0 14px; }
+.start-graph-title { margin: 0 0 6px; font-weight: 700; color: var(--purple); }
+.start-graph { width: 100%; height: auto; display: block; }
+.start-graph-line { stroke-dasharray: 420; stroke-dashoffset: 420; animation: start-graph-draw 1.6s ease-out .2s forwards; }
+@keyframes start-graph-draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .start-graph-line { animation: none; stroke-dashoffset: 0; } }
+.start-chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0 0 14px; }
+.start-chips li { background: var(--lav); color: var(--purple); border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: var(--small); }
+
+/* Kopf wie BetterMe: kein „Anmelden“, Menü nur als schlichter Burger */
+.start-top .dc-navigation-account { display: none; }
+.start-top .dc-navigation-menu > summary { border: 0; background: transparent; box-shadow: none; padding: 0; min-width: 44px; min-height: 44px; display: grid; place-items: center; font-size: 0; color: var(--purple); }
+.start-top .dc-navigation-menu > summary::before { content: ""; width: 22px; height: 2px; background: currentColor; border-radius: 2px; box-shadow: 0 -7px 0 currentColor, 0 7px 0 currentColor; }
+.start-top .dc-navigation-menu > summary::after, .start-top .dc-navigation-menu > summary::marker { content: none; display: none; }
+
+/* Stimmen von Angehörigen */
+.start-voices { margin: 8px 0 8px; }
+.start-voice-row { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 12px; margin: 0 -2px 8px; -webkit-overflow-scrolling: touch; }
+.start-voice { flex: 0 0 82%; max-width: 340px; scroll-snap-align: start; margin: 0; padding: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: grid; gap: 8px; align-content: start; }
+.start-voice strong { color: var(--purple); }
+.start-voice-text { margin: 0; color: var(--ink-2); }
+.start-voice-text.is-clamped { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.start-voice .abo-link-button { justify-self: start; min-height: 44px; }
+.start-voices-all { margin: 0 0 12px; }
+.start-voices-all summary { padding: 14px 16px; font-weight: 700; cursor: pointer; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.start-voices-all ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 10px; }
+.start-voices-all .start-voice { flex: none; max-width: none; }
+
+/* Hinweis nach der Anmeldung (Link per E-Mail unterwegs) */
+
+/* Im Layer (?embed=1): ohne Fußzeile, Hinweis-Abstand klein */
+.start-embedded .abo-footer { display: none; }
+.start-embedded .start-top .dc-navigation-menu { display: none; }
+.start-embedded .start-top { min-height: 40px; }
+
+/* Einstieg wie BetterMe: Versprechen in Großbuchstaben, darunter nur die erste Frage. */
+.start-hero { text-transform: uppercase; letter-spacing: .01em; }
+.start-hero + .start-question, .start-hero ~ .start-question { color: var(--ink-2); text-transform: uppercase; font-weight: 600; }
+/* Marke im Kopf: App-Symbol mit Namen daneben, auch auf dem Handy (die gemeinsame Navigation blendet ihn sonst aus). */
+.start-page .start-top.dc-navigation-host .abo-brand > span { display: inline; font-size: 1.125rem; }

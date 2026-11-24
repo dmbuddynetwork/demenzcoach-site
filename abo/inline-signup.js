@@ -4,6 +4,8 @@ import { createGoogleAccess } from './google-auth.js';
 import { createSignupOffer, mayOfferSignupSetup } from './signup-offer-view.js';
 import { openSignupSheet } from './signup-sheet.js';
 import { redirectAfterSignIn, showSignInNotice } from './signin-success.js';
+import { leaveForFunnel } from './funnel-after-signup.js';
+import { openFunnelLayer, wantsFunnelLayer } from './funnel-layer.js';
 let stylesReady;
 export function signupStyles() {
   if (stylesReady) return stylesReady;
@@ -85,7 +87,7 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     signupCopy: window.DemenzWebExperiments?.signupCopyVariant(signupCopy) || 'variant_1', presentation: purpose === 'account' ? 'inline' : 'sheet', returnToSituation: hasSituation,
     getRetryAt: () => (email.attempt()?.createdAt || 0) + 60000,
     onBegin() { expose(); onBegin?.(); },
-    async onEmail(address) { await email.begin({ email: address, returnTo, intent: 'signin' }); return { sent: true }; },
+    async onEmail(address) { const begun = await email.begin({ email: address, returnTo, intent: 'signin' }); leaveForFunnel({ target: begun?.target || returnTo }); return { sent: true }; },
     async onGoogle() {
       const result = await google.begin();
       if (result?.signedIn === true) {
@@ -103,8 +105,17 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     onContinue() { if (purpose === 'account') void retryReturn?.(); else sheet?.close('continue'); },
     onLater: later
   });
+  if (purpose !== 'account') {
+    // Messen: welche Variante gezeigt wurde (nur mit Einwilligung, keine Nutzerdaten). Danach zählt der Funnel mit entry=layer bzw. anmeldung.
+    try { window.DemenzConsent?.track?.('signup_variant_shown', { experiment_id: 'web-signup-funnel-layer-v1', variation_id: wantsFunnelLayer() ? 1 : 0 }); } catch { /* ohne Einwilligung nichts */ }
+  }
   if (purpose === 'account') card.replaceWith(view);
-  else {
+  else if (wantsFunnelLayer()) {
+    // A/B-Variante: der Web-Funnel selbst kommt als Layer von unten, nicht die Anmeldung.
+    const anchor = document.createElement('span'); anchor.hidden = true; card.replaceWith(anchor);
+    openFunnelLayer({ returnFocus, onClose: () => { anchor.remove(); dispose(); } });
+    return;
+  } else {
     const anchor = document.createElement('span'); anchor.hidden = true; anchor.dataset.signupSheetAnchor = '';
     card.replaceWith(anchor); sheet = openSignupSheet(view, { anchor, en, onDismiss: dispose, returnFocus });
   }

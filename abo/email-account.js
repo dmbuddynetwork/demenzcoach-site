@@ -2,6 +2,7 @@ import { mountInlineSignup } from './inline-signup.js';
 import { webAuth } from './web-auth.js';
 import { createEmailAccess, safeEmailReturn } from './email-auth.js';
 import { redirectAfterSignIn } from './signin-success.js';
+import { leaveForFunnel } from './funnel-after-signup.js';
 const $ = (id) => document.getElementById(id);
 const input = window.DemenzEmailLinkContext.take();
 let target = safeEmailReturn(input.returnTo, location.origin);
@@ -105,7 +106,8 @@ $('web-account-form').addEventListener('submit', async (event) => {
   try {
     if (callbackURL) complete(await access.finish({ email: $('account-email').value, url: callbackURL, state: input.state, returnTo: target }));
     else {
-      await access.begin({ email: $('account-email').value, returnTo: target, intent });
+      const begun = await access.begin({ email: $('account-email').value, returnTo: target, intent });
+      leaveForFunnel({ target: begun?.target || target });
       await accountOffer($('account-email').value.trim());
     }
   } catch (error) { failure(error); }
