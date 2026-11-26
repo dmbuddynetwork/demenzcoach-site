@@ -89,18 +89,15 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
     checkout = await create.call(stripe, { fetchClientSecret: async () => session.clientSecret });
     if (finished) { try { checkout.destroy?.(); } catch { /* */ } return { close }; }
     checkout.mount(box);
-    // Wächter: nie endlos laden. Erscheint Stripes Rahmen nicht oder lädt er nicht fertig, kommt die Meldung mit „Erneut versuchen“.
-    let loaded = false;
+    // Wächter: nie endlos laden. Sobald Stripes Rahmen da ist, lädt Stripe selbst weiter (eigenes Skelett). Ein „load“-Ereignis
+    // des Rahmens kommt nicht immer bei uns an (26. Nov 2026: falsche Fehlermeldung über einer fertigen Kasse). Fehler nur, wenn
+    // nach 15 Sekunden gar kein Rahmen erschienen ist.
     const started = Date.now();
     const poll = () => {
-      if (finished || loaded) return;
-      const frame = box.querySelector("iframe");
-      if (frame && !frame.__dcWatched) {
-        frame.__dcWatched = true;
-        frame.addEventListener("load", () => { loaded = true; status.hidden = true; track?.("checkout_embedded_ready"); });
-      }
+      if (finished) return;
+      if (box.querySelector("iframe")) { status.hidden = true; track?.("checkout_embedded_ready"); return; }
       if (Date.now() - started > LOAD_LIMIT_MS) return fail("Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt.");
-      watchdog = setTimeout(poll, 300);
+      watchdog = setTimeout(poll, 100);
     };
     poll();
   } catch {
