@@ -415,3 +415,6 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-tp-slot { position: absolute; inset: 0; opacity: 0; overflow: hidden; border-radius: 999px; z-index: 2; }
 .start-tp-slot[hidden] { display: none; }
 .start-tp .abo-radio { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); }
+.start-tp-alt, .start-tp-more { justify-self: center; font-size: var(--small); }
+.start-tp-alt[hidden] { display: none; }
+.start-tp-more { color: var(--ink-2); }
