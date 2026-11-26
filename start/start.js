@@ -38,6 +38,16 @@
   const config = window.DEMENZ_ABO_CONFIG || {};
   const embedded = params.get("embed") === "1" && window.top !== window;
   if (params.get("embed") === "1") document.documentElement.classList.add("start-embedded");
+  // Im Layer lädt kein Link eine andere Seite in den Rahmen (sonst steckt die Website im Layer).
+  // Logo: keine Seite; andere Links (AGB, Datenschutz) in einem neuen Tab.
+  if (embedded) {
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest?.("a[href]");
+      if (!link || link.getAttribute("href").startsWith("#")) return;
+      if (link.id === "brand") { event.preventDefault(); return; }
+      link.target = "_blank"; link.rel = "noopener";
+    }, true);
+  }
   // Daniel, 26. Nov 2026: Nach einem Klick kein blauer Rahmen. Maus/Finger: kein Fokus-Rahmen; Tab-Taste: Rahmen wie bisher.
   const rootClasses = document.documentElement.classList;
   document.addEventListener("pointerdown", () => rootClasses.add("start-pointer"), true);
@@ -250,6 +260,34 @@
       clearTimeout(progressExpiryTimer);
       progressExpiryTimer = setTimeout(forgetProgress, progressMaxAge);
     } catch { /* ohne Speicher normal weiter */ }
+  }
+  // Fragebogen fertig: nur die Auswahl-Schlüssel (keine Namen, E-Mails oder freien Sätze) bleiben 30 Tage auf diesem Gerät.
+  // Daniel, 26. Nov 2026: Wer den Fragebogen schon ausgefüllt hat, bekommt im Layer sofort die Angebotsseite.
+  const doneKey = "demenzCoachQuizDone.v1";
+  const doneMaxAge = 30 * 86400000;
+  function rememberDone() {
+    if (directMode) return;
+    const choices = {};
+    for (const [key, items] of Object.entries(choiceSets)) if (items.includes(answers[key])) choices[key] = answers[key].key;
+    const tries = answers.tries.filter(item => data.tries.includes(item)).map(item => item.key);
+    const multi = Object.fromEntries(Object.entries(multiSets).map(([key, items]) => [key, answers[key].filter(item => items.includes(item)).map(item => item.key)]));
+    try { localStorage.setItem(doneKey, JSON.stringify({ version: 1, at: Date.now(), choices, tries, multi })); } catch { /* privates Fenster */ }
+  }
+  function restoreDone() {
+    let saved;
+    try { saved = JSON.parse(localStorage.getItem(doneKey) || "null"); } catch { return false; }
+    if (!saved) return false;
+    if (saved.version !== 1 || !Number.isFinite(saved.at) || saved.at > Date.now() || Date.now() - saved.at >= doneMaxAge
+      || !saved.choices || typeof saved.choices !== "object" || !Array.isArray(saved.tries)) {
+      try { localStorage.removeItem(doneKey); } catch { /* */ }
+      return false;
+    }
+    for (const [key, items] of Object.entries(choiceSets)) answers[key] = items.find(item => item.key === saved.choices[key]) || null;
+    if (preset) answers.situation = preset;
+    answers.tries = data.tries.filter(item => saved.tries.includes(item.key));
+    for (const [key, items] of Object.entries(multiSets)) answers[key] = items.filter(item => Array.isArray(saved.multi?.[key]) && saved.multi[key].includes(item.key));
+    answers.name = answers.relation?.call || "";
+    return Boolean(answers.relation);
   }
   function restoreProgress() {
     // Der Layer von unten (A/B-Test statt Anmelde-Layer) startet immer bei der ersten Frage.
@@ -554,7 +592,7 @@
 
   // Vorschau auf die konkrete Hilfe, ohne Lernprognose oder Wirkungsdarstellung.
   function resultScreen() {
-    if (!completed) { completed = true; track("quiz_complete", "Lead"); window.DemenzTeller?.stage("complete"); }
+    if (!completed) { completed = true; rememberDone(); track("quiz_complete", "Lead"); window.DemenzTeller?.stage("complete"); }
     const s = chosen();
     const name = forWho();
     // Kurve „Jetzt → Nach 4 Wochen“ wie BetterMe („dein Plan ist bereit“). Nur Veranschaulichung, ausdrücklich keine Messung.
@@ -1108,6 +1146,7 @@
   let completed = false;
   const restart = el("button", { type: "button", class: "abo-link-button", text: "Neu anfangen", onclick: () => {
     forgetProgress();
+    try { localStorage.removeItem(doneKey); } catch { /* */ }
     for (const key of Object.keys(choiceSets)) answers[key] = null;
     if (preset) answers.situation = preset;
     answers.name = ""; answers.email = ""; knownEmail = ""; answers.tries = []; typed = "";
@@ -1193,7 +1232,7 @@
       bars[number].firstChild.style.width = `${Math.round(share * 100)}%`;
     });
     $("count").textContent = done ? "" : sections[index]?.title ?? "";
-    $("back").style.visibility = ["relation", "email", "newsletter", "name"].includes(name) ? "hidden" : "visible";
+    $("back").style.visibility = ["relation", "email", "newsletter", "name"].includes(name) || embedded ? "hidden" : "visible";
     // Wie bei BetterMe: auf der allerersten Seite weder Abschnittsname noch Fortschrittsleiste.
     $("progress").hidden = done || name === "relation";
     $("count").hidden = done || name === "relation";
@@ -1278,7 +1317,9 @@
   // Direkt-Angebot (z. B. vom Üben): eine schon bestätigte Konto-Adresse aus diesem Tab übernehmen, wie BetterMe nach der Anmeldung.
   readKnownEmail();
   if (directMode && validEmail(knownEmail)) answers.email = knownEmail;
-  const resumed = directMode ? "plan" : restoreProgress();
+  // Im Layer: Fragebogen schon fertig → Angebotsseite (Daniel, 26. Nov 2026); sonst die erste Frage.
+  const resumed = directMode ? "plan" : embedded && restoreDone() ? "plan" : restoreProgress();
+  if (embedded && resumed === "plan") completed = true;
   // Aus dem Layer: „Zurück“ führt zur ersten Frage auf dieser Seite, nicht zurück zur Seite mit dem Layer.
   if (params.get("weiter") === "1" && resumed !== "relation") {
     history.replaceState({ screen: "relation" }, "", location.href);
