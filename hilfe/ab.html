@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Weiter – Demenz Coach</title>
+  <link rel="canonical" href="https://dementiacoachapp.com/hilfe/ab.html">
+  <meta http-equiv="refresh" content="1; url=/start/">
+  <!-- A/B-Test für Werbung (Daniel, 26. Nov 2026): 50/50 zwischen dem alten Fragebogen /start/ (Arm a) und der neuen Verkaufsseite /hilfe/ (Arm b).
+       Werbe-Link: https://dementiacoachapp.com/hilfe/ab.html?utm_source=meta&utm_campaign=… (alle Parameter bleiben erhalten).
+       Pro Tab-Sitzung gleich (sessionStorage, kein Cookie). ?arm=a oder ?arm=b legt den Arm fest; automatisierte Browser bekommen immer a. -->
+  <script>
+    (function () {
+      var key = "demenzcoach.lpArm.v1", params = new URLSearchParams(location.search), arm = params.get("arm");
+      params.delete("arm");
+      try {
+        if (arm !== "a" && arm !== "b") arm = sessionStorage.getItem(key);
+        if (arm !== "a" && arm !== "b") arm = !navigator.webdriver && Math.random() < 0.5 ? "b" : "a";
+        sessionStorage.setItem(key, arm);
+      } catch (e) { if (arm !== "a" && arm !== "b") arm = "a"; }
+      var query = params.toString();
+      location.replace((arm === "b" ? "/hilfe/" : "/start/") + (query ? "?" + query : "") + location.hash);
+    })();
+  </script>
+</head>
+<body style="font-family: system-ui, sans-serif; text-align: center; padding: 48px 16px; color: #1c1b1f; background: #f6f5f2">
+  <p>Einen Moment …</p>
+  <p><a href="/start/">Weiter</a></p>
+</body>
+</html>

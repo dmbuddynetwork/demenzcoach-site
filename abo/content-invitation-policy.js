@@ -1,6 +1,7 @@
 // Functional invitation cadence only: no identity, URL, care text or analytics.
 export const contentInvitationPolicy = Object.freeze({
-  firstReadMS: 5000, cooldownMS: 60000, windowMS: 30 * 60000, maxAutomatic: 3,
+  // Frequency Capping (Daniel, 26. Nov 2026: „wenn ich es wegklicke, kommt es sofort wieder“): 30 Min. Pause, höchstens 3 pro Tag.
+  firstReadMS: 5000, cooldownMS: 30 * 60000, windowMS: 24 * 3600000, maxAutomatic: 3,
   minimumScrollFraction: .25, furtherBlocks: 6,
   firstFunnelAt: 6, funnelEvery: 12, maxFeedFunnels: 4
 });

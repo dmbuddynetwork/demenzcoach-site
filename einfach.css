@@ -982,11 +982,11 @@ body.einfach .translator-chat button.translator-chat-send::before {
 body:has(dialog[open]) .translator-chat, body.dc-signup-sheet-open .translator-chat { display: none !important; }
 
 /* Ziel selbst wählen und ändern (Daniel, 26. Nov). */
-body.einfach .translator-answer .translator-goal-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 12px; }
-body.einfach .translator-answer .translator-goal-row .translator-goal-chosen { margin: 0 !important; }
+body.einfach .translator-answer .translator-goal-row { display: flex; align-items: center; gap: 8px 14px; margin: 0 0 12px; padding: 10px 14px 10px 12px; background: #e7f4ea; border-radius: 18px; }
+body.einfach .translator-answer .translator-goal-row .translator-goal-chosen { margin: 0 !important; padding: 0; background: none; flex: 1 1 auto; min-width: 0; width: auto; }
 body.einfach .translator-goal-change {
-  min-height: 48px; margin: 0; padding: 8px 18px; background: #fff; color: var(--e-purple); border: 2px solid var(--e-purple); border-radius: 999px;
-  font: inherit; font-size: 1.0625rem; font-weight: 700; line-height: 1.2; cursor: pointer; box-shadow: none;
+  flex: 0 0 auto; min-height: 44px; margin: 0; padding: 4px 6px; background: none; color: #1d5e33; border: 0; border-radius: 8px;
+  font: inherit; font-size: 1.0625rem; font-weight: 600; line-height: 1.2; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; box-shadow: none;
 }
 body.einfach .translator-goal-change::after { content: none !important; }
 body.einfach .translator-goal-change:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; }
@@ -1042,3 +1042,8 @@ body.einfach .translator-ai-goals .translator-own-goal-row button.translator-own
   -webkit-mask: var(--e-send-arrow) center / contain no-repeat; mask: var(--e-send-arrow) center / contain no-repeat;
 }
 body.einfach .translator-ai-goals:not(.translator-ai-goals-selected) > .translator-goal-question { margin: 8px 0 14px; font-size: clamp(1.75rem, 6.4vw, 2.25rem); font-weight: 800; line-height: 1.2; }
+
+/* Zielauswahl ohne Flackern (Daniel, 26. Nov): Der Server markiert /auswahl/-Seiten. Die fertige Antwort bleibt verdeckt,
+   bis translator.js die Zielfrage zeigt. Fällt das Skript aus, erscheint die Antwort nach 4 Sekunden. */
+body[data-translator-pending-goal] #translator-result { visibility: hidden; animation: dc-pending-goal-reveal 0s linear 4s forwards; }
+@keyframes dc-pending-goal-reveal { to { visibility: visible; } }
