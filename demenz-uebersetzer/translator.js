@@ -32,6 +32,17 @@
   const formStartNext = form.nextSibling;
   const keepInputAtTop = document.body.dataset.translatorInputPosition === 'top';
   const initialPlaceholder = input.getAttribute('placeholder') ?? '';
+  // Wechselnde Beispielsätze im leeren Feld (Daniel, 26. Nov): gemeinsame Liste in /eingabe-beispiele.js, nur auf Deutsch.
+  const withExamples = (run) => {
+    if (ui) return;
+    if (window.DcBeispiele) { run(window.DcBeispiele); return; }
+    const script = document.createElement('script');
+    script.src = '/eingabe-beispiele.js';
+    script.onload = () => window.DcBeispiele && run(window.DcBeispiele);
+    document.head.append(script);
+  };
+  const examplesOn = (field, on) => { if (on) delete field.dataset.dcBeispiele; else field.dataset.dcBeispiele = 'off'; };
+  withExamples((examples) => examples.attach(input, { prefix: 'Zum Beispiel: ' }));
   let syncChat = () => {};
   let syncHelpful = () => {};
   const setViewState = (state) => {
@@ -599,6 +610,7 @@
       formStartParent.insertBefore(form, formStartNext?.parentNode === formStartParent ? formStartNext : null);
       form.classList.remove('translator-form-below');
       formMoved = false;
+      examplesOn(input, true);
       input.setAttribute('placeholder', initialPlaceholder);
       grow();
       foldSignup();
@@ -621,6 +633,7 @@
     if (formMoved) return;
     formMoved = true;
     form.classList.add('translator-form-below');
+    examplesOn(input, false);
     input.setAttribute('placeholder', tr('Was ist noch passiert? Schreib es hier.'));
   };
   const returnToInput = () => {
@@ -629,6 +642,7 @@
     form.classList.remove('translator-form-below');
     form.querySelector('.translator-form-below-title')?.remove();
     formMoved = false;
+    examplesOn(input, true);
     input.setAttribute('placeholder', initialPlaceholder);
     output.replaceChildren();
     output.hidden = true;
@@ -2346,6 +2360,7 @@
     const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation' } });
     const send = element('button', { className: 'translator-chat-send', text: en ? 'Find an answer' : 'Antwort finden', attributes: { type: 'submit' } });
     const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
+    withExamples((examples) => examples.attach(field, { prefix: 'z. B. ', maxChars: innerWidth < 480 ? 29 : 44 }));
     // Nachfrage oder neue Situation (Daniel, 19. Nov, Variante 1): Unter einer Antwort stehen unten zwei
     // große Knöpfe statt eines Felds. „Nachfrage“ schickt die Situation mit (sonst fragt die KI bei
     // „Das klappt nicht“ nur „Was ist passiert?“), „Neue Situation“ schickt nur den neuen Text.
@@ -2387,11 +2402,13 @@
       if (situation) moreHint.textContent = `${en ? 'about' : 'zu'} ${shortQuote(situation)}`;
       if (chatMode === 'more') {
         chip.textContent = `${en ? 'About' : 'Zu'}: ${shortQuote(situation)}`;
+        examplesOn(field, false);
         field.setAttribute('placeholder', en ? 'What happened then?' : 'Was ist dann passiert?');
         field.setAttribute('aria-label', en ? `Follow-up about ${shortQuote(situation)}` : `Nachfrage zu ${shortQuote(situation)}`);
         field.maxLength = Math.max(40, maxLength - Array.from(`${followLabels[0]}„${baseFor(situation)}“ ${followLabels[1]}`).length);
       } else {
         chip.textContent = en ? 'New situation' : 'Neue Situation';
+        examplesOn(field, true);
         field.setAttribute('placeholder', en ? 'What happened?' : 'Was ist passiert?');
         field.setAttribute('aria-label', en ? 'Your situation' : 'Deine Situation');
         field.maxLength = maxLength;
