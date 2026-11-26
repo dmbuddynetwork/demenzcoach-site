@@ -23,7 +23,12 @@ const android = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KH
         }, label);
         assert.deepEqual(m, { oneLine: true, clipped: false, sameRow: true, scroll: false }, `${view.n} ${label}`);
       }
+      // Handy: „Anmelden“ nur im Menü; Computer: in der Kopfleiste.
+      const acct = await p.evaluate(() => ({ head: getComputedStyle(document.querySelector('.e-header .dc-navigation-account')).display !== 'none', menu: !!document.querySelector('.dc-navigation-items > .dc-navigation-menu-account') }));
+      assert.deepEqual(acct, { head: view.w > 600, menu: true }, `${view.n}: Anmelden-Ort`);
+      if (view.w <= 600) { await p.locator('.dc-navigation-menu > summary').click(); assert.ok(await p.locator('.dc-navigation-menu-account').isVisible(), `${view.n}: Anmelden im Menü sichtbar`); await p.keyboard.press('Escape'); }
       const store = p.locator('.e-header a.dc-navigation-store');
+      if (view.store && view.w <= 600) assert.ok(/App Store/.test(await store.innerText()), `${view.n}: Text „App Store“ sichtbar`);
       assert.equal(await store.count(), view.store ? 1 : 0, `${view.n}: App-Store-Knopf`);
       if (view.store) { assert.match(await store.getAttribute('href'), /^https:\/\/apps\.apple\.com\/app\/apple-store\/id6790763941\?/); assert.ok(await store.isVisible()); assert.ok((await store.boundingBox()).height >= 44); }
       const box = await p.evaluate(() => { const r = s => document.querySelector(s).getBoundingClientRect(); return { chosen: r('.translator-goal-chosen'), change: r('.translator-goal-change'), row: r('.translator-goal-row') }; });
@@ -33,7 +38,9 @@ const android = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KH
     // Fragebogen bekommt keinen App-Store-Knopf.
     const c = await browser.newContext({ viewport: { width: 390, height: 844 }, userAgent: ios }); await c.route('**/*', r => new URL(r.request().url()).origin === preview.origin ? r.continue() : r.abort());
     const p = await c.newPage(); await p.goto(`${preview.origin}/start/`); await p.waitForTimeout(800);
-    assert.equal(await p.locator('a.dc-navigation-store').count(), 0, 'kein Knopf im Fragebogen'); cases.push('start ohne Knopf'); await c.close();
+    assert.equal(await p.locator('a.dc-navigation-store').count(), 0, 'kein Knopf im Fragebogen'); cases.push('start ohne Knopf');
+    for (const page of ['/hilfe/', '/abo/konto.html']) { await p.goto(preview.origin + page); await p.waitForTimeout(800); assert.equal(await p.locator('a.dc-navigation-store').count(), 0, `kein Knopf auf ${page}`); cases.push(`${page} ohne Knopf`); }
+    await c.close();
     console.log(JSON.stringify({ ok: true, cases }));
   } finally { await browser.close(); await preview.close(); }
 })().catch(e => { console.error(e); process.exit(1); });

@@ -44,16 +44,20 @@ html.e-large .dc-navigation,html.e-large .dc-navigation *{font-size:17px!importa
 .dc-navigation-store svg{flex:0 0 auto;width:20px;height:20px}
 .dc-navigation-store-text{display:grid;font-weight:600;line-height:1.1!important;font-size:15px!important}
 .dc-navigation-store-text small{font-weight:400;font-size:11px!important;line-height:1.1!important;letter-spacing:.01em}
+body .dc-navigation .dc-navigation-store .dc-navigation-store-text{font-size:15px!important;line-height:1.1!important}
+body .dc-navigation .dc-navigation-store .dc-navigation-store-text small{font-size:11px!important;line-height:1.15!important}
+/* „Anmelden“ im Menü nur auf dem Handy; dort fehlt es in der Kopfleiste. */
+.dc-navigation-items>.dc-navigation-menu-account{display:none}
 @media(max-width:600px){
-  .dc-navigation-store{justify-content:center;width:44px;padding:0}
-  .dc-navigation-store-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .dc-navigation-store svg{width:21px;height:21px;margin-top:-2px}
+  .e-header .dc-navigation-host .dc-navigation-account{display:none!important}
+  .e-header .dc-navigation-items>.dc-navigation-menu-account{display:block;font-weight:700}
+  .dc-navigation-store{height:44px;gap:6px;padding:0 10px 0 9px;border-radius:10px}
+  .dc-navigation-store svg{width:18px;height:18px;margin-top:-2px}
+  body .dc-navigation .dc-navigation-store .dc-navigation-store-text{font-size:13px!important}
+  body .dc-navigation .dc-navigation-store .dc-navigation-store-text small{font-size:9.5px!important}
   body .e-header .dc-navigation-menu.e-menu>summary{gap:0!important;padding:8px 10px!important}
-  body .e-header .dc-navigation-account{padding:8px 4px!important}
   body .e-header .dc-navigation{gap:4px!important}
   body .e-header .dc-navigation-menu.e-menu>summary::after,body .e-header .dc-navigation-menu.e-menu>summary::before{content:none!important;display:none!important}
   body.einfach .e-header .dc-navigation-host{gap:6px!important}
   body.einfach .e-header .e-brand{gap:6px!important}
 }
-body .dc-navigation .dc-navigation-store .dc-navigation-store-text{font-size:15px!important;line-height:1.1!important}
-body .dc-navigation .dc-navigation-store .dc-navigation-store-text small{font-size:11px!important;line-height:1.15!important}
