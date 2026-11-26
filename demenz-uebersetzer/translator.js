@@ -1583,7 +1583,7 @@
     };
     const requestAnswer = (situation, options) => {
       const key = JSON.stringify([situation.normalize('NFC').trim(), options.formal, options.goal, options.correctionOf || '']);
-      if (answers.has(key)) return answers.get(key).then(result => { const { access, ...cached } = result; return cached; });
+      if (answers.has(key)) return answers.get(key).then(result => { const { access, ...cached } = result; ai.remember?.(cached); return cached; });
       if (!answers.has(key)) {
         const pending = Promise.resolve().then(() => ai.ask(situation, options)).catch(() => ({ kind: 'error', reason: 'unavailable' }));
         answers.set(key, pending);
