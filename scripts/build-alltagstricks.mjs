@@ -202,7 +202,7 @@ const card = (t) => {
                 <h3 class="translator-trick-title">${esc(t.title)}</h3>
                 <p>${esc(t.text)}</p>${t.source ? `<p class="article-meta">Zum Weiterlesen: ${sourceLink(t.source)}</p>` : ''}
                 <a class="text-link translator-trick-link" href="${detailPath(t)}" data-tip-detail="${t.id}">Trick ansehen →</a>${tile ? `
-                <a class="text-link translator-trick-link" href="${tile.href}" data-related-link="trick-${t.id}-${tile.key}">Passend: ${esc(tile.label)}</a>` : ''}
+                <a class="text-link translator-trick-link" href="${tile.href}" data-related-link="trick-${t.id}-${tile.key}">${esc(tile.label)}</a>` : ''}
               </div>
             </article>`;
 };
@@ -309,8 +309,8 @@ for (const trick of data.tricks) {
     crumbs([['Start', 'https://dementiacoachapp.com/de/'], ['Alltagstricks', url], [categoryName, `${url}#${trick.category}`], [trick.title, pageURL]]),
     faqSchema(pageURL, faq), organization ] };
   const rows = { title: 'Mehr zu diesem Trick', items: [
-    ...tiles.slice(0, 2).map(tile => [tile.href, `Passend: ${tile.label}`, ` data-related-link="tip-${trick.id}-${tile.key}"`]),
-    ...(sibling ? [[detailPath(sibling), `Noch ein Trick: ${sibling.title}`, ` data-related-link="tip-${trick.id}-next"`]] : []),
+    ...tiles.slice(0, 2).map(tile => [tile.href, tile.label, ` data-related-link="tip-${trick.id}-${tile.key}"`]),
+    ...(sibling ? [[detailPath(sibling), sibling.title, ` data-related-link="tip-${trick.id}-next"`]] : []),
     [`/alltagstricks/#${trick.category}`, `Alle Tricks: ${categoryName}`],
     ['/de/', 'Eigene Situation beschreiben'],
   ] };
