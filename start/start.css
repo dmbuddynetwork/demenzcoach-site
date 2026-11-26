@@ -421,3 +421,6 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-tp-alt, .start-tp-more { justify-self: center; font-size: var(--small); }
 .start-tp-alt[hidden] { display: none; }
 .start-tp-more { color: var(--ink-2); }
+
+/* Nach Klick oder Tippen kein Fokus-Rahmen (Daniel, 26. Nov 2026). Mit der Tab-Taste bleibt er sichtbar. */
+.start-pointer :focus, .start-pointer :focus-visible { outline: none !important; }

@@ -20,6 +20,7 @@ export function openFunnelLayer({ doc = document, returnFocus = null, onClose = 
   let done = false;
   const finish = () => {
     if (done) return; done = true;
+    if (banner?.parentNode === dialog) doc.body.append(banner);
     if (dialog.open) dialog.close(); dialog.remove();
     root.style.overflow = overflow[0]; body.style.overflow = overflow[1];
     if (current?.dialog === dialog) current = undefined;
@@ -29,8 +30,12 @@ export function openFunnelLayer({ doc = document, returnFocus = null, onClose = 
   close.addEventListener('click', finish);
   dialog.addEventListener('cancel', event => { event.preventDefault(); finish(); });
   dialog.addEventListener('click', event => { if (event.target === dialog) finish(); });
+  // Noch keine Entscheidung zu Cookies: derselbe Banner der Seite bleibt über dem Layer sichtbar (kein zweiter Banner im Rahmen).
+  const banner = doc.querySelector('body > .consent-banner:not([hidden])');
   doc.body.append(dialog); root.style.overflow = 'hidden'; body.style.overflow = 'hidden';
-  dialog.showModal(); close.focus({ preventScroll: true });
+  if (banner) dialog.append(banner);
+  // Fokus auf den Layer selbst, nicht auf „Schließen“: so erscheint beim Öffnen kein Rahmen um das ×.
+  dialog.tabIndex = -1; dialog.showModal(); dialog.focus({ preventScroll: true });
   current = { dialog, close: finish };
   return current;
 }
