@@ -112,9 +112,9 @@ function termsFor(session) {
 // vorbereitet, wenn die Angebotsseite erscheint. Der Klick leitet dann ohne Wartezeit weiter. Unbezahlte Sitzungen verfallen nach 24 Stunden.
 const PREPARED_MAX_AGE = 15 * 60_000;
 const preparedSessions = new Map();
-// „Mit Karte oder anderer Zahlart bezahlen“ unter dem Apple-Pay-Knopf (Daniel, 26. Nov 2026): Am Handy führt der Link auf
-// Stripes eigene Seite. Am Desktop bleibt es beim Layer.
-const toStripePage = (options) => Boolean(options.stripePage) && !hostWindow().matchMedia?.("(min-width: 900px)").matches;
+// Handy (unter 900 px): alle Kaufknöpfe führen auf Stripes eigene Seite (Daniel, 26. Nov 2026: „Ja, alle am Handy zu Stripe“,
+// vorher nur der Link „Mit Karte oder anderer Zahlart bezahlen“). Am Desktop bleibt es beim Layer mit Stripes Formular.
+const toStripePage = () => hostWindow().matchMedia?.("(min-width: 900px)")?.matches === false;
 function sessionBody(options) {
   const stripePage = toStripePage(options);
   return { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
