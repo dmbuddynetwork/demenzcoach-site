@@ -36,6 +36,7 @@
   const landing = { ...(kampagnenDaten.standard || {}), ...(kampagne?.landing || {}) };
   const source = (params.get("src") || params.get("utm_source") || kampagne?.src || guessSource()).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 30) || "ads";
   const config = window.DEMENZ_ABO_CONFIG || {};
+  const embedded = params.get("embed") === "1" && window.top !== window;
   if (params.get("embed") === "1") document.documentElement.classList.add("start-embedded");
   // Daniel, 26. Nov 2026: Nach einem Klick kein blauer Rahmen. Maus/Finger: kein Fokus-Rahmen; Tab-Taste: Rahmen wie bisher.
   const rootClasses = document.documentElement.classList;
@@ -1179,6 +1180,15 @@
   }
   function go(name, { replace = false } = {}) {
     if (isQuestion(current)) window.DemenzTeller?.stage("first_answer");
+    // Daniel, 26. Nov 2026: Nur die erste Frage im Layer. Danach geht es auf der eigenen Fragebogen-Seite weiter.
+    // Gleicher Tab, gleicher Speicher: Die Seite nimmt den Stand aus sessionStorage auf (gleiche Quelle, gleiche Situation).
+    if (embedded && name !== "relation") {
+      saveProgress(name);
+      const target = new URL(location.href);
+      target.searchParams.delete("embed");
+      target.searchParams.set("weiter", "1");
+      try { window.top.location.assign(target.pathname + target.search); return; } catch { /* Rahmen ohne Zugriff: im Layer weiter */ }
+    }
     history[replace ? "replaceState" : "pushState"]({ screen: name }, "", location.href);
     render(name);
   }
@@ -1243,7 +1253,12 @@
   readKnownEmail();
   if (directMode && validEmail(knownEmail)) answers.email = knownEmail;
   const resumed = directMode ? "plan" : restoreProgress();
-  history.replaceState({ screen: resumed }, "", location.href);
+  // Aus dem Layer: „Zurück“ führt zur ersten Frage auf dieser Seite, nicht zurück zur Seite mit dem Layer.
+  if (params.get("weiter") === "1" && resumed !== "relation") {
+    history.replaceState({ screen: "relation" }, "", location.href);
+    history.pushState({ screen: resumed }, "", location.href);
+  } else history.replaceState({ screen: resumed }, "", location.href);
   render(resumed);
-  track(directMode ? "direct_offer_view" : "quiz_start");
+  // Aus dem Layer gekommen: der Start wurde dort schon gezählt.
+  if (params.get("weiter") !== "1") track(directMode ? "direct_offer_view" : "quiz_start");
 })();

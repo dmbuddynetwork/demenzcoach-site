@@ -27,15 +27,30 @@ async function api(path, { method = "GET", body, token } = {}) {
   const headers = {};
   if (body) headers["Content-Type"] = "application/json";
   if (token) headers.Authorization = `Bearer ${token}`;
-  const response = await fetch(`${config.endpoint}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20_000);
+  let response;
+  try {
+    response = await fetch(`${config.endpoint}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
+  } catch (problem) {
+    throw Object.assign(new Error("network"), { code: problem?.name === "AbortError" ? "timeout" : "network" });
+  } finally {
+    clearTimeout(timer);
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(data.message || `HTTP ${response.status}`);
     error.code = data.code;
+    error.status = response.status;
     throw error;
   }
   return data;
 }
+
+// Kurze Störungen (Netz, Zeitüberschreitung, Serverfehler) versuchen wir selbst noch zweimal, bevor wir den Kunden stören.
+const AUTO_RETRIES = 2;
+const isTransient = (problem) => problem?.code === "network" || problem?.code === "timeout" || problem?.status >= 500 || problem?.message === "hosted_checkout_unavailable";
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function signedInUser() {
   if (!auth) {
@@ -96,30 +111,41 @@ export async function open(options) {
   };
 
   try {
-    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
-    checkoutUID = user.uid;
-    if (sheet?.node === node) sheet.uid = checkoutUID;
-    if (!requireCurrentAccount()) return;
-    publicConfig = loadedConfig;
-    await window.DemenzTeller?.ready;
-    const token = await user.getIdToken();
-    if (!requireCurrentAccount()) return;
-    // Daniel, 24. Nov 2026: kein eigenes eingebettetes Stripe-Formular. Apple Pay und Google Pay stehen auf der gehosteten
-    // Stripe-Seite oben, die E-Mail kommt von Stripe, wenn sie hier noch nicht bekannt ist.
-    loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
-    const session = await api("/session", {
-      method: "POST",
-      token,
-      body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
-        ...window.DemenzTeller?.attribution(),
-        ...window.DemenzConsent?.metaContext?.(),
-        hostedFallback: true,
-        ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
-        ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
-    });
-    if (!requireCurrentAccount()) return;
-    if (!redirectHostedCheckout(session, { attempt, isCurrent: currentAttempt })) throw new Error("hosted_checkout_unavailable");
-    options.track?.("checkout_sheet_ready");
+    const begin = async () => {
+      const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+      checkoutUID = user.uid;
+      if (sheet?.node === node) sheet.uid = checkoutUID;
+      if (!requireCurrentAccount()) return;
+      publicConfig = loadedConfig;
+      await window.DemenzTeller?.ready;
+      const token = await user.getIdToken();
+      if (!requireCurrentAccount()) return;
+      // Daniel, 24. Nov 2026: kein eigenes eingebettetes Stripe-Formular. Apple Pay und Google Pay stehen auf der gehosteten
+      // Stripe-Seite oben, die E-Mail kommt von Stripe, wenn sie hier noch nicht bekannt ist.
+      loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
+      const session = await api("/session", {
+        method: "POST",
+        token,
+        body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
+          ...window.DemenzTeller?.attribution(),
+          ...window.DemenzConsent?.metaContext?.(),
+          hostedFallback: true,
+          ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
+          ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
+      });
+      if (!requireCurrentAccount()) return;
+      if (!redirectHostedCheckout(session, { attempt, isCurrent: currentAttempt })) throw new Error("hosted_checkout_unavailable");
+      options.track?.("checkout_sheet_ready");
+    };
+    for (let tries = 0; ; tries++) {
+      try { await begin(); break; } catch (problem) {
+        if (!isTransient(problem) || tries >= AUTO_RETRIES || sheet?.node !== node) throw problem;
+        options.track?.("checkout_auto_retry");
+        loading.textContent = "Die Verbindung ist langsam. Ich versuche es noch einmal …";
+        await wait(1500 * (tries + 1));
+        if (sheet?.node !== node) return;
+      }
+    }
   } catch (problem) {
     clearTimeout(loadingTimer);
     loading.hidden = true;
@@ -140,7 +166,14 @@ export async function open(options) {
     }
     if (problem.code === "email_required") return fail("Bitte gib deine E-Mail-Adresse ein. Geh dafür einen Schritt zurück.");
     if (problem.code === "terms_outdated") return fail("Die Seite ist nicht mehr aktuell. Bitte lade sie neu.");
-    fail("Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
+    options.track?.("checkout_load_failed");
+    fail(isTransient(problem)
+      ? "Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt."
+      : "Die Zahlung kann gerade nicht starten. Du hast nichts bezahlt. Bitte versuch es noch einmal.");
+    card.append(
+      el("button", { type: "button", class: "abo-button", text: "Erneut versuchen", onclick: () => { if (sheet?.node === node) open(options); } }),
+      el("a", { class: "kasse-help", href: "/kontakt.html", text: "Klappt es nicht? Schreib uns, wir helfen sofort." })
+    );
   } finally {
     if (sheet?.node === node) sheet.pending = false;
   }
