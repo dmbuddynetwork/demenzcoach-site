@@ -940,16 +940,25 @@
     ]));
     const dots = shotList.map((_, index) => el("button", { type: "button", class: index === 0 ? "is-on" : "", "aria-label": `Bild ${index + 1} von ${shotList.length}` }));
     const shotsTrack = el("div", { class: "start-shots-track" }, slides);
-    const goTo = (index) => shotsTrack.scrollTo({ left: slides[index].offsetLeft - (shotsTrack.clientWidth - slides[index].offsetWidth) / 2, behavior: "smooth" });
+    // Mitte aus den sichtbaren Rechtecken berechnen, nicht aus offsetLeft: offsetLeft zählt ab einem Vorfahren und
+    // lag auf Tablet und im Layer daneben (Bild landete nicht in der Mitte). Ein getipptes Bild bleibt markiert, auch wenn
+    // es am Rand nicht ganz in die Mitte rollen kann; erst eigenes Wischen gibt die Markierung wieder frei.
+    const centerOffset = (slide) => { const t = shotsTrack.getBoundingClientRect(), r = slide.getBoundingClientRect(); return r.left + r.width / 2 - (t.left + t.width / 2); };
+    const mark = (active) => {
+      slides.forEach((slide, index) => slide.classList.toggle("is-on", index === active));
+      dots.forEach((dot, index) => dot.classList.toggle("is-on", index === active));
+    };
+    let pinned = -1;
+    const goTo = (index) => { pinned = index; mark(index); shotsTrack.scrollTo({ left: shotsTrack.scrollLeft + centerOffset(slides[index]), behavior: "smooth" }); };
+    for (const type of ["pointerdown", "wheel", "touchstart"]) shotsTrack.addEventListener(type, () => { pinned = -1; }, { passive: true });
     let shotFrame = 0;
     shotsTrack.addEventListener("scroll", () => {
+      if (pinned >= 0) return;
       cancelAnimationFrame(shotFrame);
       shotFrame = requestAnimationFrame(() => {
-        const middle = shotsTrack.scrollLeft + shotsTrack.clientWidth / 2;
         let active = 0;
-        slides.forEach((slide, index) => { if (Math.abs(slide.offsetLeft + slide.offsetWidth / 2 - middle) < Math.abs(slides[active].offsetLeft + slides[active].offsetWidth / 2 - middle)) active = index; });
-        slides.forEach((slide, index) => slide.classList.toggle("is-on", index === active));
-        dots.forEach((dot, index) => dot.classList.toggle("is-on", index === active));
+        slides.forEach((slide, index) => { if (Math.abs(centerOffset(slide)) < Math.abs(centerOffset(slides[active]))) active = index; });
+        mark(active);
       });
     }, { passive: true });
     slides.forEach((slide, index) => slide.addEventListener("click", () => goTo(index)));
