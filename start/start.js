@@ -252,6 +252,9 @@
     } catch { /* ohne Speicher normal weiter */ }
   }
   function restoreProgress() {
+    // Der Layer von unten (A/B-Test statt Anmelde-Layer) startet immer bei der ersten Frage.
+    // Sonst springt er mit dem Stand einer früheren Runde mitten in den Funnel, z. B. auf „Newsletter“.
+    if (params.get("src") === "layer") { forgetProgress(); return "relation"; }
     let saved;
     try { saved = JSON.parse(sessionStorage.getItem(progressKey) || "null"); } catch { forgetProgress(); return "relation"; }
     if (!saved) return "relation";
