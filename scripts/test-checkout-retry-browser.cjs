@@ -93,6 +93,13 @@ const server = http.createServer((req, res) => { try {
       await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
       assert.equal(state.calls, 1, 'Klick nutzt die vorbereitete Sitzung');
     }, { open: false });
+    // 4b) Vorbereitung läuft noch, Kunde klickt sofort: eine einzige Sitzung, kein zweiter Aufruf (Tempo, 26. Nov 2026).
+    await run([], 'ok', async (page, state) => {
+      await page.evaluate(() => { import('/abo/kasse.js').then(k => k.prepare({ plan: 'yearly', email: 'fixture@example.invalid', source: 'retry-test' })); });
+      await page.locator('#fx-open').click();
+      await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
+      assert.equal(state.calls, 1, 'Klick wartet auf die laufende Vorbereitung');
+    }, { open: false });
     // 5) Im Layer (iframe): das ganze Fenster geht zu Stripe, nicht nur der Rahmen (sonst endloses Lade-Skeleton).
     await run([], 'ok', async (page, state) => {
       await page.evaluate(() => { const f = document.createElement('iframe'); f.id = 'fx-frame'; f.src = '/start/?src=layer&embed=1'; f.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:9'; document.body.append(f); });

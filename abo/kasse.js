@@ -57,19 +57,28 @@ const AUTO_RETRIES = 2;
 const isTransient = (problem) => problem?.code === "network" || problem?.code === "timeout" || problem?.status >= 500 || problem?.message === "hosted_checkout_unavailable";
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Tempo (Daniel, 26. Nov 2026): Vorbereitung und Klick laufen oft gleichzeitig. Firebase, Gast-Konto und /config dürfen nur
+// einmal starten, sonst entstehen zwei Gast-Konten und zwei Stripe-Sitzungen, und die Kasse wartet auf die zweite.
+let authReady = null, anonymousSignIn = null, configLoading = null;
+async function initAuth() {
+  const [{ initializeApp }, authModule] = await Promise.all([
+    import(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-app.js`),
+    import(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-auth.js`)
+  ]);
+  firebase = authModule;
+  auth = firebase.getAuth(initializeApp(config.firebase));
+  auth.languageCode = "de";
+  await new Promise((resolve) => { const stop = firebase.onAuthStateChanged(auth, () => { stop(); resolve(); }); });
+}
 async function signedInUser() {
-  if (!auth) {
-    const [{ initializeApp }, authModule] = await Promise.all([
-      import(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-app.js`),
-      import(`https://www.gstatic.com/firebasejs/${firebaseVersion}/firebase-auth.js`)
-    ]);
-    firebase = authModule;
-    auth = firebase.getAuth(initializeApp(config.firebase));
-    auth.languageCode = "de";
-    await new Promise((resolve) => { const stop = firebase.onAuthStateChanged(auth, () => { stop(); resolve(); }); });
-  }
+  if (!auth) await (authReady ||= initAuth().catch((problem) => { authReady = null; throw problem; }));
   // Wie Noom und BetterMe: erst bezahlen, Konto danach. Das Gast-Konto trägt den Kauf; eine bestätigte E-Mail wird anschließend mit derselben Nutzerkennung verknüpft.
-  return auth.currentUser ?? (await firebase.signInAnonymously(auth)).user;
+  if (auth.currentUser) return auth.currentUser;
+  return (anonymousSignIn ||= firebase.signInAnonymously(auth).then((credential) => credential.user).finally(() => { anonymousSignIn = null; }));
+}
+function loadConfig() {
+  if (publicConfig) return Promise.resolve(publicConfig);
+  return (configLoading ||= api("/config").then((loaded) => { configLoading = null; publicConfig = loaded; return loaded; }, (problem) => { configLoading = null; throw problem; }));
 }
 
 function close() {
@@ -103,7 +112,7 @@ function sessionFor(options, user, token) {
   return promise;
 }
 async function prepareOnce(options) {
-  const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+  const [loadedConfig, user] = await Promise.all([loadConfig(), signedInUser()]);
   publicConfig = loadedConfig;
   await window.DemenzTeller?.ready;
   const token = await user.getIdToken();
@@ -153,7 +162,7 @@ export async function open(options) {
 
   try {
     const begin = async () => {
-      const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+      const [loadedConfig, user] = await Promise.all([loadConfig(), signedInUser()]);
       checkoutUID = user.uid;
       if (sheet?.node === node) sheet.uid = checkoutUID;
       if (!requireCurrentAccount()) return;
@@ -230,7 +239,7 @@ export async function mountApplePay(slot, options) {
   if (!quickSupported()) return false;
   const key = `${options.plan}|${options.offer?.kind ?? ""}|${options.email ?? ""}`;
   try {
-    const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+    const [loadedConfig, user] = await Promise.all([loadConfig(), signedInUser()]);
     publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
     if (!quickSessions.has(key)) {
