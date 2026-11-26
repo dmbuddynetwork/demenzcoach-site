@@ -30,8 +30,9 @@ function ensureStyle(doc) {
   doc.head.append(link);
 }
 
-// showEmbeddedCheckout({ host, session, publishableKey, title, onClose, onRetry, track }) → { close }
-export async function showEmbeddedCheckout({ host = hostWindow(), session, publishableKey, title, onClose, onRetry, track }) {
+// showEmbeddedCheckout({ host, session, publishableKey, title, onClose, onRetry, onOpen, onDispose, track }) → { close }
+// onOpen({ close }) kommt sofort, wenn das Fenster steht (noch vor dem Laden von Stripe), onDispose, sobald es weg ist (×, Esc, Zurück, Wiederholen).
+export async function showEmbeddedCheckout({ host = hostWindow(), session, publishableKey, title, onClose, onRetry, onOpen, onDispose, track }) {
   const doc = host.document;
   if (doc.querySelector("dialog.kasse-embed")) return { close() {} }; // schon offen (Doppeltipp)
   ensureStyle(doc);
@@ -54,6 +55,7 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
     try { if (dialog.open) dialog.close(); } catch { /* */ }
     dialog.remove();
     root.style.overflow = overflow[0]; body.style.overflow = overflow[1];
+    try { onDispose?.(); } catch { /* */ }
     return true;
   };
   const close = () => { if (dispose()) onClose?.(); };
@@ -64,6 +66,7 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
   root.style.overflow = "hidden"; body.style.overflow = "hidden";
   try { dialog.showModal(); } catch { dialog.setAttribute("open", ""); }
   heading.focus({ preventScroll: true });
+  try { onOpen?.({ close }); } catch { /* */ }
 
   const fail = (message) => {
     if (finished) return;

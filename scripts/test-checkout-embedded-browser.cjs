@@ -66,6 +66,24 @@ const server = http.createServer((req, res) => { try {
       await page.locator('.kasse-embed-close').click();
       assert.equal(await layer.count(), 0, '× schließt');
       assert.equal(await page.evaluate(() => window.__dcCalls.destroyed), true);
+      // Nach dem Schließen lässt sich die Seite wieder scrollen (kein hängender Scroll-Sperrklassen-Rest).
+      assert.equal(await page.evaluate(() => document.body.classList.contains('start-noscroll')), false, 'Scroll-Sperre weg');
+      assert.notEqual(await page.evaluate(() => document.body.style.overflow), 'hidden');
+      assert.equal(await page.evaluate(() => window.DemenzKasse.isOpen()), false);
+    });
+    // 1b) Zurück-Taste schließt das Layer (isOpen/close kennen es), und das Scrollen ist danach frei.
+    await run({}, async (page) => {
+      await page.goto(origin + '/start/?direkt=1');
+      await page.waitForFunction(() => window.DemenzKasse?.open);
+      await page.evaluate(() => history.pushState({ screen: 'plan', sheet: true }, '', location.href));
+      await openIn(page);
+      const layer = page.locator('dialog.kasse-embed');
+      await layer.waitFor({ state: 'visible', timeout: 15000 });
+      assert.equal(await page.evaluate(() => window.DemenzKasse.isOpen()), true, 'isOpen kennt das Layer');
+      await page.goBack();
+      await layer.waitFor({ state: 'detached', timeout: 5000 });
+      assert.equal(await page.evaluate(() => document.body.classList.contains('start-noscroll')), false);
+      assert.match(page.url(), /\/start\//, 'Zurück bleibt auf der Seite');
     });
     // 2) Im Rahmen des Quiz-Layers: der Layer erscheint im OBERSTEN Dokument, der Rahmen wird nicht zu Stripe.
     await run({}, async (page, state) => {

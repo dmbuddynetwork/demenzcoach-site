@@ -73,7 +73,11 @@ async function signedInUser() {
   return auth.currentUser ?? (await firebase.signInAnonymously(auth)).user;
 }
 
+// Stripes eingebettete Zahlungsseite im obersten Layer (kasse-embedded.js). Zurück-Taste und close() müssen sie auch schließen.
+let embedded = null;
+
 function close() {
+  if (embedded) { embedded.close(); return; }
   if (!sheet) return;
   sheet.node.remove();
   document.body.classList.remove("start-noscroll");
@@ -177,8 +181,10 @@ export async function open(options) {
         sheet.detach();
         sheet.node.remove();
         sheet = null;
+        document.body.classList.remove("start-noscroll"); // das Layer sperrt das Scrollen selbst und gibt es beim Schließen wieder frei
         await showEmbeddedCheckout({ session, publishableKey: publicConfig.publishableKey, title: title.textContent,
-          onClose: () => options.onClose?.(), onRetry: () => { preparedSessions.clear(); open({ ...options }); }, track: options.track });
+          onClose: () => options.onClose?.(), onRetry: () => { preparedSessions.clear(); open({ ...options }); },
+          onOpen: (handle) => { embedded = handle; }, onDispose: () => { embedded = null; }, track: options.track });
         options.track?.("checkout_sheet_ready");
         return;
       }
@@ -298,5 +304,5 @@ export async function mountApplePay(slot, options) {
   }
 }
 
-export const isOpen = () => Boolean(sheet);
+export const isOpen = () => Boolean(sheet || embedded);
 window.DemenzKasse = Object.freeze({ open, close, isOpen, mountApplePay, prepare });
