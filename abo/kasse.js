@@ -3,7 +3,12 @@
 // Kein eigenes Zahlungsformular (Daniel, 24. Nov 2026: eingebettetes Stripe Elements sieht schlecht aus). Die Ebene zeigt nur
 // kurz „Weiter zur sicheren Zahlung“ und leitet im selben Tab auf die gehostete Stripe-Seite, nie in ein neues Fenster.
 import { createHostedCheckoutRedirect } from "./checkout-redirect.js";
-const redirectHostedCheckout = createHostedCheckoutRedirect((url) => location.assign(url));
+// Läuft die Kasse im Layer (Funnel-Rahmen, iframe), muss das ganze Fenster zu Stripe wechseln: Stripes Seite lässt sich nicht
+// in einem Rahmen laden und bliebe dort endlos beim Lade-Skeleton (Daniel, 26. Nov 2026).
+const redirectHostedCheckout = createHostedCheckoutRedirect((url) => {
+  if (window.top !== window) { try { window.top.location.assign(url); return; } catch { /* anderer Ursprung: unten im eigenen Fenster */ } }
+  location.assign(url);
+});
 const config = window.DEMENZ_ABO_CONFIG || {};
 const firebaseVersion = "12.16.0";
 
@@ -75,6 +80,42 @@ function close() {
   sheet = null;
 }
 
+// Tempo (Daniel, 26. Nov 2026: die Zahlung muss sofort kommen): Konto, Konfiguration und die Stripe-Sitzung werden schon
+// vorbereitet, wenn die Angebotsseite erscheint. Der Klick leitet dann ohne Wartezeit weiter. Unbezahlte Sitzungen verfallen nach 24 Stunden.
+const PREPARED_MAX_AGE = 15 * 60_000;
+const preparedSessions = new Map();
+function sessionBody(options) {
+  return { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
+    ...window.DemenzTeller?.attribution(),
+    ...window.DemenzConsent?.metaContext?.(),
+    hostedFallback: true,
+    ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
+    ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) };
+}
+function sessionFor(options, user, token) {
+  const meta = window.DemenzConsent?.metaContext?.()?.meta?.consent === true;
+  const key = JSON.stringify([user.uid, options.plan, options.email || "", options.offer || null, options.source || "", options.campaign || "", meta]);
+  const hit = preparedSessions.get(key);
+  if (hit && Date.now() - hit.at < PREPARED_MAX_AGE) return hit.promise;
+  const promise = api("/session", { method: "POST", token, body: sessionBody(options) });
+  preparedSessions.set(key, { at: Date.now(), promise });
+  promise.catch(() => { if (preparedSessions.get(key)?.promise === promise) preparedSessions.delete(key); });
+  return promise;
+}
+async function prepareOnce(options) {
+  const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
+  publicConfig = loadedConfig;
+  await window.DemenzTeller?.ready;
+  const token = await user.getIdToken();
+  const session = await sessionFor(options, user, token);
+  return session;
+}
+// prepare({ plan, email, offer, source, campaign }): leise im Hintergrund, Fehler werden ignoriert (der Klick versucht es dann selbst).
+export function prepare(options) {
+  if (!config.endpoint || !config.firebase?.apiKey) return Promise.resolve(false);
+  return prepareOnce(options).then(() => true, () => false);
+}
+
 // open({ plan, email, offer, source, campaign, onClose, onOfferExpired, track })
 export async function open(options) {
   if (sheet?.pending && sheet.plan === options.plan && sheet.email === options.email && (!sheet.uid || sheet.uid === auth?.currentUser?.uid)) return;
@@ -123,16 +164,7 @@ export async function open(options) {
       // Daniel, 24. Nov 2026: kein eigenes eingebettetes Stripe-Formular. Apple Pay und Google Pay stehen auf der gehosteten
       // Stripe-Seite oben, die E-Mail kommt von Stripe, wenn sie hier noch nicht bekannt ist.
       loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
-      const session = await api("/session", {
-        method: "POST",
-        token,
-        body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
-          ...window.DemenzTeller?.attribution(),
-          ...window.DemenzConsent?.metaContext?.(),
-          hostedFallback: true,
-          ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
-          ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
-      });
+      const session = await sessionFor(options, user, token);
       if (!requireCurrentAccount()) return;
       if (!redirectHostedCheckout(session, { attempt, isCurrent: currentAttempt })) throw new Error("hosted_checkout_unavailable");
       options.track?.("checkout_sheet_ready");
@@ -251,4 +283,4 @@ export async function mountApplePay(slot, options) {
 }
 
 export const isOpen = () => Boolean(sheet);
-window.DemenzKasse = Object.freeze({ open, close, isOpen, mountApplePay });
+window.DemenzKasse = Object.freeze({ open, close, isOpen, mountApplePay, prepare });

@@ -744,6 +744,7 @@
     // Labels wie BetterMe („GET MY PLAN“, „MOST POPULAR“). Statt „Beliebtester“ (ohne Verkaufszahlen nicht belegbar, UWG)
     // steht auf dem Jahresplan „Bester Preis“: belegbar, weil er pro Tag am günstigsten ist.
     const ctaText = "Plan anfordern";
+    setTimeout(() => { if (current === "plan") prepareCheckout(plan); }, 300);
 
     const tables = [];
     const applePayHooks = [];
@@ -753,6 +754,7 @@
       for (const node of document.querySelectorAll("[data-start-price]")) node.textContent = `Dein Abo beginnt: ${priceText(plan)}. Vorher online kündbar.`;
       for (const node of document.querySelectorAll("[data-start-fine]")) node.textContent = fineText();
       for (const hook of applePayHooks) hook();
+      prepareCheckout(key);
     };
     // Tarifkarte wie BetterMe: Kreis, Name groß, alter Preis → neuer Preis, rechts groß der Tagespreis.
     const tier = (key, title, line, cents, days, was, band) => el("button", { type: "button", class: "start-tier", role: "radio", "data-plan": key, "aria-checked": String(plan === key), onclick: () => select(key) }, [
@@ -1034,6 +1036,29 @@
       ])
     ];
   }
+
+  // Tempo (Daniel, 26. Nov 2026): Konto, Preise und Stripe-Sitzung im Hintergrund vorbereiten, sobald der Plan sichtbar ist.
+  // Der Klick auf „Plan anfordern“ leitet dann sofort weiter. Dieselben Werte wie in checkout(), sonst greift der Zwischenspeicher nicht.
+  function prepareCheckout(forPlan) {
+    const kasse = window.DemenzKasse;
+    if (!kasse?.prepare || !config.firebase?.apiKey) return;
+    const email = validEmail(answers.email) ? answers.email : validEmail(knownEmail) ? knownEmail : "";
+    if (!email && !walletEmail) return;
+    const { campaign, src } = checkoutMeta();
+    kasse.prepare({ plan: forPlan, email, offer: forPlan === "yearly" && offer.offers ? deals?.forCheckout() : null, source: src, campaign });
+  }
+
+  // Bilder der Angebotsseite schon im Hintergrund laden, damit sie beim Wechsel zum Plan sofort da sind.
+  const warmedImages = [];
+  function warmImages() {
+    const paths = ["/assets/zeichnungen/nach-hause.webp", "/assets/zeichnungen/nach-hause-ruhig.webp"];
+    try {
+      const pair = JSON.parse(sessionStorage.getItem("demenzCoachSimPair") || "null");
+      for (const key of ["before", "after"]) if (typeof pair?.[key] === "string" && /^\/assets\/zeichnungen\/[a-z0-9-]+\.webp$/u.test(pair[key])) paths.push(pair[key]);
+    } catch { /* privater Modus */ }
+    for (const path of new Set(paths)) { const image = new Image(); image.decoding = "async"; image.src = path; warmedImages.push(image); }
+  }
+  (window.requestIdleCallback || ((callback) => setTimeout(callback, 800)))(warmImages);
 
   function checkoutMeta() {
     const campaign = (params.get("utm_campaign") || (kampagne && kampagne.id !== "vorschau" ? kampagne.id : "")).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
