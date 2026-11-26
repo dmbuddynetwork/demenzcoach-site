@@ -22,8 +22,8 @@ const server = http.createServer((req, res) => { try {
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   const origin = 'http://127.0.0.1:' + server.address().port;
   let browser, cases = 0;
-  const run = async ({ query, applePay, stripeApple = true, email }, check) => {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const run = async ({ query, applePay, stripeApple = true, email, viewport = { width: 390, height: 844 } }, check) => {
+    const context = await browser.newContext({ viewport, isMobile: true, hasTouch: true });
     const page = await context.newPage(), sessions = [], stripeScripts = [];
     if (applePay) await page.addInitScript(() => { window.ApplePaySession = { canMakePayments: () => true }; });
     if (email) await page.addInitScript(e => { try { sessionStorage.setItem('demenzCoachEmail', e); } catch {} }, email);
@@ -102,12 +102,27 @@ const server = http.createServer((req, res) => { try {
       assert.equal(sessions[0].emailLater, true);
       assert.equal(sessions[0].email, undefined);
     });
-    // 3) Ohne ?ap=1: die lange Angebotsseite bleibt, nichts ändert sich.
-    await run({ query: '?direkt=1', applePay: true }, async ({ page, sessions, stripeScripts }) => {
-      await new Promise(r => setTimeout(r, 900));
-      assert.equal(sessions.length, 0); assert.equal(stripeScripts.length, 0);
-      assert.equal(await page.locator('.start-tp').count(), 0);
+    // 3) Ohne ?ap=1, aber mit Apple Pay: der Bildschirm kommt automatisch (Daniel 26. Nov 2026).
+    await run({ query: '?direkt=1', applePay: true }, async ({ page }) => {
+      await page.waitForFunction(() => window.__ece?.mounted.includes('start-ap-yearly'));
+      assert.equal(await page.locator('.start-tp').count(), 1);
     });
+    // 3b) ?ap=0 schaltet ihn ab; ohne Apple Pay und ohne ?ap=1 bleibt die lange Seite ohne Stripe.js und ohne Sitzung.
+    for (const [query, applePay] of [['?direkt=1&ap=0', true], ['?direkt=1', false]]) {
+      await run({ query, applePay }, async ({ page, sessions, stripeScripts }) => {
+        await new Promise(r => setTimeout(r, 900));
+        assert.equal(sessions.length, 0); assert.equal(stripeScripts.length, 0);
+        assert.equal(await page.locator('.start-tp').count(), 0);
+      });
+    }
+    // 3c) iPhone SE, normal, Pro Max (sichtbare Fläche in Safari): Preiszeile und Knopf ohne Scrollen sichtbar.
+    for (const viewport of [{ width: 375, height: 548 }, { width: 393, height: 659 }, { width: 430, height: 739 }]) {
+      await run({ query: '?direkt=1', applePay: true, viewport }, async ({ page }) => {
+        await page.evaluate(() => window.scrollTo(0, 0));
+        const fit = await page.evaluate(() => ({ terms: document.querySelector('.start-tp-terms').getBoundingClientRect().top >= 0, cta: document.querySelector('.start-tp-cta').getBoundingClientRect().bottom, h: innerHeight }));
+        assert.ok(fit.terms && fit.cta <= fit.h, `Knopf sichtbar bei ${viewport.width}x${viewport.height}: ${fit.cta} > ${fit.h}`);
+      });
+    }
     // 4) ?ap=1 ohne Apple Pay: gleicher Bildschirm, aber ohne Stripe.js und ohne Sitzung; der Knopf bleibt ein normaler Knopf.
     await run({ query: '?direkt=1&ap=1', applePay: false }, async ({ page, sessions, stripeScripts }) => {
       await new Promise(r => setTimeout(r, 900));
