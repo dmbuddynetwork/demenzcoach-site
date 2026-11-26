@@ -210,11 +210,11 @@ async function mountQuick(plan) {
       if (!paymentMethods || !paymentMethods.applePay) hideQuick();
       else track("apple_pay_quick_shown", { plan, source: state.source });
     });
-    express.on("confirm", async () => {
+    express.on("confirm", async (event) => {
       track("apple_pay_quick_confirm", { plan, source: state.source });
       try {
         const loaded = await checkout.loadActions?.();
-        const result = await (loaded?.actions ?? checkout).confirm();
+        const result = await (loaded?.actions ?? checkout).confirm({ expressCheckoutConfirmEvent: event });
         if (result?.type === "error" || result?.error) fail(result.error?.message || "Die Zahlung hat nicht geklappt.");
       } catch {
         fail("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");

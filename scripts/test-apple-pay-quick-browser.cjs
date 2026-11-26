@@ -10,7 +10,7 @@ const auth={currentUser:null};export const getAuth=()=>auth;export const getRedi
 export const signInAnonymously=async a=>{a.currentUser=user;return{user}};
 export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(a.currentUser),0);return()=>{}};`;
 const stripeFixture = `window.__ece={mounted:[],options:null,handlers:{}};
-window.Stripe=()=>({initCheckoutElementsSdk:async()=>({loadActions:async()=>({actions:{confirm:async()=>({type:'success'})}}),
+window.Stripe=()=>({initCheckoutElementsSdk:async()=>({loadActions:async()=>({actions:{confirm:async(a)=>{(window.__ece.confirms=window.__ece.confirms||[]).push(a);return{type:'success'}}}}),
 createExpressCheckoutElement:o=>{window.__ece.options=o;return{on:(n,f)=>{window.__ece.handlers[n]=f},mount:el=>{window.__ece.mounted.push(el.id);setTimeout(()=>window.__ece.handlers.availablepaymentmethodschange?.({paymentMethods:window.__ece.apple===false?{}:{applePay:true}}),0)}}}})});`;
 const server = http.createServer((req, res) => { try {
   let n = new URL(req.url, 'http://localhost').pathname; if (n.endsWith('/')) n += 'index.html';
@@ -66,6 +66,10 @@ const server = http.createServer((req, res) => { try {
       assert.equal(stripeScripts.length, 1);
       assert.equal(await page.evaluate(() => window.__ece.options.paymentMethods.applePay), 'always');
       assert.equal(await page.evaluate(() => window.__ece.options.paymentMethods.paypal), 'never');
+      // Nach Face ID muss das confirm-Ereignis an Stripe übergeben werden (sonst scheitert die Zahlung).
+      await page.evaluate(() => window.__ece.handlers.confirm({ marker: 'ev1' }));
+      await page.waitForFunction(() => window.__ece.confirms?.length === 1);
+      assert.equal(await page.evaluate(() => window.__ece.confirms[0].expressCheckoutConfirmEvent.marker), 'ev1');
       assert.match(await page.locator('#quick-summary').innerText(), /Inkl\. MwSt\./);
       assert.equal(await page.locator('#quick-pay').isVisible(), true);
       assert.equal(await page.locator('#plan-next').innerText(), 'Mit Karte oder PayPal weiter');
