@@ -101,6 +101,8 @@
   let reservationEnded = false;
   // E-Mail übersprungen (Daniel, 26. Nov 2026): Die Adresse wird dann erst vor der Kasse verlangt.
   let emailForCheckout = false;
+  // Holt Stripes gehostete Kasse die Adresse selbst (Server-Schalter walletEmail), fragen wir vor der Kasse nicht extra.
+  let walletEmail = false;
   // Schon bekannte Adresse (Daniel, 26. Nov 2026: „dann brauchen wir die ja nicht“): aus diesem Tab
   // (E-Mail-Schritt, Simulator) oder von einem angemeldeten Konto. Dann entfällt die E-Mail-Seite.
   let knownEmail = "";
@@ -1033,7 +1035,7 @@
   function checkout() {
     if (directMode && !validEmail(answers.email)) { go("email"); return; }
     if (!validEmail(answers.email) && validEmail(knownEmail)) answers.email = knownEmail;
-    if (!validEmail(answers.email)) { emailForCheckout = true; go("email"); return; }
+    if (!validEmail(answers.email) && !walletEmail) { emailForCheckout = true; go("email"); return; }
     track(directMode ? "direct_offer_checkout" : "quiz_checkout", "InitiateCheckout");
     // Eine schon bestätigte Konto-Adresse zählt als E-Mail, auch ohne den E-Mail-Schritt.
     countDirect("direct_email");
@@ -1222,6 +1224,7 @@
   if (config.endpoint) {
     fetch(`${config.endpoint}/config`).then((response) => response.ok ? response.json() : null).then((data) => {
       if (!data?.plans) return;
+      walletEmail = data.walletEmail === true;
       offer = { yearly: data.plans.yearly.amount, monthly: data.plans.monthly.amount, currency: data.plans.yearly.currency || "eur", trialDays: data.trialDays ?? 7, offers: data.offers || null };
       if (current === "plan" || current === "reveal") render(current);
     }).catch(() => {});
