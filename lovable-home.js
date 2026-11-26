@@ -352,33 +352,40 @@ const websiteAnalytics = (() => {
   return { clearSessionChoices, startStatistics, stopStatistics, deny, denyMarketing, grant, grantMarketing, askMarketing, loadPixels, loadTag, marketingOnPage, metaContext, readConsent, readMarketing, track, trackMarketing };
 })();
 
+// Banner-Text (26. Nov 2026, „besser konvertieren“): kurze Nutzen-Zeile vorn, Pflichtangaben klein darunter.
+// Rechtlich: Ja und Nein sehen gleich aus, kein Knopf ist vorausgewählt oder hervorgehoben.
+const tiktokActive = Boolean(marketingPixelIDs.tiktok);
 const fallbackAnalyticsCopy = usesEnglish
   ? {
-      title: 'May we count visits?',
-      marketingTitle: 'May we count visits and measure ads?',
-      text: 'With your permission, Google Analytics counts which pages are used and how. What you type is never sent. Data may be transferred to the USA. You can change your choice at any time under “Privacy settings”.',
-      marketingText: 'With your permission, Google Analytics counts which pages are used, and Meta (Facebook, Instagram) and TikTok measure which of our ads work. When you order, we also report the trial and first payment to Meta, with your email only as a hash. What you type is never sent. Data may be transferred to the USA. You can change your choice at any time under “Privacy settings”.',
-      decline: 'Decline',
-      accept: 'Allow',
-      acceptAll: 'Allow all',
+      title: 'Will you help us improve this site?',
+      marketingTitle: 'Will you help more families find us?',
+      lead: 'With your yes, we see which pages help caregivers. What you type stays with you.',
+      marketingLead: 'With your yes, we see which ads bring caregivers to us. What you type stays with you.',
+      text: 'We use Google Analytics for this. Data may be transferred to the USA. You can change your choice at any time under “Privacy settings”.',
+      marketingText: `We use Google Analytics and Meta (Facebook, Instagram)${tiktokActive ? ' and TikTok' : ''} for this. When you order, we also report the trial and first payment to Meta, with your email only as a hash. Data may be transferred to the USA. You can change your choice at any time under “Privacy settings”.`,
+      decline: 'No, thanks',
+      accept: 'Yes, gladly',
+      acceptAll: 'Yes, gladly',
       choose: 'Choose individually',
       statistics: 'Count visits (Google Analytics)',
-      marketing: 'Measure ads (Meta, TikTok)',
+      marketing: `Measure ads (Meta${tiktokActive ? ', TikTok' : ''})`,
       save: 'Save choice',
       privacy: 'Privacy policy',
       settings: 'Privacy settings'
     }
   : {
-      title: 'Dürfen wir Besuche zählen?',
-      marketingTitle: 'Dürfen wir Besuche zählen und Werbung messen?',
-      text: 'Mit deiner Einwilligung zählt Google Analytics, welche Seiten wie genutzt werden. Was du eintippst, wird nie übertragen. Dabei können Daten in die USA gehen. Du kannst das jederzeit unter „Datenschutz-Einstellungen“ ändern.',
-      marketingText: 'Mit deiner Einwilligung zählt Google Analytics, welche Seiten genutzt werden, und Meta (Facebook, Instagram) und TikTok messen, welche unserer Anzeigen wirken. Bei einer Bestellung melden wir Meta auch Probezeit und erste Zahlung, die E-Mail nur als Prüfsumme. Was du eintippst, wird nie übertragen. Dabei können Daten in die USA gehen. Du kannst das jederzeit unter „Datenschutz-Einstellungen“ ändern.',
-      decline: 'Ablehnen',
-      accept: 'Erlauben',
-      acceptAll: 'Alle erlauben',
+      title: 'Hilfst du uns, die Seite zu verbessern?',
+      marketingTitle: 'Hilfst du uns, mehr Familien zu erreichen?',
+      lead: 'Mit deinem Ja sehen wir, welche Seiten Angehörigen helfen. Was du eintippst, bleibt bei dir.',
+      marketingLead: 'Mit deinem Ja sehen wir, welche Anzeigen Angehörige zu uns bringen. Was du eintippst, bleibt bei dir.',
+      text: 'Dafür nutzen wir Google Analytics. Dabei können Daten in die USA gehen. Du kannst das jederzeit unter „Datenschutz-Einstellungen“ ändern.',
+      marketingText: `Dafür nutzen wir Google Analytics und Meta (Facebook, Instagram)${tiktokActive ? ' und TikTok' : ''}. Bei einer Bestellung melden wir Meta auch Probezeit und erste Zahlung, die E-Mail nur als Prüfsumme. Dabei können Daten in die USA gehen. Du kannst das jederzeit unter „Datenschutz-Einstellungen“ ändern.`,
+      decline: 'Nein, danke',
+      accept: 'Ja, gern',
+      acceptAll: 'Ja, gern',
       choose: 'Einzeln auswählen',
       statistics: 'Besuche zählen (Google Analytics)',
-      marketing: 'Werbung messen (Meta, TikTok)',
+      marketing: `Werbung messen (Meta${tiktokActive ? ', TikTok' : ''})`,
       save: 'Auswahl speichern',
       privacy: 'Datenschutzerklärung',
       settings: 'Datenschutz-Einstellungen'
@@ -435,6 +442,8 @@ if (!tellerContext && websiteAnalytics.readConsent() === 'granted') {
 }
 const tellerLanguage = document.documentElement.lang.split('-')[0];
 const tellerConsentCopy = localizedSiteCopy.analytics?.tellerText ?? tellerConsentTexts[tellerLanguage];
+// Nutzen-Zeile nur, wenn die Sprache eine hat (Deutsch, Englisch); übersetzte Seiten zeigen ihren bisherigen Text.
+const consentLead = localizedSiteCopy.analytics?.text ? '' : (websiteAnalytics.askMarketing ? analyticsCopy.marketingLead : analyticsCopy.lead);
 const consentText = baseConsentText + (tellerContext && tellerConsentCopy ? ` ${tellerConsentCopy}` : '');
 // Absolute Adresse, damit der Link auch in Unterordnern wie /start/ oder /ratgeber/ stimmt.
 const privacyURL = new URL(localizedSiteCopy.privacyURL ?? (usesEnglish ? 'privacy-en.html' : 'datenschutz.html'), `${location.origin}/`).pathname;
@@ -444,10 +453,12 @@ consentBanner.className = 'consent-banner';
 consentBanner.hidden = true;
 consentBanner.setAttribute('role', 'region');
 consentBanner.setAttribute('aria-labelledby', 'consent-title');
+consentBanner.tabIndex = -1;
 consentBanner.innerHTML = `
   <div class="consent-copy">
     <strong id="consent-title">${websiteAnalytics.askMarketing ? analyticsCopy.marketingTitle : analyticsCopy.title}</strong>
-    <p>${consentText} <a href="${privacyURL}">${analyticsCopy.privacy}</a></p>
+    ${consentLead ? `<p class="consent-lead">${consentLead}</p>` : ''}
+    <p${consentLead ? ' class="consent-fine"' : ''}>${consentText} <a href="${privacyURL}">${analyticsCopy.privacy}</a></p>
   </div>
   <div class="consent-choices" hidden>
     <label class="consent-choice"><input type="checkbox" name="statistics"> <span>${analyticsCopy.statistics}</span></label>
@@ -455,8 +466,8 @@ consentBanner.innerHTML = `
     <button class="consent-button consent-save" type="button">${analyticsCopy.save}</button>
   </div>
   <div class="consent-actions">
-    <button class="consent-button consent-decline" type="button">${analyticsCopy.decline}</button>
     <button class="consent-button consent-accept" type="button">${websiteAnalytics.askMarketing ? analyticsCopy.acceptAll : analyticsCopy.accept}</button>
+    <button class="consent-button consent-decline" type="button">${analyticsCopy.decline}</button>
   </div>
   ${websiteAnalytics.askMarketing ? `<button class="consent-choose" type="button" aria-expanded="false">${analyticsCopy.choose}</button>` : ''}`;
 document.body.appendChild(consentBanner);
@@ -473,7 +484,8 @@ const consentChooseButton = consentBanner.querySelector('.consent-choose');
 const showConsentBanner = () => {
   consentBanner.hidden = false;
   consentSettingsButton.hidden = true;
-  consentBanner.querySelector('.consent-decline').focus();
+  // Fokus auf den Banner selbst, nicht auf einen Knopf: ein Fokusring würde eine Wahl hervorheben.
+  consentBanner.focus({ preventScroll: true });
 };
 
 const hideConsentBanner = () => {

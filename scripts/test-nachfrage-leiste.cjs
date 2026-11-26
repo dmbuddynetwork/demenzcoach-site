@@ -13,7 +13,7 @@ const shots = process.env.LEISTE_SHOTS || '';
       const p = await c.newPage(); const errors = []; p.on('pageerror', e => errors.push(e.message));
       const shot = async (name) => { if (shots) await p.screenshot({ path: path.join(shots, `${name}-${view.n}.png`) }); };
       await p.goto(`${preview.origin}/de/`);
-      const decline = p.getByRole('button', { name: 'Ablehnen', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
+      const decline = p.getByRole('button', { name:'Nein, danke', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
       await p.locator('a.e-tile[data-translator-key]').first().click();
       await p.locator('.translator-goal').nth(0).click();
       await p.locator('.translator-goal-chosen').waitFor();

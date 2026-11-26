@@ -45,7 +45,7 @@ const server = http.createServer((req, res) => { try {
     });
     try {
       await page.goto(origin + '/start/' + query);
-      const decline = page.getByRole('button', { name: 'Ablehnen', exact: true });
+      const decline = page.getByRole('button', { name:'Nein, danke', exact: true });
       if (await decline.count()) await decline.click();
       page.on('console', m => process.env.DBG && console.log('console:', m.text())); page.on('pageerror', e => process.env.DBG && console.log('pageerror:', e.message));
       await page.locator('.start-cta').first().waitFor();

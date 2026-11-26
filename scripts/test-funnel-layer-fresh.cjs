@@ -27,7 +27,7 @@ const { createPreviewServer } = require('./generator-preview.cjs');
     await c.addInitScript(() => { try { localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied'); localStorage.setItem('demenzcoach.marketingConsent.v1', 'denied'); } catch {} });
     await c.route('**/*', r => new URL(r.request().url()).origin === preview.origin ? r.continue() : r.abort());
     const p = await c.newPage(); await p.goto(`${preview.origin}/de/`);
-    const decline = p.getByRole('button', { name: 'Ablehnen', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
+    const decline = p.getByRole('button', { name:'Nein, danke', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
     await p.evaluate(() => window.scrollTo(0, 1500)); await p.locator('.translator-chat-input').waitFor({ state: 'visible' });
     assert.ok(await p.evaluate(() => { const b = document.querySelector('.translator-chat-send').getBoundingClientRect(); return b.width >= 44 && Math.abs(b.width - b.height) < 1; }), 'Senden-Knopf ist rund');
     await p.evaluate(() => { const d = document.createElement('dialog'); d.className = 'dc-funnel-layer'; document.body.append(d); d.showModal(); });

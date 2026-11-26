@@ -46,7 +46,7 @@ const server = http.createServer((req, res) => { try {
     });
     try {
       await page.goto(origin + '/hilfe/' + query);
-      const decline = page.getByRole('button', { name: 'Ablehnen', exact: true });
+      const decline = page.getByRole('button', { name:'Nein, danke', exact: true });
       if (await decline.count()) await decline.click();
       await page.locator('#preis .lp-btn').waitFor();
       await page.evaluate(() => document.querySelector('#preis').scrollIntoView({ block: 'center' }));

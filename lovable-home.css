@@ -562,6 +562,9 @@ blockquote { margin: 24px auto 26px; font-size: clamp(2.2rem, 4.2vw, 4.2rem); }
 .consent-copy strong { font-family: var(--serif); font-size: 1.35rem; }
 .consent-copy p { margin: 5px 0 0; color: #d7e1d9; font-size: .9rem; line-height: 1.5; }
 .consent-copy a { color: white; text-underline-offset: 3px; }
+.consent-banner:focus { outline: none; }
+.consent-copy .consent-lead { color: white; font-size: 1rem; }
+.consent-copy .consent-fine { font-size: .8rem; }
 .consent-actions { display: flex; flex: 0 0 auto; gap: 10px; }
 .consent-button, .consent-settings {
   min-height: 44px;
