@@ -1914,7 +1914,17 @@
     const goals = goal ? goalsFor(result) : null;
     const chosenGoal = goals?.find((candidate) => candidate.id === goal) ?? null;
     // The selected goal stays green above the answer; alternatives follow its full content.
-    if (chosenGoal) answerCard.append(element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }));
+    if (chosenGoal) {
+      // „Ziel ändern“ führt zurück zur Zielfrage derselben Situation.
+      answerCard.append(element('div', { className: 'translator-goal-row' }, [
+        element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }),
+        button('Ziel ändern', 'translator-goal-change', () => {
+          track('translator_goal', { goal: 'change', result_key: result.key, step: 'change' });
+          askGoal(entry, { safetyHit, alternatives, also, typed, mood, protection });
+          setPage(entry);
+        })
+      ]));
+    }
     const presetOtherGoals = chosenGoal ? element('section', { className: 'translator-other-goals translator-preset-other-goals' }, [
       element('h3', { className: 'translator-step', text: 'Ein anderes Ziel ausprobieren' }),
       element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.filter(option => option.id !== goal).map(option => goalChoice(option, () => {
@@ -2119,8 +2129,9 @@
   function show(entry, source) {
     if (!keepInputAtTop && !input.value.trim()) input.value = entry.says;
     grow();
-    render(entry, { goal: ui?.lang === 'en' ? '' : 'jetzt' });
-    setPage(entry, ui?.lang === 'en' ? '' : 'jetzt');
+    // Das Ziel wählt die Person selbst (Daniel, 26. Nov): erst die Zielfrage, nicht automatisch „Jetzt antworten“.
+    if (goalsFor(entry)) askGoal(entry, {}); else render(entry, { goal: '' });
+    setPage(entry);
     track('translator_result', { result_key: entry.key, input_source: source, safety_hint: 'no' });
   }
 
@@ -2222,7 +2233,7 @@
       if (event.detail > 1) { event.preventDefault(); return; }
       if (chip.tagName === 'A') {
         const route = publicByKey.get(chip.dataset.translatorKey);
-        if (route) chip.href = route.path;
+        if (route) chip.href = route.goalPaths && route.selectionPath ? route.selectionPath : route.path;
         return;
       }
       const entry = entryByKey.get(chip.dataset.translatorKey);

@@ -105,9 +105,9 @@ body.homepage-v2 .home-situations .e-tile span {
 
 body.homepage-v2 #translator-form {
   margin-top: 0;
-  padding: 24px !important;
-  background: var(--e-card) !important;
-  border-radius: 24px;
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 0;
 }
 
 body.homepage-v2 #translator-form > .e-privacy {
@@ -115,7 +115,7 @@ body.homepage-v2 #translator-form > .e-privacy {
 }
 
 body.homepage-v2 #translator-input {
-  min-height: 128px;
+  min-height: 108px;
 }
 
 body.homepage-v2 #translator-input::placeholder {
@@ -123,13 +123,12 @@ body.homepage-v2 #translator-input::placeholder {
 }
 
 body.homepage-v2 #translator-input:focus-visible {
-  outline: 3px solid var(--e-purple);
-  outline-offset: 3px;
+  outline: none;
 }
 
 @media (max-width: 699px) {
   body.homepage-v2 #translator-form {
-    padding: 16px !important;
+    padding: 0 !important;
   }
 }
 
