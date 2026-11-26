@@ -29,7 +29,7 @@ export function openFunnelLayer({ doc = document, returnFocus = null, onClose = 
   };
   close.addEventListener('click', finish);
   dialog.addEventListener('cancel', event => { event.preventDefault(); finish(); });
-  dialog.addEventListener('click', event => { if (event.target === dialog) finish(); });
+  // Daniel, 26. Nov 2026: ein Klick neben den Layer schließt ihn nicht mehr (versehentlich weggeklickt). Schließen nur über das ×.
   // Noch keine Entscheidung zu Cookies: derselbe Banner der Seite bleibt über dem Layer sichtbar (kein zweiter Banner im Rahmen).
   const banner = doc.querySelector('body > .consent-banner:not([hidden])');
   doc.body.append(dialog); root.style.overflow = 'hidden'; body.style.overflow = 'hidden';
