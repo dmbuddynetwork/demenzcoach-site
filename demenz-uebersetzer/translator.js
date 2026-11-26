@@ -47,6 +47,7 @@
   let syncHelpful = () => {};
   const setViewState = (state) => {
     document.body.dataset.translatorState = state;
+    document.body.removeAttribute('data-translator-pending-goal');
     const examples = document.querySelector('[data-ready-situations]');
     if (examples) examples.hidden = state !== 'input';
     syncHelpful();
@@ -1961,11 +1962,11 @@
       // „Ziel ändern“ führt zurück zur Zielfrage derselben Situation.
       answerCard.append(element('div', { className: 'translator-goal-row' }, [
         element('p', { className: 'translator-goal-chosen', text: `Dein Ziel: ${chosenGoal.label}` }),
-        button('Ziel ändern', 'translator-goal-change', () => {
+        button('Ändern', 'translator-goal-change', () => {
           track('translator_goal', { goal: 'change', result_key: result.key, step: 'change' });
           askGoal(entry, { safetyHit, alternatives, also, typed, mood, protection });
           setPage(entry);
-        })
+        }, { 'aria-label': 'Ziel ändern' })
       ]));
     }
     const presetOtherGoals = chosenGoal ? element('section', { className: 'translator-other-goals translator-preset-other-goals' }, [
