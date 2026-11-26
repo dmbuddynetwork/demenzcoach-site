@@ -89,7 +89,7 @@ const server = http.createServer((req, res) => { try {
       assert.ok(sessions.some(s => s.hostedFallback === true), 'Weiter fordert die gehostete Seite');
     });
     // 3) Ohne ?ap=1: nichts ändert sich.
-    await run({ query: '', applePay: true }, async ({ page, sessions, stripeScripts }) => {
+    await run({ query: '?alt=1', applePay: true }, async ({ page, sessions, stripeScripts }) => {
       await new Promise(r => setTimeout(r, 900));
       assert.equal(sessions.length, 0);
       assert.equal(stripeScripts.length, 0);

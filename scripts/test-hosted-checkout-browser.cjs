@@ -38,10 +38,10 @@ const server = http.createServer((req,res)=>{try {
     assert.equal(sessions[0].token,'Bearer fixture-owner');
     assert.deepEqual(stripeScripts,[],'hosted flow must not load embedded Stripe.js');
     await page.getByRole('link',{name:'Abbrechen'}).click();
-    await page.waitForURL(origin+'/abo/?status=abgebrochen&plan='+plan);
-    assert.equal(await page.locator('#step-plan').isVisible(),true);
-    assert.equal(await page.locator('[data-plan="'+plan+'"]').getAttribute('aria-checked'),'true');
-    assert.equal(await page.locator('#step-done').isVisible(),false);
+    // Abbruch bei Stripe führt zurück auf die BetterMe-optimierte Angebotsseite /start/ (alte Planwahl /abo/ leitet dorthin um).
+    await page.waitForURL(origin+'/start/?direkt=1'+(plan==='monthly'?'&plan=monthly':''));
+    await page.locator('.start-tier[data-plan="'+plan+'"]').first().waitFor();
+    assert.equal(await page.locator('.start-tier[data-plan="'+plan+'"]').first().getAttribute('aria-checked'),'true');
     assert.equal(sessions.length,1,'Cancel return must not automatically create a second session');
     assert.deepEqual(errors,[]);cases++;
    }finally{await context.close();}
@@ -129,7 +129,7 @@ const server = http.createServer((req,res)=>{try {
   });
  }
  async function open(page,origin,mode,plan){
-  await page.goto(origin+'/abo/?plan='+plan);
+  await page.goto(origin+'/abo/?alt=1&plan='+plan);
   const decline=page.getByRole('button',{name:'Ablehnen',exact:true});
   if(await decline.count())await decline.click();
   if(mode==='page'){

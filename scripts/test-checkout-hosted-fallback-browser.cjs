@@ -42,7 +42,7 @@ const server = http.createServer((req, res) => { try {
         return route.abort();
       });
       try {
-        await page.goto(origin + '/abo/?plan=yearly');
+        await page.goto(origin + '/abo/?plan=yearly&alt=1');
         const decline = page.getByRole('button', { name: 'Ablehnen', exact: true });
         if (await decline.count()) await decline.click();
         await page.evaluate(async withEmail => { const k = await import('/abo/kasse.js'); const b = document.createElement('button'); b.id = 'fx-open'; b.textContent = 'Plan starten'; b.style.cssText = 'position:fixed;top:8px;left:8px;z-index:5'; b.onclick = () => k.open({ plan: 'yearly', ...(withEmail ? { email: 'fixture@example.invalid' } : {}), source: 'hosted-test' }); document.body.append(b); }, withEmail);

@@ -92,7 +92,7 @@
     tries: [], goal: null, burden: null, minutes: null, email: "",
     age: null, personAge: null, reaction: null, visits: null, outings: null, meals: null, helpreact: null, feeling: null, sleep: null,
     breaks: null, work: null, when: null, joy: null, moments: [], calms: [], helpers: [], learn: [] };
-  let plan = "yearly";
+  let plan = params.get("plan") === "monthly" ? "monthly" : "yearly";
   let offer = { yearly: 6999, monthly: 1299, currency: "eur", trialDays: 7, offers: null };
   // Willkommenspreis (angebot.js): Preis vom Server; die Gültigkeit prüft die Kasse erneut.
   // Keine sichtbare Frist: eine dauerhaft bindende Begrenzung ist für den veröffentlichten Flow nicht belegt.
