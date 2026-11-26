@@ -87,11 +87,17 @@ export function mountSharedNavigation(doc = document) {
     if (draft && !host.confirm(en ? 'Change page? Your unsent text is not automatically transferred.' : 'Seite wechseln? Deine ungesendete Eingabe wird nicht automatisch übernommen.')) return;
     host.location.assign(select.value);
   });
+  // Auf dem Handy steht „Anmelden“ im Menü statt in der Kopfleiste (Daniel, 26. Nov). Der Menü-Eintrag löst denselben Klick aus.
+  const menuAccount = doc.createElement('button'); menuAccount.type = 'button'; menuAccount.className = 'dc-navigation-menu-account'; menuAccount.textContent = account.textContent;
+  menuAccount.addEventListener('click', () => { menu.open = false; account.click(); });
+  items.prepend(menuAccount);
   label.append(select); items.append(label, change, status);
   // Sichtbarer App-Store-Knopf in der Kopfleiste (Daniel, 26. Nov: „damit man sieht, dass es eine iOS-App ist“).
   // Nur in der normalen Seiten-Kopfleiste, nicht im Fragebogen oder in der Kasse. Auf Android gibt es die App nicht.
   const userAgent = host.navigator?.userAgent || '';
-  const store = container.matches('.e-header .e-wrap') && !/Android/i.test(userAgent) ? doc.createElement('a') : null;
+  // Nicht im Fragebogen, in der Kasse oder auf Abo-Seiten (Daniel, 26. Nov: „nicht im Funnel / Paywall“).
+  const funnelPage = /^\/(?:start|hilfe|abo|kasse)\//.test(host.location.pathname);
+  const store = container.matches('.e-header .e-wrap') && !funnelPage && !/Android/i.test(userAgent) ? doc.createElement('a') : null;
   if (store) {
     store.className = 'dc-navigation-store'; store.dataset.storeLink = 'nav-badge';
     store.href = 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_nav_badge&mt=8';
@@ -128,8 +134,9 @@ export function mountSharedNavigation(doc = document) {
       account.dataset.accountState = signed ? 'signed-in' : 'signed-out';
       account.textContent = signed ? (user.emailVerified ? (en ? '✓ Signed in' : '✓ Angemeldet') : (en ? 'Verify account' : 'Konto bestätigen')) : (en ? 'Sign in' : 'Anmelden');
       account.setAttribute('aria-label', signed ? (en ? 'Your account, signed in' : 'Dein Konto, angemeldet') : account.textContent);
+      menuAccount.textContent = account.textContent;
       fitBrand();
-    } catch { if (request === version) { account.dataset.accountState = 'unknown'; account.textContent = en ? 'Account' : 'Konto'; fitBrand(); } }
+    } catch { if (request === version) { account.dataset.accountState = 'unknown'; account.textContent = en ? 'Account' : 'Konto'; menuAccount.textContent = account.textContent; fitBrand(); } }
   };
   account.addEventListener('click', async event => {
     if (currentAuth?.currentUser?.isAnonymous === false) return;
