@@ -141,6 +141,10 @@ const websiteAnalytics = (() => {
   const marketingKey = 'demenzcoach.marketingConsent.v1';
   const marketingOnPage = document.body?.hasAttribute('data-marketing-pixels') === true
     && Boolean(marketingPixelIDs.meta || marketingPixelIDs.tiktok);
+  // Daniel, 26. Nov 2026: Die Einwilligung kommt komplett beim Aufruf der Seite, nicht erst im Quiz-Layer.
+  // Deutsche Seiten fragen darum gleich beide Bereiche ab; Pixel laden weiter nur Seiten mit data-marketing-pixels.
+  const askMarketing = marketingOnPage
+    || (Boolean(marketingPixelIDs.meta || marketingPixelIDs.tiktok) && document.documentElement.lang.startsWith('de'));
   let tagLoaded = false;
   let pixelsLoaded = false;
 
@@ -338,7 +342,7 @@ const websiteAnalytics = (() => {
   };
 
   const clearSessionChoices = () => { sessionChoice = {}; };
-  return { clearSessionChoices, startStatistics, stopStatistics, deny, denyMarketing, grant, grantMarketing, loadPixels, loadTag, marketingOnPage, metaContext, readConsent, readMarketing, track, trackMarketing };
+  return { clearSessionChoices, startStatistics, stopStatistics, deny, denyMarketing, grant, grantMarketing, askMarketing, loadPixels, loadTag, marketingOnPage, metaContext, readConsent, readMarketing, track, trackMarketing };
 })();
 
 const fallbackAnalyticsCopy = usesEnglish
@@ -377,7 +381,7 @@ const analyticsCopy = {
   ...(localizedSiteCopy.analytics ?? {})
 };
 // Andere Sprachen haben einen eigenen Text ohne Anbieternamen: den Anbieter dann anhängen.
-const baseConsentText = websiteAnalytics.marketingOnPage
+const baseConsentText = websiteAnalytics.askMarketing
   ? analyticsCopy.marketingText
   : /Google/.test(analyticsCopy.text) ? analyticsCopy.text : `${analyticsCopy.text} (Google Analytics)`;
 const tellerConsentTexts = {
@@ -435,7 +439,7 @@ consentBanner.setAttribute('role', 'region');
 consentBanner.setAttribute('aria-labelledby', 'consent-title');
 consentBanner.innerHTML = `
   <div class="consent-copy">
-    <strong id="consent-title">${websiteAnalytics.marketingOnPage ? analyticsCopy.marketingTitle : analyticsCopy.title}</strong>
+    <strong id="consent-title">${websiteAnalytics.askMarketing ? analyticsCopy.marketingTitle : analyticsCopy.title}</strong>
     <p>${consentText} <a href="${privacyURL}">${analyticsCopy.privacy}</a></p>
   </div>
   <div class="consent-choices" hidden>
@@ -445,9 +449,9 @@ consentBanner.innerHTML = `
   </div>
   <div class="consent-actions">
     <button class="consent-button consent-decline" type="button">${analyticsCopy.decline}</button>
-    <button class="consent-button consent-accept" type="button">${websiteAnalytics.marketingOnPage ? analyticsCopy.acceptAll : analyticsCopy.accept}</button>
+    <button class="consent-button consent-accept" type="button">${websiteAnalytics.askMarketing ? analyticsCopy.acceptAll : analyticsCopy.accept}</button>
   </div>
-  ${websiteAnalytics.marketingOnPage ? `<button class="consent-choose" type="button" aria-expanded="false">${analyticsCopy.choose}</button>` : ''}`;
+  ${websiteAnalytics.askMarketing ? `<button class="consent-choose" type="button" aria-expanded="false">${analyticsCopy.choose}</button>` : ''}`;
 document.body.appendChild(consentBanner);
 
 const consentSettingsButton = document.createElement('button');
@@ -479,7 +483,7 @@ const hideConsentBanner = () => {
 const applyConsent = (statistics, marketing) => {
   if (statistics) websiteAnalytics.grant();
   else websiteAnalytics.deny();
-  if (websiteAnalytics.marketingOnPage) {
+  if (websiteAnalytics.askMarketing) {
     if (marketing) websiteAnalytics.grantMarketing();
     else websiteAnalytics.denyMarketing();
   }
@@ -538,8 +542,10 @@ window.addEventListener('storage', (event) => {
 
 if (websiteAnalytics.readConsent() === 'granted') websiteAnalytics.loadTag();
 if (websiteAnalytics.marketingOnPage && websiteAnalytics.readMarketing() === 'granted') websiteAnalytics.loadPixels();
-if (websiteAnalytics.readConsent() === null
-  || (websiteAnalytics.marketingOnPage && websiteAnalytics.readMarketing() === null)) {
+// Im Quiz-Layer (/start/?embed=1 im Rahmen) fragt die Seite dahinter; der Rahmen zeigt keinen zweiten Banner.
+const embeddedInLayer = (() => { try { return window.parent !== window && new URLSearchParams(location.search).get('embed') === '1'; } catch { return false; } })();
+if (!embeddedInLayer && (websiteAnalytics.readConsent() === null
+  || (websiteAnalytics.askMarketing && websiteAnalytics.readMarketing() === null))) {
   showConsentBanner();
 }
 

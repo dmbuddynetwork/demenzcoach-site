@@ -37,6 +37,10 @@
   const source = (params.get("src") || params.get("utm_source") || kampagne?.src || guessSource()).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 30) || "ads";
   const config = window.DEMENZ_ABO_CONFIG || {};
   if (params.get("embed") === "1") document.documentElement.classList.add("start-embedded");
+  // Daniel, 26. Nov 2026: Nach einem Klick kein blauer Rahmen. Maus/Finger: kein Fokus-Rahmen; Tab-Taste: Rahmen wie bisher.
+  const rootClasses = document.documentElement.classList;
+  document.addEventListener("pointerdown", () => rootClasses.add("start-pointer"), true);
+  document.addEventListener("keydown", (event) => { if (event.key === "Tab") rootClasses.remove("start-pointer"); }, true);
 
   const svg = (paths) => `<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
   const icons = {
@@ -579,7 +583,8 @@
         el("ul", { class: "start-say", role: "list" }, [el("li", { text: `„${s.say[0]}“` })])
       ]),
       el("p", { class: "start-small", text: "Satzideen, nächste Schritte und weitere Alltagssituationen zum Nachschauen. Der Wochenplan ist eine zusätzliche Hilfe." }),
-      el("button", { type: "button", class: "abo-button", text: "Weiter", onclick: () => go(after("result")) })
+      // Daniel, 26. Nov 2026: Der Knopf ist ohne Scrollen sichtbar (fest unten, wie bei den Fragen).
+      el("button", { type: "button", class: "abo-button start-next", text: "Weiter", onclick: () => go(after("result")) })
     ];
   }
 
@@ -1147,6 +1152,7 @@
     if (name === "building") askAccountEmail();
     if (!(name === "email" && emailForCheckout)) countStep(name);
     const screen = $("screen");
+    if (rootClasses.contains("start-pointer")) document.activeElement?.blur?.();
     screen.replaceChildren(...screens[name]().filter(Boolean));
     screen.dataset.kind = isQuestion(name) ? "question" : name;
     document.body.dataset.screen = name;
