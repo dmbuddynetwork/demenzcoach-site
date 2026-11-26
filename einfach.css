@@ -1081,3 +1081,10 @@ body.einfach[data-translator-state="goal"] .translator-said-with-art .translator
 body.einfach .translator-said-art { mix-blend-mode: multiply; }
 @media (min-width: 720px) { body.einfach[data-translator-state="goal"] .translator-said-with-art .translator-said-art { max-height: 220px; max-width: 34%; } }
 body.einfach[data-translator-state="goal"] > .translator-chat { display: none !important; }
+
+/* Ziel-Box auf dem Handy (Daniel, 26. Nov: „Ändern“ quetschte das Ziel in eine schmale Spalte). Ziel über die volle Breite, „Ändern“ darunter. */
+@media (max-width: 719px) {
+  body.einfach .translator-answer .translator-goal-row { flex-wrap: wrap; gap: 0; padding: 12px 14px 4px; }
+  body.einfach .translator-answer .translator-goal-row .translator-goal-chosen { flex: 1 1 100%; font-size: 1.25rem !important; line-height: 1.3 !important; }
+  body.einfach .translator-answer .translator-goal-row .translator-goal-change { margin-left: 30px; padding: 4px 6px; font-size: 1rem; }
+}

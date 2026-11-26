@@ -87,7 +87,32 @@ export function mountSharedNavigation(doc = document) {
     if (draft && !host.confirm(en ? 'Change page? Your unsent text is not automatically transferred.' : 'Seite wechseln? Deine ungesendete Eingabe wird nicht automatisch übernommen.')) return;
     host.location.assign(select.value);
   });
-  label.append(select); items.append(label, change, status); dock.append(account, menu); container.append(dock); if (oldNav) oldNav.remove();
+  label.append(select); items.append(label, change, status);
+  // Sichtbarer App-Store-Knopf in der Kopfleiste (Daniel, 26. Nov: „damit man sieht, dass es eine iOS-App ist“).
+  // Nur in der normalen Seiten-Kopfleiste, nicht im Fragebogen oder in der Kasse. Auf Android gibt es die App nicht.
+  const userAgent = host.navigator?.userAgent || '';
+  const store = container.matches('.e-header .e-wrap') && !/Android/i.test(userAgent) ? doc.createElement('a') : null;
+  if (store) {
+    store.className = 'dc-navigation-store'; store.dataset.storeLink = 'nav-badge';
+    store.href = 'https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_nav_badge&mt=8';
+    store.setAttribute('aria-label', en ? 'Download on the App Store' : 'Im App Store laden');
+    store.innerHTML = '<svg aria-hidden="true" focusable="false" viewBox="0 0 384 512" width="18" height="18"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg><span class="dc-navigation-store-text"><small>' + (en ? 'Download on the' : 'Laden im') + '</small> App Store</span>';
+  }
+  dock.append(...[store, account, menu].filter(Boolean)); container.append(dock); if (oldNav) oldNav.remove();
+  // Markenname bleibt einzeilig: erst „App“ weglassen, dann nur das Logo zeigen (Daniel, 26. Nov: „nicht zweizeilig“).
+  const brandText = container.querySelector('.e-brand > span');
+  if (brandText && !brandText.querySelector('.dc-brand-app')) {
+    const match = brandText.textContent.match(/^(.*\S)\s+(App)$/);
+    if (match) { brandText.textContent = match[1]; const app = doc.createElement('span'); app.className = 'dc-brand-app'; app.textContent = ' ' + match[2]; brandText.append(app); }
+  }
+  const fitBrand = () => {
+    if (!brandText?.isConnected) return;
+    container.classList.remove('dc-brand-short', 'dc-brand-mark');
+    const overflows = () => brandText.scrollWidth > brandText.clientWidth + 1 || container.scrollWidth > container.clientWidth + 1;
+    if (overflows()) container.classList.add('dc-brand-short');
+    if (overflows()) container.classList.add('dc-brand-mark');
+  };
+  if (brandText) { fitBrand(); host.ResizeObserver ? new host.ResizeObserver(fitBrand).observe(container) : host.addEventListener('resize', fitBrand); host.document.fonts?.ready?.then(fitBrand); doc.querySelector('link[href="/shared-navigation.css"]')?.addEventListener('load', fitBrand); host.addEventListener('load', fitBrand); }
   const close = focus => { menu.open = false; if (focus) summary.focus({ preventScroll: true }); };
   doc.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.open) { event.preventDefault(); close(true); } });
   doc.addEventListener('pointerdown', event => { if (menu.open && !menu.contains(event.target)) close(false); });
@@ -103,7 +128,8 @@ export function mountSharedNavigation(doc = document) {
       account.dataset.accountState = signed ? 'signed-in' : 'signed-out';
       account.textContent = signed ? (user.emailVerified ? (en ? '✓ Signed in' : '✓ Angemeldet') : (en ? 'Verify account' : 'Konto bestätigen')) : (en ? 'Sign in' : 'Anmelden');
       account.setAttribute('aria-label', signed ? (en ? 'Your account, signed in' : 'Dein Konto, angemeldet') : account.textContent);
-    } catch { if (request === version) { account.dataset.accountState = 'unknown'; account.textContent = en ? 'Account' : 'Konto'; } }
+      fitBrand();
+    } catch { if (request === version) { account.dataset.accountState = 'unknown'; account.textContent = en ? 'Account' : 'Konto'; fitBrand(); } }
   };
   account.addEventListener('click', async event => {
     if (currentAuth?.currentUser?.isAnonymous === false) return;
