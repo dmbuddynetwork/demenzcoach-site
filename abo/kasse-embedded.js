@@ -30,9 +30,11 @@ function ensureStyle(doc) {
   doc.head.append(link);
 }
 
-// showEmbeddedCheckout({ host, session, publishableKey, title, onClose, onRetry, onOpen, onDispose, track }) → { close }
+// showEmbeddedCheckout({ host, session, publishableKey, title, terms, onClose, onRetry, onOpen, onDispose, track }) → { close }
+// session.checkoutMode "form": Stripes kürzeres Formular (ui_mode form, ca. 740 statt 1.020 px). Es zeigt keine eigenen Texte,
+// darum stehen Preis, Laufzeit und Kündigung (terms) direkt darüber und die Links darunter.
 // onOpen({ close }) kommt sofort, wenn das Fenster steht (noch vor dem Laden von Stripe), onDispose, sobald es weg ist (×, Esc, Zurück, Wiederholen).
-export async function showEmbeddedCheckout({ host = hostWindow(), session, publishableKey, title, onClose, onRetry, onOpen, onDispose, track }) {
+export async function showEmbeddedCheckout({ host = hostWindow(), session, publishableKey, title, terms, onClose, onRetry, onOpen, onDispose, track }) {
   const doc = host.document;
   if (doc.querySelector("dialog.kasse-embed")) return { close() {} }; // schon offen (Doppeltipp)
   ensureStyle(doc);
@@ -47,8 +49,22 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
   // Der Titel bleibt nur für Screenreader; das × schwebt oben rechts.
   heading.className = "kasse-embed-sr";
   // Kein Scrollen im Fenster (Daniel, 26. Nov 2026): Das Fenster wächst mit Stripe, gescrollt wird die ganze Fläche.
-  const panel = make("div", { class: "kasse-embed-panel" });
-  panel.append(heading, closeButton, status, problem, box);
+  const isForm = session?.checkoutMode === "form";
+  const panel = make("div", { class: isForm ? "kasse-embed-panel kasse-embed-form" : "kasse-embed-panel" });
+  if (isForm) {
+    const base = "https://dementiacoachapp.com";
+    const intro = make("p", { class: "kasse-embed-terms" }, terms || "");
+    const links = make("p", { class: "kasse-embed-links" });
+    links.append("Online kündbar, ohne Anmeldung: ");
+    for (const [index, [href, text]] of [["/abo/kuendigen.html", "Verträge hier kündigen"], ["/abo/garantie.html", "30 Tage Geld-zurück-Garantie"],
+      ["/nutzungsbedingungen.html", "Nutzungsbedingungen"], ["/abo/widerruf.html", "Widerrufsbelehrung"], ["/datenschutz.html", "Datenschutz"]].entries()) {
+      if (index) links.append(" · ");
+      links.append(make("a", { href: base + href, target: "_blank", rel: "noopener" }, text));
+    }
+    panel.append(heading, closeButton, intro, status, problem, box, links);
+  } else {
+    panel.append(heading, closeButton, status, problem, box);
+  }
   dialog.append(panel);
   const root = doc.documentElement, body = doc.body, overflow = [root.style.overflow, body.style.overflow];
   let finished = false, checkout = null, watchdog = null;
@@ -86,14 +102,43 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
     track?.("checkout_embedded_failed");
   };
 
+  // Stripes Formular: zuerst „compact“ (Schritte, Vorabversion bei Stripe), ohne Freischaltung sofort „expanded“.
+  const mountForm = async (stripe) => {
+    if (typeof stripe.initCheckoutFormSdk !== "function") throw new Error("form_unsupported");
+    const sdk = stripe.initCheckoutFormSdk({ clientSecret: session.clientSecret,
+      appearance: { variables: { colorPrimary: "#47408c", colorBackground: "#ffffff", colorText: "#1c1b1f", borderRadius: "12px", fontSizeBase: "17px" } } });
+    const attach = (layout) => new Promise((resolve) => {
+      setTimeout(() => resolve(null), LOAD_LIMIT_MS); // nie endlos warten
+      const slot = make("div", { class: "kasse-embed-slot" });
+      box.replaceChildren(slot);
+      const form = sdk.createForm({ layout, expressCheckout: { buttonHeight: 52 } });
+      form.on("ready", () => resolve(form));
+      form.on("loaderror", () => resolve(null));
+      form.mount(slot);
+    });
+    const form = (await attach("compact")) || (await attach("expanded"));
+    if (!form) throw new Error("form_failed");
+    if (finished) return;
+    track?.(`checkout_form_${box.querySelector("iframe") ? "ready" : "empty"}`);
+    const loaded = await sdk.loadActions();
+    if (loaded?.type !== "success") throw new Error("form_actions");
+    form.on("confirm", (event) => {
+      loaded.actions.confirm({ formConfirmEvent: event }).catch(() => { /* Stripe zeigt den Fehler selbst im Formular */ });
+    });
+  };
+
   try {
     await loadStripe(host);
     const stripe = host.Stripe(publishableKey);
-    const create = stripe.createEmbeddedCheckoutPage || stripe.initEmbeddedCheckout;
-    if (typeof create !== "function") throw new Error("embedded_unsupported");
-    checkout = await create.call(stripe, { fetchClientSecret: async () => session.clientSecret });
-    if (finished) { try { checkout.destroy?.(); } catch { /* */ } return { close }; }
-    checkout.mount(box);
+    if (isForm) {
+      await mountForm(stripe);
+    } else {
+      const create = stripe.createEmbeddedCheckoutPage || stripe.initEmbeddedCheckout;
+      if (typeof create !== "function") throw new Error("embedded_unsupported");
+      checkout = await create.call(stripe, { fetchClientSecret: async () => session.clientSecret });
+      if (finished) { try { checkout.destroy?.(); } catch { /* */ } return { close }; }
+      checkout.mount(box);
+    }
     // Wächter: nie endlos laden. Sobald Stripes Rahmen da ist, lädt Stripe selbst weiter (eigenes Skelett). Ein „load“-Ereignis
     // des Rahmens kommt nicht immer bei uns an (26. Nov 2026: falsche Fehlermeldung über einer fertigen Kasse). Fehler nur, wenn
     // nach 15 Sekunden gar kein Rahmen erschienen ist.
