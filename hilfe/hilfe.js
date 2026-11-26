@@ -31,9 +31,16 @@ let plan = 'yearly';
 const guaranteeDays = 30;
 const euro = cents => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
 // Nur ein belegbarer Vergleich (Jahrespreis gegenüber 12 Monatszahlungen), wie auf /start/.
-const saving = () => Math.floor((1 - offer.yearly / (offer.monthly * 12)) * 20) * 5;
-const priceText = key => `${key === 'yearly' ? `${euro(offer.yearly)} pro Jahr` : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
-const termsText = () => `${offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos, dann ` : ''}${priceText(plan)} ${plan === 'yearly' ? 'Laufzeit 1 Jahr, danach mit 1 Monat Frist kündbar.' : 'Jederzeit zum Monatsende kündbar.'}`;
+// Willkommenspreis wie auf /start/ (49,99 € im ersten Jahr, danach 69,99 €), damit beide Test-Arme dasselbe Angebot haben.
+// Das Fenster kommt vom Server (abo/angebot.js, POST /offer) mit echtem Ende. Danach gilt der normale Preis.
+let offersOn = true;
+const deal = () => (offersOn ? window.DemenzAngebot?.current?.() || null : null);
+const firstYear = () => deal()?.firstYear ?? offer.yearly;
+const saving = () => (deal() ? Math.floor((1 - firstYear() / (offer.monthly * 12)) * 100) : Math.floor((1 - offer.yearly / (offer.monthly * 12)) * 20) * 5);
+const yearlyText = () => (deal() ? `${euro(firstYear())} im ersten Jahr, danach ${euro(offer.yearly)} pro Jahr` : `${euro(offer.yearly)} pro Jahr`);
+const until = () => new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' }).format(new Date(deal().expiresAt));
+const priceText = key => `${key === 'yearly' ? yearlyText() : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
+const termsText = () => `${offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos, dann ` : ''}${priceText(plan)} ${plan === 'yearly' ? 'Laufzeit 1 Jahr, danach mit 1 Monat Frist kündbar.' : 'Jederzeit zum Monatsende kündbar.'}${plan === 'yearly' && deal() ? ` Willkommenspreis gilt bis ${until()} Uhr.` : ''}`;
 const buttonText = () => (offer.trialDays > 0 ? `Für ${euro(0)} starten` : `Für ${euro(plan === 'yearly' ? offer.yearly : offer.monthly)} starten`);
 
 const el = (tag, props = {}, children = []) => {
@@ -61,14 +68,14 @@ const fillCard = card => {
   const yearly = card.dataset.plan === 'yearly';
   card.querySelector('[data-name]').textContent = yearly ? '12-Monats-Plan' : '1-Monats-Plan';
   card.querySelector('[data-price]').textContent = yearly
-    ? `${euro(offer.yearly)} im Jahr\nDas sind ${euro(Math.round(offer.yearly / 12))} im Monat`
+    ? (deal() ? `${euro(firstYear())} im ersten Jahr\nDanach ${euro(offer.yearly)} im Jahr` : `${euro(offer.yearly)} im Jahr\nDas sind ${euro(Math.round(offer.yearly / 12))} im Monat`)
     : `${euro(offer.monthly)} im Monat`;
   const tag = card.querySelector('[data-tag]');
   tag.textContent = yearly && saving() >= 10 ? `Spare ${saving()} %` : '';
   tag.hidden = !tag.textContent;
 };
 const legal = () => el('p', { class: 'lp-legal' }, [
-  `${offer.trialDays > 0 ? `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft` : 'Das Abo beginnt sofort und läuft'} zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende. Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
+  `${offer.trialDays > 0 ? `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft` : 'Das Abo beginnt sofort und läuft'} zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende.${deal() ? ' Der Sonderpreis gilt für das erste Jahr des Jahresplans.' : ''} Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
   el('a', { href: '/nutzungsbedingungen.html', text: 'Nutzungsbedingungen' }), ' und die ',
   el('a', { href: '/abo/widerruf.html', text: 'Widerrufsbelehrung' }),
   '. Allgemeine Kommunikations- und Alltagshilfe, kein Medizinprodukt.'
@@ -99,10 +106,10 @@ const refresh = () => {
     item.block.querySelector('.lp-legal').replaceWith(legal());
   }
   if (stickyButton) stickyButton.textContent = buttonText();
-  if (stickyNote) stickyNote.textContent = `${offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos, dann ` : ''}${plan === 'yearly' ? `${euro(offer.yearly)} im Jahr` : `${euro(offer.monthly)} im Monat`}`;
+  if (stickyNote) stickyNote.textContent = `${offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos, dann ` : ''}${plan === 'yearly' ? (deal() ? `${euro(firstYear())} im ersten Jahr` : `${euro(offer.yearly)} im Jahr`) : `${euro(offer.monthly)} im Monat`}`;
   const yearlyFaq = document.querySelector('[data-faq-yearly]');
   const monthlyFaq = document.querySelector('[data-faq-monthly]');
-  if (yearlyFaq) yearlyFaq.textContent = euro(offer.yearly);
+  if (yearlyFaq) yearlyFaq.textContent = deal() ? `${euro(firstYear())} im ersten Jahr, danach ${euro(offer.yearly)}` : euro(offer.yearly);
   if (monthlyFaq) monthlyFaq.textContent = euro(offer.monthly);
 };
 
@@ -110,10 +117,12 @@ const refresh = () => {
 let prepared = '';
 const prepare = () => {
   const kasse = window.DemenzKasse;
-  if (!kasse?.prepare || prepared === plan) return;
-  prepared = plan;
-  kasse.prepare({ plan, source, campaign });
+  const key = `${plan}|${plan === 'yearly' ? deal()?.token || '' : ''}`;
+  if (!kasse?.prepare || prepared === key) return;
+  prepared = key;
+  kasse.prepare({ plan, source, campaign, offer: checkoutOffer() });
 };
+const checkoutOffer = () => (plan === 'yearly' && deal() ? window.DemenzAngebot.forCheckout() : null);
 function select(key) {
   plan = key;
   refresh();
@@ -128,8 +137,10 @@ const buy = where => {
   }
   // Zurück-Taste des Handys schließt die Kasse statt die Seite zu verlassen.
   history.pushState({ sheet: true }, '', location.href);
-  kasse.open({ plan, source, campaign, track: name => track(name, { where }),
-    onClose: () => { if (history.state?.sheet) history.back(); } });
+  kasse.open({ plan, source, campaign, offer: checkoutOffer(), track: name => track(name, { where }),
+    onClose: () => { if (history.state?.sheet) history.back(); },
+    // Fenster abgelaufen: normaler Preis wird angezeigt, der Kunde tippt erneut (wie /start/).
+    onOfferExpired: () => { const gone = deal(); if (gone) window.DemenzAngebot.drop(gone.kind); refresh(); } });
 };
 addEventListener('popstate', () => { if (window.DemenzKasse?.isOpen?.()) window.DemenzKasse.close(); });
 document.addEventListener('click', event => {
@@ -158,9 +169,20 @@ if (config.endpoint) {
   fetch(`${config.endpoint}/config`).then(response => (response.ok ? response.json() : null)).then(data => {
     if (!data?.plans?.yearly?.amount || !data?.plans?.monthly?.amount) return;
     offer = { yearly: data.plans.yearly.amount, monthly: data.plans.monthly.amount, trialDays: data.trialDays ?? 7 };
+    offersOn = Boolean(data.offers?.intro || data.offers?.exit);
     refresh();
   }).catch(() => { /* feste Preise bleiben */ });
 }
+// Willkommensfenster holen (oder fortsetzen). Läuft es ab, springt die Anzeige auf den normalen Preis.
+let expiryTimer = null;
+const watchExpiry = () => {
+  clearTimeout(expiryTimer);
+  const current = deal();
+  if (current) expiryTimer = setTimeout(() => { window.DemenzAngebot.drop(current.kind); refresh(); watchExpiry(); }, Math.max(0, current.expiresAt - Date.now()) + 500);
+};
+if (window.DemenzAngebot && !window.DemenzAngebot.ended('intro')) {
+  window.DemenzAngebot.start('intro').then(() => { refresh(); watchExpiry(); }).catch(() => {});
+} else watchExpiry();
 
 // ---- Live-Demo: Satz antippen, Antwort sofort sehen. Nur feste, geprüfte Texte, keine KI-Anfrage. ------------------
 const data = window.DEMENZ_PLAN_DATA || {};
