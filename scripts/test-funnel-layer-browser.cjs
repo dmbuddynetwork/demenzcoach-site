@@ -39,8 +39,8 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
             const box = await dialog.boundingBox();
             assert.ok(Math.abs(box.y + box.height - view.h) < 2, 'Layer sitzt unten');
             assert.equal(await p.locator('.dc-signup').count(), 0, 'keine Anmeldung in dieser Variante');
-            // Layer deckt die ganze Seite ab (Daniel, 26. Nov 2026).
-            assert.ok(box.width >= view.w - 2 && box.height >= view.h - 2, 'Layer vollflächig');
+            // Layer von unten, breit, Seite dahinter abgedunkelt erkennbar (Daniel, 26. Nov 2026).
+            assert.ok(box.width >= Math.min(view.w, 1100) - 2 && box.height < view.h - 10, 'breiter Layer von unten, kein Vollbild');
             if (shots) await p.screenshot({ path: path.join(shots, `layer-funnel-${view.n}-1.png`) });
             // Nur die erste Frage im Layer: danach eigene Fragebogen-Seite mit dem Stand aus diesem Tab.
             await Promise.all([p.waitForURL(/\/start\/\?src=layer&weiter=1/), frame.getByRole('button', { name: /Mutter/ }).first().click()]);
