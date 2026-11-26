@@ -1,7 +1,7 @@
-// Bezahlbildschirm wie Tolan auf /start/ (Test nur mit ?ap=1): Bild, Überschrift, zwei Tarifkarten, Apple-Pay-Zeichen, eine Zeile
-// Bedingungen, großer Knopf. Mit Apple Pay liegt der unsichtbare Express-Knopf über dem Knopf. Ohne ?ap=1 bleibt die lange Angebotsseite;
-// ohne Apple Pay lädt der Bildschirm weder Stripe.js noch eine Sitzung und der Knopf startet die gehostete Seite.
-// Nur Test-Daten und ein Stripe-Ersatz, keine echten Konten oder Zahlungen.
+// Apple Pay direkt auf der normalen Angebotsseite von /start/ (Daniel 26. Nov 2026: „genau die gleiche Seite, nur dass statt Stripe
+// Apple Pay sich direkt öffnet“ + Link „Andere Zahlungsmöglichkeiten“). Auf Geräten mit Apple Pay (oder ?ap=1) liegt der unsichtbare
+// Express-Knopf über dem lila Knopf; Link und Hinweistext darunter. Ohne Apple Pay lädt die Seite weder Stripe.js
+// noch eine Sitzung. Nur Test-Daten und ein Stripe-Ersatz, keine echten Konten oder Zahlungen.
 const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = path.resolve(__dirname, '..');
@@ -12,7 +12,7 @@ export const signInAnonymously=async a=>{a.currentUser=user;return{user}};
 export const onAuthStateChanged=(a,cb)=>{setTimeout(()=>cb(a.currentUser),0);return()=>{}};`;
 const stripe = (apple) => `window.__ece={mounted:[],options:null};
 window.Stripe=()=>({initCheckoutElementsSdk:async()=>({loadActions:async()=>({actions:{confirm:async()=>({type:'success'})}}),
-createExpressCheckoutElement:o=>{window.__ece.options=o;let h={};return{on:(n,f)=>{h[n]=f},mount:el=>{window.__ece.mounted.push(el.id);setTimeout(()=>h.availablepaymentmethodschange?.({paymentMethods:${apple ? '{applePay:true}' : '{}'}}),0)}}}})});`;
+createExpressCheckoutElement:o=>{window.__ece.options=o;let h={};return{on:(n,f)=>{h[n]=f},mount:el=>{window.__ece.mounted.push(el.dataset.apSlot||el.id);setTimeout(()=>h.availablepaymentmethodschange?.({paymentMethods:${apple ? '{applePay:true}' : '{}'}}),0)}}}})});`;
 const server = http.createServer((req, res) => { try {
   let n = new URL(req.url, 'http://localhost').pathname; if (n.endsWith('/')) n += 'index.html';
   const f = path.resolve(root, '.' + n); if (!f.startsWith(root + path.sep)) throw Error();
@@ -55,88 +55,87 @@ const server = http.createServer((req, res) => { try {
   };
   try {
     browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
-    // 1) ?ap=1 + Apple Pay + bekannte E-Mail: Tolan-Bildschirm, Sitzung mit E-Mail, Express-Knopf unsichtbar über dem Knopf, Planwechsel gibt zweite Sitzung.
-    await run({ query: '?direkt=1&ap=1', applePay: true, email: 'fixture@example.invalid', embedded: true }, async ({ page, sessions, stripeScripts }) => {
-      await page.waitForFunction(() => window.__ece?.mounted.includes('start-ap-yearly'));
-      await page.locator('#start-ap-yearly').waitFor({ state: 'attached' });
-      await page.waitForFunction(() => !document.querySelector('#start-ap-yearly').hidden);
-      assert.equal(sessions.length, 1);
+    const slot = (page, key) => page.locator(`.start-ap-wrap >> nth=0`).locator(`[data-ap-slot="${key}"]`);
+    // 1) Apple Pay + bekannte E-Mail: gleiche Angebotsseite (Kopf, Titel, Kacheln), Express-Knopf unsichtbar über dem lila Knopf,
+    //    Link „Andere Zahlungsmöglichkeiten“ direkt darunter, dann der Hinweistext, Planwechsel gibt zweite Sitzung.
+    await run({ query: '?direkt=1', applePay: true, email: 'fixture@example.invalid', embedded: true }, async ({ page, sessions, stripeScripts }) => {
+      await page.waitForFunction(() => window.__ece?.mounted.includes('yearly'));
+      await page.waitForFunction(() => !document.querySelector('[data-ap-slot="yearly"]').hidden);
+      assert.equal(sessions.length, 1, 'nur der obere Knopf startet sofort eine Sitzung');
       assert.equal(sessions[0].plan, 'yearly');
       assert.equal(sessions[0].email, 'fixture@example.invalid');
       assert.equal(sessions[0].emailLater, undefined);
       assert.equal(sessions[0].hostedFallback, undefined);
       assert.equal(stripeScripts.length, 1);
       assert.equal(await page.evaluate(() => window.__ece.options.paymentMethods.applePay), 'always');
-      assert.equal(await page.locator('.start-tp-plan').count(), 2);
-      assert.equal(await page.locator('.start-tp-plan[aria-checked="true"]').getAttribute('data-plan'), 'yearly');
-      assert.equal(await page.locator('.start-tp-applepay').count(), 1);
-      assert.match(await page.locator('.start-tp-terms').innerText(), /Tage kostenlos, dann .*inkl\. MwSt\./);
-      assert.match(await page.locator('.start-tp-terms').innerText(), /Laufzeit 1 Jahr/);
-      assert.match(await page.locator('.start-tp-cta').innerText(), /^Für 0,00\s€ starten$/u);
-      // Vorgeschaltet: der kurze Bildschirm steht oben, die lange Seite (Hilfen, Fragen, bisheriger Knopf) bleibt darunter.
-      assert.equal(await page.locator('.start-included').count(), 1);
-      assert.equal(await page.locator('.start-faq').count(), 1);
-      const order2 = await page.evaluate(() => document.querySelector('.start-tp').compareDocumentPosition(document.querySelector('.start-included')) & Node.DOCUMENT_POSITION_FOLLOWING);
-      assert.ok(order2, 'Bezahlbildschirm steht vor der langen Seite');
-      assert.equal(await page.locator('.start-head').count(), 0, 'keine zweite Kopfleiste über dem Bildschirm');
-      assert.equal(await page.locator('.start-cta').count(), 2, 'oben der Bildschirmknopf, unten der bisherige Knopf');
-      await page.waitForFunction(() => !document.querySelector('[data-tp-alt]').hidden);
-      assert.match(await page.locator('[data-tp-alt]').innerText(), /Karte oder anderer Zahlart/);
-      const box = await page.evaluate(() => { const c = document.querySelector('.start-tp-cta').getBoundingClientRect(), s = document.querySelector('#start-ap-yearly').getBoundingClientRect();
-        return { same: Math.abs(c.top - s.top) < 2 && Math.abs(c.height - s.height) < 2 && Math.abs(c.width - s.width) < 2, opacity: getComputedStyle(document.querySelector('#start-ap-yearly')).opacity }; });
+      assert.equal(await page.locator('.start-tp').count(), 0, 'keine eigene Apple-Pay-Vorseite mehr');
+      assert.equal(await page.locator('.start-head').count(), 1);
+      assert.equal(await page.locator('.start-plan-title').count(), 1);
+      assert.equal(await page.locator('.start-tiers').first().locator('.start-tier').count(), 2);
+      assert.match(await page.locator('.start-cta').first().innerText(), /freischalten/);
+      const order = await page.evaluate(() => { const f = document.querySelector('.start-fine'), w = document.querySelector('.start-ap-wrap'), a = document.querySelector('.start-ap-alt');
+        return { fineAfterLink: Boolean(a.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_FOLLOWING), altAfterButton: Boolean(w.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING) }; });
+      assert.deepEqual(order, { fineAfterLink: true, altAfterButton: true });
+      assert.match(await page.locator('.start-fine').first().innerText(), /Heute zahlst du 0,00 €.*inkl\. MwSt\./s);
+      await page.waitForFunction(() => !document.querySelector('.start-ap-alt').hidden);
+      assert.equal(await page.locator('.start-ap-alt').first().innerText(), 'Andere Zahlungsmöglichkeiten');
+      const box = await page.evaluate(() => { const c = document.querySelector('.start-ap-wrap .start-cta').getBoundingClientRect(), s = document.querySelector('[data-ap-slot="yearly"]').getBoundingClientRect();
+        return { same: Math.abs(c.top - s.top) < 2 && Math.abs(c.height - s.height) < 2 && Math.abs(c.width - s.width) < 2, opacity: getComputedStyle(document.querySelector('[data-ap-slot="yearly"]')).opacity }; });
       assert.deepEqual(box, { same: true, opacity: '0' });
-      await page.locator('.start-tp-plan[data-plan="monthly"]').click();
-      await page.waitForFunction(() => window.__ece.mounted.includes('start-ap-monthly'));
-      await page.waitForFunction(() => !document.querySelector('#start-ap-monthly').hidden);
-      assert.equal(sessions.length, 2);
-      assert.equal(sessions[1].plan, 'monthly');
-      assert.equal(await page.locator('#start-ap-yearly').isHidden(), true);
-      assert.match(await page.locator('.start-tp-terms').innerText(), /Jederzeit zum Monatsende kündbar/);
-      await page.locator('[data-tp-alt]').click();
+      await page.locator('.start-tier[data-plan="monthly"]').first().click();
+      await page.waitForFunction(() => window.__ece.mounted.includes('monthly'));
+      await page.waitForFunction(() => !document.querySelector('[data-ap-slot="monthly"]').hidden);
+      assert.equal(sessions.filter(x => x.plan === 'monthly').length, 1);
+      assert.equal(await slot(page, 'yearly').isHidden(), true);
+      await page.locator('.start-ap-alt').first().click();
       await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
-      assert.ok((sessions.hosted || []).some(x => x.hostedFallback === true && x.plan === 'monthly' && x.embedded === undefined && x.form === undefined), 'andere Zahlart am Handy: Stripes eigene Seite für den gewählten Plan, kein Layer');
+      assert.ok((sessions.hosted || []).some(x => x.hostedFallback === true && x.plan === 'monthly' && x.embedded === undefined && x.form === undefined), 'andere Zahlart am Handy: Stripes eigene Seite für den gewählten Plan');
     });
-    // 2) ?ap=1 + Apple Pay ohne E-Mail: Sitzung mit emailLater (Apple Pay liefert die E-Mail).
-    await run({ query: '?direkt=1&ap=1', applePay: true }, async ({ page, sessions }) => {
-      await page.waitForFunction(() => window.__ece?.mounted.includes('start-ap-yearly'));
+    // 2) Apple Pay ohne E-Mail: Sitzung mit emailLater (Apple Pay liefert die E-Mail).
+    await run({ query: '?direkt=1', applePay: true }, async ({ page, sessions }) => {
+      await page.waitForFunction(() => window.__ece?.mounted.includes('yearly'));
       assert.equal(sessions[0].emailLater, true);
       assert.equal(sessions[0].email, undefined);
     });
-    // 3) Ohne ?ap=1, aber mit Apple Pay: der Bildschirm kommt automatisch (Daniel 26. Nov 2026).
-    await run({ query: '?direkt=1', applePay: true }, async ({ page }) => {
-      await page.waitForFunction(() => window.__ece?.mounted.includes('start-ap-yearly'));
-      assert.equal(await page.locator('.start-tp').count(), 1);
+    // 3) Der untere Knopf bekommt seine Sitzung erst beim Scrollen.
+    await run({ query: '?direkt=1', applePay: true }, async ({ page, sessions }) => {
+      await page.waitForFunction(() => window.__ece?.mounted.includes('yearly'));
+      await page.locator('.start-ap-wrap').last().scrollIntoViewIfNeeded();
+      await page.waitForFunction(() => window.__ece.mounted.filter(x => x === 'yearly').length === 2);
+      assert.ok(sessions.length <= 2, 'höchstens eine Sitzung je Knopf');
     });
-    // 3b) ?ap=0 schaltet ihn ab; ohne Apple Pay und ohne ?ap=1 bleibt die lange Seite ohne Stripe.js und ohne Sitzung.
+    // 3b) ?ap=0 und Geräte ohne Apple Pay: normale Seite ohne Stripe.js, ohne Sitzung, ohne Link.
     for (const [query, applePay] of [['?direkt=1&ap=0', true], ['?direkt=1', false]]) {
       await run({ query, applePay }, async ({ page, sessions, stripeScripts }) => {
         await new Promise(r => setTimeout(r, 900));
         assert.equal(sessions.length, 0); assert.equal(stripeScripts.length, 0);
-        assert.equal(await page.locator('.start-tp').count(), 0);
+        assert.equal(await page.locator('.start-ap-wrap').count(), 0);
+        assert.equal(await page.locator('.start-ap-alt').count(), 0);
       });
     }
-    // 3c) iPhone SE, normal, Pro Max (sichtbare Fläche in Safari): Preiszeile und Knopf ohne Scrollen sichtbar.
+    // 3c) iPhone SE, normal, Pro Max: Kacheln, Rechtstext und Knopf ohne Scrollen sichtbar.
     for (const viewport of [{ width: 375, height: 548 }, { width: 393, height: 659 }, { width: 430, height: 739 }]) {
       await run({ query: '?direkt=1', applePay: true, viewport }, async ({ page }) => {
         await page.evaluate(() => window.scrollTo(0, 0));
-        const fit = await page.evaluate(() => ({ terms: document.querySelector('.start-tp-terms').getBoundingClientRect().top >= 0, cta: document.querySelector('.start-tp-cta').getBoundingClientRect().bottom, h: innerHeight }));
-        assert.ok(fit.terms && fit.cta <= fit.h, `Knopf sichtbar bei ${viewport.width}x${viewport.height}: ${fit.cta} > ${fit.h}`);
+        const fit = await page.evaluate(() => ({ tiers: document.querySelector('.start-tiers').getBoundingClientRect().top >= 0, cta: document.querySelector('.start-ap-wrap').getBoundingClientRect().bottom, h: innerHeight }));
+        assert.ok(fit.tiers, `Kacheln sichtbar bei ${viewport.width}x${viewport.height}`);
+        if (viewport.height >= 650) assert.ok(fit.cta <= fit.h, `Knopf sichtbar bei ${viewport.width}x${viewport.height}: ${fit.cta} > ${fit.h}`);
       });
     }
-    // 4) ?ap=1 ohne Apple Pay: gleicher Bildschirm, aber ohne Stripe.js und ohne Sitzung; der Knopf bleibt ein normaler Knopf.
+    // 4) ?ap=1 ohne Apple Pay: Knopf-Hülle da, aber ohne Stripe.js und Sitzung; der lila Knopf trägt, kein Link.
     await run({ query: '?direkt=1&ap=1', applePay: false }, async ({ page, sessions, stripeScripts }) => {
       await new Promise(r => setTimeout(r, 900));
-      assert.equal(await page.locator('.start-tp').count(), 1);
       assert.equal(sessions.length, 0); assert.equal(stripeScripts.length, 0);
-      assert.equal(await page.locator('#start-ap-yearly').isHidden(), true);
-      assert.equal(await page.locator('.start-tp-cta').isVisible(), true);
-      assert.equal(await page.locator('[data-tp-alt]').isHidden(), true, 'ohne Apple Pay trägt der große Knopf selbst die Karte');
+      assert.equal(await slot(page, 'yearly').isHidden(), true);
+      assert.equal(await page.locator('.start-ap-wrap .start-cta').first().isVisible(), true);
+      assert.equal(await page.locator('.start-ap-alt').first().isHidden(), true);
     });
     // 5) Stripe meldet kein Apple Pay: Express-Knopf bleibt versteckt, der normale Knopf trägt.
-    await run({ query: '?direkt=1&ap=1', applePay: true, stripeApple: false }, async ({ page }) => {
-      await page.waitForFunction(() => window.__ece?.mounted.includes('start-ap-yearly'));
+    await run({ query: '?direkt=1', applePay: true, stripeApple: false }, async ({ page }) => {
+      await page.waitForFunction(() => window.__ece?.mounted.includes('yearly'));
       await new Promise(r => setTimeout(r, 300));
-      assert.equal(await page.locator('#start-ap-yearly').isHidden(), true);
+      assert.equal(await slot(page, 'yearly').isHidden(), true);
+      assert.equal(await page.locator('.start-ap-alt').first().isHidden(), true);
     });
     console.log(JSON.stringify({ ok: true, cases }));
   } finally { await browser?.close(); await new Promise(r => server.close(r)); }
