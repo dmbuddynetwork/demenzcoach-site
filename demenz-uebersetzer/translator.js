@@ -32,6 +32,17 @@
   const formStartNext = form.nextSibling;
   const keepInputAtTop = document.body.dataset.translatorInputPosition === 'top';
   const initialPlaceholder = input.getAttribute('placeholder') ?? '';
+  // Wechselnde Beispielsätze im leeren Feld (Daniel, 26. Nov): gemeinsame Liste in /eingabe-beispiele.js, nur auf Deutsch.
+  const withExamples = (run) => {
+    if (ui) return;
+    if (window.DcBeispiele) { run(window.DcBeispiele); return; }
+    const script = document.createElement('script');
+    script.src = '/eingabe-beispiele.js';
+    script.onload = () => window.DcBeispiele && run(window.DcBeispiele);
+    document.head.append(script);
+  };
+  const examplesOn = (field, on) => { if (on) delete field.dataset.dcBeispiele; else field.dataset.dcBeispiele = 'off'; };
+  withExamples((examples) => examples.attach(input, { prefix: 'Zum Beispiel: ' }));
   let syncChat = () => {};
   let syncHelpful = () => {};
   const setViewState = (state) => {
@@ -599,6 +610,7 @@
       formStartParent.insertBefore(form, formStartNext?.parentNode === formStartParent ? formStartNext : null);
       form.classList.remove('translator-form-below');
       formMoved = false;
+      examplesOn(input, true);
       input.setAttribute('placeholder', initialPlaceholder);
       grow();
       foldSignup();
@@ -621,6 +633,7 @@
     if (formMoved) return;
     formMoved = true;
     form.classList.add('translator-form-below');
+    examplesOn(input, false);
     input.setAttribute('placeholder', tr('Was ist noch passiert? Schreib es hier.'));
   };
   const returnToInput = () => {
@@ -629,6 +642,7 @@
     form.classList.remove('translator-form-below');
     form.querySelector('.translator-form-below-title')?.remove();
     formMoved = false;
+    examplesOn(input, true);
     input.setAttribute('placeholder', initialPlaceholder);
     output.replaceChildren();
     output.hidden = true;
@@ -702,6 +716,25 @@
     node.append(icon, element('span', { className: 'translator-goal-label', text: goal.label }));
     return node;
   };
+  // Eigenes Ziel eintippen (Daniel, 26. Nov): Eingabezeile im ChatGPT-Stil unter den drei Zielen. Die KI antwortet zu diesem Ziel.
+  const ownGoalRow = (entry, options) => {
+    const field = element('input', { className: 'translator-own-goal-input', attributes: { type: 'text', maxlength: '160', autocomplete: 'off', enterkeyhint: 'go', placeholder: 'Oder: Eigenes Ziel …', 'aria-label': 'Eigenes Ziel eingeben' } });
+    const send = element('button', { className: 'translator-own-goal-send', attributes: { type: 'submit', 'aria-label': 'Antwort zu meinem Ziel' } });
+    const row = element('form', { className: 'translator-own-goal-row' }, [field, send]);
+    row.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const label = field.value.trim();
+      if (label.length < 3) { field.focus(); return; }
+      track('translator_goal', { goal: 'custom', result_key: entry.key });
+      const text = bubbleText(entry, options.typed);
+      const heading = element(homeHeading ? 'h1' : 'h2', { text: `„${text}“`, attributes: { tabindex: '-1' } });
+      setPage(entry);
+      output.replaceChildren(saidBlock(entry.says, entry, heading), aiGoalBox(text, 'own_goal', () => {}, { initialGoal: { id: 'custom', label } }));
+      output.hidden = false;
+      document.body.classList.add('translator-has-result');
+    });
+    return row;
+  };
   const askGoal = (entry, options = {}) => {
     const goals = goalsFor(entry);
     if (!goals) { render(entry, options); return; }
@@ -722,6 +755,7 @@
         setPage(entry, goal.id);
         render(entry, { ...options, goal: goal.id, preserveViewport: false });
       }))),
+      ownGoalRow(entry, options),
       element('p', { className: 'translator-change-situation' }, [changeSituation])
     ].filter(Boolean));
     output.hidden = false;
@@ -1473,7 +1507,7 @@
 
   // hint: ein schwacher Treffer der festen Liste. Die KI antwortet passend zur Eingabe; der Treffer
   // steht als erster Vorschlag unter „Meinst du vielleicht“ und gibt der Sprechblase seine Zeichnung.
-  const aiGoalBox = (text, source, onFail, { auto = false, allowHelpful = true } = {}) => {
+  const aiGoalBox = (text, source, onFail, { auto = false, allowHelpful = true, initialGoal = null } = {}) => {
     const en = ui?.lang === 'en';
     const box = element('section', { className: 'translator-ai translator-ai-goals' });
     const heading = element('h2', { text: en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?' });
@@ -1730,6 +1764,11 @@
     box.append(heading, status, choices, ownDetails, retry, warningHistory, answerSlot);
     ownDetails.hidden = true;
     if (auto) requestAnimationFrame(() => { void load(); });
+    // Eigenes Ziel schon auf der Zielfrage (Daniel, 26. Nov): keine Ziele von der KI holen, sondern gleich mit diesem Ziel antworten.
+    if (initialGoal) {
+      retry.hidden = true;
+      requestAnimationFrame(() => { ownDetails.hidden = false; select(initialGoal); });
+    }
     return box;
   };
 
@@ -2346,17 +2385,13 @@
     const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation' } });
     const send = element('button', { className: 'translator-chat-send', text: en ? 'Find an answer' : 'Antwort finden', attributes: { type: 'submit' } });
     const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
-    // Nachfrage oder neue Situation (Daniel, 19. Nov, Variante 1): Unter einer Antwort stehen unten zwei
-    // große Knöpfe statt eines Felds. „Nachfrage“ schickt die Situation mit (sonst fragt die KI bei
-    // „Das klappt nicht“ nur „Was ist passiert?“), „Neue Situation“ schickt nur den neuen Text.
-    const moreHint = element('small');
-    const moreButton = element('button', { className: 'translator-chat-more', attributes: { type: 'button' } }, [element('span', { text: en ? 'Follow-up' : 'Nachfrage' }), moreHint]);
-    const newButton = element('button', { className: 'translator-chat-new', attributes: { type: 'button' } }, [element('span', { text: en ? 'New situation' : 'Neue Situation' }), element('small', { text: en ? 'start over' : 'von vorn' })]);
-    const choice = element('div', { className: 'translator-chat-choice', attributes: { hidden: '' } }, [moreButton, newButton]);
-    const chip = element('p', { className: 'translator-chat-chip', attributes: { hidden: '' } });
-    const cancel = element('button', { className: 'translator-chat-cancel', text: en ? 'Cancel' : 'Abbrechen', attributes: { type: 'button', hidden: '' } });
-    const chipRow = element('div', { className: 'translator-chat-chiprow' }, [chip, cancel]);
-    const panel = element('div', { className: 'translator-chat-panel' }, [choice, chipRow, chatForm]);
+    withExamples((examples) => examples.attach(field, { prefix: 'z. B. ', maxChars: innerWidth < 480 ? 29 : 44 }));
+    // Unter einer Antwort (Daniel, 26. Nov): eine Eingabezeile „Frag weiter …“ im ChatGPT-Stil und daneben ein runder
+    // Knopf „+“ für eine neue Situation. Ein Tipp auf „+“ wechselt zu „Was ist passiert?“, derselbe Knopf zeigt dann „×“ (zurück).
+    const plusIcon = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    const backIcon = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    const plus = element('button', { className: 'translator-chat-plus', attributes: { type: 'button', hidden: '' } });
+    const panel = element('div', { className: 'translator-chat-panel' }, [plus, chatForm]);
     const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': en ? 'Describe another situation' : 'Andere Situation beschreiben', hidden: '' } }, [panel]);
     let positionFrame = 0;
     const maxLength = input.maxLength > 0 ? input.maxLength : 200;
@@ -2378,28 +2413,26 @@
     };
     const setChatMode = (mode) => {
       const situation = situationNow();
-      chatMode = situation ? mode : 'choose';
-      const choosing = Boolean(situation) && chatMode === 'choose';
-      choice.hidden = !choosing;
-      chatForm.hidden = choosing;
-      chip.hidden = cancel.hidden = chipRow.hidden = !situation || choosing;
-      chip.classList.toggle('translator-chat-chip-new', chatMode === 'new');
-      if (situation) moreHint.textContent = `${en ? 'about' : 'zu'} ${shortQuote(situation)}`;
+      // Ohne Antwort gibt es nur „neue Situation“. Mit Antwort ist „Frag weiter“ die Voreinstellung.
+      chatMode = situation && mode !== 'new' ? 'more' : 'new';
+      plus.hidden = !situation;
+      plus.innerHTML = chatMode === 'new' ? backIcon : plusIcon;
+      const plusLabel = chatMode === 'new' ? (en ? 'Back to follow-up' : 'Zurück zur Nachfrage') : (en ? 'New situation' : 'Neue Situation');
+      plus.setAttribute('aria-label', plusLabel);
+      plus.title = plusLabel;
       if (chatMode === 'more') {
-        chip.textContent = `${en ? 'About' : 'Zu'}: ${shortQuote(situation)}`;
-        field.setAttribute('placeholder', en ? 'What happened then?' : 'Was ist dann passiert?');
+        examplesOn(field, false);
+        field.setAttribute('placeholder', en ? 'Ask more …' : 'Frag weiter …');
         field.setAttribute('aria-label', en ? `Follow-up about ${shortQuote(situation)}` : `Nachfrage zu ${shortQuote(situation)}`);
         field.maxLength = Math.max(40, maxLength - Array.from(`${followLabels[0]}„${baseFor(situation)}“ ${followLabels[1]}`).length);
       } else {
-        chip.textContent = en ? 'New situation' : 'Neue Situation';
+        examplesOn(field, true);
         field.setAttribute('placeholder', en ? 'What happened?' : 'Was ist passiert?');
         field.setAttribute('aria-label', en ? 'Your situation' : 'Deine Situation');
         field.maxLength = maxLength;
       }
     };
-    moreButton.addEventListener('click', () => { setChatMode('more'); field.focus(); track('translator_write_chat', { step: 'more' }); syncChat(); });
-    newButton.addEventListener('click', () => { setChatMode('new'); field.focus(); track('translator_write_chat', { step: 'new' }); syncChat(); });
-    cancel.addEventListener('click', () => { field.value = ''; setChatMode('choose'); syncChat(); });
+    plus.addEventListener('click', () => { const next = chatMode === 'new' ? 'more' : 'new'; field.value = ''; setChatMode(next); field.focus(); track('translator_write_chat', { step: next }); syncChat(); });
     // Jede Eingabe über das große Feld oder „Neue Situation“ beginnt neu; nur „Nachfrage“ behält die Situation.
     form.addEventListener('submit', () => { if (!viaFollow) { base = ''; follows = []; composed = ''; } viaFollow = false; }, true);
     // Die Sprechblase zeigt weiter die Situation, die Nachfrage steht darunter (nicht „Situation: … Nachfrage: …“).

@@ -20,7 +20,7 @@ for (const slug of slugs) {
   for (const url of article.citation) assert.ok(html.includes(`href="${url}"`), `${slug}: source not visible`);
   assert.ok(html.indexOf('id="sicherheit"') < html.indexOf('class="article-cta"'), `${slug}: safety must precede app offer`);
   assert.ok(html.includes('data-related-link="passende-situation"'), `${slug}: missing contextual tool link`);
-  assert.ok(html.includes('Anbieterin: <a href="/impressum.html">Deborah Frey</a>'), `${slug}: missing provider attribution`);
+  assert.ok(html.includes('Anbieter: <a href="/impressum.html">Freyheits UG (haftungsbeschränkt) i. G.</a>'), `${slug}: missing provider attribution`);
   assert.ok((html.match(/data-related-link=/g) || []).length >= 2);
 }
 console.log('Five situation guides: metadata, discoverability, sources, jump links and safety placement passed.');
