@@ -20,7 +20,7 @@ export function signupStyles() {
   });
   return stylesReady;
 }
-export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, purpose = 'intro', creditActive = false, signupCopy, sentEmail = '', canPresent = () => true, onPresented = () => {}, returnFocus = null }) {
+export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, purpose = 'intro', creditActive = false, signupCopy, sentEmail = '', asSheet = false, canPresent = () => true, onPresented = () => {}, returnFocus = null }) {
   const config = window.DEMENZ_ABO_CONFIG;
   if (config?.signIn?.emailLink !== true) return;
   const [{ auth }] = await Promise.all([webAuth({ anonymous: false }), signupStyles()]);
@@ -80,11 +80,11 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
     if (creditActive === true && purpose === 'intro' && view.isConnected && view.dataset.signupCopy) window.DemenzWebExperiments?.showSignupCopy(signupCopy);
   };
   const later = () => {
-    if (purpose === 'account') { dispose(); window.location.assign(returnTo); return; }
+    if (purpose === 'account' && !asSheet) { dispose(); window.location.assign(returnTo); return; }
     sheet?.close('dismiss');
   };
   const view = createSignupOffer({ additionalAnswers: bonus, locale: en ? 'en' : 'de', googleAvailable: config.signIn?.google === true, purpose, creditActive,
-    signupCopy: window.DemenzWebExperiments?.signupCopyVariant(signupCopy) || 'variant_1', presentation: purpose === 'account' ? 'inline' : 'sheet', returnToSituation: hasSituation,
+    signupCopy: window.DemenzWebExperiments?.signupCopyVariant(signupCopy) || 'variant_1', presentation: purpose === 'account' && !asSheet ? 'inline' : 'sheet', returnToSituation: hasSituation,
     getRetryAt: () => (email.attempt()?.createdAt || 0) + 60000,
     onBegin() { expose(); onBegin?.(); },
     async onEmail(address) { const begun = await email.begin({ email: address, returnTo, intent: 'signin' }); leaveForFunnel({ target: begun?.target || returnTo }); return { sent: true }; },
@@ -102,15 +102,15 @@ export async function mountInlineSignup(card, { bonus, en, onBegin, returnTo, pu
       }
       return result;
     },
-    onContinue() { if (purpose === 'account') void retryReturn?.(); else sheet?.close('continue'); },
+    onContinue() { if (purpose === 'account' && !asSheet) void retryReturn?.(); else if (purpose === 'account') void retryReturn?.(); else sheet?.close('continue'); },
     onLater: later
   });
   if (purpose !== 'account') {
     // Messen: welche Variante gezeigt wurde (nur mit Einwilligung, keine Nutzerdaten). Danach zählt der Funnel mit entry=layer bzw. anmeldung.
     try { window.DemenzConsent?.track?.('signup_variant_shown', { experiment_id: 'web-signup-funnel-layer-v1', variation_id: wantsFunnelLayer() ? 1 : 0 }); } catch { /* ohne Einwilligung nichts */ }
   }
-  if (purpose === 'account') card.replaceWith(view);
-  else if (wantsFunnelLayer()) {
+  if (purpose === 'account' && !asSheet) card.replaceWith(view);
+  else if (purpose !== 'account' && wantsFunnelLayer()) {
     // A/B-Variante: der Web-Funnel selbst kommt als Layer von unten, nicht die Anmeldung.
     const anchor = document.createElement('span'); anchor.hidden = true; card.replaceWith(anchor);
     openFunnelLayer({ returnFocus, onClose: () => { anchor.remove(); dispose(); } });
