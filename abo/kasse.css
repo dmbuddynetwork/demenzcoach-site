@@ -6,6 +6,7 @@ dialog.kasse-embed::backdrop { background: rgba(28, 27, 31, .45); }
 .kasse-embed-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 640px; margin: 0 auto;
   padding: calc(14px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
 .kasse-embed-head h2 { margin: 0; font-size: 1.125rem; }
+.kasse-embed-head h2:focus { outline: none; } /* Fokus nur für Screenreader, kein blauer Rahmen (Daniel, 26. Nov 2026) */
 .kasse-embed-close { flex: 0 0 auto; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #ece9f7; color: #47408c; font-size: 1.75rem; line-height: 1; cursor: pointer; }
 .kasse-embed-status, .kasse-embed-problem { max-width: 640px; margin: 0 auto; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); color: #55525e; }
 .kasse-embed-problem[hidden], .kasse-embed-status[hidden] { display: none; }
