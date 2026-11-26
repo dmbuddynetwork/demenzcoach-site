@@ -1,11 +1,13 @@
-// Verkaufsseite /hilfe/ (A/B-Test gegen /start/, Daniel, 26. Nov 2026). Nur Darstellung und Weitergabe an den Fragebogen:
-// Live-Demo mit Sätzen aus abo/plan-data.js, Eintritt über dieselben Bildkarten wie /start/ (start/inline-entry.js),
-// Stimmen aus start/stimmen.js, Messung über DemenzConsent. Ohne Skript bleiben alle Knöpfe normale Links auf /start/.
+// Verkaufsseite /hilfe/ (A/B-Test gegen /start/, Daniel, 26. Nov 2026).
+// Runde 3 (Daniel: „eine Landingpage, die direkt verkauft, statt den 50-Seiten-Funnel“): kein Fragebogen. Jeder Knopf öffnet
+// sofort die Kasse auf dieser Seite (abo/kasse.js, dieselbe wie /start/?direkt=1). Stripe fragt die E-Mail selbst.
+// Live-Demo mit Sätzen aus abo/plan-data.js, Stimmen aus start/stimmen.js, Messung über DemenzConsent.
+// Ohne Skript bleiben alle Knöpfe normale Links auf /start/?direkt=1.
 import '/abo/plan-data.js';
-import { createInlineEntry } from '/start/inline-entry.js';
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
+const config = window.DEMENZ_ABO_CONFIG || {};
 const clean = (value, max = 30) => String(value || '').toLowerCase().replace(/[^a-z0-9_-]/gu, '').slice(0, max);
 const guessApp = () => {
   const agent = navigator.userAgent || '';
@@ -14,67 +16,170 @@ const guessApp = () => {
   if (/musical_ly|BytedanceWebview|TikTok/iu.test(agent)) return 'tiktok_app';
   return 'ads';
 };
-// Quelle für den Fragebogen: „lp_“ + Kanal. So sind die Besucher dieser Seite in Statistik und Kasse vom alten Weg getrennt.
+// Quelle: „lp_“ + Kanal. So sind Käufe über diese Seite in Statistik und Kasse vom alten Weg (/start/) getrennt.
 const channel = clean(params.get('src') || params.get('utm_source')) || guessApp();
 const source = `lp_${channel}`.slice(0, 30);
-const track = (name, extra = {}) => {
+const campaign = clean(params.get('utm_campaign') || params.get('k'), 60);
+const track = (name, extra = {}, marketing = '') => {
   try { window.DemenzConsent?.track?.(name, { entry: source, ...extra }); } catch { /* ohne Einwilligung nichts */ }
+  try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing); } catch { /* */ }
 };
 
+// ---- Preise: feste Werte, dann die Werte des Servers (dieselben wie in der Kasse) ----------------------------------
+let offer = { yearly: 6999, monthly: 1299, trialDays: 7 };
+let plan = 'yearly';
+const guaranteeDays = 30;
+const euro = cents => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
+// Nur ein belegbarer Vergleich (Jahrespreis gegenüber 12 Monatszahlungen), wie auf /start/.
+const saving = () => Math.floor((1 - offer.yearly / (offer.monthly * 12)) * 20) * 5;
+const priceText = key => `${key === 'yearly' ? `${euro(offer.yearly)} pro Jahr` : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
+const termsText = () => `${offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos, dann ` : ''}${priceText(plan)} ${plan === 'yearly' ? 'Laufzeit 1 Jahr, danach mit 1 Monat Frist kündbar.' : 'Jederzeit zum Monatsende kündbar.'}`;
+const buttonText = () => (offer.trialDays > 0 ? `Für ${euro(0)} starten` : `Für ${euro(plan === 'yearly' ? offer.yearly : offer.monthly)} starten`);
+
+const el = (tag, props = {}, children = []) => {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(props)) {
+    if (key === 'text') node.textContent = value;
+    else if (key.startsWith('on')) node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value);
+  }
+  for (const child of [].concat(children)) if (child) node.append(child);
+  return node;
+};
+
+// Ein Preisblock je Platz ([data-buy-slot]): zwei Pläne, ein Knopf, Bedingungen direkt darunter.
+const blocks = [];
+const planCard = (key, where) => el('button', { type: 'button', class: 'lp-plan', role: 'radio', 'data-plan': key, 'aria-checked': String(plan === key),
+  onclick: () => { select(key); track('lp_plan', { plan: key, where }); } }, [
+  el('span', { class: 'lp-plan-dot', 'aria-hidden': 'true' }),
+  el('span', { class: 'lp-plan-text' }, [
+    el('span', { class: 'lp-plan-row' }, [el('strong', { 'data-name': '' }), el('span', { class: 'lp-plan-tag', 'data-tag': '' })]),
+    el('span', { 'data-price': '' })
+  ])
+]);
+const fillCard = card => {
+  const yearly = card.dataset.plan === 'yearly';
+  card.querySelector('[data-name]').textContent = yearly ? '12-Monats-Plan' : '1-Monats-Plan';
+  card.querySelector('[data-price]').textContent = yearly
+    ? `${euro(offer.yearly)} im Jahr\nDas sind ${euro(Math.round(offer.yearly / 12))} im Monat`
+    : `${euro(offer.monthly)} im Monat`;
+  const tag = card.querySelector('[data-tag]');
+  tag.textContent = yearly && saving() >= 10 ? `Spare ${saving()} %` : '';
+  tag.hidden = !tag.textContent;
+};
+const legal = () => el('p', { class: 'lp-legal' }, [
+  `${offer.trialDays > 0 ? `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft` : 'Das Abo beginnt sofort und läuft'} zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende. Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
+  el('a', { href: '/nutzungsbedingungen.html', text: 'Nutzungsbedingungen' }), ' und die ',
+  el('a', { href: '/abo/widerruf.html', text: 'Widerrufsbelehrung' }),
+  '. Allgemeine Kommunikations- und Alltagshilfe, kein Medizinprodukt.'
+]);
+const mountBuy = slot => {
+  const where = slot.querySelector('[data-go]')?.dataset.go || 'buy';
+  const cards = ['yearly', 'monthly'].map(key => planCard(key, where));
+  const terms = el('p', { class: 'lp-terms' });
+  const button = el('button', { type: 'button', class: 'lp-btn', 'data-buy': where });
+  const block = el('div', { class: 'lp-buy-block' }, [
+    el('div', { class: 'lp-plans', role: 'radiogroup', 'aria-label': 'Plan wählen' }, cards),
+    terms, button,
+    el('ul', { class: 'lp-pills' }, [
+      el('li', {}, el('a', { href: '/abo/garantie.html', text: `${guaranteeDays} Tage Geld-zurück-Garantie` })),
+      el('li', { text: 'Online kündbar' })
+    ]),
+    legal()
+  ]);
+  slot.replaceChildren(block);
+  slot.classList.add('is-ready');
+  blocks.push({ cards, terms, button, block });
+};
+const refresh = () => {
+  for (const item of blocks) {
+    for (const card of item.cards) { fillCard(card); card.setAttribute('aria-checked', String(card.dataset.plan === plan)); }
+    item.terms.textContent = termsText();
+    item.button.textContent = buttonText();
+    item.block.querySelector('.lp-legal').replaceWith(legal());
+  }
+  if (stickyButton) stickyButton.textContent = buttonText();
+  if (stickyNote) stickyNote.textContent = `${offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos, dann ` : ''}${plan === 'yearly' ? `${euro(offer.yearly)} im Jahr` : `${euro(offer.monthly)} im Monat`}`;
+  const yearlyFaq = document.querySelector('[data-faq-yearly]');
+  const monthlyFaq = document.querySelector('[data-faq-monthly]');
+  if (yearlyFaq) yearlyFaq.textContent = euro(offer.yearly);
+  if (monthlyFaq) monthlyFaq.textContent = euro(offer.monthly);
+};
+
+// ---- Kasse: Plan wählen, Knopf, sofort Stripe (über abo/kasse.js) -------------------------------------------------
+let prepared = '';
+const prepare = () => {
+  const kasse = window.DemenzKasse;
+  if (!kasse?.prepare || prepared === plan) return;
+  prepared = plan;
+  kasse.prepare({ plan, source, campaign });
+};
+function select(key) {
+  plan = key;
+  refresh();
+  if (prepared) prepare();
+}
+const buy = where => {
+  track('lp_checkout', { where, plan }, 'InitiateCheckout');
+  const kasse = window.DemenzKasse;
+  if (!kasse || !config.firebase?.apiKey) {
+    location.href = `/abo/?plan=${plan}&src=${source}${campaign ? `&c=${campaign}` : ''}&weiter=1`;
+    return;
+  }
+  // Zurück-Taste des Handys schließt die Kasse statt die Seite zu verlassen.
+  history.pushState({ sheet: true }, '', location.href);
+  kasse.open({ plan, source, campaign, track: name => track(name, { where }),
+    onClose: () => { if (history.state?.sheet) history.back(); } });
+};
+addEventListener('popstate', () => { if (window.DemenzKasse?.isOpen?.()) window.DemenzKasse.close(); });
+document.addEventListener('click', event => {
+  const target = event.target.closest('[data-buy]');
+  if (!target) return;
+  event.preventDefault();
+  buy(target.dataset.buy || target.dataset.go || 'buy');
+});
+// Tempo: Konto und Stripe-Sitzung vorbereiten, sobald jemand den Knopf berührt oder der Preis eine Weile sichtbar ist.
+document.addEventListener('pointerdown', event => { if (event.target.closest('[data-buy], .lp-plan')) prepare(); }, { passive: true });
+
+for (const slot of document.querySelectorAll('[data-buy-slot]')) mountBuy(slot);
+const sticky = $('sticky');
+const stickyLink = sticky?.querySelector('[data-buy]');
+let stickyButton = null, stickyNote = null;
+if (stickyLink) {
+  // Die Knopfleiste nutzt denselben gewählten Plan. Kein Link mehr, ein Knopf.
+  const button = el('button', { type: 'button', class: 'lp-btn', 'data-buy': 'sticky' });
+  stickyNote = el('p', { class: 'lp-sticky-note' });
+  stickyLink.replaceWith(stickyNote, button);
+  stickyButton = button;
+}
+refresh();
+
+if (config.endpoint) {
+  fetch(`${config.endpoint}/config`).then(response => (response.ok ? response.json() : null)).then(data => {
+    if (!data?.plans?.yearly?.amount || !data?.plans?.monthly?.amount) return;
+    offer = { yearly: data.plans.yearly.amount, monthly: data.plans.monthly.amount, trialDays: data.trialDays ?? 7 };
+    refresh();
+  }).catch(() => { /* feste Preise bleiben */ });
+}
+
+// ---- Live-Demo: Satz antippen, Antwort sofort sehen. Nur feste, geprüfte Texte, keine KI-Anfrage. ------------------
 const data = window.DEMENZ_PLAN_DATA || {};
 const items = [...(data.situations || []), ...(data.weeks || [])].filter(item => item.key && item.say?.length);
-const moments = new Set((data.situations || []).filter(item => item.say).map(item => item.key));
-let chosen = 'nachhause';
-
-// Knöpfe: Adresse mit Quelle, gewählter Situation (m) und Kampagnen-Angaben (k, a, utm_*).
-const startUrl = () => {
-  const url = new URL('/start/', location.origin);
-  url.searchParams.set('src', source);
-  if (moments.has(chosen)) url.searchParams.set('m', chosen);
-  for (const [key, value] of params) if (key === 'k' || key === 'a' || key.startsWith('utm_')) url.searchParams.set(key, value);
-  return url.pathname + url.search;
-};
-const links = () => document.querySelectorAll('a[data-go]');
-for (const link of links()) link.addEventListener('click', () => track('lp_cta_click', { where: link.dataset.go }));
-const syncLinks = () => { for (const link of links()) link.href = startUrl(); };
-syncLinks();
-
-// Eintritt: dieselbe erste Frage wie im Fragebogen („Für wen suchst du Hilfe?“). Mit der gewählten Demo-Situation als Moment.
-const mountEntry = id => {
-  const slot = $(id);
-  if (!slot) return;
-  try {
-    const entry = createInlineEntry(document, { source, contextKey: moments.has(chosen) ? chosen : '' });
-    entry.addEventListener('click', event => { if (event.target.closest('[data-relation]')) track('lp_entry_click', { where: id, item: chosen }); }, true);
-    slot.replaceChildren(entry);
-    slot.classList.add('is-ready');
-  } catch { /* Der Link bleibt. */ }
-};
-const mountEntries = () => { mountEntry('entry-top'); mountEntry('entry-bottom'); };
-mountEntries();
-
-// Live-Demo: Satz antippen, Antwort sofort sehen. Nur feste, geprüfte Texte, keine KI-Anfrage.
 const art = { nachhause: 'nach-hause.webp', wiederholt: 'ruhig-uhrzeit.webp', arbeit: 'work.webp', mutter: 'ruhig-mutter.webp',
   wer: 'ruhig-wer.webp', geld: 'ruhig-geld.webp', waschen: 'ruhig-waschen.webp', schongegessen: 'ruhig-gegessen.webp' };
 const chips = [...document.querySelectorAll('[data-demo]')];
 const show = (key, { focus = false, user = false } = {}) => {
   const item = items.find(entry => entry.key === key);
   if (!item) return;
-  chosen = key;
   for (const chip of chips) { const on = chip.dataset.demo === key; chip.setAttribute('aria-checked', String(on)); chip.tabIndex = on ? 0 : -1; if (on && focus) chip.focus(); }
   $('a-quote').textContent = `„${item.quote}“`;
-  $('a-meaning').textContent = item.meaning || '';
-  $('a-meaning').hidden = !item.meaning;
-  $('a-say').textContent = item.say[0];
-  $('a-more').replaceChildren(...item.say.slice(1).map(text => { const li = document.createElement('li'); li.textContent = text; return li; }));
-  $('a-tip').textContent = item.tip || '';
+  $('a-say').replaceChildren(...item.say.slice(0, 3).map(text => el('li', { text })));
   const image = $('a-art');
   if (art[key]) { image.src = `/assets/zeichnungen/${art[key]}`; image.hidden = false; } else image.hidden = true;
   const card = $('answer'); card.classList.remove('is-new'); void card.offsetWidth; card.classList.add('is-new');
-  syncLinks(); mountEntries();
   if (user) track('lp_demo', { item: key });
 };
-chips.forEach((chip, index) => {
+chips.forEach(chip => {
   if (!items.some(entry => entry.key === chip.dataset.demo)) { chip.remove(); return; }
   chip.addEventListener('click', () => show(chip.dataset.demo, { user: true }));
   chip.addEventListener('keydown', event => {
@@ -91,19 +196,18 @@ const wanted = clean(params.get('zeige'));
 if (wanted && chips.some(chip => chip.dataset.demo === wanted)) show(wanted);
 for (const name of Object.values(art)) { const pre = new Image(); pre.src = `/assets/zeichnungen/${name}`; }
 
-// Stimmen: echte Texte (start/stimmen.js, Vornamen mit Zustimmung). Keine Sterne, keine Zahlen.
-const voices = Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : [];
-const section = $('stimmen');
-if (voices.length && section) {
+// ---- Stimmen: echte Texte (start/stimmen.js, Vornamen mit Zustimmung). Keine Sterne, keine Zahlen. ---------------------
+const mountVoices = () => {
+  const voices = Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : [];
+  const section = $('stimmen');
+  if (!voices.length || !section) return;
   const card = (voice, clamp) => {
-    const figure = document.createElement(clamp ? 'figure' : 'li');
-    figure.className = 'lp-voice'; if (clamp) figure.setAttribute('role', 'listitem');
-    const name = document.createElement('strong'); name.textContent = `${voice.name}, ${voice.rolle}`;
-    const text = document.createElement('p'); text.textContent = `„${voice.text}“`;
-    figure.append(name, text);
+    const figure = el(clamp ? 'figure' : 'li', { class: 'lp-voice', ...(clamp ? { role: 'listitem' } : {}) });
+    const text = el('p', { text: `„${voice.text}“` });
+    figure.append(el('strong', { text: `${voice.name}, ${voice.rolle}` }), text);
     if (clamp && voice.text.length > 150) {
       text.classList.add('is-clamped');
-      const more = document.createElement('button'); more.type = 'button'; more.className = 'lp-link'; more.textContent = 'Mehr lesen'; more.setAttribute('aria-expanded', 'false');
+      const more = el('button', { type: 'button', class: 'lp-link', text: 'Mehr lesen', 'aria-expanded': 'false' });
       more.addEventListener('click', () => {
         const open = text.classList.toggle('is-clamped') === false;
         more.textContent = open ? 'Weniger' : 'Mehr lesen'; more.setAttribute('aria-expanded', String(open));
@@ -116,27 +220,33 @@ if (voices.length && section) {
   $('voices-all').append(...voices.map(voice => card(voice, false)));
   $('voices-all-title').textContent = `Alle ${voices.length} Stimmen lesen`;
   section.hidden = false;
-}
+};
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountVoices, { once: true }); else mountVoices();
 
-// Feste Knopfleiste unten: nur wenn keine Bildkarten sichtbar sind.
-const sticky = $('sticky');
-if (sticky && 'IntersectionObserver' in window) {
-  const visible = new Map();
-  const watcher = new IntersectionObserver(entries => {
-    for (const entry of entries) visible.set(entry.target, entry.isIntersecting);
-    const anyEntry = [...visible.values()].some(Boolean);
-    const scrolled = window.scrollY > 400;
-    sticky.hidden = anyEntry || !scrolled;
-  }, { threshold: 0 });
-  for (const id of ['entry-top', 'entry-bottom']) watcher.observe($(id));
-  addEventListener('scroll', () => { if (window.scrollY <= 400) sticky.hidden = true; else if (![...visible.values()].some(Boolean)) sticky.hidden = false; }, { passive: true });
-}
-
-// Ein Ereignis, wenn jemand bis zum Preisabschnitt liest (ohne Einwilligung passiert nichts).
-const trust = document.querySelector('.lp-path');
-if (trust && 'IntersectionObserver' in window) {
-  const watcher = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) { track('lp_read_price'); watcher.disconnect(); }
-  }, { threshold: .5 });
-  watcher.observe(trust);
+// ---- Beobachter: Knopfleiste, Vorbereitung der Kasse, Lesetiefe ----------------------------------------------------
+if ('IntersectionObserver' in window) {
+  const slots = [...document.querySelectorAll('[data-buy-slot]')];
+  // Feste Knopfleiste unten: nur wenn kein Preisblock sichtbar ist und die Seite gescrollt wurde.
+  if (sticky) {
+    const visible = new Map();
+    const update = () => { sticky.hidden = window.scrollY <= 400 || [...visible.values()].some(Boolean); };
+    const watcher = new IntersectionObserver(entries => { for (const entry of entries) visible.set(entry.target, entry.isIntersecting); update(); }, { threshold: 0 });
+    for (const slot of slots) watcher.observe(slot);
+    addEventListener('scroll', update, { passive: true });
+  }
+  // Preis 1,5 Sekunden sichtbar: Kasse im Hintergrund vorbereiten, damit der Klick sofort zu Stripe führt.
+  let timer = null;
+  const warm = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting)) { clearTimeout(timer); timer = setTimeout(() => { prepare(); warm.disconnect(); }, 1500); }
+    else clearTimeout(timer);
+  }, { threshold: .4 });
+  for (const slot of slots) warm.observe(slot);
+  // Ein Ereignis, wenn jemand bis zum Ablauf („So geht es weiter“) liest.
+  const path = document.querySelector('.lp-path');
+  if (path) {
+    const reader = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) { track('lp_read_price'); reader.disconnect(); }
+    }, { threshold: .5 });
+    reader.observe(path);
+  }
 }
