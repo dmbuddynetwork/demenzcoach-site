@@ -198,11 +198,11 @@ export async function mountApplePay(slot, options) {
         if (paymentMethods?.applePay) { options.track?.("apple_pay_quick_shown"); resolve(true); } else resolve(false);
       });
     });
-    express.on("confirm", async () => {
+    express.on("confirm", async (event) => {
       options.track?.("apple_pay_quick_confirm");
       try {
         const loaded = await checkout.loadActions?.();
-        const result = await (loaded?.actions ?? checkout).confirm();
+        const result = await (loaded?.actions ?? checkout).confirm({ expressCheckoutConfirmEvent: event });
         if (result?.type === "error" || result?.error) options.onError?.(result.error?.message || "Die Zahlung hat nicht geklappt.");
       } catch {
         options.onError?.("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
