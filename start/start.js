@@ -977,86 +977,56 @@
         el("span", { class: "start-week-mark", "aria-label": index === 0 ? "Geschafft" : "", text: index === 0 ? "✓" : "" })
       ]))) : null;
 
-    const offerBlock = () => [ticket(), table(), cta(), fine(), payments()];
-
-    // Bezahlbildschirm wie Tolan (Daniel 26. Nov 2026, automatisch bei Apple Pay, sonst mit ?ap=1): ein Bild, Überschrift, zwei Tarifkarten, Apple-Pay-Zeichen,
-    // eine Zeile Preis und Laufzeit, ein großer Knopf. Auf Geräten mit Apple Pay liegt der unsichtbare Express-Knopf von Stripe genau über
-    // unserem Knopf: Ein Tipp öffnet direkt das Apple-Pay-Fenster. Ohne Apple Pay startet derselbe Knopf die gehostete Stripe-Seite.
-    // Nicht übernommen: Presse-Logos (nicht belegt), „Jederzeit kündbar“ (der Jahresplan hat 1 Jahr Laufzeit), Probezeit-Verlängerung (kein Produkt).
-    const tolanScreen = () => {
-      const perMonth = (cents, months) => euro(Math.round(cents / months));
-      const trial = offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : null;
-      const planCard = (key, title, priceNode, sub, badge) => el("button", { type: "button", class: "start-tp-plan", role: "radio", "data-plan": key, "aria-checked": String(plan === key), onclick: () => select(key) }, [
-        badge ? el("span", { class: "start-tp-badge", text: badge }) : null,
-        el("span", { class: "abo-radio", "aria-hidden": "true" }),
-        el("span", { class: "start-tp-name" }, [el("strong", { text: title }), trial ? el("span", { class: "start-tp-trial", text: trial }) : null]),
-        el("span", { class: "start-tp-price" }, [el("strong", { text: priceNode }), sub ? el("span", { text: sub }) : null])
-      ]);
-      const savingText = `Spare ${deal ? Math.floor((1 - firstYear / (offer.monthly * 12)) * 100) : saving} %`;
-      const group = el("div", { class: "start-tp-plans", role: "radiogroup", "aria-label": "Tarif" }, [
-        planCard("yearly", "12 Monate", `${euro(firstYear)}/Jahr`, `${perMonth(firstYear, 12)}/Monat`, saving >= 10 ? savingText : null),
-        planCard("monthly", "1 Monat", `${euro(offer.monthly)}/Monat`, null, null)
-      ]);
-      tables.push(group);
-      const label = () => (offer.trialDays > 0 ? `Für ${euro(0)} starten` : `Für ${euro(plan === "yearly" ? firstYear : offer.monthly)} starten`);
-      const button = el("button", { type: "button", class: "abo-button start-cta start-tp-cta", "data-tp-label": "", text: label(), onclick: () => { countDirect("direct_cta"); checkout(); } });
-      const slots = { yearly: el("div", { class: "start-tp-slot", id: "start-ap-yearly", hidden: "" }), monthly: el("div", { class: "start-tp-slot", id: "start-ap-monthly", hidden: "" }) };
-      const cta = el("div", { class: "start-tp-cta-wrap" }, [button, slots.yearly, slots.monthly]);
-      // Eine Zeile wie bei Tolan, aber mit der echten Laufzeit (§ 312j BGB, PAngV): Preis inkl. MwSt. und Kündigung stehen direkt über dem Knopf.
-      const termsText = () => `${trial ? `${trial}, dann ` : ""}${priceText(plan)} ${plan === "yearly" ? "Laufzeit 1 Jahr, danach mit 1 Monat Frist kündbar." : "Jederzeit zum Monatsende kündbar."}`;
-      const note = el("p", { class: "start-tp-terms", text: termsText() });
+    // Daniel 26. Nov 2026: „Die Apple-Pay-Seite soll genau die gleiche Seite sein, nur dass statt Stripe Apple Pay sich direkt öffnet“
+    // + „unter dem Button ein Link für andere Zahlungsmöglichkeiten“. Auf Geräten mit Apple Pay liegt der unsichtbare Express-Knopf von
+    // Stripe genau über unserem Knopf (wie /hilfe/): Ein Tipp öffnet direkt das Apple-Pay-Fenster. Preis, Laufzeit und Kündigung stehen
+    // dann direkt über dem Knopf (§ 312j BGB), weil der Kauf im Apple-Pay-Fenster abschließt. ?ap=1 erzwingt, ?ap=0 schaltet ab.
+    const applePayDevice = (() => { try { return window.ApplePaySession?.canMakePayments?.() === true; } catch { return false; } })();
+    const applePayHere = params.get("ap") === "1" || (params.get("ap") !== "0" && applePayDevice);
+    const applePayCta = () => {
+      const button = cta();
+      const slots = { yearly: el("div", { class: "start-tp-slot", "data-ap-slot": "yearly", hidden: "" }), monthly: el("div", { class: "start-tp-slot", "data-ap-slot": "monthly", hidden: "" }) };
+      const wrap = el("div", { class: "start-tp-cta-wrap start-ap-wrap" }, [button, slots.yearly, slots.monthly]);
+      const alt = el("button", { type: "button", class: "abo-link-button start-ap-alt", hidden: "", text: "Andere Zahlungsmöglichkeiten",
+        onclick: () => { countDirect("direct_cta"); checkout({ stripePage: true }); } });
       const ready = {};
       const mounted = {};
+      let near = false;
       const sync = () => {
         for (const key of ["yearly", "monthly"]) slots[key].hidden = key !== plan || !ready[key];
-        button.textContent = label();
-        note.textContent = termsText();
-        const alt = cta.parentNode?.querySelector("[data-tp-alt]");
-        if (alt) alt.hidden = !ready[plan];
+        alt.hidden = !ready[plan];
       };
       const mount = (key) => {
-        if (mounted[key] || !window.DemenzKasse?.mountApplePay || !config.firebase?.apiKey) return;
+        if (!near || mounted[key] || !window.DemenzKasse?.mountApplePay || !config.firebase?.apiKey) return;
         mounted[key] = true;
         const meta = checkoutMeta();
         window.DemenzKasse.mountApplePay(slots[key], { plan: key, email: answers.email || undefined, offer: key === "yearly" && offer.offers ? deals?.forCheckout() : null,
-          source: meta.src, campaign: meta.campaign, track: (name) => track(name), onError: (message) => { note.textContent = message; } })
+          source: meta.src, campaign: meta.campaign, track: (name) => track(name), onError: () => { alt.hidden = false; } })
           .then((shown) => { if (shown) { ready[key] = true; sync(); } else mounted[key] = false; });
       };
-      applePayHooks.push(() => { sync(); setTimeout(() => { if (document.body.contains(cta)) mount(plan); }, 400); });
-      setTimeout(() => { if (document.body.contains(cta)) mount(plan); }, 400);
-      const pic = el("img", { class: "start-tp-pic", src: "/assets/zeichnungen/nach-hause-ruhig.webp", width: "480", height: "420", alt: "" });
-      const applePayMark = payLogos.find(([logo]) => logo === "Apple Pay");
-      return [
-        reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
-        el("div", { class: "start-tp" }, [
-          pic,
-          el("h1", { class: "start-center", text: pair ? "Dein Gesprächstraining ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : directMode ? "Die richtigen Worte, wenn es schwierig wird" : (name ? `Deine Hilfe für Gespräche mit ${name} ist bereit!` : "Deine Hilfe für schwierige Gespräche ist bereit!") }),
-          el("p", { class: "start-tp-sub", text: "Schalte alles mit einem Tipp frei." }),
-          group,
-          el("span", { class: "start-tp-applepay", role: "img", "aria-label": "Apple Pay", html: applePayMark[1] }),
-          note,
-          cta,
-          // Andere Zahlart: auf Geräten mit Apple Pay fängt der unsichtbare Express-Knopf den Tipp auf den großen Knopf ab, darum gibt es hier einen eigenen Weg zur Stripe-Seite (Karte und weitere Zahlarten).
-          el("button", { type: "button", class: "abo-link-button start-tp-alt", "data-tp-alt": "", hidden: "", text: "Mit Karte oder anderer Zahlart bezahlen", onclick: () => { countDirect("direct_cta"); checkout({ stripePage: true }); } }),
-          el("button", { type: "button", class: "abo-link-button start-tp-more", text: "Mehr erfahren ↓", onclick: () => document.querySelector(".start-big-title")?.scrollIntoView({ behavior: "smooth", block: "start" }) })
-        ])
-      ];
+      applePayHooks.push(() => { sync(); setTimeout(() => { if (document.body.contains(wrap)) mount(plan); }, 400); });
+      // Stripe-Sitzung erst, wenn der Knopf in die Nähe des Bildschirms kommt (der zweite Knopf unten braucht sonst sofort eigene Sitzungen).
+      const start = () => { near = true; mount(plan); };
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) { observer.disconnect(); start(); } }, { rootMargin: "300px 0px" });
+        setTimeout(() => { if (document.body.contains(wrap)) observer.observe(wrap); }, 400);
+      } else setTimeout(start, 400);
+      return [wrap, alt];
     };
-    // Daniel 26. Nov 2026 („Ja, für alle mit Apple Pay“): Geräte mit Apple Pay sehen den Bildschirm automatisch, alle anderen nie.
-    // ?ap=1 erzwingt ihn (Vorschau auf jedem Gerät), ?ap=0 schaltet ihn ab.
-    const applePayDevice = (() => { try { return window.ApplePaySession?.canMakePayments?.() === true; } catch { return false; } })();
-    const tolanTop = params.get("ap") === "1" || (params.get("ap") !== "0" && applePayDevice) ? tolanScreen() : null;
+    const offerBlock = () => applePayHere
+      ? [ticket(), table(), fine(), ...applePayCta(), payments()]
+      : [ticket(), table(), cta(), fine(), payments()];
+
 
     return [
-      ...(tolanTop ? [] : [head]),
+      head,
       reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
-      tolanTop ? null : hero,
-      tolanTop ? null : el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Gesprächstraining ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : directMode ? "Die richtigen Worte, wenn es schwierig wird" : (name ? `Deine Hilfe für Gespräche mit ${name} ist bereit!` : "Deine Hilfe für schwierige Gespräche ist bereit!") }),
-      tolanTop ? null : (result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null),
+      hero,
+      el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Gesprächstraining ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : directMode ? "Die richtigen Worte, wenn es schwierig wird" : (name ? `Deine Hilfe für Gespräche mit ${name} ist bereit!` : "Deine Hilfe für schwierige Gespräche ist bereit!") }),
+      (result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null),
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
-      // Mit Apple Pay (oder ?ap=1) steht davor der kurze Bezahlbildschirm wie Tolan; darunter bleibt die lange Seite mit allen Hilfen und dem bisherigen Knopf.
-      ...(tolanTop ?? offerBlock()),
+      ...offerBlock(),
       pair ? null : preview,
       el("h2", { class: "start-section start-center start-big-title", text: "Was du bekommst" }),
       shots,
