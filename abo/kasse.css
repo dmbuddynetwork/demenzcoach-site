@@ -26,3 +26,8 @@ dialog.kasse-embed::backdrop { background: rgba(28, 27, 31, .28); }
   .kasse-embed-panel { width: min(460px, calc(100vw - 32px)); min-height: 0; margin: 16px auto; border-radius: 18px; overflow: hidden; box-shadow: 0 16px 48px rgba(28, 27, 31, .22); }
   .kasse-embed-box { min-height: 420px; padding: 0 4px 8px; }
 }
+/* Stripes kürzeres Formular (ui_mode form): eine Zeile Pflichtangaben darüber, Links darunter. */
+.kasse-embed-form .kasse-embed-terms { margin: 0; padding: calc(16px + env(safe-area-inset-top, 0px)) 56px 4px 16px; color: #3d3a45; font-size: .9375rem; line-height: 1.4; }
+.kasse-embed-form .kasse-embed-box { min-height: 0; padding: 8px 16px 4px; }
+.kasse-embed-form .kasse-embed-links { margin: 0; padding: 4px 16px 18px; color: #55525e; font-size: .8125rem; line-height: 1.5; text-align: center; }
+.kasse-embed-form .kasse-embed-links a { color: inherit; }

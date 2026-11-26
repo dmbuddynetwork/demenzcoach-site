@@ -94,6 +94,20 @@ function close() {
   sheet = null;
 }
 
+// Pflichtangaben über Stripes Formular (ui_mode "form" kennt keine eigenen Texte): Preis inkl. MwSt., Laufzeit, Kündigung, Probezeit.
+const euro = (cents) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
+function termsFor(session) {
+  const amount = publicConfig?.plans?.[session?.plan]?.amount;
+  if (!Number.isFinite(amount)) return "";
+  const trial = session.trialDays > 0 ? `${session.trialDays} Tage kostenlos, dann ` : "";
+  if (session.plan === "yearly") {
+    const first = Number.isFinite(session.firstYear) ? session.firstYear : amount;
+    const price = first !== amount ? `${euro(first)} im ersten Jahr, danach ${euro(amount)} pro Jahr` : `${euro(amount)} pro Jahr`;
+    return `${trial}${price} inkl. MwSt. 1 Jahr Mindestlaufzeit, danach unbefristet mit 1 Monat Kündigungsfrist.${trial ? " Kündigst du vorher, zahlst du nichts." : ""}`;
+  }
+  return `${trial}${euro(amount)} pro Monat inkl. MwSt. Verlängert sich monatlich, jederzeit zum Monatsende kündbar.${trial ? " Kündigst du vorher, zahlst du nichts." : ""}`;
+}
+
 // Tempo (Daniel, 26. Nov 2026: die Zahlung muss sofort kommen): Konto, Konfiguration und die Stripe-Sitzung werden schon
 // vorbereitet, wenn die Angebotsseite erscheint. Der Klick leitet dann ohne Wartezeit weiter. Unbezahlte Sitzungen verfallen nach 24 Stunden.
 const PREPARED_MAX_AGE = 15 * 60_000;
@@ -105,6 +119,8 @@ function sessionBody(options) {
     hostedFallback: true,
     // Stripes eingebettete Zahlungsseite im Layer, wenn der Server sie anbietet (Daniel, 26. Nov 2026). Ältere Server ignorieren das Feld und liefern die gehostete Seite.
     ...(publicConfig.embedded === true ? { embedded: true } : {}),
+    // Stripes kürzeres Formular (Daniel, 26. Nov 2026: Bezahlknopf direkt sichtbar). ?kasse=seite zeigt zum Vergleich die bisherige Stripe-Seite.
+    ...(publicConfig.form === true && !/[?&]kasse=seite\b/u.test(location.search) ? { form: true } : {}),
     ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
     ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) };
 }
@@ -185,13 +201,13 @@ export async function open(options) {
       loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
       const session = await sessionFor(options, user, token);
       if (!requireCurrentAccount()) return;
-      if (session?.checkoutMode === "embedded") {
+      if (session?.checkoutMode === "embedded" || session?.checkoutMode === "form") {
         // Stripes eigene Zahlungsseite im obersten Layer. Dieses Fenster (Ladehinweis) verschwindet leise, ohne onClose.
         sheet.detach();
         sheet.node.remove();
         sheet = null;
         document.body.classList.remove("start-noscroll"); // das Layer sperrt das Scrollen selbst und gibt es beim Schließen wieder frei
-        await showEmbeddedCheckout({ session, publishableKey: publicConfig.publishableKey, title: title.textContent,
+        await showEmbeddedCheckout({ session, publishableKey: publicConfig.publishableKey, title: title.textContent, terms: termsFor(session),
           onClose: () => options.onClose?.(), onRetry: () => { preparedSessions.clear(); open({ ...options }); },
           onOpen: (handle) => { embedded = handle; }, onDispose: () => { embedded = null; }, track: options.track });
         options.track?.("checkout_sheet_ready");
