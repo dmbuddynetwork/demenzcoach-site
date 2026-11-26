@@ -1,0 +1,46 @@
+{
+  "note": "Website-Ordnung der Alltagstricks. Die gemeinsame App-Liste (tricks.json) bleibt unverändert; hier stehen nur Themen, Zuordnung und Hinweisboxen der Website. Eine Hinweisbox erscheint nur bei Tricks, zu denen sie inhaltlich passt.",
+  "categories": {
+    "essen": "Essen",
+    "trinken": "Trinken",
+    "bad": "Waschen und Duschen",
+    "toilette": "Toilette",
+    "zaehne": "Zähne putzen",
+    "orientierung": "Orientierung",
+    "schlaf": "Abend und Nacht",
+    "sicherheit": "Sicherheit",
+    "kleidung": "Kleidung",
+    "beschaeftigung": "Beschäftigung und Ruhe",
+    "gespraech": "Gespräch und Begegnung"
+  },
+  "assign": {
+    "wc-sitz-farbig": "toilette",
+    "tuer-bild": "toilette",
+    "feste-toilettenzeiten": "toilette",
+    "unruhe-toilette": "toilette",
+    "eimer-weg": "toilette",
+    "ruhig-bei-missgeschick": "toilette",
+    "vor-der-tuer-warten": "toilette",
+    "zaehne-nebeneinander": "zaehne",
+    "elektrische-zahnbuerste": "zaehne",
+    "zahnpasta-vorbereiten": "zaehne",
+    "nachtlicht-weg": "schlaf",
+    "handcreme": "beschaeftigung",
+    "leichtes-abendessen": "essen",
+    "wasser-am-bett": "trinken",
+    "spiegel-abdecken": "orientierung",
+    "eigenes-portemonnaie": "orientierung",
+    "keine-dunklen-matten": "orientierung",
+    "garderobenhaken": "orientierung",
+    "zettel-wo-du-bist": "orientierung"
+  },
+  "notes": {
+    "bad": "Achte auf Einverständnis, Privatsphäre und eine sichere Umgebung. Prüfe die Wassertemperatur vor dem Kontakt und hole Unterstützung, wenn die Person unsicher steht.",
+    "toilette": "Achte auf Würde und Privatsphäre. Hole Unterstützung, wenn die Person unsicher steht oder stürzen könnte.",
+    "zaehne": "Putze nur mit Einverständnis der Person und achte auf ihre Privatsphäre. Bei Schmerzen oder Fragen zu den Zähnen frage die Zahnarztpraxis."
+  },
+  "sources": {
+    "toilette": ["bathing", "home"],
+    "zaehne": ["bathing"]
+  }
+}

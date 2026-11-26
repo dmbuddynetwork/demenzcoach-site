@@ -12,6 +12,16 @@ for (const [id, override] of Object.entries(references.overrides)) {
   if (!data.tricks.some(trick => trick.id === id) || !references.sources[override.source]) throw new Error(`Unknown source override: ${id}`);
 }
 data.tricks = data.tricks.map(trick => ({ ...trick, ...references.overrides[trick.id] }));
+// Website-Ordnung: eigene Themen und Hinweisboxen, die App-Liste bleibt unverändert (alltagstricks/site-categories.json).
+const siteCategories = JSON.parse(fs.readFileSync(path.join(root, 'alltagstricks/site-categories.json'), 'utf8'));
+for (const [id, key] of Object.entries(siteCategories.assign)) {
+  if (!data.tricks.some(trick => trick.id === id) || !siteCategories.categories[key]) throw new Error(`Unknown category assignment: ${id}`);
+}
+data.categories = siteCategories.categories;
+Object.assign(references.notes, siteCategories.notes);
+Object.assign(references.categories, siteCategories.sources);
+data.tricks = data.tricks.map(trick => ({ ...trick, category: siteCategories.assign[trick.id] ?? trick.category }));
+for (const trick of data.tricks) if (!data.categories[trick.category] || !references.categories[trick.category]) throw new Error(`Missing category data: ${trick.id}`);
 // Reuse the five reviewed full tips, without rewriting the shared native App catalog.
 const reviewed = JSON.parse(fs.readFileSync(path.join(root, 'content/teller-five-tricks.de.json'), 'utf8'));
 const reviewedIDs = { 'teller-rot': 'roter-teller', 'becher-farbig': 'farbiger-becher', 'lieblingslied': 'lied-anziehen', 'nachtlicht-weg': 'nachtlicht' };
@@ -49,17 +59,17 @@ const situationKeys = {
   accuse: ['geld', 'luegen'], money: ['geld'], rummage: ['geld'], jealous: ['untreue'], help: ['hilfe'], doctor: ['krank'], cold: ['kalt'],
 };
 const categoryKeys = {
-  essen: ['schongegessen', 'hunger'], trinken: ['schongegessen', 'hunger'], bad: ['waschen', 'toilette'], orientierung: ['wobin', 'wer'],
+  essen: ['schongegessen', 'hunger'], trinken: ['schongegessen', 'hunger'], bad: ['waschen'], toilette: ['toilette', 'toilettefinden'], zaehne: ['waschen'], orientierung: ['wobin', 'wer'],
   schlaf: ['bett', 'aufstehen'], sicherheit: ['wobin', 'eingesperrt'], kleidung: ['umziehen', 'ausziehen'], beschaeftigung: ['langweilig', 'dumm'],
   gespraech: ['wer', 'ruhe'],
 };
 const goals = {
-  essen: 'Mahlzeiten leichter machen', trinken: 'Getränke gut erkennbar anbieten', bad: 'Pflege ruhiger gestalten', orientierung: 'Orientierung erleichtern',
+  essen: 'Mahlzeiten leichter machen', trinken: 'Getränke gut erkennbar anbieten', bad: 'Waschen ruhiger gestalten', toilette: 'Toilettengänge leichter machen', zaehne: 'Zähneputzen leichter machen', orientierung: 'Orientierung erleichtern',
   schlaf: 'Abend und Nacht ruhiger gestalten', sicherheit: 'Die Umgebung sicherer machen', kleidung: 'Anziehen leichter machen',
   beschaeftigung: 'Gemeinsam etwas Schönes tun', gespraech: 'Begegnungen leichter machen',
 };
 const guides = {
-  essen: null, trinken: null, bad: ['/de/ratgeber/demenz-will-sich-nicht-waschen.html', 'Demenz: wenn jemand sich nicht waschen will'],
+  essen: null, trinken: null, toilette: null, zaehne: null, bad: ['/de/ratgeber/demenz-will-sich-nicht-waschen.html', 'Demenz: wenn jemand sich nicht waschen will'],
   schlaf: ['/de/ratgeber/demenz-nachts-zur-arbeit.html', 'Nachts unruhig: ruhig reagieren'], gespraech: ['/de/ratgeber/demenz-kommunikation.html', 'Kommunikation bei Demenz: ruhig sprechen in schwierigen Momenten'],
   orientierung: ['/de/ratgeber/demenz-immer-dieselbe-frage.html', 'Immer dieselbe Frage: ruhig antworten'], sicherheit: ['/de/ratgeber/demenz-nach-hause-was-sagen.html', 'Will nach Hause: was du sagen kannst'],
   kleidung: null, beschaeftigung: null,
@@ -133,6 +143,7 @@ const footer = `  <footer class="e-footer">
   <script>window.demenzCoachSiteLocale={"menuOpen":"Menü öffnen","menuClose":"Menü schließen","privacyURL":"/datenschutz.html"};</script>
   <script src="/lovable-home.js?v=20261108a"></script>
   <script src="/demenz-uebersetzer/translator-signup.js"></script>
+  <script src="/alltagstricks/tips-chat.js"></script>
   <script>(function(){var list=document.getElementById('e-tiles'),end=document.getElementById('e-tiles-end');if(!list||!end||!('IntersectionObserver' in window))return;var step=6,items=[].slice.call(list.children);items.forEach(function(li,i){if(i>=step)li.hidden=true;});function rest(){return list.querySelectorAll('li[hidden]');}var io=new IntersectionObserver(function(e){if(!e[0].isIntersecting)return;var h=rest();for(var i=0;i<step&&i<h.length;i++)h[i].hidden=false;if(!rest().length)io.disconnect();else{io.unobserve(end);io.observe(end);}},{rootMargin:'400px 0px'});io.observe(end);})();</script>
   <script>(function(){var host=document.getElementById('tricks-signup');if(!host)return;var b=window.DemenzTranslatorSignup&&window.DemenzTranslatorSignup.box();if(b){host.append(b);}else{var d=host.closest('details');if(d)d.hidden=true;}})();</script>
 </body>

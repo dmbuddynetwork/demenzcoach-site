@@ -7,6 +7,9 @@ const root = path.resolve(__dirname, '..');
 const reviewed = require('../content/teller-five-tricks.de.json');
 const catalog = require('../alltagstricks/tricks.json');
 const refs = require('../alltagstricks/sources.json');
+const siteCategories = require('../alltagstricks/site-categories.json');
+const categoryOf = trick => siteCategories.assign[trick.id] ?? trick.category;
+const noteOf = trick => siteCategories.notes[categoryOf(trick)] ?? refs.notes[categoryOf(trick)];
 const esc = text => text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','lieblingslied':'lied-anziehen','nachtlicht-weg':'nachtlicht'};
 (async () => {
@@ -25,7 +28,7 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
    const route = tipDetailRoutes[old.id], html = fs.readFileSync(path.join(root,route),'utf8');
    assert.ok(html.includes('>'+esc(expected.title)+'</h1>'),old.id);
    assert.ok(html.includes('translator-do">'+esc(expected.text)+'</p>'),old.id);
-   if(refs.notes[old.category])assert.ok(html.includes(esc(refs.notes[old.category])),old.id+' retains full category safeguard');
+   if(noteOf(old))assert.ok(html.includes(esc(noteOf(old))),old.id+' retains full category safeguard');
   }
   for (const tip of reviewed.tips) {
    const route=tipDetailRoutes[tip.id],html=fs.readFileSync(path.join(root,route),'utf8');
