@@ -424,3 +424,13 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 
 /* Nach Klick oder Tippen kein Fokus-Rahmen (Daniel, 26. Nov 2026). Mit der Tab-Taste bleibt er sichtbar. */
 .start-pointer :focus, .start-pointer :focus-visible { outline: none !important; }
+
+/* Layer: die erste Frage passt ohne inneres Scrollen (Daniel, 26. Nov 2026). Bilder richten sich nach der Höhe des Layers. */
+.start-embedded body[data-screen="relation"] .start-page { padding-top: 4px; padding-bottom: 8px; }
+.start-embedded body[data-screen="relation"] .start-top { min-height: 0; margin-bottom: 4px; }
+.start-embedded body[data-screen="relation"] .start-top .abo-brand img { width: 32px; height: 32px; }
+.start-embedded body[data-screen="relation"] h1 { margin-bottom: 4px; }
+.start-embedded body[data-screen="relation"] .start-question { margin-bottom: 10px; }
+.start-embedded body[data-screen="relation"] .start-pics { gap: 10px; margin-bottom: 10px; }
+.start-embedded body[data-screen="relation"] .start-pic img { padding-top: 6px; }
+.start-embedded body[data-screen="relation"] .start-pic > span { padding: 10px 14px; }

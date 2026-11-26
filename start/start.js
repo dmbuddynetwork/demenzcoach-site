@@ -1206,6 +1206,18 @@
     directCounted.add(step);
     countEvent(step);
   };
+  // Layer: die erste Frage passt ohne inneres Scrollen. Die Bilder werden so klein wie nötig (zwei Bildreihen).
+  function fitLayer() {
+    const images = [...document.querySelectorAll("#screen .start-pic img")];
+    if (!images.length) return;
+    images.forEach((image) => { image.style.height = ""; });
+    const over = document.documentElement.scrollHeight - window.innerHeight;
+    if (over > 0) {
+      const height = Math.max(48, images[0].getBoundingClientRect().height - Math.ceil(over / 2) - 1);
+      images.forEach((image) => { image.style.height = `${height}px`; });
+    }
+  }
+  if (embedded) window.addEventListener("resize", () => { if (current === "relation") fitLayer(); });
   function render(name) {
     current = name;
     clearTimeout(revealTimer);
@@ -1224,6 +1236,7 @@
     if (rootClasses.contains("start-pointer")) document.activeElement?.blur?.();
     screen.replaceChildren(...screens[name]().filter(Boolean));
     screen.dataset.kind = isQuestion(name) ? "question" : name;
+    if (embedded && name === "relation") requestAnimationFrame(fitLayer);
     document.body.dataset.screen = name;
     const done = !isQuestion(name) && flow.indexOf(name) >= flow.indexOf("building");
     const index = sections.findIndex((section) => section.steps.includes(name));
@@ -1318,7 +1331,7 @@
   readKnownEmail();
   if (directMode && validEmail(knownEmail)) answers.email = knownEmail;
   // Im Layer: Fragebogen schon fertig → Angebotsseite (Daniel, 26. Nov 2026); sonst die erste Frage.
-  const resumed = directMode ? "plan" : embedded && restoreDone() ? "plan" : restoreProgress();
+  const resumed = directMode ? "plan" : embedded && (restoreDone() || params.get("angebot") === "1") ? "plan" : restoreProgress();
   if (embedded && resumed === "plan") completed = true;
   // Aus dem Layer: „Zurück“ führt zur ersten Frage auf dieser Seite, nicht zurück zur Seite mit dem Layer.
   if (params.get("weiter") === "1" && resumed !== "relation") {
