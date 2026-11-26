@@ -498,3 +498,15 @@ body[data-screen="plan"] .start-faq details p { font-size: 1.125rem; line-height
 
 /* Knopftext in normaler Schreibweise statt GROSSBUCHSTABEN (für 60+ leichter lesbar, Daniel 26. Nov). */
 body[data-screen="plan"] .start-cta, body[data-screen="plan"] .start-head-button { text-transform: none; letter-spacing: 0; }
+
+/* Knopf auffälliger (Daniel, 26. Nov: „Der Button ist zu wenig sichtbar“): größer, fetter, Schatten, Pfeil. */
+body[data-screen="plan"] .start-cta { min-height: 70px; font-size: 1.3125rem; font-weight: 800; box-shadow: 0 10px 24px rgba(71, 64, 140, .38); }
+body[data-screen="plan"] .start-cta::after { content: " →"; }
+body[data-screen="plan"] .start-cta:hover { filter: brightness(1.08); }
+body[data-screen="plan"] .start-head-button { font-weight: 800; box-shadow: 0 6px 16px rgba(71, 64, 140, .3); }
+@media (min-width: 900px) { html:not(.start-embedded) body[data-screen="plan"] .start-cta { min-height: 76px; font-size: 1.375rem; } }
+/* Handy: Kopf bleibt eine Zeile (Text links, Knopf rechts), damit oben mehr Platz für Preis und Knopf bleibt. */
+@media (max-width: 520px) {
+  body[data-screen="plan"] .start-head { flex-wrap: nowrap; }
+  body[data-screen="plan"] .start-head-button { padding: 10px 18px; font-size: 1.0625rem; white-space: nowrap; }
+}

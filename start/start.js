@@ -397,7 +397,7 @@
           el("p", { text: explained
             ? "Erklären und Widersprechen probieren fast alle zuerst. Oft wird es dadurch aber schwerer, weil die Person ihre Welt gerade anders erlebt."
             : "Hinter fast jedem Menschen mit Demenz stehen Angehörige, die jeden Tag nach den richtigen Worten suchen." }),
-          el("p", { text: "Fachleute raten: erst das Gefühl aufgreifen, dann die Fakten. Genau dafür ist dein Plan gemacht." })
+          el("p", { text: "Fachleute raten: erst das Gefühl aufgreifen, dann die Fakten. Genau dabei hilft dir die App." })
         ]),
         next("insight")
       ];
@@ -493,13 +493,13 @@
   }
   // Zwischenstopps (Zeichnung, kurze Überschrift, zwei Sätze). Keine erfundenen Zahlen, Logos oder Zitate.
   const infoPages = {
-    hello: ["together.webp", "Du bist nicht allein", "Viele Angehörige suchen jeden Tag nach den richtigen Worten. Mit jeder Antwort wird dein Plan genauer."],
-    feelings: ["schritt-zurueck.webp", "Erst das Gefühl, dann die Fakten", "Hinter vielen Sätzen steckt ein Gefühl: Angst, Sehnsucht oder der Wunsch, gebraucht zu werden. Dein Plan zeigt dir, was dahinter stecken könnte."],
-    self: ["pause-tochter.webp", "Auch du zählst", "Wer sich kümmert, braucht selbst Pausen. Dein Plan hat kleine Hilfen für dich, die nur wenige Minuten brauchen."],
+    hello: ["together.webp", "Du bist nicht allein", "Viele Angehörige suchen jeden Tag nach den richtigen Worten. Mit jeder Antwort passt deine Hilfe besser."],
+    feelings: ["schritt-zurueck.webp", "Erst das Gefühl, dann die Fakten", "Hinter vielen Sätzen steckt ein Gefühl: Angst, Sehnsucht oder der Wunsch, gebraucht zu werden. Die App zeigt dir, was dahinter stecken könnte."],
+    self: ["pause-tochter.webp", "Auch du zählst", "Wer sich kümmert, braucht selbst Pausen. Die App hat kleine Hilfen für dich, die nur wenige Minuten brauchen."],
     hope: ["ruhig-abend.webp", "Wir helfen dir, ruhig zu bleiben", "Mit passenden Sätzen wird es leichter, nicht zu streiten. Du bekommst jeden Tag einen Moment mit Sätzen zum Sagen."],
-    content: ["words.webp", "So entstehen deine Sätze", "Die Sätze stammen aus unseren Übersetzer-Seiten. Sie sind ruhig, einfach und ohne Vorwurf. Dein Plan wählt die aus, die zu eurem Alltag passen."],
-    step: ["ruhig-hilfe.webp", "Kleine Schritte reichen", "Du musst nicht alles auf einmal ändern. Dein Plan gibt dir jeden Tag einen kleinen Schritt, der in wenigen Minuten klappt."],
-    motivate: ["v-garten.webp", "Denk an einen guten Moment", "Gab es zuletzt einen Augenblick, der leichter war? Ein Lächeln, ein Lied, ein gemeinsamer Tee. Darauf baut dein Plan auf."]
+    content: ["words.webp", "So entstehen deine Sätze", "Die Sätze stammen aus unseren Übersetzer-Seiten. Sie sind ruhig, einfach und ohne Vorwurf. Die App wählt die aus, die zu eurem Alltag passen."],
+    step: ["ruhig-hilfe.webp", "Kleine Schritte reichen", "Du musst nicht alles auf einmal ändern. Die App gibt dir jeden Tag einen kleinen Schritt, der in wenigen Minuten klappt."],
+    motivate: ["v-garten.webp", "Denk an einen guten Moment", "Gab es zuletzt einen Augenblick, der leichter war? Ein Lächeln, ein Lied, ein gemeinsamer Tee. Darauf baut deine Hilfe auf."]
   };
   for (const [name, [image, title, text]] of Object.entries(infoPages)) {
     screens[name] = () => [el("img", { class: "start-art", src: `../assets/zeichnungen/${image}`, width: "600", height: "600", alt: "" }),
@@ -547,7 +547,7 @@
     };
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") send(); });
     return [
-      el("h1", { text: contract ? "E-Mail für die Vertragsbestätigung" : forWho() ? `Gib deine E-Mail ein, um den persönlichen Plan für ${forWho()} zu erhalten` : "Gib deine E-Mail ein, um deinen persönlichen Plan zu erhalten" }),
+      el("h1", { text: contract ? "E-Mail für die Vertragsbestätigung" : forWho() ? `Gib deine E-Mail ein, um deine Hilfe für Gespräche mit ${forWho()} zu erhalten` : "Gib deine E-Mail ein, um deine persönliche Hilfe zu erhalten" }),
       contract ? el("p", { class: "start-lead", text: "An diese Adresse schicken wir die Vertragsbestätigung, wenn du ein Abo abschließt." }) : null,
       el("label", { for: "email", class: "sr-only", text: "E-Mail-Adresse" }),
       input,
@@ -610,7 +610,7 @@
       + '<circle cx="30" cy="130" r="7" fill="#fff" stroke="#47408c" stroke-width="4"/><circle cx="300" cy="28" r="8" fill="#47408c"/>'
       + '<g font-family="system-ui,sans-serif" font-size="11" fill="#5b5870" text-anchor="middle"><text x="30" y="162">Jetzt</text><text x="97" y="162">Woche 1</text><text x="164" y="162">Woche 2</text><text x="231" y="162">Woche 3</text><text x="291" y="162">Woche 4</text></g>';
     return [
-      el("h1", { text: name ? `${name}: Dein Plan ist bereit!` : "Dein Plan ist bereit!" }),
+      el("h1", { text: name ? `Deine Hilfe für Gespräche mit ${name} ist bereit!` : "Deine Hilfe für schwierige Gespräche ist bereit!" }),
       el("div", { class: "start-graph-card" }, [
         el("p", { class: "start-graph-title", text: "Sicherheit im Gespräch" }),
         chart,
@@ -784,7 +784,8 @@
     // Labels wie BetterMe („GET MY PLAN“, „MOST POPULAR“). Statt „Beliebtester“ (ohne Verkaufszahlen nicht belegbar, UWG)
     // steht auf dem Jahresplan „Bester Preis“: belegbar, weil er pro Tag am günstigsten ist.
     // Knopftext (Daniel, 26. Nov, Entscheidung „Direkt: 7 Tage kostenlos testen“): nennt Probezeit und „kostenlos“. Ohne Probezeit bleibt „Plan anfordern“.
-    const ctaText = offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos testen` : "Plan anfordern";
+    // Daniel 26. Nov: „verkaufen wir einen Plan?“ → kein „Plan“ mehr; Knopf „Jetzt kostenlos freischalten“ (Vorschlag „Zugang freischalten“).
+    const ctaText = offer.trialDays > 0 ? "Jetzt kostenlos freischalten" : "Jetzt freischalten";
     setTimeout(() => { if (current === "plan") prepareCheckout(plan); }, 300);
 
     const tables = [];
@@ -811,8 +812,8 @@
         ? el("span", {}, [el("s", { text: euro(offer.yearly) }), ` → ${euro(firstYear)} im 1. Jahr`])
         : el("span", { text: `${euro(offer.yearly)} pro Jahr` });
       const group = el("div", { role: "radiogroup", "aria-label": "Tarif", class: "start-tiers" }, [
-        tier("monthly", "1-Monats-Plan", el("span", { text: `${euro(offer.monthly)} pro Monat` }), offer.monthly, 30, null, null),
-        tier("yearly", "12-Monats-Plan", yearlyLine, firstYear, 365, deal ? offer.yearly : null, saving >= 10 ? `Bester Preis · Spare ${deal ? Math.floor((1 - firstYear / (offer.monthly * 12)) * 100) : saving} %` : "Bester Preis")
+        tier("monthly", "1 Monat", el("span", { text: `${euro(offer.monthly)} pro Monat` }), offer.monthly, 30, null, null),
+        tier("yearly", "12 Monate", yearlyLine, firstYear, 365, deal ? offer.yearly : null, saving >= 10 ? `Bester Preis · Spare ${deal ? Math.floor((1 - firstYear / (offer.monthly * 12)) * 100) : saving} %` : "Bester Preis")
       ]);
       tables.push(group);
       return group;
@@ -853,7 +854,7 @@
     // Fester Kopf wie BetterMe: links die Uhr (oder die Probezeit), rechts „Plan anfordern“.
     const head = el("div", { class: "start-head" }, [
       clock(false) || el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewähltes Abo" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
-      el("button", { type: "button", class: "start-head-button", text: ctaText, onclick: scrollToPlans })
+      el("button", { type: "button", class: "start-head-button", text: offer.trialDays > 0 ? "Gratis freischalten" : "Freischalten", onclick: scrollToPlans })
     ]);
 
     // Nur tatsächlich vorhandene Hilfen zeigen. Keine Vorher-/Nachher-Wirkung versprechen.
@@ -868,7 +869,7 @@
     if (answers.burden?.key === "kraft") gets.splice(3, 0, "Kleine Hilfen für dich selbst");
     const faq = [
       ["Was kostet es?", (deal
-        ? `12-Monats-Plan: ${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} im Jahr. 1-Monats-Plan: ${euro(offer.monthly)} im Monat.`
+        ? `12 Monate: ${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} im Jahr. 1 Monat: ${euro(offer.monthly)} im Monat.`
         : `${euro(offer.yearly)} im Jahr oder ${euro(offer.monthly)} im Monat, je nach Wahl.`) + (offer.trialDays > 0 ? ` In den ${offer.trialDays} Tagen zahlst du nichts.` : " Alle Preise inkl. MwSt.")],
       ["Was ist, wenn es uns nicht hilft?", `Dann bekommst du dein Geld zurück. Es gilt eine ${guaranteeDays} Tage Geld-zurück-Garantie ab der ersten Zahlung: Unter „Verträge hier kündigen“ die Garantie wählen, fertig. Die Bedingungen stehen auf der Seite Geld-zurück-Garantie.`],
       ["Wie kündige ich?", `Online über „Verträge hier kündigen“ unten auf jeder Seite, ohne Anmeldung.${offer.trialDays > 0 ? " Kündigst du in der Probezeit, zahlst du nichts." : ""}`],
@@ -954,7 +955,7 @@
     }, { passive: true });
     slides.forEach((slide, index) => slide.addEventListener("click", () => goTo(index)));
     dots.forEach((dot, index) => dot.addEventListener("click", () => goTo(index)));
-    const shots = el("div", { class: "start-shots", role: "region", "aria-label": "Bilder aus dem Plan" }, [shotsTrack, el("div", { class: "start-shots-dots" }, dots)]);
+    const shots = el("div", { class: "start-shots", role: "region", "aria-label": "Bilder aus der App" }, [shotsTrack, el("div", { class: "start-shots-dots" }, dots)]);
 
     // Übungsplan für 7 Tage (nur vom Üben): je Tag eine Situation. Tag 1 ist die gerade geübte Situation und ist geschafft.
     const weekDays = [
@@ -993,8 +994,8 @@
       ]);
       const savingText = `Spare ${deal ? Math.floor((1 - firstYear / (offer.monthly * 12)) * 100) : saving} %`;
       const group = el("div", { class: "start-tp-plans", role: "radiogroup", "aria-label": "Tarif" }, [
-        planCard("yearly", "12-Monats-Plan", `${euro(firstYear)}/Jahr`, `${perMonth(firstYear, 12)}/Monat`, saving >= 10 ? savingText : null),
-        planCard("monthly", "1-Monats-Plan", `${euro(offer.monthly)}/Monat`, null, null)
+        planCard("yearly", "12 Monate", `${euro(firstYear)}/Jahr`, `${perMonth(firstYear, 12)}/Monat`, saving >= 10 ? savingText : null),
+        planCard("monthly", "1 Monat", `${euro(offer.monthly)}/Monat`, null, null)
       ]);
       tables.push(group);
       const label = () => (offer.trialDays > 0 ? `Für ${euro(0)} starten` : `Für ${euro(plan === "yearly" ? firstYear : offer.monthly)} starten`);
@@ -1029,15 +1030,15 @@
         reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
         el("div", { class: "start-tp" }, [
           pic,
-          el("h1", { class: "start-center", text: pair ? "Dein Übungsplan für Gespräche ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : (name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!") }),
-          el("p", { class: "start-tp-sub", text: "Sichere dir deinen Plan mit einem Tipp." }),
+          el("h1", { class: "start-center", text: pair ? "Dein Gesprächstraining ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : directMode ? "Die richtigen Worte, wenn es schwierig wird" : (name ? `Deine Hilfe für Gespräche mit ${name} ist bereit!` : "Deine Hilfe für schwierige Gespräche ist bereit!") }),
+          el("p", { class: "start-tp-sub", text: "Schalte alles mit einem Tipp frei." }),
           group,
           el("span", { class: "start-tp-applepay", role: "img", "aria-label": "Apple Pay", html: applePayMark[1] }),
           note,
           cta,
           // Andere Zahlart: auf Geräten mit Apple Pay fängt der unsichtbare Express-Knopf den Tipp auf den großen Knopf ab, darum gibt es hier einen eigenen Weg zur Stripe-Seite (Karte und weitere Zahlarten).
           el("button", { type: "button", class: "abo-link-button start-tp-alt", "data-tp-alt": "", hidden: "", text: "Mit Karte oder anderer Zahlart bezahlen", onclick: () => { countDirect("direct_cta"); checkout({ stripePage: true }); } }),
-          el("button", { type: "button", class: "abo-link-button start-tp-more", text: "Mehr über deinen Plan ↓", onclick: () => document.querySelector(".start-big-title")?.scrollIntoView({ behavior: "smooth", block: "start" }) })
+          el("button", { type: "button", class: "abo-link-button start-tp-more", text: "Mehr erfahren ↓", onclick: () => document.querySelector(".start-big-title")?.scrollIntoView({ behavior: "smooth", block: "start" }) })
         ])
       ];
     };
@@ -1050,14 +1051,14 @@
       ...(tolanTop ? [] : [head]),
       reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
       tolanTop ? null : hero,
-      tolanTop ? null : el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Übungsplan für Gespräche ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : (name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!") }),
+      tolanTop ? null : el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Gesprächstraining ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : directMode ? "Die richtigen Worte, wenn es schwierig wird" : (name ? `Deine Hilfe für Gespräche mit ${name} ist bereit!` : "Deine Hilfe für schwierige Gespräche ist bereit!") }),
       tolanTop ? null : (result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null),
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
       // Mit Apple Pay (oder ?ap=1) steht davor der kurze Bezahlbildschirm wie Tolan; darunter bleibt die lange Seite mit allen Hilfen und dem bisherigen Knopf.
       ...(tolanTop ?? offerBlock()),
       pair ? null : preview,
-      el("h2", { class: "start-section start-center start-big-title", text: "Was ist in deinem Plan enthalten" }),
+      el("h2", { class: "start-section start-center start-big-title", text: "Was du bekommst" }),
       shots,
       includedList,
       week ? el("div", { class: "start-weekcard" }, [
@@ -1073,12 +1074,12 @@
       voices(),
       el("h2", { class: "start-section start-center start-big-title", text: "Häufig gestellte Fragen" }),
       el("div", { class: "start-faq" }, faq.map(([question, answer], index) => el("details", index === 0 ? { open: "" } : {}, [el("summary", { text: question }), el("p", { text: answer })]))),
-      el("h2", { class: "start-section start-center start-big-title", text: pair ? "Ruhiger reden. Ab heute üben." : "Starte heute mit deinem Plan" }),
+      el("h2", { class: "start-section start-center start-big-title", text: pair ? "Ruhiger reden. Ab heute üben." : "Ruhiger reden. Ab heute." }),
       ...offerBlock(),
       el("div", { class: "start-guarantee-card" }, [
         el("span", { html: icons.shield }),
         el("h2", { text: `${guaranteeDays}-Tage-Geld-zurück-Garantie` }),
-        el("p", { text: `Hilft dir der Plan nicht, bekommst du dein Geld zurück. Wähle innerhalb von ${guaranteeDays} Tagen nach der ersten Zahlung unter „Verträge hier kündigen“ die Geld-zurück-Garantie. Wir erstatten den vollen Betrag, das Abo endet sofort.` }),
+        el("p", { text: `Hilft es dir nicht, bekommst du dein Geld zurück. Wähle innerhalb von ${guaranteeDays} Tagen nach der ersten Zahlung unter „Verträge hier kündigen“ die Geld-zurück-Garantie. Wir erstatten den vollen Betrag, das Abo endet sofort.` }),
         el("p", {}, ["Weitere Infos und Bedingungen findest du hier: ", el("a", { href: "/abo/garantie.html", text: "Geld-zurück-Garantie" }), "."])
       ]),
       el("p", { class: "start-small start-legal" }, [
