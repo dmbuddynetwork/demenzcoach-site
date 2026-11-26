@@ -929,3 +929,64 @@ body.einfach .situation-more .situation-more-guide { margin-top: 16px; }
 body.einfach form.translator-chat-form { flex-direction: column; align-items: stretch; gap: 10px; }
 body.einfach input.translator-chat-input { flex: none; width: 100% !important; height: 60px; min-height: 60px; padding: 0 18px; border: 2px solid var(--e-purple, #47408C); border-radius: 16px; font-size: 1.25rem !important; line-height: 1.3 !important; }
 body.einfach button.translator-chat-send { flex: none; width: 100%; max-width: none; min-width: 0; height: 56px; min-height: 56px; padding: 0 16px; border-radius: 16px; font-size: 1.125rem !important; font-weight: 700; white-space: nowrap; }
+
+/* ---------- Eingabe wie ChatGPT (Daniel, 26. Nov): große, runde Eingabezeile, runder Senden-Pfeil darin ---------- */
+body.einfach { --e-send-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E"); }
+/* Hauptfeld: eine Zeile mit Rundung, Pfeil unten rechts im Feld. Der Text „Antwort finden“ bleibt für Screenreader. */
+body.einfach #translator-form .translator-input-row {
+  position: relative; display: block !important; max-width: 760px; margin: 0 auto;
+  background: #fff; border: 1px solid var(--e-line); border-radius: 28px; box-shadow: 0 2px 14px rgba(30, 24, 70, .1);
+}
+body.einfach #translator-form .translator-input-row:focus-within { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
+body.einfach #translator-form #translator-input {
+  min-height: 108px; padding: 18px 76px 18px 24px; border: 0 !important; border-radius: 28px;
+  background: transparent; box-shadow: none !important; outline: none; font-size: 1.25rem; line-height: 1.45;
+}
+body.einfach #translator-form #translator-input:focus, body.einfach #translator-form #translator-input:focus-visible { outline: none !important; box-shadow: none !important; }
+body.einfach #translator-form .translator-input-row .button {
+  position: absolute; right: 12px; bottom: 12px; width: 52px !important; min-width: 0; height: 52px; min-height: 52px; margin: 0; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0 !important; line-height: 0;
+}
+body.einfach #translator-form .translator-input-row .button > * { display: none !important; }
+body.einfach #translator-form .translator-input-row .button::after { content: none !important; }
+body.einfach #translator-form .translator-input-row .button::before {
+  content: ""; display: block; width: 26px; height: 26px; background: #fff;
+  -webkit-mask: var(--e-send-arrow) center / contain no-repeat; mask: var(--e-send-arrow) center / contain no-repeat;
+}
+body.einfach #translator-form .translator-form-intro { text-align: center; }
+/* Untere Leiste: gleiche Eingabezeile, schwebend, ohne Rahmenleiste. */
+body.einfach .translator-chat {
+  border: 0; box-shadow: none; padding-top: 14px;
+  background: linear-gradient(to top, var(--e-bg) 68%, rgba(246, 245, 242, 0));
+}
+body.einfach .translator-chat-panel { max-width: 760px; }
+body.einfach .translator-chat form.translator-chat-form {
+  flex-direction: row; align-items: center; gap: 8px; padding: 6px 6px 6px 22px;
+  background: #fff; border: 1px solid var(--e-line); border-radius: 999px; box-shadow: 0 2px 14px rgba(30, 24, 70, .12);
+}
+body.einfach .translator-chat form.translator-chat-form:focus-within { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
+body.einfach .translator-chat input.translator-chat-input {
+  flex: 1 1 0; width: auto !important; min-width: 0; height: 52px; min-height: 52px; padding: 0; border: 0 !important; border-radius: 0;
+  background: transparent; box-shadow: none !important; outline: none !important; font-size: 1.1875rem !important;
+}
+body.einfach .translator-chat button.translator-chat-send {
+  position: relative; flex: 0 0 52px; width: 52px; min-width: 0; max-width: none; height: 52px; min-height: 52px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0 !important; line-height: 0 !important;
+}
+body.einfach .translator-chat button.translator-chat-send::after { content: none !important; }
+body.einfach .translator-chat button.translator-chat-send::before {
+  content: ""; display: block; width: 26px; height: 26px; background: #fff;
+  -webkit-mask: var(--e-send-arrow) center / contain no-repeat; mask: var(--e-send-arrow) center / contain no-repeat;
+}
+/* Kein Chat-Balken unter dem Anmelde-, Zahlungs- oder Funnel-Layer von unten. */
+body:has(dialog[open]) .translator-chat, body.dc-signup-sheet-open .translator-chat { display: none !important; }
+
+/* Ziel selbst wählen und ändern (Daniel, 26. Nov). */
+body.einfach .translator-answer .translator-goal-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 12px; }
+body.einfach .translator-answer .translator-goal-row .translator-goal-chosen { margin: 0 !important; }
+body.einfach .translator-goal-change {
+  min-height: 48px; margin: 0; padding: 8px 18px; background: #fff; color: var(--e-purple); border: 2px solid var(--e-purple); border-radius: 999px;
+  font: inherit; font-size: 1.0625rem; font-weight: 700; line-height: 1.2; cursor: pointer; box-shadow: none;
+}
+body.einfach .translator-goal-change::after { content: none !important; }
+body.einfach .translator-goal-change:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; }
