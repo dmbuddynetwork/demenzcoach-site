@@ -25,8 +25,8 @@ const walk = (directory, prefix = "") => {
     if (!prefix && entry.name === "vorschau") continue;
     // teller/ und plate/ (EN): Landingpages für Social-Media-Traffic (noindex), eigenes Layout.
     if (!prefix && (entry.name === "teller" || entry.name === "plate")) continue;
-    // abo/, start/ und intern/: Kassen-, Werbe- und Team-Seiten mit eigenen Regeln (noindex), keine SEO-Seiten.
-    if (!prefix && (entry.name === "abo" || entry.name === "start" || entry.name === "intern")) continue;
+    // abo/, start/, hilfe/ und intern/: Kassen-, Werbe- und Team-Seiten mit eigenen Regeln (noindex), keine SEO-Seiten.
+    if (!prefix && (entry.name === "abo" || entry.name === "start" || entry.name === "hilfe" || entry.name === "intern")) continue;
     // Shared answer links: noindex shells without SEO content (token in the URL fragment).
     if ((prefix === "de" && entry.name === "geteilt.html") || (prefix === "en" && entry.name === "shared.html")) continue;
     const relative = path.posix.join(prefix, entry.name);

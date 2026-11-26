@@ -117,7 +117,8 @@
   // E-Mail übersprungen (Daniel, 26. Nov 2026): Die Adresse wird dann erst vor der Kasse verlangt.
   let emailForCheckout = false;
   // Holt Stripes gehostete Kasse die Adresse selbst (Server-Schalter walletEmail), fragen wir vor der Kasse nicht extra.
-  let walletEmail = false;
+  // Standard „an“ (Daniel, 26. Nov 2026: Stripe muss als Erstes kommen): ein Klick vor der Antwort des Servers darf nie die E-Mail-Seite zeigen.
+  let walletEmail = true;
   // Schon bekannte Adresse (Daniel, 26. Nov 2026: „dann brauchen wir die ja nicht“): aus diesem Tab
   // (E-Mail-Schritt, Simulator) oder von einem angemeldeten Konto. Dann entfällt die E-Mail-Seite.
   let knownEmail = "";
@@ -1106,7 +1107,6 @@
   }
 
   function checkout() {
-    if (directMode && !validEmail(answers.email)) { go("email"); return; }
     if (!validEmail(answers.email) && validEmail(knownEmail)) answers.email = knownEmail;
     if (!validEmail(answers.email) && !walletEmail) { emailForCheckout = true; go("email"); return; }
     track(directMode ? "direct_offer_checkout" : "quiz_checkout", "InitiateCheckout");
