@@ -46,7 +46,10 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
   // Daniel, 26. Nov 2026: kein sichtbarer Titel über Stripe, damit der Bezahlknopf möglichst ohne Scrollen sichtbar ist.
   // Der Titel bleibt nur für Screenreader; das × schwebt oben rechts.
   heading.className = "kasse-embed-sr";
-  dialog.append(heading, closeButton, status, problem, box);
+  // Kein Scrollen im Fenster (Daniel, 26. Nov 2026): Das Fenster wächst mit Stripe, gescrollt wird die ganze Fläche.
+  const panel = make("div", { class: "kasse-embed-panel" });
+  panel.append(heading, closeButton, status, problem, box);
+  dialog.append(panel);
   const root = doc.documentElement, body = doc.body, overflow = [root.style.overflow, body.style.overflow];
   let finished = false, checkout = null, watchdog = null;
   const dispose = () => {
