@@ -22,8 +22,9 @@ const server = http.createServer((req, res) => { try {
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   const origin = 'http://127.0.0.1:' + server.address().port;
   let browser, cases = 0;
-  const run = async ({ failFirst = false }, check) => {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  // Layer nur am Desktop (ab 900 px). Am Handy führt jeder Kaufknopf auf Stripes eigene Seite (Daniel, 26. Nov 2026).
+  const run = async ({ failFirst = false, phone = false }, check) => {
+    const context = await browser.newContext(phone ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1280, height: 800 } });
     const page = await context.newPage(), state = { sessions: [] };
     await context.route('**/*', async route => {
       const req = route.request(), url = new URL(req.url());
@@ -70,6 +71,17 @@ const server = http.createServer((req, res) => { try {
       assert.equal(await page.evaluate(() => document.body.classList.contains('start-noscroll')), false, 'Scroll-Sperre weg');
       assert.notEqual(await page.evaluate(() => document.body.style.overflow), 'hidden');
       assert.equal(await page.evaluate(() => window.DemenzKasse.isOpen()), false);
+    });
+    // 1a) Handy: kein Layer, Stripes eigene Seite im selben Tab, Sitzung ohne embedded/form.
+    await run({ phone: true }, async (page, state) => {
+      await page.goto(origin + '/start/?direkt=1');
+      await page.waitForFunction(() => window.DemenzKasse?.open);
+      await openIn(page);
+      await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
+      const last = state.sessions.at(-1);
+      assert.equal(last.embedded, undefined, 'am Handy keine eingebettete Sitzung');
+      assert.equal(last.form, undefined, 'am Handy kein Formular');
+      assert.equal(last.hostedFallback, true);
     });
     // 1b) Zurück-Taste schließt das Layer (isOpen/close kennen es), und das Scrollen ist danach frei.
     await run({}, async (page) => {
