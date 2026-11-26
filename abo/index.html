@@ -8,6 +8,23 @@
   <meta name="robots" content="noindex">
   <link rel="canonical" href="https://dementiacoachapp.com/abo/">
   <link rel="icon" href="/assets/lovable-logo.jpg">
+  <script>
+    // Daniel, 26. Nov 2026: Es gibt nur noch eine Preisseite, die BetterMe-optimierte Angebotsseite /start/. Jede Adresse, die früher
+    // die alte Planwahl hier zeigte (Werbung, Mails, Übersetzer-Hinweise, Abbruch bei Stripe), geht dorthin. Ausgenommen: Rückkehr
+    // nach der Zahlung (status=fertig, session_id), der Weg über „weiter“ (E-Mail-Anmeldung, Ausweichlink von /start/), der Test
+    // ?ap=1 und ?alt=1 (alte Planwahl für Tests und Notfall-Rückbau).
+    (function () {
+      var q = new URLSearchParams(location.search);
+      if ((q.has("status") && q.get("status") !== "abgebrochen") || q.has("session_id") || q.get("weiter") === "1" || q.get("ap") === "1" || q.get("alt") === "1") return;
+      var t = new URLSearchParams({ direkt: "1" });
+      var src = (q.get("src") || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 30);
+      if (src) t.set("src", src);
+      var c = (q.get("c") || q.get("utm_campaign") || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 60);
+      if (c) t.set("utm_campaign", c);
+      if (q.get("plan") === "monthly") t.set("plan", "monthly");
+      location.replace("/start/?" + t.toString());
+    })();
+  </script>
   <link rel="stylesheet" href="abo.css">
   <script src="abo-config.js"></script>
   <script src="angebot.js"></script>
