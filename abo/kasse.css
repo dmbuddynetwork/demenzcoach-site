@@ -22,6 +22,7 @@ dialog.kasse-embed::backdrop { background: rgba(28, 27, 31, .28); }
 /* Desktop: schmales Fenster in der Mitte, so breit wie Stripes Kasse. Die Seite dahinter nur leicht abgedunkelt. */
 @media (min-width: 700px) {
   dialog.kasse-embed { background: transparent; }
-  .kasse-embed-panel { width: min(460px, calc(100vw - 32px)); min-height: 0; margin: 16px auto; border-radius: 18px; box-shadow: 0 16px 48px rgba(28, 27, 31, .22); }
+  /* overflow: hidden schneidet Stripes eckigen Rahmen an den runden Ecken ab (Höhe bleibt automatisch, kein inneres Scrollen). */
+  .kasse-embed-panel { width: min(460px, calc(100vw - 32px)); min-height: 0; margin: 16px auto; border-radius: 18px; overflow: hidden; box-shadow: 0 16px 48px rgba(28, 27, 31, .22); }
   .kasse-embed-box { min-height: 420px; padding: 0 4px 8px; }
 }
