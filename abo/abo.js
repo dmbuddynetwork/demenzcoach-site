@@ -203,7 +203,7 @@ async function mountQuick(plan) {
     const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
     const checkout = await init.call(stripe, { clientSecret: session.clientSecret, elementsOptions: { appearance: { theme: "stripe", variables: { colorPrimary: "#47408c", borderRadius: "10px" } } } });
     const express = checkout.createExpressCheckoutElement({
-      buttonType: { applePay: "subscribe" }, buttonHeight: 52, layout: { maxColumns: 1, maxRows: 1, overflow: "never" },
+      buttonType: { applePay: "subscribe" }, buttonHeight: 52, layout: { maxColumns: 1, maxRows: 1, overflow: "auto" },
       paymentMethods: { applePay: "always", googlePay: "never", link: "never", paypal: "never", amazonPay: "never", klarna: "never" }
     });
     express.on("availablepaymentmethodschange", ({ paymentMethods }) => {
