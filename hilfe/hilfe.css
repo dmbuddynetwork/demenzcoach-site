@@ -82,6 +82,12 @@ a { color: var(--purple); }
 .lp-buy .lp-btn, .lp-sticky .lp-btn { width: 100%; border: 0; font: 700 var(--body)/1.3 var(--font); cursor: pointer; }
 .lp-buy .lp-pills { margin-top: 12px; }
 .lp-pills a { color: var(--ink-2); }
+/* Apple Pay (nur erster Preisblock, nur auf Geräten mit Apple Pay): der Stripe-Knopf liegt unsichtbar über unserem Knopf. */
+.lp-cta-wrap { position: relative; }
+.lp-ap-slot { position: absolute; inset: 0; opacity: 0; overflow: hidden; border-radius: 16px; z-index: 2; }
+.lp-ap-mark { display: block; width: 76px; height: 34px; margin: 0 auto 12px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--line); background: #fff; }
+.lp-ap-mark svg { display: block; width: 100%; height: 100%; }
+.lp-ap-alt { display: block; margin: 4px auto 0; }
 .lp-legal { font-size: var(--small); color: var(--ink-2); margin-top: 16px; line-height: 1.45; }
 .lp-legal a { color: var(--ink-2); }
 .lp-pills { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; font-size: var(--small); color: var(--ink-2); }

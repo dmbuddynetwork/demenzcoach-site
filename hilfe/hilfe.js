@@ -85,9 +85,20 @@ const mountBuy = slot => {
   const cards = ['yearly', 'monthly'].map(key => planCard(key, where));
   const terms = el('p', { class: 'lp-terms' });
   const button = el('button', { type: 'button', class: 'lp-btn', 'data-buy': where });
+  // Apple Pay nur im ersten Preisblock (Daniel, 26. Nov 2026, wie RevenueCat Express Checkout und /start/?ap=1): Auf Geräten mit
+  // Apple Pay liegt der unsichtbare Express-Knopf von Stripe über unserem Knopf, ein Tipp öffnet direkt das Apple-Pay-Fenster.
+  // Ohne Apple Pay (z. B. Instagram- und Facebook-Browser) bleibt alles wie bisher: Knopf → gehostete Stripe-Seite.
+  const pay = blocks.length === 0 ? {
+    slots: { yearly: el('div', { class: 'lp-ap-slot', id: 'lp-ap-yearly', hidden: '' }), monthly: el('div', { class: 'lp-ap-slot', id: 'lp-ap-monthly', hidden: '' }) },
+    ready: {}, mounted: {},
+    mark: el('span', { class: 'lp-ap-mark', role: 'img', 'aria-label': 'Apple Pay', hidden: '' }),
+    alt: el('button', { type: 'button', class: 'lp-link lp-ap-alt', 'data-buy': `${where}_andere`, hidden: '', text: 'Mit Karte oder anderer Zahlart bezahlen' })
+  } : null;
+  if (pay) pay.mark.innerHTML = APPLE_PAY_MARK;
+  const cta = pay ? el('div', { class: 'lp-cta-wrap' }, [button, pay.slots.yearly, pay.slots.monthly]) : button;
   const block = el('div', { class: 'lp-buy-block' }, [
     el('div', { class: 'lp-plans', role: 'radiogroup', 'aria-label': 'Plan wählen' }, cards),
-    terms, button,
+    terms, pay?.mark, cta, pay?.alt,
     el('ul', { class: 'lp-pills' }, [
       el('li', {}, el('a', { href: '/abo/garantie.html', text: `${guaranteeDays} Tage Geld-zurück-Garantie` })),
       el('li', { text: 'Online kündbar' })
@@ -96,8 +107,28 @@ const mountBuy = slot => {
   ]);
   slot.replaceChildren(block);
   slot.classList.add('is-ready');
-  blocks.push({ cards, terms, button, block });
+  blocks.push({ cards, terms, button, block, pay, where });
 };
+const APPLE_PAY_MARK = '<svg viewBox="0 0 60 24" aria-hidden="true"><path d="M13.6 7.3c.6-.8 1-1.8.9-2.8-.9 0-2 .6-2.6 1.4-.6.6-1.1 1.7-.9 2.7 1 .1 2-.5 2.6-1.3zm.9 1.5c-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.9-.8-1.5 0-2.8.9-3.6 2.2-1.5 2.7-.4 6.6 1.1 8.8.7 1.1 1.6 2.2 2.7 2.2s1.5-.7 2.8-.7 1.7.7 2.9.7 1.9-1.1 2.6-2.1c.8-1.2 1.1-2.4 1.2-2.5 0 0-2.3-.9-2.3-3.5 0-2.2 1.8-3.2 1.9-3.3-1-1.5-2.6-1.7-3.1-1.8z" fill="#000"/><text x="20" y="18" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="14" font-weight="600" fill="#000">Pay</text></svg>';
+// Express-Knopf für den gewählten Plan einhängen. kasse.js lädt Stripe.js und eine Sitzung nur, wenn das Gerät Apple Pay kann.
+const mountApplePay = () => {
+  const item = blocks.find(entry => entry.pay);
+  const kasse = window.DemenzKasse;
+  if (!item || !kasse?.mountApplePay || !config.firebase?.apiKey) return;
+  const key = plan, pay = item.pay;
+  if (pay.mounted[key]) return;
+  pay.mounted[key] = true;
+  kasse.mountApplePay(pay.slots[key], { plan: key, offer: key === 'yearly' && deal() ? window.DemenzAngebot.forCheckout() : null, source, campaign,
+    track: name => track(name, { where: item.where, plan: key }), onError: message => { item.terms.textContent = message; } })
+    .then(shown => { if (shown) { pay.ready[key] = true; syncApplePay(); } else pay.mounted[key] = false; });
+};
+const syncApplePay = () => {
+  const pay = blocks.find(entry => entry.pay)?.pay;
+  if (!pay) return;
+  for (const key of ['yearly', 'monthly']) pay.slots[key].hidden = key !== plan || !pay.ready[key];
+  pay.mark.hidden = pay.alt.hidden = !pay.ready[plan];
+};
+let applePayWanted = false;
 const refresh = () => {
   for (const item of blocks) {
     for (const card of item.cards) { fillCard(card); card.setAttribute('aria-checked', String(card.dataset.plan === plan)); }
@@ -126,7 +157,9 @@ const checkoutOffer = () => (plan === 'yearly' && deal() ? window.DemenzAngebot.
 function select(key) {
   plan = key;
   refresh();
+  syncApplePay();
   if (prepared) prepare();
+  if (applePayWanted) mountApplePay();
 }
 const buy = where => {
   track('lp_checkout', { where, plan }, 'InitiateCheckout');
@@ -259,7 +292,7 @@ if ('IntersectionObserver' in window) {
   // Preis 1,5 Sekunden sichtbar: Kasse im Hintergrund vorbereiten, damit der Klick sofort zu Stripe führt.
   let timer = null;
   const warm = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) { clearTimeout(timer); timer = setTimeout(() => { prepare(); warm.disconnect(); }, 1500); }
+    if (entries.some(entry => entry.isIntersecting)) { clearTimeout(timer); timer = setTimeout(() => { prepare(); applePayWanted = true; mountApplePay(); warm.disconnect(); }, 1500); }
     else clearTimeout(timer);
   }, { threshold: .4 });
   for (const slot of slots) warm.observe(slot);
