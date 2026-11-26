@@ -34,4 +34,8 @@
   };
   if (window.visualViewport) { visualViewport.addEventListener('resize', place); visualViewport.addEventListener('scroll', place); }
   document.body.append(chat);
+  // Wechselnde Beispielsätze im leeren Feld, gleiche Liste wie auf der Startseite (/eingabe-beispiele.js).
+  var examples = function () { window.DcBeispiele.attach(field, { prefix: 'z. B. ', maxChars: innerWidth < 480 ? 29 : 44 }); };
+  if (window.DcBeispiele) examples();
+  else { var script = make('script', '', { src: '/eingabe-beispiele.js' }); script.onload = examples; document.head.append(script); }
 })();
