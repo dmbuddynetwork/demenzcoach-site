@@ -1,3 +1,10 @@
+// Im Quiz-Layer läuft nur der Fragebogen (/start/). Landet dort eine andere Seite (z. B. über einen Link),
+// öffnet sie sich im ganzen Fenster statt als Seite im Layer (Daniel, 26. Nov 2026).
+try {
+  if (window.top !== window && window.frameElement?.classList.contains('dc-funnel-layer-frame') && !location.pathname.startsWith('/start/')) {
+    window.top.location.replace(location.href);
+  }
+} catch { /* anderer Ursprung: nichts tun */ }
 // A one-time functional hint only; the helper rechecks the actual signed-in user.
 try {
   if (sessionStorage.getItem('demenzcoach.signinNotice.v1')) import('/abo/signin-success.js').then(module => module.consumeSignInNotice()).catch(() => {});

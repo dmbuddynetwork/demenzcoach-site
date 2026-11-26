@@ -4,6 +4,12 @@ export const funnelLayerSource = '/start/?src=layer&embed=1';
 export const wantsFunnelLayer = (host = window) => { try { return host.sessionStorage.getItem('demenzcoach.anmeldungVariante.v1') === 'funnel'; } catch { return false; } };
 let current;
 export function openFunnelLayer({ doc = document, returnFocus = null, onClose = () => {} } = {}) {
+  // Nie ein Layer im Layer (Daniel, 26. Nov 2026: „weiße Zeile oben“). In einem Rahmen öffnet die äußere Seite.
+  const view = doc.defaultView || window;
+  if (view.top !== view) {
+    try { const outer = view.top.document; if (!outer.querySelector('dialog.dc-funnel-layer[open]')) return openFunnelLayer({ doc: outer, returnFocus, onClose }); } catch { /* anderer Ursprung */ }
+    onClose(); return null;
+  }
   current?.close();
   if (!doc.getElementById('dc-funnel-layer-style')) {
     const link = doc.createElement('link'); link.id = 'dc-funnel-layer-style'; link.rel = 'stylesheet'; link.href = '/abo/funnel-layer.css'; doc.head.append(link);
