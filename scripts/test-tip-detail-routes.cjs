@@ -23,8 +23,8 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
    const selected = reviewed.tips.find(tip => tip.id === (aliases[old.id] || old.id));
    const expected = selected || {...old,...refs.overrides[old.id]};
    const route = tipDetailRoutes[old.id], html = fs.readFileSync(path.join(root,route),'utf8');
-   assert.ok(html.includes('<h1>'+esc(expected.title)+'</h1>'),old.id);
-   assert.ok(html.includes('<p>'+esc(expected.text)+'</p>'),old.id);
+   assert.ok(html.includes('>'+esc(expected.title)+'</h1>'),old.id);
+   assert.ok(html.includes('translator-do">'+esc(expected.text)+'</p>'),old.id);
    if(refs.notes[old.category])assert.ok(html.includes(esc(refs.notes[old.category])),old.id+' retains full category safeguard');
   }
   for (const tip of reviewed.tips) {
@@ -32,7 +32,7 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
    assert.ok(html.includes(esc(tip.text))); assert.ok(html.includes('src="'+tip.image+'"'));
    for(const id of tip.sources)assert.ok(html.includes(esc(reviewed.sources[id].url)),tip.id+' source');
    if(['roter-teller','farbiger-becher'].includes(tip.id)) {
-    const note=html.indexOf(esc(reviewed.note));assert.ok(note>0&&note<html.indexOf('translator-next tricks-jump'),'full food note precedes next actions');
+    const note=html.indexOf(esc(reviewed.note));assert.ok(note>0&&note<html.indexOf('<div class="translator-next">'),'full food note precedes next actions');
    }
   }
   preview=await createPreviewServer();
@@ -40,7 +40,7 @@ const aliases = {'teller-rot':'roter-teller','becher-farbig':'farbiger-becher','
   for(let i=0;i<paths.length;i+=8)await Promise.all(paths.slice(i,i+8).map(async route=>{
    const response=await fetch(preview.origin+route,{redirect:'manual'});assert.equal(response.status,200,route);const html=await response.text();
    assert.ok(html.includes('rel="canonical" href="https://dementiacoachapp.com'+route+'"'),route);
-   const image=html.match(/class="tip-detail-art" src="([^"]+)"/)[1];assert.ok(fs.existsSync(path.join(root,image)),image);
+   const image=html.match(/class="translator-said-art" src="([^"]+)"/)[1];assert.ok(fs.existsSync(path.join(root,image)),image);
    report.directPages.push({route,status:response.status});
   }));
   browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
