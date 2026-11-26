@@ -69,6 +69,8 @@ const server = http.createServer((req, res) => { try {
       assert.match(text, /nichts bezahlt/);
       const retry = page.locator('.kasse').getByRole('button', { name: 'Erneut versuchen' });
       assert.equal(await retry.count(), 1);
+      await page.mouse.click(2, 2); await page.waitForTimeout(200);
+      assert.equal(await page.locator('.kasse').count(), 1, 'Klick neben die Kasse schließt sie nicht');
       if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
       assert.equal(await page.locator('.kasse a.kasse-help[href="/kontakt.html"]').count(), 1, 'Hilfe-Link');
       state.after = 'ok';

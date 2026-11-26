@@ -131,8 +131,8 @@ export async function open(options) {
     error,
     loading
   ]);
-  const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title",
-    onclick: (event) => { if (event.target === node) close(); } }, card);
+  // Daniel, 26. Nov 2026: ein Klick neben die Kasse schließt sie nicht mehr (versehentlich weggeklickt). Schließen nur über das ×.
+  const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title" }, card);
   const onKey = (event) => { if (event.key === "Escape") close(); };
   document.addEventListener("keydown", onKey);
   sheet = { node, plan: options.plan, email: options.email, pending: true, onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
