@@ -38,7 +38,7 @@ const server = http.createServer((req, res) => { try {
       if (url.hostname === 'checkout.stripe.com') return route.fulfill({ contentType: 'text/html', body: '<h1>Stripe hosted fixture</h1>' });
       if (url.hostname.endsWith('cloudfunctions.net')) {
         if (url.pathname.endsWith('/config')) return route.fulfill({ headers, json: { checkoutMode: 'elements', hostedFallback: true, walletEmail: true, plans: { yearly: { amount: 6999, currency: 'eur' }, monthly: { amount: 1299, currency: 'eur' } }, trialDays: 7, textVersions: { terms: 'fx' }, publishableKey: 'pk_test_fx' } });
-        if (url.pathname.endsWith('/session')) { sessions.push(req.postDataJSON()); return route.fulfill({ headers, json: req.postDataJSON().hostedFallback ? { checkoutMode: 'hosted', url: 'https://checkout.stripe.com/c/pay/cs_fx', trialDays: 7, plan: 'yearly', firstYear: null } : { clientSecret: 'cs_fx_secret', trialDays: 7, plan: 'yearly', firstYear: null } }); }
+        if (url.pathname.endsWith('/session')) { { const body = req.postDataJSON(); if (body.hostedFallback) (sessions.hosted ||= []).push(body); else sessions.push(body); } return route.fulfill({ headers, json: req.postDataJSON().hostedFallback ? { checkoutMode: 'hosted', url: 'https://checkout.stripe.com/c/pay/cs_fx', trialDays: 7, plan: 'yearly', firstYear: null } : { clientSecret: 'cs_fx_secret', trialDays: 7, plan: 'yearly', firstYear: null } }); }
         return route.fulfill({ headers, json: {} });
       }
       return route.abort();
@@ -94,7 +94,7 @@ const server = http.createServer((req, res) => { try {
       assert.match(await page.locator('.start-tp-terms').innerText(), /Jederzeit zum Monatsende kündbar/);
       await page.locator('[data-tp-alt]').click();
       await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
-      assert.ok(sessions.some(x => x.hostedFallback === true && x.plan === 'monthly'), 'andere Zahlart: gehostete Seite für den gewählten Plan');
+      assert.ok((sessions.hosted || []).some(x => x.hostedFallback === true && x.plan === 'monthly'), 'andere Zahlart: gehostete Seite für den gewählten Plan (vorbereitet oder beim Tipp)');
     });
     // 2) ?ap=1 + Apple Pay ohne E-Mail: Sitzung mit emailLater (Apple Pay liefert die E-Mail).
     await run({ query: '?direkt=1&ap=1', applePay: true }, async ({ page, sessions }) => {

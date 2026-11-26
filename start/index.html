@@ -9,6 +9,13 @@
   <meta name="theme-color" content="#f6f5f2">
   <link rel="canonical" href="https://dementiacoachapp.com/start/">
   <link rel="icon" href="/assets/lovable-logo.jpg">
+  <!-- Tempo: Verbindungen und Module für die Zahlung schon beim Laden vorbereiten (Daniel, 26. Nov 2026). -->
+  <link rel="preconnect" href="https://europe-west1-dementica-df17b.cloudfunctions.net" crossorigin>
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
+  <link rel="dns-prefetch" href="https://checkout.stripe.com">
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js" crossorigin>
+  <link rel="modulepreload" href="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js" crossorigin>
   <link rel="stylesheet" href="../abo/abo.css">
   <link rel="stylesheet" href="start.css">
   <script src="../abo/abo-config.js"></script>

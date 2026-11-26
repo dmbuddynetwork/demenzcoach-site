@@ -17,7 +17,7 @@ const server = http.createServer((req, res) => { try {
   const origin = 'http://127.0.0.1:' + server.address().port;
   let browser, cases = 0;
   // mode: Liste der Antworten je /session-Aufruf; danach gilt `after`
-  const run = async (plan, after, check) => {
+  const run = async (plan, after, check, { open = true } = {}) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     const page = await context.newPage(), state = { calls: 0, plan: [...plan], after };
     await context.route('**/*', async route => {
@@ -47,7 +47,7 @@ const server = http.createServer((req, res) => { try {
       const decline = page.getByRole('button', { name: 'Ablehnen', exact: true });
       if (await decline.count()) await decline.click();
       await page.evaluate(async () => { const k = await import('/abo/kasse.js'); const b = document.createElement('button'); b.id = 'fx-open'; b.textContent = 'Plan starten'; b.style.cssText = 'position:fixed;top:8px;left:8px;z-index:5'; b.onclick = () => k.open({ plan: 'yearly', email: 'fixture@example.invalid', source: 'retry-test' }); document.body.append(b); });
-      await page.locator('#fx-open').click();
+      if (open) await page.locator('#fx-open').click();
       await check(page, state);
       cases++;
     } finally { await context.close(); }
@@ -82,6 +82,25 @@ const server = http.createServer((req, res) => { try {
       await message.waitFor({ state: 'visible', timeout: 15000 });
       assert.equal(state.calls, 3);
     });
+    // 4) Vorbereitet: prepare() erzeugt die Sitzung schon vor dem Klick, der Klick leitet ohne zweiten Aufruf weiter.
+    await run([], 'ok', async (page, state) => {
+      await page.evaluate(async () => { const k = await import('/abo/kasse.js'); window.__prepared = await k.prepare({ plan: 'yearly', email: 'fixture@example.invalid', source: 'retry-test' }); });
+      assert.equal(await page.evaluate(() => window.__prepared), true);
+      assert.equal(state.calls, 1, 'Sitzung vor dem Klick erzeugt');
+      await page.locator('#fx-open').click();
+      await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
+      assert.equal(state.calls, 1, 'Klick nutzt die vorbereitete Sitzung');
+    }, { open: false });
+    // 5) Im Layer (iframe): das ganze Fenster geht zu Stripe, nicht nur der Rahmen (sonst endloses Lade-Skeleton).
+    await run([], 'ok', async (page, state) => {
+      await page.evaluate(() => { const f = document.createElement('iframe'); f.id = 'fx-frame'; f.src = '/start/?src=layer&embed=1'; f.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:9'; document.body.append(f); });
+      await page.waitForFunction(() => document.querySelector('#fx-frame'));
+      const frame = await (await page.locator('#fx-frame').elementHandle()).contentFrame();
+      await frame.waitForLoadState('load');
+      await frame.waitForFunction(() => window.DemenzKasse?.open);
+      await frame.evaluate(() => window.DemenzKasse.open({ plan: 'yearly', email: 'fixture@example.invalid', source: 'frame-test' }));
+      await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
+    }, { open: false });
     console.log(JSON.stringify({ ok: true, cases }));
   } finally { await browser?.close(); server.close(); }
 })().catch(error => { console.error(error); process.exit(1); });
