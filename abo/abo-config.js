@@ -32,7 +32,8 @@ try {
   const key = "demenzcoach.anmeldungVariante.v1";
   const choice = new URLSearchParams(location.search).get("anmeldung");
   if (choice === "funnel" || choice === "standard") sessionStorage.setItem(key, choice);
-  else if (!sessionStorage.getItem(key)) sessionStorage.setItem(key, !navigator.webdriver && Math.random() < 0.5 ? "funnel" : "standard");
+  // Daniel, 26. Nov 2026: generell zuerst die kostenlose Anmeldung, dann Fragebogen, dann Paywall. Test beendet: immer „standard“.
+  else sessionStorage.setItem(key, "standard");
 } catch { /* Ohne Speicher bleibt die normale Anmeldung. */ }
 
 // Läuft der Funnel als Layer (A/B-Test), kommt Stripe mit der Adresse /abo/ zurück in den Rahmen. Dann den ganzen Tab dorthin bringen.

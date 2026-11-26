@@ -61,7 +61,7 @@ export function mountContentScrollSignup({ doc = document, now = Date.now, minRe
     const value = readVisit(); if (value) writeVisit({ ...value, lastAt: now(), pendingUntil: 0 });
   };
   const noticeOtherSheet = () => {
-    const dialog = doc.querySelector('.dc-signup-sheet[open]');
+    const dialog = doc.querySelector('.dc-signup-sheet[open], dialog.dc-funnel-layer[open]');
     if (dialog) { markShown(dialog); return; }
     recordClosed();
   };
@@ -83,7 +83,17 @@ export function mountContentScrollSignup({ doc = document, now = Date.now, minRe
       if (host.DEMENZ_ABO_CONFIG?.signIn?.emailLink !== true) return;
       const { webAuth } = await import('/abo/web-auth.js');
       const { auth } = await webAuth({ anonymous: false });
-      if (auth.currentUser && !auth.currentUser.isAnonymous) { disabled = true; return; }
+      // Daniel, 26. Nov 2026: Reihenfolge Anmeldung → Fragebogen → Paywall. Angemeldet (deutsch, nicht zahlend):
+      // Fragebogen im Layer; schon fertig oder einmal weggeklickt: Paywall im Layer. Zählt im selben Capping.
+      if (auth.currentUser && !auth.currentUser.isAnonymous) {
+        if (!/^de(?:-|$)/i.test(doc.documentElement.lang) || await contentAccessState(auth, doc) !== 'free') { disabled = true; return; }
+        if (!eligible()) return;
+        const { openFunnelLayer, funnelLayerWantsPaywall } = await import('/abo/funnel-layer.js');
+        if (!eligible()) return;
+        const layer = openFunnelLayer({ paywall: funnelLayerWantsPaywall(host), returnFocus: doc.activeElement && doc.activeElement !== doc.body ? doc.activeElement : doc.querySelector('main') });
+        if (layer?.dialog) { sheet = { close: () => layer.close() }; markShown(layer.dialog); }
+        return;
+      }
       if (!eligible()) return;
       ownPendingUntil = now() + 15000;
       if (!writeVisit({ ...readVisit(), pendingUntil: ownPendingUntil })) return;
