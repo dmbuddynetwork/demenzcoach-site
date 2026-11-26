@@ -23,8 +23,24 @@
     || value.safetyLevel === 'concern' && typeof value.message === 'string' && value.message.trim().length > 0);
 
   const normalizedText = text => String(text).normalize('NFC').trim();
-  const bodyFor = (text, { formal = false, goal } = {}) => ({ text,
-    formal: language === 'en' ? false : formal === true, ...(language ? { language } : {}), ...(goal ? { goal } : {}), share: false });
+  const bodyFor = (text, { formal = false, goal, previous } = {}) => ({ text,
+    formal: language === 'en' ? false : formal === true, ...(language ? { language } : {}), ...(goal ? { goal } : {}),
+    ...(typeof previous === 'string' && previous ? { previous } : {}), share: false });
+  // Nachfragen (Text „Situation: „…“ Nachfrage: …“) schicken die zuletzt gezeigte Antwort als „previous“ mit (höchstens 400 Zeichen),
+  // damit die KI sich nicht wiederholt. Nur im Speicher, nur bei Nachfragen.
+  const followUpPattern = /^Situation: „[\s\S]*“ (?:Nachfrage|Follow-up): /u;
+  let lastAnswer = '';
+  const previousFrom = result => {
+    const clean = value => typeof value === 'string' ? value.normalize('NFC').replace(/\s+/gu, ' ').trim() : '';
+    const doLabel = language === 'en' ? ' Do: ' : ' Tun: ';
+    let text = '';
+    if (result?.kind === 'answer' && Array.isArray(result.phrases)) text = result.phrases.map(clean).filter(Boolean).join(' ') + (clean(result.nextStep) ? doLabel + clean(result.nextStep) : '');
+    else if (result?.kind === 'self_support' && Array.isArray(result.steps)) text = result.steps.map(clean).filter(Boolean).join(' ') + (clean(result.nextStep) ? doLabel + clean(result.nextStep) : '');
+    else if (result?.kind === 'clarification') text = clean(result.question);
+    return Array.from(text.trim()).slice(0, 400).join('');
+  };
+  const remember = result => { const text = previousFrom(result); if (text) lastAnswer = text; };
+  const previousFor = text => followUpPattern.test(text) ? lastAnswer : '';
   // Shared by goals and answers: transmit the complete normalized text or reject it.
   const requestIssue = (text, options = {}) => {
     const value = normalizedText(text);
@@ -38,13 +54,15 @@
     if (typeof snapshot?.onResult !== 'function') return;
     try { snapshot.onResult({ proof: response.headers.get('X-Translator-Snapshot-Proof') || null, error: response.headers.get('X-Translator-Snapshot-Error') || null }); } catch { /* sharing never blocks care */ }
   };
-  const ask = async (text, { formal = false, correctionOf = "", requestID = "", goal, snapshot } = {}) => {
+  const ask = async (text, options = {}) => { const result = await askOnce(text, options); remember(result); return result; };
+  const askOnce = async (text, { formal = false, correctionOf = "", requestID = "", goal, snapshot } = {}) => {
     const accessContext = root.DemenzKiFreigabe?.createAccessContext?.();
     const finish = result => root.DemenzKiFreigabe?.bindAccessResult?.(result, accessContext) || result;
     const value = normalizedText(text);
-    const issue = requestIssue(value, { formal, goal });
+    const previous = previousFor(value);
+    const issue = requestIssue(value, { formal, goal, previous });
     if (issue) return { kind: 'error', reason: issue };
-    const payload = bodyFor(value, { formal, goal });
+    const payload = bodyFor(value, { formal, goal, previous });
     if (!requestID && root.DemenzKiFreigabe?.enabled()) requestID = root.crypto.randomUUID();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
@@ -133,14 +151,15 @@
 
   const askGoals = async (text, { formal = false, snapshot } = {}) => {
     const textValue = normalizedText(text);
-    const issue = requestIssue(textValue, { formal });
+    const previous = previousFor(textValue);
+    const issue = requestIssue(textValue, { formal, previous });
     if (issue) return { kind: 'error', reason: issue };
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
       const response = await fetch(`${endpoint}/goals?goal_contract=${outcomesContract}`, { method: 'POST', mode: 'cors', credentials: 'omit',
         referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json', ...snapshotHeaders(snapshot) },
-        body: JSON.stringify(bodyFor(textValue, { formal })), signal: controller.signal });
+        body: JSON.stringify(bodyFor(textValue, { formal, previous })), signal: controller.signal });
       if (response.ok) reportSnapshot(snapshot, response);
       if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
       const value = await response.json();
@@ -169,5 +188,5 @@
     } catch { return { kind: 'error', reason: 'unavailable' }; }
     finally { clearTimeout(timer); }
   };
-  root.DemenzTranslatorAI = { ask, askGoals, share, requestIssue, generalSafetyInfo, endpoint };
+  root.DemenzTranslatorAI = { ask, askGoals, share, requestIssue, generalSafetyInfo, endpoint, remember };
 })(typeof window !== 'undefined' ? window : globalThis);
