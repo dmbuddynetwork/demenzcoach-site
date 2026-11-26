@@ -30,6 +30,12 @@ const shots = process.env.BEISPIEL_SHOTS || '';
       await big.fill(''); const before = await ph(); await p.waitForTimeout(1500);
       assert.ok((await ph()) !== before || (await ph()).length > 0, 'läuft nach Leeren weiter');
       cases.push(`${view.n}: Tippen stoppt, Leeren startet`);
+      // 2b Leeres Feld + Absenden schickt das gezeigte Beispiel ab.
+      await big.fill(''); await p.waitForFunction(() => document.querySelector('#translator-input').dataset.dcBeispielText);
+      const shown = await big.evaluate(el => el.dataset.dcBeispielText);
+      await big.focus(); await p.keyboard.press('Enter');
+      await p.waitForFunction(text => document.body.innerText.includes(text), shown);
+      cases.push(`${view.n}: leeres Feld sendet Beispiel „${shown}“`);
       // 3 Leiste auf Tipp-Seite.
       await p.goto(`${preview.origin}/alltagstricks/abendritual.html`);
       const bar = p.locator('.translator-chat-input');

@@ -22,7 +22,7 @@
   chat.append(panel);
   form.addEventListener('submit', function (event) {
     event.preventDefault();
-    var text = field.value.trim();
+    var text = field.value.trim() || (window.DcBeispiele ? window.DcBeispiele.current(field) : '');
     if (!text) { field.focus(); return; }
     try { sessionStorage.setItem('demenzCoachKiOffen', JSON.stringify({ text: text.slice(0, 200), until: Date.now() + 900000 })); } catch (e) { /* ohne Speicher öffnet die Startseite leer */ }
     location.href = '/de/';

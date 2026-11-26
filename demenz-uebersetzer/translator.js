@@ -1777,6 +1777,8 @@
     setViewState('goal');
     const heading = element(homeHeading ? 'h1' : 'h2', { text: `„${typed}“`, attributes: { tabindex: '-1' } });
     output.replaceChildren(saidBlock(typed, hint, heading), aiBox(typed, 'typed_goal', () => {}, { auto: true }));
+    // Passt die Eingabe genau zu einer Situation mit eigener Seite, zeigt die Adressleiste deren Adresse (Daniel, 26. Nov).
+    if (hint && publicByKey.has(hint.key)) setPage(hint);
     output.hidden = false;
     document.body.classList.add('translator-has-result');
     document.body.classList.remove('translator-answers-seen');
@@ -2185,6 +2187,9 @@
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
+    // Leeres Feld: das gezeigte Beispiel wird abgeschickt (Daniel, 26. Nov).
+    const shownExample = window.DcBeispiele?.current(input) ?? '';
+    if (shownExample && !input.value.trim()) input.value = shownExample;
     const text = input.value.trim();
     if (!text) {
       // Leeres Feld: sagen, was fehlt – sichtbar und für Vorlesen.
@@ -2212,7 +2217,7 @@
         || (entry.variants ?? []).some(value => core.normalize(value) === core.normalize(text))
         || (core.rank(text, [entry])[0]?.score ?? 0) >= strongScore) ? entry : null;
       renderTypedGoal(text, imageMatch);
-      setHash('');
+      if (!imageMatch || !publicByKey.has(imageMatch.key)) setHash('');
       track('translator_result', { result_key: 'none', input_source: 'typed', safety_hint: 'no' });
       return;
     }
@@ -2449,7 +2454,7 @@
     field.addEventListener('input', () => { if (chatMode !== 'more') { input.value = field.value; grow(); } });
     chatForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      const value = field.value.trim();
+      const value = field.value.trim() || (window.DcBeispiele?.current(field) ?? '');
       if (!value) { field.focus(); return; }
       const situation = situationNow();
       if (situation && chatMode === 'more') {
