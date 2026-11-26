@@ -163,7 +163,7 @@ const endlessTricks = (tricks) => `<div class="e-moments-block e-tiles-block e-t
 const faqHTML = faq => faq.map(item => `<h3>${esc(item.q)}</h3><p>${esc(item.a)}</p>`).join('');
 const listHTML = (items, tag = 'ul', cls = '') => `<${tag}${cls ? ` class="${cls}"` : ''}>${items.map(item => `<li>${esc(item)}</li>`).join('')}</${tag}>`;
 const sourcesBlock = entries => `<section class="tricks-sources-block" aria-label="Zum Weiterlesen"><h2>Zum Weiterlesen</h2><ul>${entries.map(source => `<li><a href="${esc(source.url)}" rel="noopener">${esc(source.label)}</a></li>`).join('')}</ul><p class="article-meta">Weiterführende Informationen zur Einordnung. Die Organisationen sind nicht mit Demenz Coach verbunden.</p></section>`;
-const howFooter = `<section class="section translator-how" aria-label="Hinweise"><div class="container content-narrow"><p class="article-meta">Quellenstand: <time datetime="${references.checkedAt}">9. November 2026</time> · <a href="/de/ratgeber/redaktion.html">Redaktionelle Leitlinien</a> · Anbieterin: <a href="/impressum.html">Deborah Frey</a></p></div></section>`;
+const howFooter = `<section class="section translator-how" aria-label="Hinweise"><div class="container content-narrow"><p class="article-meta">Quellenstand: <time datetime="${references.checkedAt}">9. November 2026</time> · <a href="/de/ratgeber/redaktion.html">Redaktionelle Leitlinien</a> · Anbieter: <a href="/impressum.html">Freyheits UG (haftungsbeschränkt) i. G.</a></p></div></section>`;
 const wrap = (inner, extra = '') => `  <main id="main">
     <section id="top" class="e-hero e-home" aria-labelledby="home-title">
       <div class="e-wrap">
