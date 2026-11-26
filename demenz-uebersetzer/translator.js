@@ -1974,7 +1974,7 @@
       element('div', { className: 'translator-ai-goal-choices', attributes: { role: 'group', 'aria-label': 'Ziel wechseln' } }, goals.filter(option => option.id !== goal).map(option => goalChoice(option, () => {
         track('translator_goal', { goal: option.id, result_key: result.key, step: 'switch' });
         setPage(result, option.id, false);
-        render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id, preserveViewport: true });
+        render(entry, { safetyHit, alternatives, also, typed, mood, protection, goal: option.id, preserveViewport: false }); // Neue Antwort von oben zeigen (Daniel, 26. Nov: „passiert nix“).
       }, { 'aria-pressed': 'false' })))
     ]) : null;
     // Die Zeichnung steht oben neben der Sprechblase (saidBlock), nicht mehr in der Karte.

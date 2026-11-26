@@ -371,16 +371,16 @@ body.einfach .translator-call-link { color: inherit !important; font-weight: 700
 body.einfach .translator-said { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; }
 body.einfach .translator-said-text { flex: 1 1 auto; min-width: 0; }
 body.einfach .translator-said-label { margin: 0 0 4px !important; color: var(--e-purple) !important; font-size: var(--e-small) !important; font-weight: 700 !important; }
-body.einfach :is(h1, h2).translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 10px 14px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
-body.einfach :is(h1, h2).translator-said-bubble::before { display: none !important; }
-body.einfach :is(h1, h2).translator-said-bubble::after { content: ""; position: absolute; left: 30px; bottom: -9px; width: 16px; height: 16px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
-body.einfach .translator-said-with-art :is(h1, h2).translator-said-bubble::after { left: auto; right: -9px; bottom: auto; top: calc(50% - 8px); border-bottom: 0; border-top: 1px solid var(--e-line); }
+body.einfach :is(h1, h2, p).translator-said-bubble { position: relative; display: block !important; margin: 0 !important; padding: 10px 14px !important; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 22px; font-size: 1.45rem !important; line-height: 1.25 !important; font-weight: 800 !important; overflow-wrap: anywhere; }
+body.einfach :is(h1, h2, p).translator-said-bubble::before { display: none !important; }
+body.einfach :is(h1, h2, p).translator-said-bubble::after { content: ""; position: absolute; left: 30px; bottom: -9px; width: 16px; height: 16px; background: var(--e-card); border-right: 1px solid var(--e-line); border-bottom: 1px solid var(--e-line); transform: rotate(45deg); }
+body.einfach .translator-said-with-art :is(h1, h2, p).translator-said-bubble::after { left: auto; right: -9px; bottom: auto; top: calc(50% - 8px); border-bottom: 0; border-top: 1px solid var(--e-line); }
 body.einfach .translator-said-art { flex: 0 0 22%; max-width: 112px; width: 22%; height: auto; max-height: 112px; object-fit: contain; }
 @media (max-width: 480px) {
-  body.einfach :is(h1, h2).translator-said-bubble { padding: 10px 12px !important; font-size: 1.25rem !important; }
+  body.einfach :is(h1, h2, p).translator-said-bubble { padding: 10px 12px !important; font-size: 1.25rem !important; }
 }
 body.einfach .translator-answer .translator-goal-chosen { margin-bottom: 14px; }
-@media (min-width: 720px) { body.einfach :is(h1, h2).translator-said-bubble { font-size: 1.75rem !important; padding: 12px 16px !important; } }
+@media (min-width: 720px) { body.einfach :is(h1, h2, p).translator-said-bubble { font-size: 1.75rem !important; padding: 12px 16px !important; } }
 
 /* ---------- Alltagstrick in der Antwort und als Kacheln im Archiv (Daniel, 8. Nov) ---------- */
 body.einfach .translator-trick { display: flex; align-items: center; gap: 16px; margin: 14px 0 4px; padding: 16px; background: var(--e-card); border: 1px solid var(--e-line); border-radius: 18px; }
@@ -1055,7 +1055,7 @@ body[data-translator-pending-goal] #translator-result { visibility: hidden; anim
   body.einfach .translator-said-with-art .translator-said-art {
     order: -1; flex: 0 0 auto; align-self: center; width: auto; max-width: min(100%, 360px); max-height: 230px;
   }
-  body.einfach .translator-said-with-art :is(h1, h2).translator-said-bubble::after {
+  body.einfach .translator-said-with-art :is(h1, h2, p).translator-said-bubble::after {
     left: calc(50% - 8px); right: auto; top: -9px; bottom: auto; border: 0; border-left: 1px solid var(--e-line); border-top: 1px solid var(--e-line);
   }
 }
@@ -1066,3 +1066,20 @@ body[data-translator-pending-goal] #translator-result { visibility: hidden; anim
 @media (max-width: 719.98px) {
   body.einfach .translator-said-with-art .translator-said-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
+
+/* Kopfleiste (Daniel, 26. Nov): beim Runterscrollen weg, beim Hochscrollen sofort zurück. */
+body.einfach .e-header { transition: transform .25s ease, background-color .2s ease, border-color .2s ease; }
+body.einfach .e-header.is-hidden { transform: translateY(-100%); }
+@media (prefers-reduced-motion: reduce) { body.einfach .e-header { transition: none; } }
+
+/* Farbverlauf wie /hilfe/ (Daniel, 26. Nov): zartes Lila oben, nach unten Warmweiß. Oben ist die Kopfleiste durchsichtig. */
+body.einfach.homepage-v2 { background: linear-gradient(180deg, #ece9f7 0, var(--e-bg) 520px) no-repeat, var(--e-bg); }
+body.einfach.homepage-v2 .e-header:not(.is-scrolled) { background: transparent; border-bottom-color: transparent; }
+body.einfach.homepage-v2 .home-eyebrow { margin: 0 0 10px; color: var(--e-purple); font-size: var(--e-small); font-weight: 700; letter-spacing: .01em; text-align: center; }
+body.einfach.homepage-v2[data-translator-input-position="top"] #translator-form .translator-form-intro { margin: 0 0 14px !important; color: var(--e-text) !important; font-size: 1.125rem !important; }
+
+/* Zielfrage (Daniel, 26. Nov): Sprechblase wie auf der Antwortseite, Bild etwas kleiner, keine zweite Eingabeleiste unten. */
+body.einfach[data-translator-state="goal"] .translator-said-with-art .translator-said-art { max-height: 170px; }
+body.einfach .translator-said-art { mix-blend-mode: multiply; }
+@media (min-width: 720px) { body.einfach[data-translator-state="goal"] .translator-said-with-art .translator-said-art { max-height: 220px; max-width: 34%; } }
+body.einfach[data-translator-state="goal"] > .translator-chat { display: none !important; }

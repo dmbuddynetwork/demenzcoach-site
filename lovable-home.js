@@ -686,3 +686,22 @@ import('/alltagstricks/detail-links.js').catch(() => {});
 // Shared functional account/language navigation and optional static-tip membership invitation.
 import('/shared-navigation.js').catch(() => {});
 import('/abo/tip-membership.js').catch(() => {});
+
+// Kopfleiste (Daniel, 26. Nov): beim Runterscrollen verschwindet sie, beim Hochscrollen ist sie sofort wieder da.
+(function () {
+  var header = document.querySelector('.e-header');
+  if (!header || !window.requestAnimationFrame) return;
+  var last = Math.max(0, window.scrollY), ticking = false;
+  var keep = function () { return window.scrollY < 80 || header.contains(document.activeElement) || !!header.querySelector('details[open]'); };
+  var update = function () {
+    ticking = false;
+    var y = Math.max(0, window.scrollY), delta = y - last;
+    header.classList.toggle('is-scrolled', y > 4);
+    if (keep()) { header.classList.remove('is-hidden'); last = y; return; }
+    if (delta > 8) { header.classList.add('is-hidden'); last = y; }
+    else if (delta < -8) { header.classList.remove('is-hidden'); last = y; }
+  };
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  header.addEventListener('focusin', function () { header.classList.remove('is-hidden'); });
+  update();
+})();

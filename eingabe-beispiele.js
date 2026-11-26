@@ -40,7 +40,7 @@
       if (off()) { running = false; return; }
       var text = prefix + list[index];
       field.dataset.dcBeispielText = list[index];
-      var shown = 0;
+      var shown = prefix.length; // „z. B. “ steht sofort da, nur das Beispiel tippt sich.
       var type = function () {
         if (off()) { running = false; return; }
         shown += 1;
