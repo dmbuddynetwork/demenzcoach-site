@@ -231,7 +231,7 @@
     const form = root.document?.querySelector('#translator-form'); if (!form) return;
     const generation = ++mountGeneration;
     const notice = root.document.getElementById('web-access-notice') || node(root.document, 'p', en ? 'Checking your introductory allowance …' : 'Dein kostenloser Einstieg wird geprüft …');
-    notice.hidden = form.dataset.accessNotice === 'on-action';
+    notice.hidden = true; // Kontingent-Text bleibt unsichtbar (Daniel, 26. Nov); nur der Fehlerhinweis wird gezeigt.
     notice.id = 'web-access-notice'; notice.className = 'ki-angebot-klein'; notice.setAttribute('role', 'status'); form.prepend(notice);
     try {
       const value = await refresh();

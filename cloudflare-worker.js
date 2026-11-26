@@ -12,7 +12,7 @@ export const generatorRouteTarget = (request, routes = publicGeneratorRoutes.rou
   const language=state?.route.language||homeLanguage;
   const linked=language&&routes.find(route=>route.language===language&&route.key===url.searchParams.get('situation'));
   if(linked){const goal=url.searchParams.get('ziel');const path=linked.goalPaths?(['jetzt','verstehen','tipps'].includes(goal)&&Object.hasOwn(linked.goalPaths,goal)?linked.goalPaths[goal]:linked.selectionPath):linked.path;return {redirect:new URL(path,url.origin).href};}
-  return state?{assetPath:state.route.path,canonicalPath:state.route.path}:null;
+  return state?{assetPath:state.route.path,canonicalPath:state.route.path,selection:Boolean(state.route.selectionPath)&&state.path===state.route.selectionPath}:null;
 };
 
 const germanAliases = new Map(germanRoutes.pages.flatMap(page => page.aliases.map(alias => [alias, page.to])));
@@ -162,7 +162,11 @@ export default {
           if(url.pathname===generatorTarget.canonicalPath)return response;
           const headers=new Headers(response.headers);
           headers.set('X-Robots-Tag','noindex, follow');
-          return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+          const served=new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+          // Zielauswahl (/auswahl/) ohne Flackern (Daniel, 26. Nov): die Antwort bleibt verdeckt, bis translator.js die Zielfrage zeigt.
+          if(generatorTarget.selection&&response.status===200&&typeof HTMLRewriter!=='undefined')
+            return new HTMLRewriter().on('body',{element(body){body.setAttribute('data-translator-pending-goal','');}}).transform(served);
+          return served;
         }
         // A missing app asset fails closed; no language-home or arbitrary-path fallback.
         return new Response('Not found',{status:404,headers:{'Content-Type':'text/plain;charset=utf-8'}});
