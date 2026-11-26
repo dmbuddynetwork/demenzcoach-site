@@ -3,14 +3,21 @@ dialog.kasse-embed { box-sizing: border-box; position: fixed; inset: 0; width: 1
   border: 0; background: #f6f5f2; color: #1c1b1f; overflow-y: auto; -webkit-overflow-scrolling: touch;
   font: 400 1rem/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
 dialog.kasse-embed::backdrop { background: rgba(28, 27, 31, .45); }
-.kasse-embed-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 640px; margin: 0 auto;
-  padding: calc(14px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
-.kasse-embed-head h2 { margin: 0; font-size: 1.125rem; }
-.kasse-embed-head h2:focus { outline: none; } /* Fokus nur für Screenreader, kein blauer Rahmen (Daniel, 26. Nov 2026) */
-.kasse-embed-close { flex: 0 0 auto; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #ece9f7; color: #47408c; font-size: 1.75rem; line-height: 1; cursor: pointer; }
+.kasse-embed-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.kasse-embed-sr:focus { outline: none; }
+/* Nur das × oben rechts, kein Titel (Daniel, 26. Nov 2026: Platz sparen, Bezahlknopf sichtbar). */
+.kasse-embed-close { position: absolute; top: calc(8px + env(safe-area-inset-top, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); z-index: 2;
+  width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(236, 233, 247, .95); color: #47408c; font-size: 1.6rem; line-height: 1; cursor: pointer; }
 .kasse-embed-status, .kasse-embed-problem { max-width: 640px; margin: 0 auto; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); color: #55525e; }
 .kasse-embed-problem[hidden], .kasse-embed-status[hidden] { display: none; }
 .kasse-embed-problem .abo-error { margin: 0 0 14px; color: #a3261f; font-weight: 700; }
 .kasse-embed-problem .abo-button { display: block; width: 100%; min-height: 52px; border: 0; border-radius: 999px; background: #47408c; color: #fff; font: inherit; font-size: 1.0625rem; font-weight: 700; cursor: pointer; }
 .kasse-embed-problem .kasse-help { display: block; margin-top: 14px; text-align: center; color: #55525e; font-size: .9375rem; }
-.kasse-embed-box { max-width: 640px; margin: 0 auto; padding: 0 max(8px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); min-height: 60vh; }
+.kasse-embed-box { max-width: 640px; margin: 0 auto; padding: calc(4px + env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); min-height: 60vh; }
+.kasse-embed-status, .kasse-embed-problem { padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-right: 56px; }
+/* Desktop: Fenster in der Mitte über der abgedunkelten Seite, nicht bildschirmfüllend (Daniel, 26. Nov 2026). */
+@media (min-width: 700px) {
+  dialog.kasse-embed { inset: 0; width: min(560px, calc(100vw - 48px)); height: fit-content; max-height: calc(100vh - 48px); margin: auto; border-radius: 18px; box-shadow: 0 24px 64px rgba(28, 27, 31, .28); }
+  .kasse-embed-box { min-height: 420px; padding: 8px 8px 16px; }
+}
+
