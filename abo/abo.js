@@ -53,7 +53,7 @@ function fail(message) {
 // Werbe-Einwilligung. Nie E-Mail, Name oder Telefonnummer senden.
 const track = (name, values = {}, marketing = null) => {
   try { window.DemenzConsent?.track?.(name, values); } catch { /* ohne Einwilligung nichts */ }
-  try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing.event, marketing.values); } catch { /* */ }
+  try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing.event, marketing.values, marketing.eventID ? { eventID: marketing.eventID } : {}); } catch { /* */ }
 };
 
 const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
@@ -330,6 +330,7 @@ async function startCheckout(email, preparedWindow) {
       token,
       body: { plan: attempt.plan, checkoutMode: "hosted", hostedFallback: true, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
+        ...window.DemenzConsent?.metaContext?.(),
         ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
     });
     if (!currentAttempt(attempt)) throw new Error("checkout_attempt_changed");
@@ -479,6 +480,7 @@ translatorReturn();
 if (params.get("status") === "fertig") {
   show("done");
   let portalAvailable = false;
+  let metaTrialSent = false;
   const checkStatus = createPaymentStatusController({
     sessionID: params.get("session_id"),
     loadStatus: async (sessionID) => {
@@ -492,6 +494,11 @@ if (params.get("status") === "fertig") {
       return api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
     },
     render: (outcome) => {
+      // Probezeit läuft = StartTrial im Pixel (nur mit Werbe-Einwilligung). Gleiche event_id wie der Server, Meta zählt einmal.
+      if (outcome === "trialing" && !metaTrialSent) {
+        metaTrialSent = true;
+        track("trial_started", { source: state.source }, { event: "StartTrial", values: { currency: "EUR", value: 0 }, eventID: `st_${params.get("session_id")}` });
+      }
       const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
       const [title, text] = paymentStatusText[outcome];
       $("done-title").textContent = title;
