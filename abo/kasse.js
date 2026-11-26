@@ -3,6 +3,7 @@
 // Kein eigenes Zahlungsformular (Daniel, 24. Nov 2026: eingebettetes Stripe Elements sieht schlecht aus). Die Ebene zeigt nur
 // kurz „Weiter zur sicheren Zahlung“ und leitet im selben Tab auf die gehostete Stripe-Seite, nie in ein neues Fenster.
 import { createHostedCheckoutRedirect } from "./checkout-redirect.js";
+import { hostWindow, loadStripe, showEmbeddedCheckout } from "./kasse-embedded.js";
 // Läuft die Kasse im Layer (Funnel-Rahmen, iframe), muss das ganze Fenster zu Stripe wechseln: Stripes Seite lässt sich nicht
 // in einem Rahmen laden und bliebe dort endlos beim Lade-Skeleton (Daniel, 26. Nov 2026).
 const redirectHostedCheckout = createHostedCheckoutRedirect((url) => {
@@ -81,7 +82,11 @@ function loadConfig() {
   return (configLoading ||= api("/config").then((loaded) => { configLoading = null; publicConfig = loaded; return loaded; }, (problem) => { configLoading = null; throw problem; }));
 }
 
+// Stripes eingebettete Zahlungsseite im obersten Layer (kasse-embedded.js). Zurück-Taste und close() müssen sie auch schließen.
+let embedded = null;
+
 function close() {
+  if (embedded) { embedded.close(); return; }
   if (!sheet) return;
   sheet.node.remove();
   document.body.classList.remove("start-noscroll");
@@ -98,6 +103,8 @@ function sessionBody(options) {
     ...window.DemenzTeller?.attribution(),
     ...window.DemenzConsent?.metaContext?.(),
     hostedFallback: true,
+    // Stripes eingebettete Zahlungsseite im Layer, wenn der Server sie anbietet (Daniel, 26. Nov 2026). Ältere Server ignorieren das Feld und liefern die gehostete Seite.
+    ...(publicConfig.embedded === true ? { embedded: true } : {}),
     ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
     ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) };
 }
@@ -115,6 +122,7 @@ async function prepareOnce(options) {
   const [loadedConfig, user] = await Promise.all([loadConfig(), signedInUser()]);
   publicConfig = loadedConfig;
   await window.DemenzTeller?.ready;
+  if (publicConfig.embedded === true) loadStripe(hostWindow()).catch(() => {});
   const token = await user.getIdToken();
   const session = await sessionFor(options, user, token);
   return session;
@@ -144,7 +152,9 @@ export async function open(options) {
   const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title" }, card);
   const onKey = (event) => { if (event.key === "Escape") close(); };
   document.addEventListener("keydown", onKey);
-  sheet = { node, plan: options.plan, email: options.email, pending: true, onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
+  sheet = { node, plan: options.plan, email: options.email, pending: true,
+    detach: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); },
+    onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
   document.body.append(node);
   document.body.classList.add("start-noscroll");
   title.focus();
@@ -175,6 +185,18 @@ export async function open(options) {
       loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
       const session = await sessionFor(options, user, token);
       if (!requireCurrentAccount()) return;
+      if (session?.checkoutMode === "embedded") {
+        // Stripes eigene Zahlungsseite im obersten Layer. Dieses Fenster (Ladehinweis) verschwindet leise, ohne onClose.
+        sheet.detach();
+        sheet.node.remove();
+        sheet = null;
+        document.body.classList.remove("start-noscroll"); // das Layer sperrt das Scrollen selbst und gibt es beim Schließen wieder frei
+        await showEmbeddedCheckout({ session, publishableKey: publicConfig.publishableKey, title: title.textContent,
+          onClose: () => options.onClose?.(), onRetry: () => { preparedSessions.clear(); open({ ...options }); },
+          onOpen: (handle) => { embedded = handle; }, onDispose: () => { embedded = null; }, track: options.track });
+        options.track?.("checkout_sheet_ready");
+        return;
+      }
       if (!redirectHostedCheckout(session, { attempt, isCurrent: currentAttempt })) throw new Error("hosted_checkout_unavailable");
       options.track?.("checkout_sheet_ready");
     };
@@ -291,5 +313,5 @@ export async function mountApplePay(slot, options) {
   }
 }
 
-export const isOpen = () => Boolean(sheet);
+export const isOpen = () => Boolean(sheet || embedded);
 window.DemenzKasse = Object.freeze({ open, close, isOpen, mountApplePay, prepare });
