@@ -24,6 +24,13 @@ export function mountSharedNavigation(doc = document) {
   container.classList.add('dc-navigation-host');
   const dock = doc.createElement('div'); dock.className = 'dc-navigation';
   const account = doc.createElement('a'); account.className = 'dc-navigation-account'; account.href = '/abo/konto.html?returnTo=' + encodeURIComponent(en ? '/en/dementia-translator/' : '/de/'); account.textContent = en ? 'Account' : 'Konto'; account.dataset.accountState = 'unknown';
+  // „Anmelden“ öffnet den Anmelde-Layer von unten statt der Seite (Daniel, 26. Nov). Mit Cmd/Strg-Klick oder ohne Layer-Unterstützung bleibt der Link ein normaler Link.
+  account.addEventListener('click', (event) => {
+    if (account.dataset.accountState !== 'signed-out' || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    import('/abo/account-layer.js').then(layer => layer.openAccountLayer({ returnTo: new URL(account.href, host.location.href).searchParams.get('returnTo') || (en ? '/en/dementia-translator/' : '/de/'), en, returnFocus: account, fallback: account.href }))
+      .catch(() => host.location.assign(account.href));
+  });
   const status = doc.createElement('span'); status.className = 'dc-navigation-status'; status.setAttribute('role', 'status');
   let menu = container.querySelector('.site-menu,.e-menu');
   if (!menu) { menu = doc.createElement('details'); menu.className = 'e-menu'; const summary = doc.createElement('summary'); summary.textContent = en ? 'Menu' : 'Menü'; menu.append(summary); }
