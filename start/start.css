@@ -424,3 +424,16 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 
 /* Nach Klick oder Tippen kein Fokus-Rahmen (Daniel, 26. Nov 2026). Mit der Tab-Taste bleibt er sichtbar. */
 .start-pointer :focus, .start-pointer :focus-visible { outline: none !important; }
+
+/* Angebotsseite am Desktop (Daniel, 26. Nov: „nutz den Platz“): zwei Spalten. Links Titel, Pläne, Knopf; rechts Bildschirme und Leistungen;
+   Stimmen, Fragen und die zweite Planwahl über die volle Breite. Im Layer (embed) und auf dem Handy bleibt alles einspaltig. */
+@media (min-width: 1100px) {
+  html:not(.start-embedded) body[data-screen="plan"] .start-page { max-width: 1160px; padding-left: 32px; padding-right: 32px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section { column-count: 2; column-gap: 64px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-head { column-span: all; margin: 0 0 12px; padding: 10px 0; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > h2.start-big-title:first-of-type { break-before: column; margin-top: 22px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-voices,
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-voices ~ * { column-span: all; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-shots { margin-left: 0; margin-right: 0; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > * { break-inside: avoid; }
+}
