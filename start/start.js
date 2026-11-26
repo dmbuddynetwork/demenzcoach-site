@@ -108,6 +108,16 @@
     age: null, personAge: null, reaction: null, visits: null, outings: null, meals: null, helpreact: null, feeling: null, sleep: null,
     breaks: null, work: null, when: null, joy: null, moments: [], calms: [], helpers: [], learn: [] };
   let plan = params.get("plan") === "monthly" ? "monthly" : "yearly";
+  // A/B-Test Knopftext (Daniel, 26. Nov): a = „Plan anfordern“, b = „7 Tage kostenlos testen“. 50/50, je Browser fest, ?cta=a|b erzwingt.
+  // Automatisierte Browser bekommen a, damit Tests stabil bleiben. Variante b hängt „_cb“ an die Quelle (src), so sind Käufe trennbar.
+  const ctaVariant = (() => {
+    const forced = params.get("cta");
+    if (forced === "a" || forced === "b") return forced;
+    try { const saved = localStorage.getItem("demenzcoach.ctaTest.v1"); if (saved === "a" || saved === "b") return saved; } catch { /* */ }
+    const picked = !navigator.webdriver && Math.random() < 0.5 ? "b" : "a";
+    try { localStorage.setItem("demenzcoach.ctaTest.v1", picked); } catch { /* */ }
+    return picked;
+  })();
   let offer = { yearly: 6999, monthly: 1299, currency: "eur", trialDays: 7, offers: null };
   // Willkommenspreis (angebot.js): Preis vom Server; die Gültigkeit prüft die Kasse erneut.
   // Keine sichtbare Frist: eine dauerhaft bindende Begrenzung ist für den veröffentlichten Flow nicht belegt.
@@ -155,7 +165,7 @@
   // Messen nur über die gemeinsame Einwilligung der Website (lovable-home.js, DemenzConsent):
   // GA4 nur mit Statistik-, Meta/TikTok nur mit Werbe-Einwilligung. Nie Antworten, Namen oder E-Mail senden.
   const track = (name, marketing) => {
-    try { window.DemenzConsent?.track?.(name, { entry: source, ...(kampagne ? { kampagne: kampagne.id, anzeige: anzeige || "" } : {}) }); } catch { /* ohne Einwilligung nichts */ }
+    try { window.DemenzConsent?.track?.(name, { entry: source, cta: ctaVariant, ...(kampagne ? { kampagne: kampagne.id, anzeige: anzeige || "" } : {}) }); } catch { /* ohne Einwilligung nichts */ }
     try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing); } catch { /* */ }
   };
 
@@ -783,7 +793,7 @@
     const name = forWho();
     // Labels wie BetterMe („GET MY PLAN“, „MOST POPULAR“). Statt „Beliebtester“ (ohne Verkaufszahlen nicht belegbar, UWG)
     // steht auf dem Jahresplan „Bester Preis“: belegbar, weil er pro Tag am günstigsten ist.
-    const ctaText = "Plan anfordern";
+    const ctaText = ctaVariant === "b" && offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos testen` : "Plan anfordern";
     setTimeout(() => { if (current === "plan") prepareCheckout(plan); }, 300);
 
     const tables = [];
@@ -852,7 +862,7 @@
     // Fester Kopf wie BetterMe: links die Uhr (oder die Probezeit), rechts „Plan anfordern“.
     const head = el("div", { class: "start-head" }, [
       clock(false) || el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewähltes Abo" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
-      el("button", { type: "button", class: "start-head-button", text: "Plan anfordern", onclick: scrollToPlans })
+      el("button", { type: "button", class: "start-head-button", text: ctaText, onclick: scrollToPlans })
     ]);
 
     // Nur tatsächlich vorhandene Hilfen zeigen. Keine Vorher-/Nachher-Wirkung versprechen.
@@ -1102,7 +1112,8 @@
 
   function checkoutMeta() {
     const campaign = (params.get("utm_campaign") || (kampagne && kampagne.id !== "vorschau" ? kampagne.id : "")).toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
-    const src = directMode ? `direkt_${source}`.slice(0, 40) : `quiz_${source}${preset ? `_${preset.key}` : ""}`.slice(0, 40);
+    const base = directMode ? `direkt_${source}` : `quiz_${source}${preset ? `_${preset.key}` : ""}`;
+    const src = ctaVariant === "b" ? `${base.slice(0, 37)}_cb` : base.slice(0, 40);
     return { campaign, src };
   }
 

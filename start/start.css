@@ -484,3 +484,6 @@ body[data-screen="plan"] .start-faq details p { font-size: 1.125rem; line-height
   html:not(.start-embedded) body[data-screen="plan"] .start-faq summary { padding: 22px 0; font-size: 1.375rem; }
   html:not(.start-embedded) body[data-screen="plan"] .start-faq details p { font-size: 1.1875rem; }
 }
+
+/* Knopftext in normaler Schreibweise statt GROSSBUCHSTABEN (für 60+ leichter lesbar, Daniel 26. Nov, Knopftext-Test). */
+body[data-screen="plan"] .start-cta, body[data-screen="plan"] .start-head-button { text-transform: none; letter-spacing: 0; }
