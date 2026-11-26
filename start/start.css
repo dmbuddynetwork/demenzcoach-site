@@ -421,6 +421,17 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-tp-alt, .start-tp-more { justify-self: center; font-size: var(--small); }
 .start-tp-alt[hidden] { display: none; }
 .start-tp-more { color: var(--ink-2); }
+/* iPhone: Preiszeile und Knopf ohne Scrollen sichtbar. Normales iPhone: kleineres Bild; iPhone SE: kein Bild. */
+@media (max-width: 760px) and (max-height: 760px) {
+  .start-tp { gap: 10px; }
+  .start-tp-pic { width: min(36vw, 140px); }
+  .start-tp h1 { font-size: 1.5rem; }
+  .start-tp-plan { min-height: 64px; padding: 12px 16px; }
+}
+@media (max-width: 760px) and (max-height: 600px) {
+  .start-tp-pic { display: none; }
+  .start-tp-sub { display: none; }
+}
 
 /* Nach Klick oder Tippen kein Fokus-Rahmen (Daniel, 26. Nov 2026). Mit der Tab-Taste bleibt er sichtbar. */
 .start-pointer :focus, .start-pointer :focus-visible { outline: none !important; }

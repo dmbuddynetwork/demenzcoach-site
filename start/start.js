@@ -968,7 +968,7 @@
 
     const offerBlock = () => [ticket(), table(), cta(), fine(), payments()];
 
-    // Bezahlbildschirm wie Tolan (Daniel 26. Nov 2026, Test nur mit ?ap=1): ein Bild, Überschrift, zwei Tarifkarten, Apple-Pay-Zeichen,
+    // Bezahlbildschirm wie Tolan (Daniel 26. Nov 2026, automatisch bei Apple Pay, sonst mit ?ap=1): ein Bild, Überschrift, zwei Tarifkarten, Apple-Pay-Zeichen,
     // eine Zeile Preis und Laufzeit, ein großer Knopf. Auf Geräten mit Apple Pay liegt der unsichtbare Express-Knopf von Stripe genau über
     // unserem Knopf: Ein Tipp öffnet direkt das Apple-Pay-Fenster. Ohne Apple Pay startet derselbe Knopf die gehostete Stripe-Seite.
     // Nicht übernommen: Presse-Logos (nicht belegt), „Jederzeit kündbar“ (der Jahresplan hat 1 Jahr Laufzeit), Probezeit-Verlängerung (kein Produkt).
@@ -1031,7 +1031,10 @@
         ])
       ];
     };
-    const tolanTop = params.get("ap") === "1" ? tolanScreen() : null;
+    // Daniel 26. Nov 2026 („Ja, für alle mit Apple Pay“): Geräte mit Apple Pay sehen den Bildschirm automatisch, alle anderen nie.
+    // ?ap=1 erzwingt ihn (Vorschau auf jedem Gerät), ?ap=0 schaltet ihn ab.
+    const applePayDevice = (() => { try { return window.ApplePaySession?.canMakePayments?.() === true; } catch { return false; } })();
+    const tolanTop = params.get("ap") === "1" || (params.get("ap") !== "0" && applePayDevice) ? tolanScreen() : null;
 
     return [
       ...(tolanTop ? [] : [head]),
@@ -1041,7 +1044,7 @@
       tolanTop ? null : (result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null),
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
-      // Mit ?ap=1 steht davor der kurze Bezahlbildschirm wie Tolan; darunter bleibt die lange Seite mit allen Hilfen und dem bisherigen Knopf.
+      // Mit Apple Pay (oder ?ap=1) steht davor der kurze Bezahlbildschirm wie Tolan; darunter bleibt die lange Seite mit allen Hilfen und dem bisherigen Knopf.
       ...(tolanTop ?? offerBlock()),
       pair ? null : preview,
       el("h2", { class: "start-section start-center start-big-title", text: "Was ist in deinem Plan enthalten" }),
