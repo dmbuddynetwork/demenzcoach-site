@@ -915,6 +915,8 @@
         for (const key of ["yearly", "monthly"]) slots[key].hidden = key !== plan || !ready[key];
         button.textContent = label();
         note.textContent = termsText();
+        const alt = cta.parentNode?.querySelector("[data-tp-alt]");
+        if (alt) alt.hidden = !ready[plan];
       };
       const mount = (key) => {
         if (mounted[key] || !window.DemenzKasse?.mountApplePay || !config.firebase?.apiKey) return;
@@ -937,21 +939,25 @@
           group,
           el("span", { class: "start-tp-applepay", role: "img", "aria-label": "Apple Pay", html: applePayMark[1] }),
           note,
-          cta
+          cta,
+          // Andere Zahlart: auf Geräten mit Apple Pay fängt der unsichtbare Express-Knopf den Tipp auf den großen Knopf ab, darum gibt es hier einen eigenen Weg zur Stripe-Seite (Karte und weitere Zahlarten).
+          el("button", { type: "button", class: "abo-link-button start-tp-alt", "data-tp-alt": "", hidden: "", text: "Mit Karte oder anderer Zahlart bezahlen", onclick: () => { countDirect("direct_cta"); checkout(); } }),
+          el("button", { type: "button", class: "abo-link-button start-tp-more", text: "Mehr über deinen Plan ↓", onclick: () => document.querySelector(".start-big-title")?.scrollIntoView({ behavior: "smooth", block: "start" }) })
         ])
       ];
     };
-    if (params.get("ap") === "1") return tolanScreen();
+    const tolanTop = params.get("ap") === "1" ? tolanScreen() : null;
 
     return [
-      head,
+      ...(tolanTop ? [] : [head]),
       reservationEnded && !deal ? el("p", { class: "start-small start-center start-ended", text: "Der Willkommenspreis ist nicht mehr verfügbar. Es gilt der normale Preis." }) : null,
-      hero,
-      el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Übungsplan für Gespräche ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : (name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!") }),
-      result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null,
+      tolanTop ? null : hero,
+      tolanTop ? null : el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Übungsplan für Gespräche ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : (name ? `Dein Plan für ${name} ist bereit!` : "Dein Plan ist bereit!") }),
+      tolanTop ? null : (result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null),
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
-      ...offerBlock(),
+      // Mit ?ap=1 steht davor der kurze Bezahlbildschirm wie Tolan; darunter bleibt die lange Seite mit allen Hilfen und dem bisherigen Knopf.
+      ...(tolanTop ?? offerBlock()),
       pair ? null : preview,
       el("h2", { class: "start-section start-center start-big-title", text: "Was ist in deinem Plan enthalten" }),
       shots,

@@ -35,9 +35,10 @@ const server = http.createServer((req, res) => { try {
       if (url.pathname.endsWith('/firebase-app.js')) return route.fulfill({ headers, contentType: 'text/javascript', body: 'export const initializeApp=()=>({});' });
       if (url.pathname.endsWith('/firebase-auth.js')) return route.fulfill({ headers, contentType: 'text/javascript', body: auth });
       if (url.hostname === 'js.stripe.com') { stripeScripts.push(req.url()); return route.fulfill({ contentType: 'text/javascript', body: stripe(stripeApple) }); }
+      if (url.hostname === 'checkout.stripe.com') return route.fulfill({ contentType: 'text/html', body: '<h1>Stripe hosted fixture</h1>' });
       if (url.hostname.endsWith('cloudfunctions.net')) {
         if (url.pathname.endsWith('/config')) return route.fulfill({ headers, json: { checkoutMode: 'elements', hostedFallback: true, walletEmail: true, plans: { yearly: { amount: 6999, currency: 'eur' }, monthly: { amount: 1299, currency: 'eur' } }, trialDays: 7, textVersions: { terms: 'fx' }, publishableKey: 'pk_test_fx' } });
-        if (url.pathname.endsWith('/session')) { sessions.push(req.postDataJSON()); return route.fulfill({ headers, json: { clientSecret: 'cs_fx_secret', trialDays: 7, plan: 'yearly', firstYear: null } }); }
+        if (url.pathname.endsWith('/session')) { sessions.push(req.postDataJSON()); return route.fulfill({ headers, json: req.postDataJSON().hostedFallback ? { checkoutMode: 'hosted', url: 'https://checkout.stripe.com/c/pay/cs_fx', trialDays: 7, plan: 'yearly', firstYear: null } : { clientSecret: 'cs_fx_secret', trialDays: 7, plan: 'yearly', firstYear: null } }); }
         return route.fulfill({ headers, json: {} });
       }
       return route.abort();
@@ -72,7 +73,15 @@ const server = http.createServer((req, res) => { try {
       assert.match(await page.locator('.start-tp-terms').innerText(), /Tage kostenlos, dann .*inkl\. MwSt\./);
       assert.match(await page.locator('.start-tp-terms').innerText(), /Laufzeit 1 Jahr/);
       assert.match(await page.locator('.start-tp-cta').innerText(), /^Für 0,00\s€ starten$/u);
-      assert.equal(await page.locator('.start-included, .start-faq, .start-shots').count(), 0, 'ein Bildschirm, nichts darunter');
+      // Vorgeschaltet: der kurze Bildschirm steht oben, die lange Seite (Hilfen, Fragen, bisheriger Knopf) bleibt darunter.
+      assert.equal(await page.locator('.start-included').count(), 1);
+      assert.equal(await page.locator('.start-faq').count(), 1);
+      const order2 = await page.evaluate(() => document.querySelector('.start-tp').compareDocumentPosition(document.querySelector('.start-included')) & Node.DOCUMENT_POSITION_FOLLOWING);
+      assert.ok(order2, 'Bezahlbildschirm steht vor der langen Seite');
+      assert.equal(await page.locator('.start-head').count(), 0, 'keine zweite Kopfleiste über dem Bildschirm');
+      assert.equal(await page.locator('.start-cta').count(), 2, 'oben der Bildschirmknopf, unten der bisherige Knopf');
+      await page.waitForFunction(() => !document.querySelector('[data-tp-alt]').hidden);
+      assert.match(await page.locator('[data-tp-alt]').innerText(), /Karte oder anderer Zahlart/);
       const box = await page.evaluate(() => { const c = document.querySelector('.start-tp-cta').getBoundingClientRect(), s = document.querySelector('#start-ap-yearly').getBoundingClientRect();
         return { same: Math.abs(c.top - s.top) < 2 && Math.abs(c.height - s.height) < 2 && Math.abs(c.width - s.width) < 2, opacity: getComputedStyle(document.querySelector('#start-ap-yearly')).opacity }; });
       assert.deepEqual(box, { same: true, opacity: '0' });
@@ -83,6 +92,9 @@ const server = http.createServer((req, res) => { try {
       assert.equal(sessions[1].plan, 'monthly');
       assert.equal(await page.locator('#start-ap-yearly').isHidden(), true);
       assert.match(await page.locator('.start-tp-terms').innerText(), /Jederzeit zum Monatsende kündbar/);
+      await page.locator('[data-tp-alt]').click();
+      await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
+      assert.ok(sessions.some(x => x.hostedFallback === true && x.plan === 'monthly'), 'andere Zahlart: gehostete Seite für den gewählten Plan');
     });
     // 2) ?ap=1 + Apple Pay ohne E-Mail: Sitzung mit emailLater (Apple Pay liefert die E-Mail).
     await run({ query: '?direkt=1&ap=1', applePay: true }, async ({ page, sessions }) => {
@@ -103,6 +115,7 @@ const server = http.createServer((req, res) => { try {
       assert.equal(sessions.length, 0); assert.equal(stripeScripts.length, 0);
       assert.equal(await page.locator('#start-ap-yearly').isHidden(), true);
       assert.equal(await page.locator('.start-tp-cta').isVisible(), true);
+      assert.equal(await page.locator('[data-tp-alt]').isHidden(), true, 'ohne Apple Pay trägt der große Knopf selbst die Karte');
     });
     // 5) Stripe meldet kein Apple Pay: Express-Knopf bleibt versteckt, der normale Knopf trägt.
     await run({ query: '?direkt=1&ap=1', applePay: true, stripeApple: false }, async ({ page }) => {
