@@ -990,3 +990,17 @@ body.einfach .translator-goal-change {
 }
 body.einfach .translator-goal-change::after { content: none !important; }
 body.einfach .translator-goal-change:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; }
+
+/* Leiste unter der Antwort (Daniel, 26. Nov): eine flache Zeile „Frag weiter …“ mit rundem „+“ für eine neue Situation. */
+body.einfach .translator-chat .translator-chat-panel { display: flex; align-items: center; gap: 10px; }
+body.einfach .translator-chat .translator-chat-form { flex: 1 1 0; min-width: 0; margin: 0; }
+body.einfach .translator-chat button.translator-chat-plus {
+  flex: 0 0 52px; width: 52px; height: 52px; min-height: 52px; min-width: 0; margin: 0; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; border-radius: 50%;
+  background: #fff; color: var(--e-purple, #47408C); border: 1px solid var(--e-line); box-shadow: 0 2px 14px rgba(30, 24, 70, .12);
+  font-size: 0 !important; line-height: 0 !important; cursor: pointer;
+}
+body.einfach .translator-chat button.translator-chat-plus[hidden] { display: none !important; }
+body.einfach .translator-chat button.translator-chat-plus::after, body.einfach .translator-chat button.translator-chat-plus::before { content: none !important; }
+body.einfach .translator-chat button.translator-chat-plus:focus-visible { outline: 3px solid var(--e-purple, #47408C); outline-offset: 2px; }
+body.einfach .translator-chat:has(.translator-chat-plus:not([hidden])) { background: linear-gradient(to top, var(--e-bg) 68%, rgba(246, 245, 242, 0)); }
