@@ -390,8 +390,28 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 /* Marke im Kopf: App-Symbol mit Namen daneben, auch auf dem Handy (die gemeinsame Navigation blendet ihn sonst aus). */
 .start-page .start-top.dc-navigation-host .abo-brand > span { display: inline; font-size: 1.125rem; }
 
-/* Apple Pay vorn (Test mit ?ap=1): Preis und Laufzeit direkt über dem Express-Knopf, darunter "oder" zur Karte. */
-.start-ap { margin: 6px 0 4px; }
-.start-ap .start-ap-fine { margin: 10px 0; }
-.start-ap-slot { min-height: 56px; margin: 0 0 8px; }
-.start-ap-or { margin: 4px 0 10px; text-align: center; font-size: var(--small); color: var(--ink-2); }
+/* Bezahlbildschirm wie Tolan (Test mit ?ap=1): ein Bild, Überschrift, zwei Tarifkarten, Apple-Pay-Zeichen, eine Zeile Bedingungen, ein großer Knopf. */
+.start-tp { display: grid; gap: 14px; justify-items: stretch; padding-bottom: 12px; }
+.start-tp-pic { justify-self: center; width: min(58vw, 240px); height: auto; margin: 0; }
+.start-tp h1 { margin: 4px 0 0; font-size: 1.75rem; line-height: 1.15; text-wrap: balance; }
+.start-tp-sub { margin: -6px 0 6px; text-align: center; color: var(--ink-2); }
+.start-tp-plans { display: grid; gap: 12px; margin: 0; }
+.start-tp-plan { position: relative; display: flex; align-items: center; gap: 14px; width: 100%; min-height: 76px; padding: 16px 18px; border: 2px solid var(--line); border-radius: 22px; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.start-tp-plan[aria-checked="true"] { border-color: var(--purple); background: #fff; box-shadow: 0 0 0 1px var(--purple); }
+.start-tp-plan[aria-checked="true"] .abo-radio { border: 7px solid var(--purple); }
+.start-tp-name { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.start-tp-name strong { font-size: 1.125rem; }
+.start-tp-trial { color: var(--purple); font-weight: 600; font-size: var(--small); }
+.start-tp-price { display: grid; gap: 2px; justify-items: end; text-align: right; }
+.start-tp-price strong { font-size: 1.125rem; font-variant-numeric: tabular-nums; }
+.start-tp-price span { color: var(--ink-2); font-size: var(--small); }
+.start-tp-badge { position: absolute; top: -13px; right: 16px; padding: 3px 12px; border-radius: 999px; background: var(--purple); color: #fff; font-size: .8125rem; font-weight: 700; }
+.start-tp-applepay { justify-self: center; display: block; width: 76px; height: 34px; margin-top: 2px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--line); background: #fff; }
+.start-tp-applepay svg { display: block; width: 100%; height: 100%; }
+.start-tp-terms { margin: 0; text-align: center; color: var(--ink); font-size: var(--small); line-height: 1.4; }
+.start-tp-cta-wrap { position: relative; }
+.start-tp-cta { width: 100%; min-height: 55px; height: 55px; letter-spacing: .02em; text-transform: none; font-size: 1.25rem; }
+/* Der Express-Knopf von Stripe liegt unsichtbar über unserem Knopf und fängt den Tipp ab. */
+.start-tp-slot { position: absolute; inset: 0; opacity: 0; overflow: hidden; border-radius: 999px; z-index: 2; }
+.start-tp-slot[hidden] { display: none; }
+.start-tp .abo-radio { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); }
