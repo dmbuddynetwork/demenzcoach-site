@@ -716,6 +716,25 @@
     node.append(icon, element('span', { className: 'translator-goal-label', text: goal.label }));
     return node;
   };
+  // Eigenes Ziel eintippen (Daniel, 26. Nov): Eingabezeile im ChatGPT-Stil unter den drei Zielen. Die KI antwortet zu diesem Ziel.
+  const ownGoalRow = (entry, options) => {
+    const field = element('input', { className: 'translator-own-goal-input', attributes: { type: 'text', maxlength: '160', autocomplete: 'off', enterkeyhint: 'go', placeholder: 'Oder: Eigenes Ziel …', 'aria-label': 'Eigenes Ziel eingeben' } });
+    const send = element('button', { className: 'translator-own-goal-send', attributes: { type: 'submit', 'aria-label': 'Antwort zu meinem Ziel' } });
+    const row = element('form', { className: 'translator-own-goal-row' }, [field, send]);
+    row.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const label = field.value.trim();
+      if (label.length < 3) { field.focus(); return; }
+      track('translator_goal', { goal: 'custom', result_key: entry.key });
+      const text = bubbleText(entry, options.typed);
+      const heading = element(homeHeading ? 'h1' : 'h2', { text: `„${text}“`, attributes: { tabindex: '-1' } });
+      setPage(entry);
+      output.replaceChildren(saidBlock(entry.says, entry, heading), aiGoalBox(text, 'own_goal', () => {}, { initialGoal: { id: 'custom', label } }));
+      output.hidden = false;
+      document.body.classList.add('translator-has-result');
+    });
+    return row;
+  };
   const askGoal = (entry, options = {}) => {
     const goals = goalsFor(entry);
     if (!goals) { render(entry, options); return; }
@@ -736,6 +755,7 @@
         setPage(entry, goal.id);
         render(entry, { ...options, goal: goal.id, preserveViewport: false });
       }))),
+      ownGoalRow(entry, options),
       element('p', { className: 'translator-change-situation' }, [changeSituation])
     ].filter(Boolean));
     output.hidden = false;
@@ -1487,7 +1507,7 @@
 
   // hint: ein schwacher Treffer der festen Liste. Die KI antwortet passend zur Eingabe; der Treffer
   // steht als erster Vorschlag unter „Meinst du vielleicht“ und gibt der Sprechblase seine Zeichnung.
-  const aiGoalBox = (text, source, onFail, { auto = false, allowHelpful = true } = {}) => {
+  const aiGoalBox = (text, source, onFail, { auto = false, allowHelpful = true, initialGoal = null } = {}) => {
     const en = ui?.lang === 'en';
     const box = element('section', { className: 'translator-ai translator-ai-goals' });
     const heading = element('h2', { text: en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?' });
@@ -1744,6 +1764,11 @@
     box.append(heading, status, choices, ownDetails, retry, warningHistory, answerSlot);
     ownDetails.hidden = true;
     if (auto) requestAnimationFrame(() => { void load(); });
+    // Eigenes Ziel schon auf der Zielfrage (Daniel, 26. Nov): keine Ziele von der KI holen, sondern gleich mit diesem Ziel antworten.
+    if (initialGoal) {
+      retry.hidden = true;
+      requestAnimationFrame(() => { ownDetails.hidden = false; select(initialGoal); });
+    }
     return box;
   };
 

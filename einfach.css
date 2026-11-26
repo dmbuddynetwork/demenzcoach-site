@@ -1004,3 +1004,22 @@ body.einfach .translator-chat button.translator-chat-plus[hidden] { display: non
 body.einfach .translator-chat button.translator-chat-plus::after, body.einfach .translator-chat button.translator-chat-plus::before { content: none !important; }
 body.einfach .translator-chat button.translator-chat-plus:focus-visible { outline: 3px solid var(--e-purple, #47408C); outline-offset: 2px; }
 body.einfach .translator-chat:has(.translator-chat-plus:not([hidden])) { background: linear-gradient(to top, var(--e-bg) 68%, rgba(246, 245, 242, 0)); }
+
+/* Eigenes Ziel unter den drei Zielen (Daniel, 26. Nov): Eingabezeile im ChatGPT-Stil. */
+body.einfach .translator-own-goal-row {
+  display: flex; align-items: center; gap: 8px; max-width: 760px; margin: 14px 0 6px; padding: 6px 6px 6px 22px;
+  background: #fff; border: 1px solid var(--e-line); border-radius: 999px; box-shadow: 0 2px 14px rgba(30, 24, 70, .12);
+}
+body.einfach .translator-own-goal-row:focus-within { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
+body.einfach .translator-own-goal-row input.translator-own-goal-input {
+  flex: 1 1 0; min-width: 0; width: auto; height: 52px; min-height: 52px; padding: 0; border: 0; border-radius: 0;
+  background: transparent; box-shadow: none; outline: none; font: inherit; font-size: 1.1875rem;
+}
+body.einfach .translator-own-goal-row button.translator-own-goal-send {
+  position: relative; flex: 0 0 52px; width: 52px; height: 52px; min-height: 52px; min-width: 0; margin: 0; padding: 0;
+  border: 0; border-radius: 50%; background: var(--e-purple, #47408C); cursor: pointer;
+}
+body.einfach .translator-own-goal-row button.translator-own-goal-send::before {
+  content: ""; position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; background: #fff;
+  -webkit-mask: var(--e-send-arrow) center / contain no-repeat; mask: var(--e-send-arrow) center / contain no-repeat;
+}
