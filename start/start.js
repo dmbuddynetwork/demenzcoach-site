@@ -979,8 +979,8 @@
 
     // Daniel 26. Nov 2026: „Die Apple-Pay-Seite soll genau die gleiche Seite sein, nur dass statt Stripe Apple Pay sich direkt öffnet“
     // + „unter dem Button ein Link für andere Zahlungsmöglichkeiten“. Auf Geräten mit Apple Pay liegt der unsichtbare Express-Knopf von
-    // Stripe genau über unserem Knopf (wie /hilfe/): Ein Tipp öffnet direkt das Apple-Pay-Fenster. Preis, Laufzeit und Kündigung stehen
-    // dann direkt über dem Knopf (§ 312j BGB), weil der Kauf im Apple-Pay-Fenster abschließt. ?ap=1 erzwingt, ?ap=0 schaltet ab.
+    // Stripe genau über unserem Knopf (wie /hilfe/): Ein Tipp öffnet direkt das Apple-Pay-Fenster. Der Hinweistext bleibt unter dem Knopf
+    // (Daniel 26. Nov: „Zeige den Text unter dem Button“); Preise stehen in den Kacheln darüber. ?ap=1 erzwingt, ?ap=0 schaltet ab.
     const applePayDevice = (() => { try { return window.ApplePaySession?.canMakePayments?.() === true; } catch { return false; } })();
     const applePayHere = params.get("ap") === "1" || (params.get("ap") !== "0" && applePayDevice);
     const applePayCta = () => {
@@ -1014,7 +1014,7 @@
       return [wrap, alt];
     };
     const offerBlock = () => applePayHere
-      ? [ticket(), table(), fine(), ...applePayCta(), payments()]
+      ? [ticket(), table(), ...applePayCta(), fine(), payments()]
       : [ticket(), table(), cta(), fine(), payments()];
 
 

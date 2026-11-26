@@ -1,6 +1,6 @@
 // Apple Pay direkt auf der normalen Angebotsseite von /start/ (Daniel 26. Nov 2026: „genau die gleiche Seite, nur dass statt Stripe
 // Apple Pay sich direkt öffnet“ + Link „Andere Zahlungsmöglichkeiten“). Auf Geräten mit Apple Pay (oder ?ap=1) liegt der unsichtbare
-// Express-Knopf über dem lila Knopf; Preis, Laufzeit und Kündigung stehen direkt darüber. Ohne Apple Pay lädt die Seite weder Stripe.js
+// Express-Knopf über dem lila Knopf; Link und Hinweistext darunter. Ohne Apple Pay lädt die Seite weder Stripe.js
 // noch eine Sitzung. Nur Test-Daten und ein Stripe-Ersatz, keine echten Konten oder Zahlungen.
 const assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -57,7 +57,7 @@ const server = http.createServer((req, res) => { try {
     browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
     const slot = (page, key) => page.locator(`.start-ap-wrap >> nth=0`).locator(`[data-ap-slot="${key}"]`);
     // 1) Apple Pay + bekannte E-Mail: gleiche Angebotsseite (Kopf, Titel, Kacheln), Express-Knopf unsichtbar über dem lila Knopf,
-    //    Rechtstext direkt über dem Knopf, Link „Andere Zahlungsmöglichkeiten“ darunter, Planwechsel gibt zweite Sitzung.
+    //    Link „Andere Zahlungsmöglichkeiten“ direkt darunter, dann der Hinweistext, Planwechsel gibt zweite Sitzung.
     await run({ query: '?direkt=1', applePay: true, email: 'fixture@example.invalid', embedded: true }, async ({ page, sessions, stripeScripts }) => {
       await page.waitForFunction(() => window.__ece?.mounted.includes('yearly'));
       await page.waitForFunction(() => !document.querySelector('[data-ap-slot="yearly"]').hidden);
@@ -74,8 +74,8 @@ const server = http.createServer((req, res) => { try {
       assert.equal(await page.locator('.start-tiers').first().locator('.start-tier').count(), 2);
       assert.match(await page.locator('.start-cta').first().innerText(), /freischalten/);
       const order = await page.evaluate(() => { const f = document.querySelector('.start-fine'), w = document.querySelector('.start-ap-wrap'), a = document.querySelector('.start-ap-alt');
-        return { fineBeforeButton: Boolean(f.compareDocumentPosition(w) & Node.DOCUMENT_POSITION_FOLLOWING), altAfterButton: Boolean(w.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING) }; });
-      assert.deepEqual(order, { fineBeforeButton: true, altAfterButton: true });
+        return { fineAfterLink: Boolean(a.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_FOLLOWING), altAfterButton: Boolean(w.compareDocumentPosition(a) & Node.DOCUMENT_POSITION_FOLLOWING) }; });
+      assert.deepEqual(order, { fineAfterLink: true, altAfterButton: true });
       assert.match(await page.locator('.start-fine').first().innerText(), /Heute zahlst du 0,00 €.*inkl\. MwSt\./s);
       await page.waitForFunction(() => !document.querySelector('.start-ap-alt').hidden);
       assert.equal(await page.locator('.start-ap-alt').first().innerText(), 'Andere Zahlungsmöglichkeiten');
