@@ -1,0 +1,15 @@
+/* Eingebettete Stripe-Zahlung im obersten Layer (kasse-embedded.js). Eigenständig: läuft auf jeder Seite, auch ohne abo.css. */
+dialog.kasse-embed { box-sizing: border-box; position: fixed; inset: 0; width: 100%; max-width: 100%; height: 100%; max-height: 100%; margin: 0; padding: 0;
+  border: 0; background: #f6f5f2; color: #1c1b1f; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  font: 400 1rem/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+dialog.kasse-embed::backdrop { background: rgba(28, 27, 31, .45); }
+.kasse-embed-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: 640px; margin: 0 auto;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); }
+.kasse-embed-head h2 { margin: 0; font-size: 1.125rem; }
+.kasse-embed-close { flex: 0 0 auto; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #ece9f7; color: #47408c; font-size: 1.75rem; line-height: 1; cursor: pointer; }
+.kasse-embed-status, .kasse-embed-problem { max-width: 640px; margin: 0 auto; padding: 8px max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); color: #55525e; }
+.kasse-embed-problem[hidden], .kasse-embed-status[hidden] { display: none; }
+.kasse-embed-problem .abo-error { margin: 0 0 14px; color: #a3261f; font-weight: 700; }
+.kasse-embed-problem .abo-button { display: block; width: 100%; min-height: 52px; border: 0; border-radius: 999px; background: #47408c; color: #fff; font: inherit; font-size: 1.0625rem; font-weight: 700; cursor: pointer; }
+.kasse-embed-problem .kasse-help { display: block; margin-top: 14px; text-align: center; color: #55525e; font-size: .9375rem; }
+.kasse-embed-box { max-width: 640px; margin: 0 auto; padding: 0 max(8px, env(safe-area-inset-right, 0px)) calc(24px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); min-height: 60vh; }

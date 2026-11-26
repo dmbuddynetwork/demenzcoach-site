@@ -3,6 +3,7 @@
 // Kein eigenes Zahlungsformular (Daniel, 24. Nov 2026: eingebettetes Stripe Elements sieht schlecht aus). Die Ebene zeigt nur
 // kurz „Weiter zur sicheren Zahlung“ und leitet im selben Tab auf die gehostete Stripe-Seite, nie in ein neues Fenster.
 import { createHostedCheckoutRedirect } from "./checkout-redirect.js";
+import { hostWindow, loadStripe, showEmbeddedCheckout } from "./kasse-embedded.js";
 // Läuft die Kasse im Layer (Funnel-Rahmen, iframe), muss das ganze Fenster zu Stripe wechseln: Stripes Seite lässt sich nicht
 // in einem Rahmen laden und bliebe dort endlos beim Lade-Skeleton (Daniel, 26. Nov 2026).
 const redirectHostedCheckout = createHostedCheckoutRedirect((url) => {
@@ -89,6 +90,8 @@ function sessionBody(options) {
     ...window.DemenzTeller?.attribution(),
     ...window.DemenzConsent?.metaContext?.(),
     hostedFallback: true,
+    // Stripes eingebettete Zahlungsseite im Layer, wenn der Server sie anbietet (Daniel, 26. Nov 2026). Ältere Server ignorieren das Feld und liefern die gehostete Seite.
+    ...(publicConfig.embedded === true ? { embedded: true } : {}),
     ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
     ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) };
 }
@@ -106,6 +109,7 @@ async function prepareOnce(options) {
   const [loadedConfig, user] = await Promise.all([publicConfig ? Promise.resolve(publicConfig) : api("/config"), signedInUser()]);
   publicConfig = loadedConfig;
   await window.DemenzTeller?.ready;
+  if (publicConfig.embedded === true) loadStripe(hostWindow()).catch(() => {});
   const token = await user.getIdToken();
   const session = await sessionFor(options, user, token);
   return session;
@@ -135,7 +139,9 @@ export async function open(options) {
   const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title" }, card);
   const onKey = (event) => { if (event.key === "Escape") close(); };
   document.addEventListener("keydown", onKey);
-  sheet = { node, plan: options.plan, email: options.email, pending: true, onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
+  sheet = { node, plan: options.plan, email: options.email, pending: true,
+    detach: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); },
+    onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
   document.body.append(node);
   document.body.classList.add("start-noscroll");
   title.focus();
@@ -166,6 +172,16 @@ export async function open(options) {
       loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
       const session = await sessionFor(options, user, token);
       if (!requireCurrentAccount()) return;
+      if (session?.checkoutMode === "embedded") {
+        // Stripes eigene Zahlungsseite im obersten Layer. Dieses Fenster (Ladehinweis) verschwindet leise, ohne onClose.
+        sheet.detach();
+        sheet.node.remove();
+        sheet = null;
+        await showEmbeddedCheckout({ session, publishableKey: publicConfig.publishableKey, title: title.textContent,
+          onClose: () => options.onClose?.(), onRetry: () => { preparedSessions.clear(); open({ ...options }); }, track: options.track });
+        options.track?.("checkout_sheet_ready");
+        return;
+      }
       if (!redirectHostedCheckout(session, { attempt, isCurrent: currentAttempt })) throw new Error("hosted_checkout_unavailable");
       options.track?.("checkout_sheet_ready");
     };
