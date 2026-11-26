@@ -189,7 +189,7 @@ export async function mountApplePay(slot, options) {
     const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
     const checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { theme: "stripe", variables: { colorPrimary: "#47408c", borderRadius: "999px" } } } });
     const express = checkout.createExpressCheckoutElement({
-      buttonType: { applePay: "subscribe" }, buttonHeight: 56, layout: { maxColumns: 1, maxRows: 1, overflow: "never" },
+      buttonType: { applePay: "subscribe" }, buttonHeight: 55, layout: { maxColumns: 1, maxRows: 1, overflow: "never" },
       paymentMethods: { applePay: "always", googlePay: "never", link: "never", paypal: "never", amazonPay: "never", klarna: "never" }
     });
     const visible = new Promise((resolve) => {
