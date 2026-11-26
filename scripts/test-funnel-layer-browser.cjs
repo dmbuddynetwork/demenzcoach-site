@@ -39,13 +39,14 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
             const box = await dialog.boundingBox();
             assert.ok(Math.abs(box.y + box.height - view.h) < 2, 'Layer sitzt unten');
             assert.equal(await p.locator('.dc-signup').count(), 0, 'keine Anmeldung in dieser Variante');
-            if (view.n === 'handy') assert.ok(box.width >= view.w - 2 && box.height > view.h * 0.85);
+            // Layer deckt die ganze Seite ab (Daniel, 26. Nov 2026).
+            assert.ok(box.width >= view.w - 2 && box.height >= view.h - 2, 'Layer vollflächig');
             if (shots) await p.screenshot({ path: path.join(shots, `layer-funnel-${view.n}-1.png`) });
-            // Antippen im Funnel läuft im Layer weiter (erste Frage).
-            await frame.getByRole('button', { name: /Mutter/ }).first().click();
-            await frame.locator('#screen').waitFor();
+            // Nur die erste Frage im Layer: danach eigene Fragebogen-Seite mit dem Stand aus diesem Tab.
+            await Promise.all([p.waitForURL(/\/start\/\?src=layer&weiter=1/), frame.getByRole('button', { name: /Mutter/ }).first().click()]);
+            await p.waitForFunction(() => document.body.dataset.screen === 'age');
             if (shots) await p.screenshot({ path: path.join(shots, `layer-funnel-${view.n}-2.png`) });
-            await p.reload(); // frische Seite für Bild 1
+            await p.goBack(); // frische Seite für Bild 1
           }
           if (variant === 'anmeldung') { await p.locator('dialog.dc-signup-sheet').waitFor(); await p.waitForTimeout(700); if (shots) await p.screenshot({ path: path.join(shots, `layer-anmeldung-${view.n}.png`) }); }
           cases++;
