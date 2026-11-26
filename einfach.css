@@ -980,3 +980,13 @@ body.einfach .translator-chat button.translator-chat-send::before {
 }
 /* Kein Chat-Balken unter dem Anmelde-, Zahlungs- oder Funnel-Layer von unten. */
 body:has(dialog[open]) .translator-chat, body.dc-signup-sheet-open .translator-chat { display: none !important; }
+
+/* Ziel selbst wählen und ändern (Daniel, 26. Nov). */
+body.einfach .translator-answer .translator-goal-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 12px; }
+body.einfach .translator-answer .translator-goal-row .translator-goal-chosen { margin: 0 !important; }
+body.einfach .translator-goal-change {
+  min-height: 48px; margin: 0; padding: 8px 18px; background: #fff; color: var(--e-purple); border: 2px solid var(--e-purple); border-radius: 999px;
+  font: inherit; font-size: 1.0625rem; font-weight: 700; line-height: 1.2; cursor: pointer; box-shadow: none;
+}
+body.einfach .translator-goal-change::after { content: none !important; }
+body.einfach .translator-goal-change:focus-visible { outline: 3px solid var(--e-purple); outline-offset: 3px; }
