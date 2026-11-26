@@ -538,3 +538,14 @@ body[data-screen="plan"] .start-fine { margin: 22px auto 20px; padding: 0 4px; b
 @media (max-width: 380px) { body[data-screen="plan"] .start-cta { font-size: 1.125rem; padding-left: 14px; padding-right: 14px; white-space: nowrap; } }
 /* Daniel 26. Nov: Überschrift auf dem Computer „komisch gebrochen“ (ein Wort allein in Zeile 2). Zeilen gleich lang verteilen. */
 body[data-screen="plan"] :is(.start-plan-title, .start-big-title, h1, h2) { text-wrap: balance; }
+/* Daniel 26. Nov: Apple-Pay-Seite mit denselben dezenten Kacheln wie die Angebotsseite (#178). */
+.start-tp-plans { gap: 18px; margin-top: 8px; }
+.start-tp-plan { gap: 12px; min-height: 60px; padding: 12px 14px; border: 1.5px solid #e2ddd4; border-radius: 14px; background: #fff; box-shadow: none; }
+.start-tp-plan[aria-checked="true"] { border: 2px solid var(--purple); background: #f6f4fd; box-shadow: none; }
+.start-tp-plan .abo-radio { width: 22px; height: 22px; }
+.start-tp-plan[aria-checked="true"] .abo-radio { border: 6px solid var(--purple); background: #fff; }
+.start-tp-name { gap: 0; }
+.start-tp-name strong, .start-tp-price strong { font-size: 1.0625rem; font-weight: 700; }
+.start-tp-trial, .start-tp-price span { font-size: .8125rem; }
+.start-tp-badge { top: 0; right: 14px; transform: translateY(-50%); padding: 3px 10px; background: #ece9f8; color: var(--purple); font-size: .75rem; line-height: 1.3; }
+.start-tp-plan[aria-checked="true"] .start-tp-badge { background: var(--purple); color: #fff; }
