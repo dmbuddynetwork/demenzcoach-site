@@ -783,7 +783,8 @@
     const name = forWho();
     // Labels wie BetterMe („GET MY PLAN“, „MOST POPULAR“). Statt „Beliebtester“ (ohne Verkaufszahlen nicht belegbar, UWG)
     // steht auf dem Jahresplan „Bester Preis“: belegbar, weil er pro Tag am günstigsten ist.
-    const ctaText = "Plan anfordern";
+    // Knopftext (Daniel, 26. Nov, Entscheidung „Direkt: 7 Tage kostenlos testen“): nennt Probezeit und „kostenlos“. Ohne Probezeit bleibt „Plan anfordern“.
+    const ctaText = offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos testen` : "Plan anfordern";
     setTimeout(() => { if (current === "plan") prepareCheckout(plan); }, 300);
 
     const tables = [];
@@ -852,7 +853,7 @@
     // Fester Kopf wie BetterMe: links die Uhr (oder die Probezeit), rechts „Plan anfordern“.
     const head = el("div", { class: "start-head" }, [
       clock(false) || el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewähltes Abo" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
-      el("button", { type: "button", class: "start-head-button", text: "Plan anfordern", onclick: scrollToPlans })
+      el("button", { type: "button", class: "start-head-button", text: ctaText, onclick: scrollToPlans })
     ]);
 
     // Nur tatsächlich vorhandene Hilfen zeigen. Keine Vorher-/Nachher-Wirkung versprechen.
@@ -930,16 +931,25 @@
     ]));
     const dots = shotList.map((_, index) => el("button", { type: "button", class: index === 0 ? "is-on" : "", "aria-label": `Bild ${index + 1} von ${shotList.length}` }));
     const shotsTrack = el("div", { class: "start-shots-track" }, slides);
-    const goTo = (index) => shotsTrack.scrollTo({ left: slides[index].offsetLeft - (shotsTrack.clientWidth - slides[index].offsetWidth) / 2, behavior: "smooth" });
+    // Mitte aus den sichtbaren Rechtecken berechnen, nicht aus offsetLeft: offsetLeft zählt ab einem Vorfahren und
+    // lag auf Tablet und im Layer daneben (Bild landete nicht in der Mitte). Ein getipptes Bild bleibt markiert, auch wenn
+    // es am Rand nicht ganz in die Mitte rollen kann; erst eigenes Wischen gibt die Markierung wieder frei.
+    const centerOffset = (slide) => { const t = shotsTrack.getBoundingClientRect(), r = slide.getBoundingClientRect(); return r.left + r.width / 2 - (t.left + t.width / 2); };
+    const mark = (active) => {
+      slides.forEach((slide, index) => slide.classList.toggle("is-on", index === active));
+      dots.forEach((dot, index) => dot.classList.toggle("is-on", index === active));
+    };
+    let pinned = -1;
+    const goTo = (index) => { pinned = index; mark(index); shotsTrack.scrollTo({ left: shotsTrack.scrollLeft + centerOffset(slides[index]), behavior: "smooth" }); };
+    for (const type of ["pointerdown", "wheel", "touchstart"]) shotsTrack.addEventListener(type, () => { pinned = -1; }, { passive: true });
     let shotFrame = 0;
     shotsTrack.addEventListener("scroll", () => {
+      if (pinned >= 0) return;
       cancelAnimationFrame(shotFrame);
       shotFrame = requestAnimationFrame(() => {
-        const middle = shotsTrack.scrollLeft + shotsTrack.clientWidth / 2;
         let active = 0;
-        slides.forEach((slide, index) => { if (Math.abs(slide.offsetLeft + slide.offsetWidth / 2 - middle) < Math.abs(slides[active].offsetLeft + slides[active].offsetWidth / 2 - middle)) active = index; });
-        slides.forEach((slide, index) => slide.classList.toggle("is-on", index === active));
-        dots.forEach((dot, index) => dot.classList.toggle("is-on", index === active));
+        slides.forEach((slide, index) => { if (Math.abs(centerOffset(slide)) < Math.abs(centerOffset(slides[active]))) active = index; });
+        mark(active);
       });
     }, { passive: true });
     slides.forEach((slide, index) => slide.addEventListener("click", () => goTo(index)));

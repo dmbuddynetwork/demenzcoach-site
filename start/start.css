@@ -446,15 +446,55 @@ body[data-screen="plan"] .start-head { background: rgba(252, 249, 243, .97); }
 .start-embedded body[data-screen="relation"] .start-pic img { padding-top: 6px; }
 .start-embedded body[data-screen="relation"] .start-pic > span { padding: 10px 14px; }
 
-/* Angebotsseite am Desktop (Daniel, 26. Nov: „nutz den Platz“): zwei Spalten. Links Titel, Pläne, Knopf; rechts Bildschirme und Leistungen;
-   Stimmen, Fragen und die zweite Planwahl über die volle Breite. Im Layer (embed) und auf dem Handy bleibt alles einspaltig. */
-@media (min-width: 1100px) {
-  html:not(.start-embedded) body[data-screen="plan"] .start-page { max-width: 1160px; padding-left: 32px; padding-right: 32px; }
-  html:not(.start-embedded) body[data-screen="plan"] .start-page > section { column-count: 2; column-gap: 64px; }
-  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-head { column-span: all; margin: 0 0 12px; padding: 10px 0; }
-  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > h2.start-big-title:first-of-type { break-before: column; margin-top: 22px; }
-  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-voices,
-  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-voices ~ * { column-span: all; }
-  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-shots { margin-left: 0; margin-right: 0; }
-  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > * { break-inside: avoid; }
+/* Angebotsseite als Sales-Landingpage (Daniel, 26. Nov: „nicht zweispaltig … Screenshots und Texte größer, eine richtige Sales-Funnel-Landingpage“).
+   Eine Spalte. Große Überschriften, große Handy-Bilder, große Tarife und Leistungen. Ersetzt die zwei Spalten aus #152. */
+body[data-screen="plan"] .start-plan-title { font-size: 2.25rem; line-height: 1.12; letter-spacing: -.01em; }
+body[data-screen="plan"] .start-big-title { margin: 48px 0 20px; font-size: 2.125rem; line-height: 1.12; letter-spacing: -.01em; }
+body[data-screen="plan"] .start-hero-pics img { height: 230px; }
+body[data-screen="plan"] .start-hero-row strong { font-size: 1.25rem; }
+body[data-screen="plan"] .start-tier-body { padding: 18px 16px 18px 18px; }
+body[data-screen="plan"] .start-tier-text strong { font-size: 1.375rem; }
+body[data-screen="plan"] .start-tier-text span { font-size: 1.0625rem; }
+body[data-screen="plan"] .start-shots-track { gap: 16px; padding-left: calc(50% - 120px); padding-right: calc(50% - 120px); }
+body[data-screen="plan"] .start-shots figure { flex-basis: 240px; }
+body[data-screen="plan"] .start-included li { grid-template-columns: 60px 1fr; gap: 16px; padding: 20px 0; }
+body[data-screen="plan"] .start-included-icon { width: 60px; height: 60px; border-radius: 14px; }
+body[data-screen="plan"] .start-included-icon svg { width: 32px; height: 32px; }
+body[data-screen="plan"] .start-included strong { font-size: 1.375rem; }
+body[data-screen="plan"] .start-included li > span:last-child > span { font-size: 1.125rem; line-height: 1.4; }
+body[data-screen="plan"] .start-voice-text { font-size: 1.125rem; line-height: 1.45; }
+body[data-screen="plan"] .start-faq summary { font-size: 1.25rem; }
+body[data-screen="plan"] .start-faq details p { font-size: 1.125rem; line-height: 1.5; }
+@media (min-width: 900px) {
+  /* Daniel, 26. Nov: „nicht alles breit, nur was Sinn ergibt, und nicht volle Breite“. Seite höchstens 1000 px.
+     Breit: Überschriften, App-Bilder, Stimmen. Schmal und mittig (600 px): Tarife, Knopf, Hinweise, Garantie. Leistungen und Fragen 720 px. */
+  html:not(.start-embedded) body[data-screen="plan"] .start-page { max-width: 1000px; padding-left: 32px; padding-right: 32px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > :is(.start-ticket, .start-tiers, .start-cta, .start-tp-cta-wrap, .start-fine, .start-pay, .start-safe, .start-ended, .start-guarantee-card, .start-legal, .start-small, .start-result-line, .start-tp) { max-width: 600px; margin-left: auto; margin-right: auto; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > :is(.start-hero, .start-included, .start-faq, .start-card, .start-weekcard) { max-width: 720px; margin-left: auto; margin-right: auto; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-head { max-width: none; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-plan-title { margin: 28px 0 24px; font-size: 3rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-big-title { margin: 72px 0 28px; font-size: 2.75rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-hero-pics img { height: 280px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-hero-row strong { font-size: 1.375rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-tier-text strong { font-size: 1.5rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-tier-text span { font-size: 1.125rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-cta { min-height: 68px; font-size: 1.25rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-shots { margin-left: 0; margin-right: 0; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-shots-track { gap: 28px; padding: 16px 4px 8px; scroll-snap-type: x proximity; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-shots figure { flex-basis: 288px; transform: none; scroll-snap-align: start; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-phone { padding: 8px; border-radius: 42px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-phone img { border-radius: 34px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-included li { grid-template-columns: 68px 1fr; gap: 20px; padding: 24px 0; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-included-icon { width: 68px; height: 68px; border-radius: 16px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-included-icon svg { width: 36px; height: 36px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-included strong { font-size: 1.5rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-included li > span:last-child > span { font-size: 1.25rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-voice { flex-basis: 360px; max-width: 360px; padding: 22px; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-voice strong { font-size: 1.1875rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-voice-text { font-size: 1.1875rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-faq summary { padding: 22px 0; font-size: 1.375rem; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-faq details p { font-size: 1.1875rem; }
 }
+
+/* Knopftext in normaler Schreibweise statt GROSSBUCHSTABEN (für 60+ leichter lesbar, Daniel 26. Nov). */
+body[data-screen="plan"] .start-cta, body[data-screen="plan"] .start-head-button { text-transform: none; letter-spacing: 0; }
