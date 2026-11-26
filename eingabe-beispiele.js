@@ -39,6 +39,7 @@
     var tick = function () {
       if (off()) { running = false; return; }
       var text = prefix + list[index];
+      field.dataset.dcBeispielText = list[index];
       var shown = 0;
       var type = function () {
         if (off()) { running = false; return; }
@@ -67,6 +68,12 @@
     start();
   }
 
-  window.DcBeispiele = { attach: attach, examples: EXAMPLES };
+  // Leeres Feld + Absenden: das gerade gezeigte Beispiel gilt als Eingabe (Daniel, 26. Nov). Leer, wenn die Animation aus ist.
+  function current(field) {
+    if (!field || field.dataset.dcBeispiele === 'off' || field.value.trim() !== '') return '';
+    return field.dataset.dcBeispielText || '';
+  }
+
+  window.DcBeispiele = { attach: attach, current: current, examples: EXAMPLES };
   document.dispatchEvent(new Event('dc-beispiele-ready'));
 })();

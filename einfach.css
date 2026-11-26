@@ -1023,3 +1023,22 @@ body.einfach .translator-own-goal-row button.translator-own-goal-send::before {
   content: ""; position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; background: #fff;
   -webkit-mask: var(--e-send-arrow) center / contain no-repeat; mask: var(--e-send-arrow) center / contain no-repeat;
 }
+
+/* KI-Zielseite (nach Nachfrage oder freier Eingabe): gleiche große Ziel-Knöpfe und gleiche Eigenes-Ziel-Zeile wie die erste Zielseite (Daniel, 26. Nov). */
+body.einfach .translator-ai-goals:not(.translator-ai-goals-selected) { padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
+body.einfach .translator-ai-goals:not(.translator-ai-goals-selected) .translator-ai-goal-choices { display: grid; gap: 12px; margin: 0 0 4px; }
+body.einfach .translator-ai-goals:not(.translator-ai-goals-selected) .translator-ai-status:empty { display: none; }
+body.einfach .translator-ai-goals .translator-own-goal-row { margin: 14px 0 6px; }
+body.einfach .translator-ai-goals .translator-own-goal-row label { display: contents; }
+body.einfach .translator-ai-goals .translator-own-goal-row label > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+body.einfach .translator-ai-goals .translator-own-goal-row input.translator-own-goal-input { flex: 1 1 0; }
+body.einfach .translator-ai-goals .translator-own-goal-row button.translator-own-goal-send {
+  position: relative; flex: 0 0 52px; width: 52px; height: 52px; min-height: 52px; min-width: 0; margin: 0; padding: 0; border: 0; border-radius: 50%;
+  background: var(--e-purple, #47408C); font-size: 0 !important; line-height: 0 !important; cursor: pointer;
+}
+body.einfach .translator-ai-goals .translator-own-goal-row button.translator-own-goal-send::after { content: none !important; }
+body.einfach .translator-ai-goals .translator-own-goal-row button.translator-own-goal-send::before {
+  content: ""; position: absolute; inset: 0; margin: auto; width: 26px; height: 26px; background: #fff;
+  -webkit-mask: var(--e-send-arrow) center / contain no-repeat; mask: var(--e-send-arrow) center / contain no-repeat;
+}
+body.einfach .translator-ai-goals:not(.translator-ai-goals-selected) > .translator-goal-question { margin: 8px 0 14px; font-size: clamp(1.75rem, 6.4vw, 2.25rem); font-weight: 800; line-height: 1.2; }

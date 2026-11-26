@@ -710,10 +710,11 @@
     return node;
   };
   const goalChoice = (goal, onClick, attributes = {}) => {
-    const node = button('', 'translator-ai-goal-choice', onClick, attributes);
+    // Gleiche große Knöpfe wie auf der Zielseite der ersten Situation (Daniel, 26. Nov); nach der Wahl werden sie klein.
+    const node = button('', 'translator-ai-goal-choice translator-goal', onClick, attributes);
     const [meaning, paths] = goalIcon(goal);
     const icon = goalSvg(paths); icon.dataset.goalIcon = meaning;
-    node.append(icon, element('span', { className: 'translator-goal-label', text: goal.label }));
+    node.append(icon, element('span', { className: 'translator-goal-label', text: goal.label }), goalSvg('<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>', 'translator-goal-arrow'));
     return node;
   };
   // Eigenes Ziel eintippen (Daniel, 26. Nov): Eingabezeile im ChatGPT-Stil unter den drei Zielen. Die KI antwortet zu diesem Ziel.
@@ -1510,7 +1511,7 @@
   const aiGoalBox = (text, source, onFail, { auto = false, allowHelpful = true, initialGoal = null } = {}) => {
     const en = ui?.lang === 'en';
     const box = element('section', { className: 'translator-ai translator-ai-goals' });
-    const heading = element('h2', { text: en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?' });
+    const heading = element('h2', { className: 'translator-goal-question', text: en ? 'What would you like to achieve now?' : 'Was möchtest du jetzt erreichen?' });
     const status = element('p', { className: 'translator-ai-status', attributes: { role: 'status', 'aria-live': 'polite' } });
     const choices = element('div', { className: 'translator-ai-goal-choices' });
     const changeGoals = element('section', { className: 'translator-other-goals' }, [element('h3', { className: 'translator-step', text: en ? 'Try another goal' : 'Ein anderes Ziel ausprobieren' })]);
@@ -1610,6 +1611,7 @@
       selectedKey = key;
       selectedGoal = { ...goal };
       box.classList.add('translator-ai-goals-selected');
+      choices.querySelectorAll('button').forEach(choice => choice.classList.remove('translator-goal'));
       heading.textContent = `${en ? 'Your goal' : 'Dein Ziel'}: ${goal.label}`;
       heading.classList.add('translator-selected-goal');
       heading.tabIndex = -1;
@@ -1649,9 +1651,9 @@
         if (top < headerBottom) window.scrollBy({ top: top - headerBottom - 12, behavior: 'instant' });
       }));
     };
-    const own = element('input', { attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', placeholder: en ? 'For example: Say no calmly' : 'Zum Beispiel: Ruhig Nein sagen' } });
+    const own = element('input', { className: 'translator-own-goal-input', attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', autocomplete: 'off', placeholder: en ? 'Or: your own goal …' : 'Oder: Eigenes Ziel …' } });
     const ownLabel = element('label', {}, [element('span', { text: en ? 'What would you like to achieve?' : 'Was möchtest du erreichen?' }), own]);
-    const ownForm = element('form', { className: 'translator-own-goal' }, [ownLabel, button(en ? 'Answer for my goal' : 'Antwort zu meinem Ziel', 'button', () => {})]);
+    const ownForm = element('form', { className: 'translator-own-goal translator-own-goal-row' }, [ownLabel, button(en ? 'Answer for my goal' : 'Antwort zu meinem Ziel', 'button translator-own-goal-send', () => {})]);
     ownForm.querySelector('button').type = 'submit';
     ownForm.addEventListener('submit', event => {
       event.preventDefault();
@@ -1742,8 +1744,8 @@
       if (result.kind === 'goals') {
         box.dataset.goalState = 'ready';
         box.dataset.selectionMode = result.selectionMode || 'guessed';
-        heading.textContent = en ? 'What would help you right now?' : 'Was möchtest du gerade erreichen?';
-        status.textContent = en ? 'Choose a goal. Your answer will follow your choice.' : 'Wähle ein Ziel. Danach richtet sich deine Antwort.';
+        heading.textContent = en ? 'What would you like to achieve now?' : 'Was möchtest du jetzt erreichen?';
+        status.textContent = '';
         choices.replaceChildren(...result.goals.map(g => goalChoice({ id: g.goal, label: g.label }, () => select({ id: g.goal, label: g.label }), { 'aria-pressed': 'false', 'data-goal-id': g.goal })));
         retry.hidden = true;
         if (result.selectionMode === 'explicit') {
@@ -1777,6 +1779,8 @@
     setViewState('goal');
     const heading = element(homeHeading ? 'h1' : 'h2', { text: `„${typed}“`, attributes: { tabindex: '-1' } });
     output.replaceChildren(saidBlock(typed, hint, heading), aiBox(typed, 'typed_goal', () => {}, { auto: true }));
+    // Passt die Eingabe genau zu einer Situation mit eigener Seite, zeigt die Adressleiste deren Adresse (Daniel, 26. Nov).
+    if (hint && publicByKey.has(hint.key)) setPage(hint);
     output.hidden = false;
     document.body.classList.add('translator-has-result');
     document.body.classList.remove('translator-answers-seen');
@@ -2185,6 +2189,9 @@
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
+    // Leeres Feld: das gezeigte Beispiel wird abgeschickt (Daniel, 26. Nov).
+    const shownExample = window.DcBeispiele?.current(input) ?? '';
+    if (shownExample && !input.value.trim()) input.value = shownExample;
     const text = input.value.trim();
     if (!text) {
       // Leeres Feld: sagen, was fehlt – sichtbar und für Vorlesen.
@@ -2212,7 +2219,7 @@
         || (entry.variants ?? []).some(value => core.normalize(value) === core.normalize(text))
         || (core.rank(text, [entry])[0]?.score ?? 0) >= strongScore) ? entry : null;
       renderTypedGoal(text, imageMatch);
-      setHash('');
+      if (!imageMatch || !publicByKey.has(imageMatch.key)) setHash('');
       track('translator_result', { result_key: 'none', input_source: 'typed', safety_hint: 'no' });
       return;
     }
@@ -2449,7 +2456,7 @@
     field.addEventListener('input', () => { if (chatMode !== 'more') { input.value = field.value; grow(); } });
     chatForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      const value = field.value.trim();
+      const value = field.value.trim() || (window.DcBeispiele?.current(field) ?? '');
       if (!value) { field.focus(); return; }
       const situation = situationNow();
       if (situation && chatMode === 'more') {
