@@ -1047,3 +1047,22 @@ body.einfach .translator-ai-goals:not(.translator-ai-goals-selected) > .translat
    bis translator.js die Zielfrage zeigt. Fällt das Skript aus, erscheint die Antwort nach 4 Sekunden. */
 body[data-translator-pending-goal] #translator-result { visibility: hidden; animation: dc-pending-goal-reveal 0s linear 4s forwards; }
 @keyframes dc-pending-goal-reveal { to { visibility: visible; } }
+
+/* Illustrationen größer (Daniel, 26. Nov). Handy: Bild groß über der Sprechblase, die Spitze zeigt nach oben zur Person.
+   Ab 720px: Bild groß rechts neben der Sprechblase. */
+@media (max-width: 719.98px) {
+  body.einfach .translator-said.translator-said-with-art { flex-direction: column; align-items: stretch; gap: 6px; }
+  body.einfach .translator-said-with-art .translator-said-art {
+    order: -1; flex: 0 0 auto; align-self: center; width: auto; max-width: min(100%, 360px); max-height: 230px;
+  }
+  body.einfach .translator-said-with-art :is(h1, h2).translator-said-bubble::after {
+    left: calc(50% - 8px); right: auto; top: -9px; bottom: auto; border: 0; border-left: 1px solid var(--e-line); border-top: 1px solid var(--e-line);
+  }
+}
+@media (min-width: 720px) {
+  body.einfach .translator-said.translator-said-with-art { gap: 20px; }
+  body.einfach .translator-said-with-art .translator-said-art { flex: 0 0 auto; width: auto; max-width: 42%; max-height: 300px; }
+}
+@media (max-width: 719.98px) {
+  body.einfach .translator-said-with-art .translator-said-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
