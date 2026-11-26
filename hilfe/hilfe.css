@@ -39,29 +39,67 @@ a { color: var(--purple); }
 .lp-btn:hover { background: var(--purple-dark); }
 .lp-center .lp-btn { display: inline-flex; }
 
-/* Einstieg */
-.lp-hero { text-align: center; }
-.lp-hero .lp-wrap { padding-block: 16px 36px; }
+/* Einstieg mit Live-Demo */
+.lp-hero { background: linear-gradient(180deg, var(--lav) 0, var(--bg) 520px); text-align: center; }
+.lp-top { background: var(--lav); }
+.lp-hero .lp-wrap { padding-block: 8px 40px; }
 .lp-eyebrow { font-size: var(--small); font-weight: 700; color: var(--purple); margin-bottom: 10px; }
-.lp-entry-top { margin-top: 24px; }
+.lp-hero .lp-lead { margin: 10px auto 16px; max-width: 34ch; color: var(--ink); }
+
+.lp-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 14px; }
+@media (min-width: 720px) { .lp-chips { grid-template-columns: repeat(3, 1fr); } }
+.lp-chips button { min-height: 52px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 14px; text-align: center; background: var(--card); color: var(--ink);
+  font: 600 var(--small)/1.25 var(--font); cursor: pointer; box-shadow: 0 1px 2px rgba(28, 27, 31, .05); }
+.lp-chips button:hover { border-color: var(--purple); }
+.lp-chips button[aria-checked="true"] { background: var(--purple); border-color: var(--purple); color: #fff; }
+
+.lp-answer { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: 0 6px 24px rgba(71, 64, 140, .12); }
+.lp-answer.is-new { animation: lp-in .35s ease; }
+@keyframes lp-in { from { opacity: .3; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .lp-answer.is-new { animation: none; } }
+.lp-answer-head { display: grid; grid-template-columns: 1fr 96px; gap: 12px; align-items: center; }
+.lp-answer-head img { width: 96px; height: 96px; object-fit: contain; }
+.lp-meaning { margin-top: 8px; color: var(--ink-2); font-size: var(--small); }
+.lp-say-now { margin: 16px -8px 4px; padding: 14px 16px; background: var(--lav); border-left: 5px solid var(--purple); border-radius: 12px; }
+.lp-say-now .lp-label { margin: 0 0 2px; color: var(--lav-ink); }
+.lp-say-main { font-size: var(--h2); line-height: 1.3; font-weight: 800; color: var(--lav-ink); }
+.lp-answer .lp-say li { background: var(--bg); color: var(--ink); font-weight: 600; }
+.lp-hero > .lp-wrap > .lp-fine { text-align: left; }
+
+.lp-cta-box { margin-top: 28px; padding: 22px 16px 18px; background: var(--card); border: 2px solid var(--purple); border-radius: 20px; }
+.lp-cta-box h2 { margin-bottom: 6px; }
+.lp-cta-box > p { color: var(--ink-2); margin-bottom: 16px; }
 .lp-entry { min-height: 64px; text-align: left; }
-.lp-entry:not(.is-ready) .lp-btn { text-align: center; }
 .lp-entry .content-funnel > h2 { text-align: center; font-size: var(--body); margin-bottom: 12px; }
 .lp-entry .content-funnel { margin: 0; }
-.lp-hero .lp-fine { margin-top: 16px; }
+.lp-pills { list-style: none; padding: 0; margin: 4px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; font-size: var(--small); color: var(--ink-2); font-weight: 600; }
+.lp-pills li::before { content: "✓ "; color: var(--purple); font-weight: 800; }
 
-/* Wiedererkennen */
-.lp-moments { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-@media (min-width: 640px) { .lp-moments { grid-template-columns: repeat(3, 1fr); } }
-.lp-moments li { display: grid; grid-template-rows: 132px auto; gap: 6px; padding: 12px 10px 14px; background: var(--bg); border: 1px solid var(--line); border-radius: 16px; text-align: center; align-content: start; }
-.lp-moments img { width: 100%; height: 132px; object-fit: contain; }
-.lp-moments span { font-weight: 700; line-height: 1.3; }
+/* Statt … lieber … */
+.lp-swap { list-style: none; padding: 0; display: grid; gap: 14px; }
+.lp-swap li { display: grid; gap: 6px; }
+.lp-swap p { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 14px; }
+.lp-swap b { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-size: .9rem; color: #fff; }
+.lp-swap em { display: block; font-style: normal; font-size: var(--small); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.lp-swap-no { background: var(--card); border: 1px solid var(--line); color: var(--ink-2); }
+.lp-swap-no b { background: #8a8794; }
+.lp-swap-no s { text-decoration-color: rgba(85, 82, 94, .5); }
+.lp-swap-yes { background: var(--lav); color: var(--lav-ink); font-weight: 700; }
+.lp-swap-yes b { background: var(--purple); }
+@media (min-width: 720px) { .lp-swap li { grid-template-columns: 1fr 1fr; } }
 
-/* Das Problem: Bild und Text */
-.lp-split { display: grid; gap: 20px; align-items: center; }
-.lp-split img { width: min(260px, 70%); margin: 0 auto; }
-.lp-split p + p { margin-top: 12px; }
-@media (min-width: 720px) { .lp-split { grid-template-columns: 240px 1fr; gap: 32px; } .lp-split img { width: 100%; } }
+/* Weg zum Start */
+.lp-path { list-style: none; padding: 0; display: grid; gap: 0; margin-bottom: 20px; }
+.lp-path li { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding-bottom: 18px; position: relative; }
+.lp-path li:not(:last-child)::after { content: ""; position: absolute; left: 19px; top: 42px; bottom: 2px; width: 2px; background: var(--line); }
+.lp-path b { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--purple); color: #fff; }
+.lp-path p { color: var(--ink-2); }
+
+/* Feste Knopfleiste */
+@media (min-width: 900px) { .lp-sticky { display: none !important; } }
+.lp-sticky { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(246, 245, 242, .96); border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(28, 27, 31, .08); }
+.lp-sticky .lp-btn { max-width: 520px; margin: 0 auto; }
+body:has(.consent-banner:not([hidden])) .lp-sticky { display: none; }
 
 /* Drei Schritte mit App-Bildern */
 .lp-steps { list-style: none; padding: 0; display: grid; gap: 28px; counter-reset: none; }
@@ -71,33 +109,22 @@ a { color: var(--purple); }
 .lp-steps p { color: var(--ink-2); max-width: 30ch; }
 @media (min-width: 720px) { .lp-steps { grid-template-columns: repeat(3, 1fr); gap: 24px; } .lp-steps img { width: 100%; } }
 
-/* Beispiel mit Reitern */
-.lp-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.lp-tabs [role="tab"] { flex: 1 1 auto; min-height: 48px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink); font: 600 var(--small)/1.2 var(--font); cursor: pointer; }
-.lp-tabs [role="tab"][aria-selected="true"] { background: var(--lav); border: 2px solid var(--purple); color: var(--lav-ink); }
-.lp-example { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+/* Antwort-Bausteine */
 .lp-label { margin-top: 16px; font-size: var(--small); font-weight: 700; color: var(--ink-2); text-transform: uppercase; letter-spacing: .04em; }
-.lp-label:first-child { margin-top: 0; }
+.lp-answer-head .lp-label { margin-top: 0; }
 .lp-quote { font-size: var(--h2); font-weight: 800; line-height: 1.25; }
 .lp-say { list-style: none; padding: 0; display: grid; gap: 8px; margin-top: 6px; }
-.lp-say li { padding: 12px 14px; background: var(--lav); color: var(--lav-ink); border-radius: 12px; font-weight: 600; }
-.lp-wrap > .lp-center { margin-top: 20px; }
+.lp-say li { padding: 12px 14px; border-radius: 12px; }
 
 /* Leistungen */
 .lp-feat, .lp-trust { list-style: none; padding: 0; display: grid; gap: 12px; }
-@media (min-width: 640px) { .lp-feat { grid-template-columns: 1fr 1fr; } }
-.lp-feat li, .lp-trust li { padding: 16px 18px; background: var(--bg); border: 1px solid var(--line); border-radius: 16px; }
-.lp-trust li { background: var(--card); }
+@media (min-width: 640px) { .lp-feat, .lp-trust { grid-template-columns: 1fr 1fr; } }
+.lp-feat li, .lp-trust li { padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; }
+.lp-feat li { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; }
+.lp-ico { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--lav); color: var(--purple); }
+.lp-ico svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .lp-feat p, .lp-trust p { color: var(--ink-2); }
 .lp-trust h3 { color: var(--purple); }
-
-/* Vergleich */
-.lp-vs { list-style: none; padding: 0; display: grid; gap: 12px; }
-.lp-vs li { padding: 16px 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; display: grid; gap: 8px; }
-.lp-vs-q { font-weight: 800; }
-.lp-vs-a { padding: 10px 12px; border-radius: 12px; }
-.lp-vs-other { background: var(--bg); color: var(--ink-2); }
-.lp-vs-us { background: var(--lav); color: var(--lav-ink); font-weight: 600; }
 
 /* Stimmen */
 .lp-voices { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 12px; margin: 0 -2px 8px; -webkit-overflow-scrolling: touch; }
