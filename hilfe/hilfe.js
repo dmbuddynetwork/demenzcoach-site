@@ -170,7 +170,7 @@ const buy = where => {
   }
   // Zurück-Taste des Handys schließt die Kasse statt die Seite zu verlassen.
   history.pushState({ sheet: true }, '', location.href);
-  kasse.open({ plan, source, campaign, offer: checkoutOffer(), track: name => track(name, { where }),
+  kasse.open({ plan, source, campaign, offer: checkoutOffer(), stripePage: where.endsWith('_andere'), track: name => track(name, { where }),
     onClose: () => { if (history.state?.sheet) history.back(); },
     // Fenster abgelaufen: normaler Preis wird angezeigt, der Kunde tippt erneut (wie /start/).
     onOfferExpired: () => { const gone = deal(); if (gone) window.DemenzAngebot.drop(gone.kind); refresh(); } });
