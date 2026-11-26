@@ -22,7 +22,7 @@ const server = http.createServer((req, res) => { try {
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   const origin = 'http://127.0.0.1:' + server.address().port;
   let browser, cases = 0;
-  const run = async ({ query, applePay, stripeApple = true, email }, check) => {
+  const run = async ({ query, applePay, stripeApple = true, email, embedded = false }, check) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: process.env.SHOT ? 2 : 1 });
     const page = await context.newPage(), sessions = [], stripeScripts = [];
     if (applePay) await page.addInitScript(() => { window.ApplePaySession = { canMakePayments: () => true }; });
@@ -38,7 +38,7 @@ const server = http.createServer((req, res) => { try {
       if (url.hostname === 'checkout.stripe.com') return route.fulfill({ contentType: 'text/html', body: '<h1>Stripe hosted fixture</h1>' });
       if (url.hostname.endsWith('cloudfunctions.net')) {
         if (url.pathname.endsWith('/offer')) return route.fulfill({ headers, json: { kind: 'intro', expiresAt: Date.now() + 900000, token: 'tok_fx', emailBound: false, firstYear: 4999, regular: 6999, currency: 'eur' } });
-        if (url.pathname.endsWith('/config')) return route.fulfill({ headers, json: { checkoutMode: 'elements', hostedFallback: true, walletEmail: true, plans: { yearly: { amount: 6999, currency: 'eur' }, monthly: { amount: 1299, currency: 'eur' } }, offers: { intro: { firstYear: 4999 } }, trialDays: 7, textVersions: { terms: 'fx' }, publishableKey: 'pk_test_fx' } });
+        if (url.pathname.endsWith('/config')) return route.fulfill({ headers, json: { checkoutMode: 'elements', ...(embedded ? { embedded: true, form: true } : {}), hostedFallback: true, walletEmail: true, plans: { yearly: { amount: 6999, currency: 'eur' }, monthly: { amount: 1299, currency: 'eur' } }, offers: { intro: { firstYear: 4999 } }, trialDays: 7, textVersions: { terms: 'fx' }, publishableKey: 'pk_test_fx' } });
         if (url.pathname.endsWith('/session')) { { const body = req.postDataJSON(); if (body.hostedFallback) (sessions.hosted ||= []).push(body); else sessions.push(body); } return route.fulfill({ headers, json: req.postDataJSON().hostedFallback ? { checkoutMode: 'hosted', url: 'https://checkout.stripe.com/c/pay/cs_fx', trialDays: 7, plan: 'yearly', firstYear: null } : { clientSecret: 'cs_fx_secret', trialDays: 7, plan: 'yearly', firstYear: null } }); }
         return route.fulfill({ headers, json: {} });
       }
@@ -57,7 +57,7 @@ const server = http.createServer((req, res) => { try {
   try {
     browser = await chromium.launch({ headless: true, ...(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}) });
     // 1) Gerät mit Apple Pay: Express-Knopf unsichtbar über dem Knopf, Willkommenspreis in der Sitzung, Planwechsel gibt zweite Sitzung.
-    await run({ query: '?utm_source=meta&utm_campaign=fx', applePay: true }, async ({ page, sessions, stripeScripts }) => {
+    await run({ query: '?utm_source=meta&utm_campaign=fx', applePay: true, embedded: true }, async ({ page, sessions, stripeScripts }) => {
       await page.waitForFunction(() => window.__ece?.mounted.includes('lp-ap-yearly'), null, { timeout: 8000 });
       await page.waitForFunction(() => !document.querySelector('#lp-ap-yearly').hidden);
       assert.equal(sessions.length, 1);
@@ -86,7 +86,7 @@ const server = http.createServer((req, res) => { try {
       assert.equal(await page.locator('#lp-ap-yearly').isHidden(), true);
       await page.locator('.lp-ap-alt').click();
       await page.waitForURL('https://checkout.stripe.com/**', { timeout: 15000 });
-      assert.ok((sessions.hosted || []).some(x => x.plan === 'monthly' && x.source === 'lp_meta'), 'andere Zahlart: gehostete Seite für den gewählten Plan');
+      assert.ok((sessions.hosted || []).some(x => x.plan === 'monthly' && x.source === 'lp_meta' && x.embedded === undefined && x.form === undefined), 'andere Zahlart am Handy: Stripes eigene Seite für den gewählten Plan, kein Layer');
     });
     // 2) Ohne Apple Pay (z. B. Instagram-Browser): kein Stripe.js, keine eingebettete Sitzung, Knopf → gehostete Seite.
     await run({ query: '', applePay: false }, async ({ page, sessions, stripeScripts }) => {

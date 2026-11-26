@@ -112,21 +112,25 @@ function termsFor(session) {
 // vorbereitet, wenn die Angebotsseite erscheint. Der Klick leitet dann ohne Wartezeit weiter. Unbezahlte Sitzungen verfallen nach 24 Stunden.
 const PREPARED_MAX_AGE = 15 * 60_000;
 const preparedSessions = new Map();
+// „Mit Karte oder anderer Zahlart bezahlen“ unter dem Apple-Pay-Knopf (Daniel, 26. Nov 2026): Am Handy führt der Link auf
+// Stripes eigene Seite. Am Desktop bleibt es beim Layer.
+const toStripePage = (options) => Boolean(options.stripePage) && !hostWindow().matchMedia?.("(min-width: 900px)").matches;
 function sessionBody(options) {
+  const stripePage = toStripePage(options);
   return { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
     ...window.DemenzTeller?.attribution(),
     ...window.DemenzConsent?.metaContext?.(),
     hostedFallback: true,
     // Stripes eingebettete Zahlungsseite im Layer, wenn der Server sie anbietet (Daniel, 26. Nov 2026). Ältere Server ignorieren das Feld und liefern die gehostete Seite.
-    ...(publicConfig.embedded === true ? { embedded: true } : {}),
+    ...(publicConfig.embedded === true && !stripePage ? { embedded: true } : {}),
     // Stripes kürzeres Formular (Daniel, 26. Nov 2026: Bezahlknopf direkt sichtbar). ?kasse=seite zeigt zum Vergleich die bisherige Stripe-Seite.
-    ...(publicConfig.form === true && !/[?&]kasse=seite\b/u.test(location.search) ? { form: true } : {}),
+    ...(publicConfig.form === true && !stripePage && !/[?&]kasse=seite\b/u.test(location.search) ? { form: true } : {}),
     ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
     ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) };
 }
 function sessionFor(options, user, token) {
   const meta = window.DemenzConsent?.metaContext?.()?.meta?.consent === true;
-  const key = JSON.stringify([user.uid, options.plan, options.email || "", options.offer || null, options.source || "", options.campaign || "", meta]);
+  const key = JSON.stringify([user.uid, options.plan, options.email || "", options.offer || null, options.source || "", options.campaign || "", meta, toStripePage(options)]);
   const hit = preparedSessions.get(key);
   if (hit && Date.now() - hit.at < PREPARED_MAX_AGE) return hit.promise;
   const promise = api("/session", { method: "POST", token, body: sessionBody(options) });
@@ -214,6 +218,7 @@ export async function open(options) {
         return;
       }
       if (!redirectHostedCheckout(session, { attempt, isCurrent: currentAttempt })) throw new Error("hosted_checkout_unavailable");
+      if (sheet?.node === node) sheet.redirected = true;
       options.track?.("checkout_sheet_ready");
     };
     for (let tries = 0; ; tries++) {
@@ -328,6 +333,9 @@ export async function mountApplePay(slot, options) {
     return false;
   }
 }
+
+// Zurück von Stripes Seite: Der Browser zeigt die alte Seite samt Ladefenster wieder an, darum schließen wir es.
+window.addEventListener("pageshow", (event) => { if (event.persisted && sheet?.redirected) close(); });
 
 export const isOpen = () => Boolean(sheet || embedded);
 window.DemenzKasse = Object.freeze({ open, close, isOpen, mountApplePay, prepare });

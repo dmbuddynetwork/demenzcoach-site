@@ -1026,7 +1026,7 @@
           note,
           cta,
           // Andere Zahlart: auf Geräten mit Apple Pay fängt der unsichtbare Express-Knopf den Tipp auf den großen Knopf ab, darum gibt es hier einen eigenen Weg zur Stripe-Seite (Karte und weitere Zahlarten).
-          el("button", { type: "button", class: "abo-link-button start-tp-alt", "data-tp-alt": "", hidden: "", text: "Mit Karte oder anderer Zahlart bezahlen", onclick: () => { countDirect("direct_cta"); checkout(); } }),
+          el("button", { type: "button", class: "abo-link-button start-tp-alt", "data-tp-alt": "", hidden: "", text: "Mit Karte oder anderer Zahlart bezahlen", onclick: () => { countDirect("direct_cta"); checkout({ stripePage: true }); } }),
           el("button", { type: "button", class: "abo-link-button start-tp-more", text: "Mehr über deinen Plan ↓", onclick: () => document.querySelector(".start-big-title")?.scrollIntoView({ behavior: "smooth", block: "start" }) })
         ])
       ];
@@ -1109,7 +1109,7 @@
     return { campaign, src };
   }
 
-  function checkout() {
+  function checkout({ stripePage = false } = {}) {
     if (!validEmail(answers.email) && validEmail(knownEmail)) answers.email = knownEmail;
     if (!validEmail(answers.email) && !walletEmail) { emailForCheckout = true; go("email"); return; }
     track(directMode ? "direct_offer_checkout" : "quiz_checkout", "InitiateCheckout");
@@ -1139,7 +1139,7 @@
     }
     const deal = plan === "yearly" && offer.offers ? deals?.forCheckout() : null;
     history.pushState({ screen: "plan", sheet: true }, "", location.href);
-    kasse.open({ plan, email: answers.email, offer: deal, source: src, campaign, track: (name) => track(name),
+    kasse.open({ plan, email: answers.email, offer: deal, source: src, campaign, stripePage, track: (name) => track(name),
       onClose: () => { if (history.state?.sheet) history.back(); },
       onOfferExpired: () => { if (deal) deals.drop(deal.kind); reservationEnded = true; render("plan"); } });
   }
