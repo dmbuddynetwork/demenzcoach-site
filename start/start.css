@@ -70,6 +70,9 @@ body:has(.start-page) { min-height: 100vh; min-height: 100svh; display: flex; fl
 .start-checks li.start-pending::before { background: var(--lav); }
 
 .start-small { font-size: var(--small); color: var(--ink-2); }
+/* „Ohne E-Mail weiter“: klein, aber groß genug zum Tippen (44 px). */
+.start-skip { display: block; margin: 6px auto 0; min-height: 44px; padding: 8px 12px; background: none; border: 0; color: var(--ink-2); font: inherit; font-size: var(--small); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.start-skip:hover { color: var(--ink); }
 .start-page .abo-button + .start-small { margin-top: 10px; text-align: center; }
 
 /* Plan-Seite: gesperrte Teile, Zeitleiste der Probezeit, Knopf bleibt unten sichtbar. */

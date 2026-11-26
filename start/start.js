@@ -99,6 +99,24 @@
   const deals = window.DemenzAngebot;
   let dealAsked = false;
   let reservationEnded = false;
+  // E-Mail übersprungen (Daniel, 26. Nov 2026): Die Adresse wird dann erst vor der Kasse verlangt.
+  let emailForCheckout = false;
+  // Schon bekannte Adresse (Daniel, 26. Nov 2026: „dann brauchen wir die ja nicht“): aus diesem Tab
+  // (E-Mail-Schritt, Simulator) oder von einem angemeldeten Konto. Dann entfällt die E-Mail-Seite.
+  let knownEmail = "";
+  let accountEmailAsked = false;
+  const readKnownEmail = () => {
+    try { const value = sessionStorage.getItem("demenzCoachEmail") || ""; if (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(value)) knownEmail = value; } catch { /* */ }
+  };
+  const askAccountEmail = () => {
+    if (accountEmailAsked || knownEmail || !config.firebase?.apiKey) return;
+    accountEmailAsked = true;
+    // Nur lesen: keine anonyme Anmeldung, nichts wird gesendet.
+    import("/abo/web-auth.js").then(({ webAuth }) => webAuth({ anonymous: false })).then(({ auth }) => {
+      const user = auth.currentUser;
+      if (user && !user.isAnonymous && user.email && !knownEmail) knownEmail = user.email;
+    }).catch(() => {});
+  };
   const clockStops = [];
   // Geld-zurück-Garantie (Daniel, 9. Nov 2026): 30 Tage ab der ersten Zahlung, Bedingungen auf /abo/garantie.html.
   const guaranteeDays = 30;
@@ -438,12 +456,15 @@
       el("h1", { text: title }), el("p", { text }), next(name)];
   }
 
-  // ---- E-Mail vor dem Ergebnis (wie BetterMe und Yazio: Pflicht, direkt nach „Plan wird erstellt“) ----------
+  // ---- E-Mail vor dem Ergebnis (wie BetterMe und Yazio, direkt nach „Plan wird erstellt“) ----------
+  // Seit 26. Nov 2026 mit kleinem Link „Ohne E-Mail weiter“: An der Pflicht-E-Mail gingen 80 % verloren (Zähler 23.–25. Nov).
+  // Wer überspringt, sieht Plan und Preis; die Adresse für die Vertragsbestätigung kommt dann direkt vor der Kasse.
   // Die Adresse bleibt in diesem Tab, bis jemand ein Abo startet (dann geht sie an Stripe für Bestätigung und Rechnung).
   // Für den Willkommenspreis schickt angebot.js sie an unseren Server, der nur einen Prüfwert speichert.
   // Werbe-Mails nur mit dem eigenen Schritt danach (Kopplungsverbot, Art. 7 Abs. 4 DSGVO): kein Haken, keine Vorauswahl.
   const validEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(value);
   function emailScreen() {
+    const contract = directMode || emailForCheckout;
     const input = el("input", { id: "email", type: "email", autocomplete: "email", inputmode: "email", placeholder: "name@beispiel.de" });
     input.value = answers.email;
     const status = el("p", { class: "start-small", role: "status" });
@@ -454,8 +475,14 @@
       if (!validEmail(value)) { status.textContent = "Bitte gib deine E-Mail-Adresse ein."; input.focus(); return; }
       answers.email = value;
       try { sessionStorage.setItem("demenzCoachEmail", value); } catch { /* */ }
-      track(directMode ? "direct_offer_email" : "quiz_email_submit");
+      track(directMode ? "direct_offer_email" : emailForCheckout ? "quiz_email_checkout" : "quiz_email_submit");
       countDirect("direct_email");
+      if (emailForCheckout && !directMode) {
+        emailForCheckout = false;
+        render("plan");
+        checkout();
+        return;
+      }
       if (directMode) {
         // The existing contact requirement remains before checkout. Reserve an intro
         // only with this validated address, then let the visitor review the real price.
@@ -470,13 +497,18 @@
     };
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") send(); });
     return [
-      el("h1", { text: directMode ? "E-Mail für die Vertragsbestätigung" : forWho() ? `Gib deine E-Mail ein, um den persönlichen Plan für ${forWho()} zu erhalten` : "Gib deine E-Mail ein, um deinen persönlichen Plan zu erhalten" }),
-      directMode ? el("p", { class: "start-lead", text: "An diese Adresse schicken wir die Vertragsbestätigung, wenn du ein Abo abschließt." }) : null,
+      el("h1", { text: contract ? "E-Mail für die Vertragsbestätigung" : forWho() ? `Gib deine E-Mail ein, um den persönlichen Plan für ${forWho()} zu erhalten` : "Gib deine E-Mail ein, um deinen persönlichen Plan zu erhalten" }),
+      contract ? el("p", { class: "start-lead", text: "An diese Adresse schicken wir die Vertragsbestätigung, wenn du ein Abo abschließt." }) : null,
       el("label", { for: "email", class: "sr-only", text: "E-Mail-Adresse" }),
       input,
-      el("button", { type: "button", class: "abo-button", text: directMode ? "Angebot prüfen" : "Weiter", onclick: send }),
+      el("button", { type: "button", class: "abo-button", text: directMode ? "Angebot prüfen" : emailForCheckout ? "Weiter zur Kasse" : "Weiter", onclick: send }),
+      contract ? null : el("button", { type: "button", class: "start-skip", text: "Ohne E-Mail weiter", onclick: () => {
+        track("quiz_email_skip");
+        // Ohne Adresse gibt es keine Tipps per E-Mail: der Newsletter-Schritt entfällt.
+        go(after("newsletter"), { replace: true });
+      } }),
       status,
-      el("p", { class: "start-small" }, [directMode
+      el("p", { class: "start-small" }, [contract
         ? "Startest du ein Abo, schicken wir die Vertragsbestätigung an diese Adresse. Für einen Willkommenspreis prüfen wir die Adresse. Keine Werbung ohne dein Ja. "
         : "Wir respektieren deine Privatsphäre und tun alles für den Schutz deiner persönlichen Daten. Deine Daten werden entsprechend unserer Datenschutzerklärung verarbeitet. Startest du ein Abo, schicken wir die Vertragsbestätigung an diese Adresse. Keine Werbung ohne dein Ja. ",
         el("a", { href: "/datenschutz.html", text: "Datenschutz" }), "."])
@@ -1000,6 +1032,8 @@
 
   function checkout() {
     if (directMode && !validEmail(answers.email)) { go("email"); return; }
+    if (!validEmail(answers.email) && validEmail(knownEmail)) answers.email = knownEmail;
+    if (!validEmail(answers.email)) { emailForCheckout = true; go("email"); return; }
     track(directMode ? "direct_offer_checkout" : "quiz_checkout", "InitiateCheckout");
     // Eine schon bestätigte Konto-Adresse zählt als E-Mail, auch ohne den E-Mail-Schritt.
     countDirect("direct_email");
@@ -1039,7 +1073,7 @@
     forgetProgress();
     for (const key of Object.keys(choiceSets)) answers[key] = null;
     if (preset) answers.situation = preset;
-    answers.name = ""; answers.email = ""; answers.tries = []; typed = "";
+    answers.name = ""; answers.email = ""; knownEmail = ""; answers.tries = []; typed = "";
     try { sessionStorage.removeItem("demenzCoachEmail"); sessionStorage.removeItem("demenzCoachKiOffen"); } catch { /* */ }
     completed = false;
     plan = "yearly";
@@ -1099,7 +1133,17 @@
   function render(name) {
     current = name;
     clearTimeout(revealTimer);
-    countStep(name);
+    // Die E-Mail vor der Kasse zählt nicht als Quiz-Schritt „email“.
+    if (name !== "email") emailForCheckout = false;
+    if (name === "email" && !directMode && !emailForCheckout && !validEmail(answers.email) && validEmail(knownEmail)) {
+      // Adresse schon bekannt: E-Mail-Seite überspringen, weiter zum eigenen Newsletter-Schritt.
+      answers.email = knownEmail;
+      track("quiz_email_known");
+      render(after("email"));
+      return;
+    }
+    if (name === "building") askAccountEmail();
+    if (!(name === "email" && emailForCheckout)) countStep(name);
     const screen = $("screen");
     screen.replaceChildren(...screens[name]().filter(Boolean));
     screen.dataset.kind = isQuestion(name) ? "question" : name;
@@ -1184,7 +1228,8 @@
   }
 
   // Direkt-Angebot (z. B. vom Üben): eine schon bestätigte Konto-Adresse aus diesem Tab übernehmen, wie BetterMe nach der Anmeldung.
-  if (directMode) { try { const known = sessionStorage.getItem("demenzCoachEmail") || ""; if (validEmail(known)) answers.email = known; } catch { /* */ } }
+  readKnownEmail();
+  if (directMode && validEmail(knownEmail)) answers.email = knownEmail;
   const resumed = directMode ? "plan" : restoreProgress();
   history.replaceState({ screen: resumed }, "", location.href);
   render(resumed);
