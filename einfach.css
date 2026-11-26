@@ -1072,9 +1072,7 @@ body.einfach .e-header { transition: transform .25s ease, background-color .2s e
 body.einfach .e-header.is-hidden { transform: translateY(-100%); }
 @media (prefers-reduced-motion: reduce) { body.einfach .e-header { transition: none; } }
 
-/* Farbverlauf wie /hilfe/ (Daniel, 26. Nov): zartes Lila oben, nach unten Warmweiß. Oben ist die Kopfleiste durchsichtig. */
-body.einfach.homepage-v2 { background: linear-gradient(180deg, #ece9f7 0, var(--e-bg) 520px) no-repeat, var(--e-bg); }
-body.einfach.homepage-v2 .e-header:not(.is-scrolled) { background: transparent; border-bottom-color: transparent; }
+/* Hintergrund (Daniel, 26. Nov): Lila-Verlauf „sieht komisch aus“. Variante A: durchgehend Warmweiß, Farbe nur bei Knöpfen. */
 body.einfach.homepage-v2 .home-eyebrow { margin: 0 0 10px; color: var(--e-purple); font-size: var(--e-small); font-weight: 700; letter-spacing: .01em; text-align: center; }
 body.einfach.homepage-v2[data-translator-input-position="top"] #translator-form .translator-form-intro { margin: 0 0 14px !important; color: var(--e-text) !important; font-size: 1.125rem !important; }
 
