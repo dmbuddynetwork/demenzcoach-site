@@ -2361,17 +2361,12 @@
     const send = element('button', { className: 'translator-chat-send', text: en ? 'Find an answer' : 'Antwort finden', attributes: { type: 'submit' } });
     const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
     withExamples((examples) => examples.attach(field, { prefix: 'z. B. ', maxChars: innerWidth < 480 ? 29 : 44 }));
-    // Nachfrage oder neue Situation (Daniel, 19. Nov, Variante 1): Unter einer Antwort stehen unten zwei
-    // große Knöpfe statt eines Felds. „Nachfrage“ schickt die Situation mit (sonst fragt die KI bei
-    // „Das klappt nicht“ nur „Was ist passiert?“), „Neue Situation“ schickt nur den neuen Text.
-    const moreHint = element('small');
-    const moreButton = element('button', { className: 'translator-chat-more', attributes: { type: 'button' } }, [element('span', { text: en ? 'Follow-up' : 'Nachfrage' }), moreHint]);
-    const newButton = element('button', { className: 'translator-chat-new', attributes: { type: 'button' } }, [element('span', { text: en ? 'New situation' : 'Neue Situation' }), element('small', { text: en ? 'start over' : 'von vorn' })]);
-    const choice = element('div', { className: 'translator-chat-choice', attributes: { hidden: '' } }, [moreButton, newButton]);
-    const chip = element('p', { className: 'translator-chat-chip', attributes: { hidden: '' } });
-    const cancel = element('button', { className: 'translator-chat-cancel', text: en ? 'Cancel' : 'Abbrechen', attributes: { type: 'button', hidden: '' } });
-    const chipRow = element('div', { className: 'translator-chat-chiprow' }, [chip, cancel]);
-    const panel = element('div', { className: 'translator-chat-panel' }, [choice, chipRow, chatForm]);
+    // Unter einer Antwort (Daniel, 26. Nov): eine Eingabezeile „Frag weiter …“ im ChatGPT-Stil und daneben ein runder
+    // Knopf „+“ für eine neue Situation. Ein Tipp auf „+“ wechselt zu „Was ist passiert?“, derselbe Knopf zeigt dann „×“ (zurück).
+    const plusIcon = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+    const backIcon = '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+    const plus = element('button', { className: 'translator-chat-plus', attributes: { type: 'button', hidden: '' } });
+    const panel = element('div', { className: 'translator-chat-panel' }, [plus, chatForm]);
     const chat = element('aside', { className: 'translator-chat', attributes: { 'aria-label': en ? 'Describe another situation' : 'Andere Situation beschreiben', hidden: '' } }, [panel]);
     let positionFrame = 0;
     const maxLength = input.maxLength > 0 ? input.maxLength : 200;
@@ -2393,30 +2388,26 @@
     };
     const setChatMode = (mode) => {
       const situation = situationNow();
-      chatMode = situation ? mode : 'choose';
-      const choosing = Boolean(situation) && chatMode === 'choose';
-      choice.hidden = !choosing;
-      chatForm.hidden = choosing;
-      chip.hidden = cancel.hidden = chipRow.hidden = !situation || choosing;
-      chip.classList.toggle('translator-chat-chip-new', chatMode === 'new');
-      if (situation) moreHint.textContent = `${en ? 'about' : 'zu'} ${shortQuote(situation)}`;
+      // Ohne Antwort gibt es nur „neue Situation“. Mit Antwort ist „Frag weiter“ die Voreinstellung.
+      chatMode = situation && mode !== 'new' ? 'more' : 'new';
+      plus.hidden = !situation;
+      plus.innerHTML = chatMode === 'new' ? backIcon : plusIcon;
+      const plusLabel = chatMode === 'new' ? (en ? 'Back to follow-up' : 'Zurück zur Nachfrage') : (en ? 'New situation' : 'Neue Situation');
+      plus.setAttribute('aria-label', plusLabel);
+      plus.title = plusLabel;
       if (chatMode === 'more') {
-        chip.textContent = `${en ? 'About' : 'Zu'}: ${shortQuote(situation)}`;
         examplesOn(field, false);
-        field.setAttribute('placeholder', en ? 'What happened then?' : 'Was ist dann passiert?');
+        field.setAttribute('placeholder', en ? 'Ask more …' : 'Frag weiter …');
         field.setAttribute('aria-label', en ? `Follow-up about ${shortQuote(situation)}` : `Nachfrage zu ${shortQuote(situation)}`);
         field.maxLength = Math.max(40, maxLength - Array.from(`${followLabels[0]}„${baseFor(situation)}“ ${followLabels[1]}`).length);
       } else {
-        chip.textContent = en ? 'New situation' : 'Neue Situation';
         examplesOn(field, true);
         field.setAttribute('placeholder', en ? 'What happened?' : 'Was ist passiert?');
         field.setAttribute('aria-label', en ? 'Your situation' : 'Deine Situation');
         field.maxLength = maxLength;
       }
     };
-    moreButton.addEventListener('click', () => { setChatMode('more'); field.focus(); track('translator_write_chat', { step: 'more' }); syncChat(); });
-    newButton.addEventListener('click', () => { setChatMode('new'); field.focus(); track('translator_write_chat', { step: 'new' }); syncChat(); });
-    cancel.addEventListener('click', () => { field.value = ''; setChatMode('choose'); syncChat(); });
+    plus.addEventListener('click', () => { const next = chatMode === 'new' ? 'more' : 'new'; field.value = ''; setChatMode(next); field.focus(); track('translator_write_chat', { step: next }); syncChat(); });
     // Jede Eingabe über das große Feld oder „Neue Situation“ beginnt neu; nur „Nachfrage“ behält die Situation.
     form.addEventListener('submit', () => { if (!viaFollow) { base = ''; follows = []; composed = ''; } viaFollow = false; }, true);
     // Die Sprechblase zeigt weiter die Situation, die Nachfrage steht darunter (nicht „Situation: … Nachfrage: …“).
