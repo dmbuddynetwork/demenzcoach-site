@@ -43,8 +43,10 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
   const status = make("p", { class: "kasse-embed-status", role: "status" }, "Die sichere Zahlung wird geladen …");
   const problem = make("div", { class: "kasse-embed-problem", hidden: "", role: "alert" });
   const box = make("div", { class: "kasse-embed-box" });
-  dialog.append(make("div", { class: "kasse-embed-head" }), status, problem, box);
-  dialog.firstChild.append(heading, closeButton);
+  // Daniel, 26. Nov 2026: kein sichtbarer Titel über Stripe, damit der Bezahlknopf möglichst ohne Scrollen sichtbar ist.
+  // Der Titel bleibt nur für Screenreader; das × schwebt oben rechts.
+  heading.className = "kasse-embed-sr";
+  dialog.append(heading, closeButton, status, problem, box);
   const root = doc.documentElement, body = doc.body, overflow = [root.style.overflow, body.style.overflow];
   let finished = false, checkout = null, watchdog = null;
   const dispose = () => {
