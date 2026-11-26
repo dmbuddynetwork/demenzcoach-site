@@ -63,14 +63,38 @@ async function api(path, { method = "GET", body, token } = {}) {
   const headers = {};
   if (body) headers["Content-Type"] = "application/json";
   if (token) headers.Authorization = `Bearer ${token}`;
-  const response = await fetch(`${config.endpoint}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20_000);
+  let response;
+  try {
+    response = await fetch(`${config.endpoint}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
+  } catch (problem) {
+    throw Object.assign(new Error("network"), { code: problem?.name === "AbortError" ? "timeout" : "network" });
+  } finally {
+    clearTimeout(timer);
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(data.message || `HTTP ${response.status}`);
     error.code = data.code;
+    error.status = response.status;
     throw error;
   }
   return data;
+}
+
+// Kurze Störungen (Netz, Zeitüberschreitung, Serverfehler) versuchen wir selbst noch zweimal, bevor wir den Kunden stören.
+const isTransient = (problem) => problem?.code === "network" || problem?.code === "timeout" || problem?.status >= 500;
+async function apiWithRetry(path, options) {
+  for (let tries = 0; ; tries++) {
+    try { return await api(path, options); } catch (problem) {
+      if (!isTransient(problem) || tries >= 2) throw problem;
+      track("checkout_auto_retry", { source: state.source });
+      const status = $("hosted-checkout-status");
+      if (status) status.textContent = "Die Verbindung ist langsam. Ich versuche es noch einmal …";
+      await new Promise((resolve) => setTimeout(resolve, 1500 * (tries + 1)));
+    }
+  }
 }
 
 // --- Schritt 1: Angebot ------------------------------------------------------------------------
@@ -325,7 +349,7 @@ async function startCheckout(email, preparedWindow) {
     const deal = attempt.plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
     await window.DemenzTeller?.ready;
     if (!currentAttempt(attempt)) throw new Error("checkout_attempt_changed");
-    const session = await api("/session", {
+    const session = await apiWithRetry("/session", {
       method: "POST",
       token,
       body: { plan: attempt.plan, checkoutMode: "hosted", hostedFallback: true, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
@@ -386,7 +410,10 @@ async function startCheckout(email, preparedWindow) {
     retry.onclick = () => {
       if (state.user === attempt.user && state.plan === attempt.plan && state.step === "pay") startCheckout(email);
     };
-    fail(error.code === "checkout_window_closed" ? "Das Zahlungsfenster wurde geschlossen. Du kannst die Zahlung erneut öffnen." : "Die Zahlung kann gerade nicht starten. Bitte versuch es gleich noch einmal.");
+    track("checkout_load_failed", { source: state.source, code: error.code || "unknown" });
+    fail(error.code === "checkout_window_closed" ? "Das Zahlungsfenster wurde geschlossen. Du kannst die Zahlung erneut öffnen."
+      : isTransient(error) || error.message === "hosted_checkout_unavailable" ? "Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt. Tippe auf „Erneut versuchen“."
+      : "Die Zahlung kann gerade nicht starten. Du hast nichts bezahlt. Bitte versuch es noch einmal.");
   }
 }
 
