@@ -532,7 +532,7 @@ body[data-screen="plan"] .start-day span, body[data-screen="plan"] .start-day s 
   html:not(.start-embedded) body[data-screen="plan"] .start-tier-text span { font-size: 1rem; }
 }
 /* Daniel 26. Nov: mehr Abstand zwischen Kacheln und Knopf; Hinweistext ohne Box und kleiner (Inhalt bleibt vollständig). */
-body[data-screen="plan"] .start-tiers { margin-bottom: 26px; }
+body[data-screen="plan"] .start-tiers { margin-bottom: 48px; }
 body[data-screen="plan"] .start-plan-title { margin-top: 28px; }
 body[data-screen="plan"] .start-fine { margin: 22px auto 20px; padding: 0 4px; border: 0; border-radius: 0; background: none; font-size: .8125rem; line-height: 1.45; color: var(--ink-2); }
 @media (max-width: 380px) { body[data-screen="plan"] .start-cta { font-size: 1.125rem; padding-left: 14px; padding-right: 14px; white-space: nowrap; } }
