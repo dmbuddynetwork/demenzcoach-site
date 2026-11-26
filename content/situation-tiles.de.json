@@ -1,0 +1,380 @@
+[
+ {
+  "key": "nachhause",
+  "href": "/de/ratgeber/demenz-nach-hause-was-sagen.html",
+  "img": "/assets/zeichnungen/nach-hause.webp",
+  "w": 480,
+  "h": 664,
+  "label": "Will nach Hause",
+  "plan": "nachhause"
+ },
+ {
+  "key": "waschen",
+  "href": "/de/demenz-uebersetzer/ich-will-nicht-duschen.html",
+  "img": "/assets/zeichnungen/tuch-mama.webp",
+  "w": 480,
+  "h": 505,
+  "label": "Will nicht duschen",
+  "plan": "waschen"
+ },
+ {
+  "key": "schongegessen",
+  "href": "/de/demenz-uebersetzer/ich-habe-schon-gegessen.html",
+  "img": "/assets/zeichnungen/together.webp",
+  "w": 480,
+  "h": 284,
+  "label": "Will nichts essen",
+  "plan": null
+ },
+ {
+  "key": "abend",
+  "href": "/de/demenz-uebersetzer/es-wird-dunkel-ich-muss-los.html",
+  "img": "/assets/zeichnungen/sunset.webp",
+  "w": 480,
+  "h": 382,
+  "label": "Unruhig am Abend",
+  "plan": null
+ },
+ {
+  "key": "auto",
+  "href": "/de/demenz-uebersetzer/ich-will-auto-fahren.html",
+  "img": "/assets/zeichnungen/car.webp",
+  "w": 480,
+  "h": 384,
+  "label": "Will Auto fahren",
+  "plan": null
+ },
+ {
+  "key": "mutter",
+  "href": "/de/demenz-uebersetzer/wo-ist-meine-mutter.html",
+  "img": "/assets/zeichnungen/s-dead.webp",
+  "w": 480,
+  "h": 411,
+  "label": "Fragt nach der Mutter",
+  "plan": "mutter"
+ },
+ {
+  "key": "wer",
+  "href": "/de/demenz-uebersetzer/wer-sind-sie.html",
+  "img": "/assets/zeichnungen/s-recognize.webp",
+  "w": 480,
+  "h": 402,
+  "label": "Erkennt mich nicht",
+  "plan": "wer"
+ },
+ {
+  "key": "geld",
+  "href": "/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html",
+  "img": "/assets/zeichnungen/s-money.webp",
+  "w": 480,
+  "h": 396,
+  "label": "Sagt, Geld wurde gestohlen",
+  "plan": "geld"
+ },
+ {
+  "key": "arbeit",
+  "href": "/de/demenz-uebersetzer/ich-muss-zur-arbeit.html",
+  "img": "/assets/zeichnungen/work.webp",
+  "w": 480,
+  "h": 486,
+  "label": "Will zur Arbeit",
+  "plan": "arbeit"
+ },
+ {
+  "key": "bett",
+  "href": "/de/demenz-uebersetzer/ich-will-nicht-ins-bett.html",
+  "img": "/assets/zeichnungen/s-evening.webp",
+  "w": 480,
+  "h": 458,
+  "label": "Will nicht ins Bett",
+  "plan": null
+ },
+ {
+  "key": "wobin",
+  "href": "/de/demenz-uebersetzer/wo-bin-ich.html",
+  "img": "/assets/zeichnungen/uhr-mama.webp",
+  "w": 480,
+  "h": 443,
+  "label": "Fragt: Wo bin ich?",
+  "plan": null
+ },
+ {
+  "key": "uhrzeit",
+  "href": "/de/demenz-uebersetzer/wann-gehen-wir.html",
+  "img": "/assets/zeichnungen/s-coat.webp",
+  "w": 480,
+  "h": 471,
+  "label": "Will ständig los",
+  "plan": null
+ },
+ {
+  "key": "luegen",
+  "href": "/de/demenz-uebersetzer/du-luegst-mich-an.html",
+  "img": "/assets/zeichnungen/s-accuse.webp",
+  "w": 480,
+  "h": 501,
+  "label": "Sagt, ich lüge",
+  "plan": null
+ },
+ {
+  "key": "jemand",
+  "href": "/de/demenz-uebersetzer/da-ist-jemand-im-zimmer.html",
+  "img": "/assets/zeichnungen/s-fear.webp",
+  "w": 480,
+  "h": 413,
+  "label": "Sieht jemanden im Zimmer",
+  "plan": null
+ },
+ {
+  "key": "ruhe",
+  "href": "/de/demenz-uebersetzer/lass-mich-in-ruhe.html",
+  "img": "/assets/zeichnungen/wuetend-ruhig.webp",
+  "w": 480,
+  "h": 319,
+  "label": "Will in Ruhe gelassen werden",
+  "plan": null
+ },
+ {
+  "key": "tabletten",
+  "href": "/de/demenz-uebersetzer/ich-nehme-keine-tabletten.html",
+  "img": "/assets/zeichnungen/s-meds.webp",
+  "w": 480,
+  "h": 270,
+  "label": "Will keine Tabletten",
+  "plan": null
+ },
+ {
+  "key": "heim",
+  "href": "/de/demenz-uebersetzer/ich-will-nicht-ins-heim.html",
+  "img": "/assets/zeichnungen/leave.webp",
+  "w": 480,
+  "h": 585,
+  "label": "Will nicht ins Heim",
+  "plan": null
+ },
+ {
+  "key": "eingesperrt",
+  "href": "/de/demenz-uebersetzer/ich-bin-hier-eingesperrt.html",
+  "img": "/assets/zeichnungen/tuer-hall.webp",
+  "w": 480,
+  "h": 264,
+  "label": "Fühlt sich eingesperrt",
+  "plan": null
+ },
+ {
+  "key": "kinder",
+  "href": "/de/demenz-uebersetzer/wo-sind-meine-kinder.html",
+  "img": "/assets/zeichnungen/child.webp",
+  "w": 480,
+  "h": 453,
+  "label": "Sucht die Kinder",
+  "plan": null
+ },
+ {
+  "key": "partner",
+  "href": "/de/demenz-uebersetzer/wo-ist-mein-mann.html",
+  "img": "/assets/zeichnungen/paywall-fotoalbum.webp",
+  "w": 480,
+  "h": 322,
+  "label": "Sucht den Partner",
+  "plan": null
+ },
+ {
+  "key": "besuch",
+  "href": "/de/demenz-uebersetzer/wann-kommt-mein-sohn.html",
+  "img": "/assets/zeichnungen/visit.webp",
+  "w": 480,
+  "h": 430,
+  "label": "Wartet auf Besuch",
+  "plan": null
+ },
+ {
+  "key": "hunger",
+  "href": "/de/demenz-uebersetzer/ich-habe-noch-nichts-gegessen.html",
+  "img": "/assets/zeichnungen/together.webp",
+  "w": 480,
+  "h": 284,
+  "label": "Sagt, es gab nichts zu essen",
+  "plan": null
+ },
+ {
+  "key": "vergiftet",
+  "href": "/de/demenz-uebersetzer/das-essen-ist-vergiftet.html",
+  "img": "/assets/zeichnungen/plates.webp",
+  "w": 480,
+  "h": 147,
+  "label": "Glaubt, das Essen ist vergiftet",
+  "plan": null
+ },
+ {
+  "key": "krank",
+  "href": "/de/demenz-uebersetzer/ich-bin-doch-nicht-dement.html",
+  "img": "/assets/zeichnungen/words.webp",
+  "w": 480,
+  "h": 424,
+  "label": "Sagt: Ich bin nicht dement",
+  "plan": null
+ },
+ {
+  "key": "dumm",
+  "href": "/de/demenz-uebersetzer/ich-kann-gar-nichts-mehr.html",
+  "img": "/assets/zeichnungen/s-cry.webp",
+  "w": 480,
+  "h": 454,
+  "label": "Fühlt sich nutzlos",
+  "plan": null
+ },
+ {
+  "key": "langweilig",
+  "href": "/de/demenz-uebersetzer/mir-ist-langweilig.html",
+  "img": "/assets/zeichnungen/s-apathy.webp",
+  "w": 480,
+  "h": 334,
+  "label": "Langweilt sich",
+  "plan": null
+ },
+ {
+  "key": "allein",
+  "href": "/de/demenz-uebersetzer/lass-mich-nicht-allein.html",
+  "img": "/assets/zeichnungen/v-haende.webp",
+  "w": 480,
+  "h": 408,
+  "label": "Will nicht allein sein",
+  "plan": null
+ },
+ {
+  "key": "aufstehen",
+  "href": "/de/demenz-uebersetzer/ich-muss-aufstehen-nachts.html",
+  "img": "/assets/zeichnungen/getup.webp",
+  "w": 480,
+  "h": 399,
+  "label": "Will sofort aufstehen",
+  "plan": null
+ },
+ {
+  "key": "liegen",
+  "href": "/de/demenz-uebersetzer/ich-bleibe-heute-im-bett.html",
+  "img": "/assets/zeichnungen/nacht-room.webp",
+  "w": 480,
+  "h": 292,
+  "label": "Will im Bett bleiben",
+  "plan": null
+ },
+ {
+  "key": "umziehen",
+  "href": "/de/demenz-uebersetzer/ich-ziehe-mich-nicht-um.html",
+  "img": "/assets/zeichnungen/lied-refuse.webp",
+  "w": 480,
+  "h": 330,
+  "label": "Will sich nicht umziehen",
+  "plan": null
+ },
+ {
+  "key": "ausziehen",
+  "href": "/de/demenz-uebersetzer/ich-will-das-ausziehen.html",
+  "img": "/assets/zeichnungen/trick-kleidung.webp",
+  "w": 480,
+  "h": 890,
+  "label": "Zieht sich aus",
+  "plan": null
+ },
+ {
+  "key": "toilette",
+  "href": "/de/demenz-uebersetzer/ich-muss-nicht-aufs-klo.html",
+  "img": "/assets/zeichnungen/wc-mama.webp",
+  "w": 480,
+  "h": 767,
+  "label": "Will nicht aufs Klo",
+  "plan": null
+ },
+ {
+  "key": "einkaufen",
+  "href": "/de/demenz-uebersetzer/ich-muss-noch-einkaufen.html",
+  "img": "/assets/zeichnungen/s-keys.webp",
+  "w": 480,
+  "h": 421,
+  "label": "Will einkaufen gehen",
+  "plan": null
+ },
+ {
+  "key": "anrufen",
+  "href": "/de/demenz-uebersetzer/ich-muss-jemanden-anrufen.html",
+  "img": "/assets/zeichnungen/v-handy.webp",
+  "w": 480,
+  "h": 629,
+  "label": "Will sofort telefonieren",
+  "plan": null
+ },
+ {
+  "key": "nachbarn",
+  "href": "/de/demenz-uebersetzer/die-nachbarn-reden-ueber-mich.html",
+  "img": "/assets/zeichnungen/noise.webp",
+  "w": 480,
+  "h": 422,
+  "label": "Misstraut den Nachbarn",
+  "plan": null
+ },
+ {
+  "key": "haustier",
+  "href": "/de/demenz-uebersetzer/wo-ist-mein-hund.html",
+  "img": "/assets/zeichnungen/v-garten.webp",
+  "w": 480,
+  "h": 442,
+  "label": "Sucht das Haustier",
+  "plan": null
+ },
+ {
+  "key": "kalt",
+  "href": "/de/demenz-uebersetzer/mir-ist-so-kalt.html",
+  "img": "/assets/zeichnungen/s-cold.webp",
+  "w": 480,
+  "h": 349,
+  "label": "Friert ständig",
+  "plan": null
+ },
+ {
+  "key": "untreue",
+  "href": "/de/demenz-uebersetzer/du-hast-einen-anderen.html",
+  "img": "/assets/zeichnungen/s-jealous.webp",
+  "w": 480,
+  "h": 654,
+  "label": "Wirft mir Untreue vor",
+  "plan": null
+ },
+ {
+  "key": "kind",
+  "href": "/de/demenz-uebersetzer/ich-bin-doch-kein-kind.html",
+  "img": "/assets/zeichnungen/accuse.webp",
+  "w": 480,
+  "h": 379,
+  "label": "Fühlt sich bevormundet",
+  "plan": null
+ },
+ {
+  "key": "tagespflege",
+  "href": "/de/demenz-uebersetzer/ich-gehe-nicht-in-die-tagespflege.html",
+  "img": "/assets/zeichnungen/daycare.webp",
+  "w": 480,
+  "h": 455,
+  "label": "Will nicht zur Tagespflege",
+  "plan": null
+ },
+ {
+  "key": "hilfe",
+  "href": "/de/demenz-uebersetzer/hilfe-hilfe-rufen.html",
+  "img": "/assets/zeichnungen/ruhig-hilfe-oben.webp",
+  "w": 480,
+  "h": 429,
+  "label": "Ruft immer wieder um Hilfe",
+  "plan": null
+ },
+ {
+  "key": "toilettefinden",
+  "href": "/de/demenz-uebersetzer/ich-finde-die-toilette-nicht.html",
+  "img": "/assets/zeichnungen/wc-mama.webp",
+  "w": 480,
+  "h": 767,
+  "label": "Findet die Toilette nicht",
+  "plan": null
+ }
+]

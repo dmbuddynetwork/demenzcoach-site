@@ -1,0 +1,18 @@
+/* Alltagstricks: Ergänzungen zum gemeinsamen Layout (einfach.css, translator.css, homepage.css). */
+body.einfach .tricks-group { scroll-margin-top: 16px; }
+body.einfach .tricks-group + .tricks-group { margin-top: 32px; }
+body.einfach .translator-trick { scroll-margin-top: 16px; }
+body.einfach h3.translator-trick-title { margin: 0 0 6px; font-size: var(--e-size, 1.0625rem) !important; line-height: 1.35; }
+body.einfach .translator-trick-link { display: block; }
+body.einfach .translator-trick:target { border-color: var(--e-purple); box-shadow: 0 0 0 2px var(--e-purple); }
+body.einfach .tricks-safety { margin: 16px 0 8px; padding: 14px; border-left: 3px solid var(--e-purple); background: var(--e-card); border-radius: 0 12px 12px 0; }
+body.einfach .tricks-answer { margin-bottom: 8px; }
+body.einfach .trick-steps { margin: 12px 0 8px; padding-inline-start: 1.5em; }
+body.einfach .trick-steps li { margin: 0 0 10px; padding-inline-start: 4px; }
+body.einfach .trick-scene-art { max-width: 260px; max-height: 210px; }
+body.einfach .tricks-sources { margin: 8px 0 12px; }
+body.einfach .tricks-sources-block { margin: 24px 0; }
+body.einfach .tricks-sources-block h2 { margin: 0 0 8px; font-size: 1.125rem; }
+body.einfach .tricks-sources-block ul { margin: 0 0 8px; padding-inline-start: 1.2em; }
+body.einfach .situation-more h3:first-child { margin-top: 0; }
+body.einfach .e-tiles .e-tile img { object-fit: contain; }
