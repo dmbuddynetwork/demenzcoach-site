@@ -49,8 +49,8 @@ test('curated food topic has distinct metadata, visible citations, real anchors 
 });
 
 test('publisher attribution uses the real provider and preserves distinct mother-page intent', () => {
-  assert.ok(read('impressum.html').includes('Deborah Frey'));
-  assert.ok(read('de/ratgeber/redaktion.html').includes('Anbieterin von Demenz Coach'));
+  assert.ok(read('impressum.html').includes('Freyheits UG'));
+  assert.ok(read('de/ratgeber/redaktion.html').includes('Anbieter von Demenz Coach'));
   assert.ok(read('de/ratgeber/redaktion.html').includes('keine Berufs- oder Fachqualifikation'));
   const quick = read('de/demenz-uebersetzer/wo-ist-meine-mutter.html');
   const guide = read('de/ratgeber/demenz-fragt-nach-verstorbener-mutter.html');
