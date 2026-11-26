@@ -1,8 +1,12 @@
 /* Eingebettete Stripe-Zahlung im obersten Layer (kasse-embedded.js). Eigenständig: läuft auf jeder Seite, auch ohne abo.css. */
+/* Der <dialog> ist nur die Scroll-Fläche über der Seite. Das sichtbare Fenster ist .kasse-embed-panel. Es wächst mit Stripe,
+   gescrollt wird die ganze Fläche, nie das Fenster selbst (Daniel, 26. Nov 2026: kein inneres Scrollen). */
 dialog.kasse-embed { box-sizing: border-box; position: fixed; inset: 0; width: 100%; max-width: 100%; height: 100%; max-height: 100%; margin: 0; padding: 0;
-  border: 0; background: #f6f5f2; color: #1c1b1f; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  border: 0; background: #f7f5fb; color: #1c1b1f; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
   font: 400 1rem/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-dialog.kasse-embed::backdrop { background: rgba(28, 27, 31, .45); }
+dialog.kasse-embed::backdrop { background: rgba(28, 27, 31, .28); }
+/* Eine Fläche im Ton von Stripes Seite (#f7f5fb), kein zweiter Farbton um die Kasse. */
+.kasse-embed-panel { position: relative; box-sizing: border-box; min-height: 100%; background: #f7f5fb; }
 .kasse-embed-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .kasse-embed-sr:focus { outline: none; }
 /* Nur das × oben rechts, kein Titel (Daniel, 26. Nov 2026: Platz sparen, Bezahlknopf sichtbar). */
@@ -15,9 +19,9 @@ dialog.kasse-embed::backdrop { background: rgba(28, 27, 31, .45); }
 .kasse-embed-problem .kasse-help { display: block; margin-top: 14px; text-align: center; color: #55525e; font-size: .9375rem; }
 .kasse-embed-box { max-width: 640px; margin: 0 auto; padding: calc(4px + env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); min-height: 60vh; }
 .kasse-embed-status, .kasse-embed-problem { padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-right: 56px; }
-/* Desktop: Fenster in der Mitte über der abgedunkelten Seite, nicht bildschirmfüllend (Daniel, 26. Nov 2026). */
+/* Desktop: schmales Fenster in der Mitte, so breit wie Stripes Kasse. Die Seite dahinter nur leicht abgedunkelt. */
 @media (min-width: 700px) {
-  dialog.kasse-embed { inset: 0; width: min(560px, calc(100vw - 48px)); height: fit-content; max-height: calc(100vh - 48px); margin: auto; border-radius: 18px; box-shadow: 0 24px 64px rgba(28, 27, 31, .28); }
-  .kasse-embed-box { min-height: 420px; padding: 8px 8px 16px; }
+  dialog.kasse-embed { background: transparent; }
+  .kasse-embed-panel { width: min(460px, calc(100vw - 32px)); min-height: 0; margin: 16px auto; border-radius: 18px; box-shadow: 0 16px 48px rgba(28, 27, 31, .22); }
+  .kasse-embed-box { min-height: 420px; padding: 0 4px 8px; }
 }
-
