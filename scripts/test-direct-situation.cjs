@@ -281,12 +281,11 @@ for (const query of ['s=uhrzeit', 'm=wiederholt']) test(`review regression ${que
     assert.doesNotMatch(await page.locator('#screen').innerText(), invented);
     assert.equal(await page.getByRole('link',{name:'Zur kostenlosen Situationshilfe'}).getAttribute('href'), '/de/demenz-uebersetzer/wann-gehen-wir.html');
     await page.getByRole('button',{name:'Persönliche Hilfe starten',exact:true}).first().click();
-    assert.equal(await page.locator('#screen h1').innerText(), 'E-Mail für die Vertragsbestätigung');
+    // Daniel, 26. Nov 2026: Stripe kommt als Erstes, keine eigene E-Mail-Seite davor. Die Adresse fragt Stripe selbst ab.
+    assert.notEqual(await page.locator('#screen h1').first().innerText().catch(() => ''), 'E-Mail für die Vertragsbestätigung');
+    assert.equal(await page.locator('#email').count(), 0, 'keine eigene E-Mail-Seite vor der Kasse');
     assert.doesNotMatch(await page.locator('#screen').innerText(), /Zugang|Login|Zugangslink/u);
     await capture(page, `kontakt-${query.startsWith('s=')?'uhrzeit':'alias'}`);
-    await page.locator('#email').fill('review@example.invalid');
-    await page.getByRole('button',{name:'Angebot prüfen',exact:true}).click();
-    await page.getByRole('button',{name:'Weiter zur Zahlung',exact:true}).first().click();
     assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('demenzCoachPlan'))), { ...previous, directSituation:'uhrzeit' });
     await page.goto(`${base}/abo/mein-plan.html`); await page.locator('#plan:not([hidden])').waitFor();
     assert.equal(await page.locator('#plan h3').first().innerText(), '„Wann gehen wir?“');
