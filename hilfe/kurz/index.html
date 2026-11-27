@@ -10,23 +10,22 @@
   <link rel="canonical" href="https://dementiacoachapp.com/hilfe/kurz/">
   <link rel="icon" href="/assets/lovable-logo.jpg">
   <link rel="preconnect" href="https://europe-west1-dementica-df17b.cloudfunctions.net" crossorigin>
-  <link rel="dns-prefetch" href="https://checkout.stripe.com">
+  <link rel="prefetch" href="/start/">
   <link rel="stylesheet" href="/hilfe/hilfe.css">
   <link rel="stylesheet" href="kurz.css">
-  <link rel="modulepreload" href="/hilfe/hilfe.js">
   <script src="/kampagnen/data.js"></script>
   <script src="/start/kampagne-utm.js"></script>
   <script src="/abo/abo-config.js"></script>
-  <script src="/abo/angebot.js"></script>
+  <script src="/abo/zaehler.js"></script>
   <script src="/demenz-uebersetzer/translator-ai.js"></script>
   <script src="/eingabe-beispiele.js" defer></script>
-  <script type="module" src="/abo/kasse.js"></script>
   <script type="module" src="kurz.js"></script>
 </head>
-<body data-marketing-pixels data-prefix="kw">
+<body data-marketing-pixels>
   <!-- Kurzweg (27. Nov 2026, Hebel 2 der Konzeptseite): dritter Arm der Werbe-Weiche /hilfe/ab.html.
        Ablauf: Situation eintippen → sofort eine echte KI-Antwort (/api/v1/translator-web, derselbe Dienst wie der Übersetzer)
-       → direkt darunter das Angebot (derselbe Preisblock und dieselbe Kasse wie /hilfe/, Quelle „kw_<kanal>“).
+       → darunter ein Knopf zur bestehenden Angebotsseite /start/?direkt=1 (Daniel, 27. Nov: „Verwende die Angebotsseite, die wir haben“),
+       Quelle src=kw_<kanal> (in der Kasse „direkt_kw_<kanal>“), alle Werbe-Parameter bleiben erhalten.
        Eine kostenlose Antwort je Browser. Kein Fragebogen, keine Anmeldung vor der Antwort. -->
   <header class="lp-top">
     <a class="lp-brand" href="/de/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
@@ -80,7 +79,8 @@
         <li>Speichere gute Sätze und teile sie mit der Familie.</li>
         <li>Im Web und in der iPhone-App mit demselben Konto.</li>
       </ul>
-      <div class="lp-buy" data-buy-slot><a class="lp-btn" href="/start/?direkt=1&amp;src=kw_ads" data-go="kurz">7 Tage kostenlos testen</a></div>
+      <a class="lp-btn kw-next" id="next" href="/start/?direkt=1&amp;src=kw_ads">7 Tage kostenlos testen</a>
+      <p class="kw-note">Du siehst den Preis, bevor du startest.</p>
     </section>
   </main>
 

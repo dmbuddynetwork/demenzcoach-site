@@ -1,8 +1,8 @@
 // Kurzweg (27. Nov 2026): Situation eintippen → sofort eine echte KI-Antwort → darunter das Angebot.
 // Dritter Arm der Werbe-Weiche /hilfe/ab.html (a = Fragebogen /start/, b = Verkaufsseite /hilfe/, c = diese Seite).
 // KI: window.DemenzTranslatorAI (demenz-uebersetzer/translator-ai.js), derselbe Dienst und dieselben Prüfungen wie der Übersetzer.
-// Angebot: /hilfe/hilfe.js wird erst nach der Antwort geladen (gleicher Preisblock, gleiche Kasse, Willkommensfenster startet erst dann).
-// Quelle in Kasse und Statistik: „kw_<kanal>“ (body[data-prefix]). Zustimmungsfreie Summen: POST /v1/quiz-count (nur Schritt + Tag).
+// Angebot: Knopf zur bestehenden Angebotsseite /start/?direkt=1 (Daniel, 27. Nov 2026: „Verwende die Angebotsseite, die wir haben“).
+// Quelle: src=kw_<kanal>. Zustimmungsfreie Summen über abo/zaehler.js (nur Schritt + Tag).
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -20,21 +20,8 @@ const track = (name, extra = {}) => {
   try { window.DemenzConsent?.track?.(name, { entry: source, ...extra }); } catch { /* ohne Einwilligung nichts */ }
 };
 
-// ---- Zähler ohne Einwilligung (wie start/start.js): nur Schritt und Tag, je Seitenaufruf einmal ----------------------
-const countEndpoint = `${String(config.translatorGate?.endpoint || '').replace(/\/v1\/translator-web$/u, '')}/v1/quiz-count`;
-const noCount = (() => {
-  if ([params.get('src'), params.get('utm_source')].some(value => String(value || '').trim().toLowerCase() === 'test')) return true;
-  try { return localStorage.getItem('demenzcoach.internal.v1') === '1'; } catch { return false; }
-})();
-const counted = new Set();
-const count = step => {
-  if (noCount || counted.has(step) || !/^https:/u.test(countEndpoint)) return;
-  counted.add(step);
-  try {
-    fetch(countEndpoint, { method: 'POST', body: JSON.stringify({ step }), keepalive: true,
-      credentials: 'omit', referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'text/plain' } }).catch(() => {});
-  } catch { /* Zählen stört nie */ }
-};
+// ---- Zähler ohne Einwilligung (abo/zaehler.js): nur Schritt und Tag, je Seitenaufruf einmal ----------------------------
+const count = step => { try { window.DemenzZaehler?.once(step); } catch { /* Zählen stört nie */ } };
 
 // ---- Eine kostenlose Antwort je Browser. Danach direkt das Angebot. ---------------------------------------------------
 const usedKey = 'demenzcoach.kurzweg.v1';
@@ -55,7 +42,18 @@ const hasText = value => typeof value === 'string' && value.trim().length > 0;
 const form = $('form'), field = $('text'), send = $('send'), errorBox = $('error');
 const showError = text => { errorBox.textContent = text; errorBox.hidden = !text; };
 
-// ---- Angebot: Preisblock aus /hilfe/hilfe.js, erst jetzt laden ---------------------------------------------------------
+// ---- Angebot: Knopf zur bestehenden Angebotsseite /start/?direkt=1 (Daniel, 27. Nov 2026) ----------------------------
+// Alle Parameter der Anzeige (utm_*, k, a, fbclid …) bleiben erhalten. src wird kw_<kanal>, die Kasse führt es als direkt_kw_<kanal>.
+const offerURL = (() => {
+  const next = new URLSearchParams(location.search);
+  for (const key of ['neu', 'arm', 'quiz', 'embed']) next.delete(key);
+  next.set('direkt', '1');
+  // Testläufe bleiben Testläufe (Zähler und Kasse erkennen src=test).
+  if (clean(next.get('src')) !== 'test') next.set('src', source);
+  return `/start/?${next.toString()}`;
+})();
+$('next').href = offerURL;
+$('next').addEventListener('click', () => { count('kw_cta'); track('kw_cta'); });
 let offerShown = false;
 const showOffer = (title = '') => {
   if (title) $('offer-title').textContent = title;
@@ -64,10 +62,7 @@ const showOffer = (title = '') => {
   offerShown = true;
   count('kw_offer');
   track('kw_offer');
-  import('/hilfe/hilfe.js').catch(() => { /* Ohne Skript bleibt der Link zu /start/?direkt=1 */ });
 };
-// Tipp auf einen Kaufknopf (hilfe.js öffnet die Kasse) zusätzlich als Kurzweg-Schritt zählen.
-document.addEventListener('click', event => { if (event.target.closest('#offer [data-buy]')) count('kw_checkout'); }, true);
 
 // ---- Antwort anzeigen ----------------------------------------------------------------------------------------------
 const block = (title, children) => el('div', { class: 'kw-block' }, [el('h3', { class: 'kw-step', text: title }), ...[].concat(children)]);

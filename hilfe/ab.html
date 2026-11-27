@@ -21,6 +21,8 @@
         if (!arms[arm]) arm = navigator.webdriver ? "a" : "abc".charAt(Math.floor(Math.random() * 3));
         sessionStorage.setItem(key, arm);
       } catch (e) { if (!arms[arm]) arm = "a"; }
+      // Arm a soll den Fragebogen zeigen, auch wenn /start/ ohne Werbe-Merkmal sonst direkt das Angebot zeigt (Daniel, 27. Nov).
+      if (arm === "a") params.set("quiz", "1");
       var query = params.toString();
       location.replace(arms[arm] + (query ? "?" + query : "") + location.hash);
     })();
