@@ -1,0 +1,165 @@
+/* Verkaufs-Startseite, Arm b (Daniel, 27. Nov 2026, Aufbau wie Propstage). Nur aktiv mit html.home-b.
+   Zielgruppe 60+: große Schrift, ruhige Flächen, warmes Weiß, keine Verläufe. Eine Spalte; Bilder und Überschriften bis ~1000 px,
+   Preis und Kaufknöpfe schmal (~600 px). */
+html:not(.home-b) .hs, html:not(.home-b) .hs-hero-cta { display: none !important; }
+html.home-b #plan, html.home-b #app { display: none !important; }
+
+.hs { --hs-ink: #1f1b2e; --hs-muted: #5b5668; --hs-line: rgba(31, 27, 46, .1); --hs-purple: #47408c; --hs-purple-dark: #362f6e; --hs-lav: #f2eff8; --hs-green: #1f6b3f;
+  margin: 8px calc(50% - 50vw) 0; color: var(--hs-ink); }
+.hs-hero-cta { --hs-ink: #1f1b2e; --hs-muted: #5b5668; --hs-purple: #47408c; --hs-purple-dark: #362f6e; --hs-green: #1f6b3f;
+  display: grid; justify-items: center; gap: 10px; max-width: 600px; margin: 18px auto 26px; text-align: center; }
+.hs-section { padding: 64px 16px; }
+.hs-band { background: #fff; border-block: 1px solid var(--hs-line); }
+.hs-wrap { max-width: 1000px; margin: 0 auto; }
+.hs-narrow { max-width: 600px; text-align: center; }
+body.einfach .hs h2, body.einfach .hs-more-title { margin: 0 0 12px; font-size: clamp(1.75rem, 4.5vw, 2.25rem) !important; line-height: 1.2 !important; font-weight: 800; letter-spacing: -.01em; text-align: center; color: var(--hs-ink); }
+body.einfach .hs h3 { margin: 0 0 6px; font-size: 1.25rem !important; line-height: 1.3 !important; font-weight: 700; color: var(--hs-ink); }
+body.einfach .hs p, body.einfach .hs li, body.einfach .hs summary { font-size: 1.1875rem; line-height: 1.5; }
+.hs-sub { max-width: 640px; margin: 0 auto 32px; text-align: center; color: var(--hs-muted); }
+.hs-quiet { margin: 20px auto 0; max-width: 640px; text-align: center; color: var(--hs-muted); }
+body.einfach .hs .hs-quiet, body.einfach .hs .hs-legal, body.einfach .hs-note { font-size: 1rem !important; }
+.hs-ico { display: inline-grid; place-items: center; flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: #e6f2ea; color: var(--hs-green); }
+.hs-ico svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Kaufknopf */
+.hs-btn { display: flex; align-items: center; justify-content: center; width: 100%; max-width: 420px; min-height: 60px; margin: 0 auto; padding: 14px 24px; border: 0; border-radius: 999px;
+  background: var(--hs-purple); color: #fff !important; font: inherit; font-size: 1.25rem !important; font-weight: 700; cursor: pointer; box-shadow: 0 6px 16px -8px rgba(71, 64, 140, .7); }
+.hs-btn:hover { background: var(--hs-purple-dark); }
+.hs-btn:focus-visible, .hs-link:focus-visible, .hs-case:focus-visible { outline: 3px solid #7c65d3; outline-offset: 3px; }
+.hs-note { margin: 0; color: var(--hs-muted); }
+.hs-link { border: 0; background: none; padding: 8px; color: var(--hs-purple); font: inherit; text-decoration: underline; cursor: pointer; }
+.hs-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin: 6px 0 0; padding: 0; list-style: none; }
+.hs-chips li { display: inline-flex; align-items: center; gap: 8px; color: var(--hs-ink); font-weight: 600; }
+body.einfach .hs-chips li { font-size: 1rem !important; }
+.hs-chips .hs-ico { width: 22px; height: 22px; background: #e6f2ea; color: var(--hs-green); }
+.hs-chips .hs-ico svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 1. Schritte: abwechselnd links/rechts wie Propstage, auf dem Handy untereinander */
+.hs-steps { display: grid; gap: 48px; margin: 0; padding: 0; list-style: none; }
+.hs-steps li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 40px; }
+.hs-steps li:nth-child(even) img { order: 2; }
+.hs-steps img { justify-self: center; width: min(280px, 70vw); height: auto; border-radius: 28px; box-shadow: 0 0 0 1px var(--hs-line), 0 24px 48px -24px rgba(31, 27, 46, .35); }
+.hs-step-no { display: inline-block; margin: 0 0 10px !important; padding: 4px 12px; border-radius: 999px; background: var(--hs-lav); color: var(--hs-purple); font-weight: 700; }
+body.einfach .hs .hs-step-no { font-size: .9375rem !important; }
+
+/* 2. Statt / Lieber */
+.hs-swap { display: grid; gap: 16px; max-width: 720px; margin: 0 auto; padding: 0; list-style: none; }
+.hs-swap li { display: grid; gap: 0; border-radius: 20px; overflow: hidden; box-shadow: 0 0 0 1px var(--hs-line); background: #fff; }
+.hs-swap p { display: grid; gap: 4px; margin: 0; padding: 16px 20px; }
+.hs-before { color: var(--hs-muted); background: #faf9f7; }
+.hs-before span:last-child { text-decoration: line-through; text-decoration-color: rgba(163, 50, 42, .55); }
+.hs-after { color: var(--hs-ink); font-weight: 700; }
+.hs-tag { display: block; text-decoration: none; font-weight: 700; color: var(--hs-muted); }
+body.einfach .hs .hs-tag { font-size: .875rem !important; text-transform: uppercase; letter-spacing: .06em; }
+.hs-after .hs-tag { color: var(--hs-green); }
+
+/* 3. Stimmen */
+.hs-voices { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.hs-voice { margin: 0; padding: 22px; border-radius: 20px; background: var(--hs-bg-soft, #faf9f7); box-shadow: 0 0 0 1px var(--hs-line); }
+.hs-voice blockquote, .hs-voice-mini blockquote { margin: 0 0 12px; }
+.hs-voice figcaption, .hs-voice-mini figcaption { color: var(--hs-muted); font-weight: 700; }
+
+/* 4. Drei Wege */
+.hs-ways { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.hs-way { display: flex; flex-direction: column; gap: 4px; padding: 24px; border-radius: 20px; background: #fff; box-shadow: 0 0 0 1px var(--hs-line); }
+.hs-way.is-ours { box-shadow: 0 0 0 2px var(--hs-purple), 0 18px 40px -20px rgba(71, 64, 140, .45); }
+.hs-way-time { margin: 0 0 12px !important; font-size: 2rem !important; line-height: 1.1 !important; font-weight: 800; color: var(--hs-muted); }
+.hs-way.is-ours .hs-way-time { color: var(--hs-purple); }
+.hs-way ul { display: grid; gap: 10px; margin: 0 0 20px; padding: 0; list-style: none; flex: 1; }
+.hs-way li { display: flex; gap: 10px; align-items: flex-start; }
+.hs-way:not(.is-ours) .hs-ico { background: #f6e9e7; color: #a3322a; }
+.hs-way .hs-btn { font-size: 1.125rem !important; min-height: 56px; }
+
+/* 5. Viele Situationen */
+.hs-cases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+.hs-case { display: grid; grid-template-rows: 170px auto; height: 100%; border-radius: 20px; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px var(--hs-line); color: var(--hs-ink); text-decoration: none; }
+.hs-case:hover { box-shadow: 0 0 0 2px var(--hs-purple); }
+.hs-case img { width: 100%; height: 170px; object-fit: contain; padding: 14px; background: #faf9f7; }
+.hs-case > span { display: grid; gap: 4px; padding: 16px 18px 20px; }
+.hs-case strong { font-size: 1.1875rem; }
+.hs-case span span { color: var(--hs-muted); }
+
+/* 6./10. Aufruf */
+.hs-cta-band { background: var(--hs-lav); }
+.hs-cta-band .hs-sub, .hs-final .hs-sub { margin-bottom: 24px; }
+.hs-cta-band .hs-note, .hs-final .hs-note { margin-top: 10px; }
+.hs-final img { width: 200px; height: auto; margin: 0 auto 16px; }
+
+/* 7. Preis */
+.hs-plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 720px; margin: 0 auto; align-items: stretch; }
+.hs-plan { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 28px 22px 22px; border-radius: 22px; background: #fff; box-shadow: 0 0 0 1px var(--hs-line); }
+.hs-plan.is-best { box-shadow: 0 0 0 2px var(--hs-purple), 0 18px 40px -20px rgba(71, 64, 140, .45); }
+.hs-plan-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); margin: 0 !important; padding: 5px 14px; border-radius: 999px; background: var(--hs-purple); color: #fff; font-weight: 700; white-space: nowrap; }
+body.einfach .hs .hs-plan-badge { font-size: .9375rem !important; }
+.hs-plan-price { margin: 4px 0 0 !important; }
+.hs-plan-price strong { font-size: 2.25rem; line-height: 1; font-weight: 800; }
+.hs-plan-then { margin: 0 0 14px !important; color: var(--hs-muted); }
+.hs-plan .hs-btn { max-width: none; }
+.hs-plan:not(.is-best) .hs-btn { background: #fff; color: var(--hs-purple) !important; box-shadow: inset 0 0 0 2px var(--hs-purple); }
+.hs-plan:not(.is-best) .hs-btn:hover { background: var(--hs-lav); }
+.hs-plan-terms { margin: 8px 0 12px !important; color: var(--hs-muted); text-align: center; }
+body.einfach .hs .hs-plan-terms { font-size: 1rem !important; }
+.hs-cta-wrap { position: relative; }
+.hs-ap-slot { position: absolute; inset: 0; opacity: 0; overflow: hidden; border-radius: 999px; z-index: 2; }
+.hs-ap-alt { display: block; margin: 2px auto 0; }
+.hs-checks { display: grid; gap: 10px; margin: 6px 0 0; padding: 16px 0 0; border-top: 1px solid var(--hs-line); list-style: none; }
+.hs-checks li { display: flex; gap: 10px; align-items: flex-start; }
+.hs-guarantee { display: flex; gap: 14px; align-items: center; max-width: 600px; margin: 28px auto 0; padding: 18px 20px; border-radius: 18px; background: #eef6f0; }
+.hs-guarantee p { margin: 0; }
+.hs-guarantee strong { display: block; }
+.hs-seal { display: grid; place-items: center; flex: 0 0 auto; width: 52px; height: 52px; border-radius: 50%; background: #fff; color: var(--hs-green); box-shadow: 0 0 0 2px #cfe5d6; }
+.hs-seal svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hs-voice-mini { max-width: 600px; margin: 16px auto 0; padding: 18px 20px; border-radius: 18px; background: #fff; box-shadow: 0 0 0 1px var(--hs-line); }
+.hs-legal { max-width: 600px; margin: 20px auto 0; color: var(--hs-muted); }
+.hs-legal a { color: inherit; }
+
+/* 8. Vorteile */
+.hs-perks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 32px; max-width: 840px; margin: 0 auto; padding: 0; list-style: none; }
+.hs-perks li { display: flex; gap: 14px; align-items: flex-start; }
+.hs-perks p { margin: 0; color: var(--hs-muted); }
+
+/* 9. Fragen */
+.hs-faq { display: grid; gap: 10px; max-width: 720px; margin: 0 auto; }
+.hs-faq details { border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px var(--hs-line); }
+.hs-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 14px 20px; font-weight: 700; cursor: pointer; list-style: none; }
+.hs-faq summary::-webkit-details-marker { display: none; }
+.hs-faq summary::after { content: "+"; flex: 0 0 auto; font-size: 1.5rem; line-height: 1; color: var(--hs-purple); }
+.hs-faq details[open] summary::after { content: "–"; }
+.hs-faq details p { margin: 0; padding: 0 20px 18px; color: var(--hs-muted); }
+
+.hs-more-title { margin: 56px 0 20px !important; }
+
+@media (max-width: 760px) {
+  .hs-section { padding: 48px 16px; }
+  .hs-steps li { grid-template-columns: 1fr; gap: 20px; text-align: center; }
+  .hs-steps li:nth-child(even) img { order: 0; }
+  .hs-ways, .hs-plans, .hs-perks { grid-template-columns: 1fr; }
+  .hs-plans { gap: 28px; }
+  .hs-cases { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .hs-case { grid-template-rows: 120px auto; }
+  .hs-case img { height: 120px; padding: 10px; }
+  .hs-case > span { padding: 12px 14px 16px; }
+  body.einfach .hs .hs-case span span { font-size: 1rem !important; }
+}
+@media print { .hs, .hs-hero-cta { display: none !important; } }
+html.home-b body { overflow-x: clip; }
+
+/* Gegen die globalen Regeln von einfach.css (body.einfach ul/img/a/p/blockquote). */
+.hs [hidden], .hs-hero-cta [hidden] { display: none !important; }
+body.einfach .hs ul, body.einfach .hs ol, body.einfach .hs-hero-cta ul { padding-left: 0; }
+body.einfach .hs .hs-swap p { margin: 0; }
+body.einfach .hs .hs-case, body.einfach .hs .hs-case * { color: inherit; text-decoration: none; }
+body.einfach .hs .hs-case span span { color: var(--hs-muted); }
+body.einfach .hs .hs-case img { height: 170px; }
+body.einfach .hs .hs-voice blockquote, body.einfach .hs .hs-voice-mini blockquote { font-weight: 400; }
+body.einfach .hs .hs-plan p, body.einfach .hs .hs-way p, body.einfach .hs-hero-cta p { margin-bottom: 0; }
+.hs-plans { margin-top: 36px; }
+@media (max-width: 760px) {
+  .hs-steps img { width: min(210px, 60vw); }
+  body.einfach .hs .hs-case img { height: 120px; }
+}
+body.einfach .hs .hs-sub { margin: 0 auto 32px; }
+body.einfach .hs .hs-quiet { margin: 20px auto 0; }
+body.einfach .hs .hs-plan-price strong { font-size: 2.25rem !important; line-height: 1.1 !important; }
+@media (max-width: 760px) { .hs-voices .hs-voice:nth-child(n+4) { display: none; } }
+body.einfach .hs .hs-legal { margin: 20px auto 0; }
