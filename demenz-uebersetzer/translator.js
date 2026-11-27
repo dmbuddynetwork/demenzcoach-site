@@ -2091,15 +2091,14 @@
       result.trainer ? element('a', { className: 'text-link', text: 'Diese Situation üben →', attributes: { href: result.trainer, 'data-related-link': 'gespraechstrainer' } }) : null
     ].filter(Boolean);
     if (retry) nextRows.push(retry.toggle);
-    // Mit Ziel stehen Ratgeber und Üben als Zeilen in derselben Liste statt als große unterstrichene Links.
+    // Mit Ziel: kein Block „Mehr zu dieser Situation“ mehr (Daniel, 27. Nov 2026: „macht keinen Sinn“, „Also das ausführlich
+    // lesen“). Ratgeber- und Übungs-Link fallen dort weg; nur „Hat nicht geholfen? Zweiter Versuch“ bleibt als eine klare Zeile.
+    // Weiter geht es über die anderen Ziele und das Angebot unter der Antwort.
     const deeperInList = Boolean(chosenGoal);
-    if (deeperInList) deeper.forEach((link) => { link.className = 'translator-copy'; link.textContent = link.textContent.replace(/\s*→$/, ''); });
-    if (deeperInList) nextRows.push(...deeper);
     if (nextRows.length) {
       nodes.push(element('div', { className: 'translator-next' }, [
-        chosenGoal ? element('p', { className: 'translator-next-title', text: 'Mehr zu dieser Situation' }) : null,
-        element('div', { className: 'translator-next-rows', attributes: { role: 'group', 'aria-label': 'Mehr zu dieser Situation' } }, nextRows)
-      ].filter(Boolean)));
+        element('div', { className: 'translator-next-rows', attributes: { role: 'group', 'aria-label': 'Wenn es nicht geholfen hat' } }, nextRows)
+      ]));
     }
     if (retry) nodes.push(retry.block);
 
