@@ -72,7 +72,9 @@ async function initAuth() {
   await new Promise((resolve) => { const stop = firebase.onAuthStateChanged(auth, () => { stop(); resolve(); }); });
 }
 async function signedInUser() {
-  if (!auth) await (authReady ||= initAuth().catch((problem) => { authReady = null; throw problem; }));
+  // Immer auf den gespeicherten Nutzer warten (27. Nov 2026): Ein zweiter Aufrufer darf nicht vor onAuthStateChanged
+  // weitermachen. Sonst ist currentUser noch leer, und ein angemeldetes Konto bekäme ein neues Gastkonto.
+  await (authReady ||= initAuth().catch((problem) => { authReady = null; throw problem; }));
   // Wie Noom und BetterMe: erst bezahlen, Konto danach. Das Gast-Konto trägt den Kauf; eine bestätigte E-Mail wird anschließend mit derselben Nutzerkennung verknüpft.
   if (auth.currentUser) return auth.currentUser;
   return (anonymousSignIn ||= firebase.signInAnonymously(auth).then((credential) => credential.user).finally(() => { anonymousSignIn = null; }));
@@ -280,9 +282,11 @@ function loadStripeScript() {
 // mountApplePay(slot, { plan, email, offer, source, campaign, track, onUnavailable }) -> Promise<boolean> (true = Knopf sichtbar)
 export async function mountApplePay(slot, options) {
   if (!quickSupported()) return false;
-  const key = `${options.plan}|${options.offer?.kind ?? ""}|${options.email ?? ""}`;
+  let key = "";
   try {
     const [loadedConfig, user] = await Promise.all([loadConfig(), signedInUser()]);
+    // Die Apple-Pay-Sitzung gehört genau zu diesem Konto. Wechselt das Konto, entsteht eine neue Sitzung.
+    key = `${user.uid}|${options.plan}|${options.offer?.kind ?? ""}|${options.email ?? ""}`;
     publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
     if (!quickSessions.has(key)) {

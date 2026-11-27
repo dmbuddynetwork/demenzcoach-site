@@ -44,6 +44,16 @@ test("unpaid completion, expired, missing proof, failure, auth and network error
   }
 });
 
+test("paid in another browser or app shows elsewhere, never activates", async () => {
+  const views = [];
+  const check = createPaymentStatusController({ sessionID: "cs_synthetic", loadStatus: async () => ({ status: "complete", paymentStatus: "paid", outcome: "elsewhere", active: false }),
+    render: (view) => views.push(view), activate: () => assert.fail("must not activate") });
+  await check();
+  assert.equal(views.at(-1), "elsewhere");
+  const { paymentStatusText } = await import(`data:text/javascript;base64,${Buffer.from(source).toString("base64")}`);
+  assert.match(paymentStatusText.elsewhere[0], /eingegangen/u);
+});
+
 test("a forged return URL without a session never loads status or activates", async () => {
   const views = [];
   const check = createPaymentStatusController({ sessionID: null, loadStatus: () => assert.fail("must not load"), render: (view) => views.push(view), activate: () => assert.fail("must not activate") });
