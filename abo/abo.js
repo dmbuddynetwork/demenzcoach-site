@@ -512,7 +512,9 @@ if (params.get("status") === "fertig") {
     sessionID: params.get("session_id"),
     loadStatus: async (sessionID) => {
       await ensureFirebase();
-      if (!state.user) throw new Error("sign_in_required");
+      // Kein Konto in diesem Browser (27. Nov 2026: Daniels Kauf, Erfolgsseite ohne das Kauf-Gastkonto): ein Gastkonto anlegen.
+      // Der Server bindet es nur, wenn die Sitzung bezahlt ist und dies der erste Aufruf der Erfolgsseite ist.
+      if (!state.user) state.user = (await state.firebase.signInAnonymously(state.auth)).user;
       const token = await state.user.getIdToken();
       portalAvailable = true;
       // Das eigene Firebase-Gastkonto sichern, unabhängig vom Zahlungsstatus.
