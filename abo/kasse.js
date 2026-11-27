@@ -117,10 +117,22 @@ const preparedSessions = new Map();
 // Handy (unter 900 px): alle Kaufknöpfe führen auf Stripes eigene Seite (Daniel, 26. Nov 2026: „Ja, alle am Handy zu Stripe“,
 // vorher nur der Link „Mit Karte oder anderer Zahlart bezahlen“). Am Desktop bleibt es beim Layer mit Stripes Formular.
 const toStripePage = () => hostWindow().matchMedia?.("(min-width: 900px)")?.matches === false;
+// Messung (27. Nov 2026): Anzeige/Reel (utm_content, aus ?a= über kampagne-utm.js) und Testlauf-Merkmal gehen als Kürzel mit in die
+// Stripe-Sitzung. So lassen sich Käufe je Reel zählen und Testkäufe (?src=test, Merkzeichen von /intern/) herausfiltern.
+function measureFields() {
+  let search = location.search;
+  try { search = hostWindow().location.search || search; } catch { /* fremder Rahmen */ }
+  const params = new URLSearchParams(search);
+  const ad = String(params.get("utm_content") || params.get("a") || "").toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
+  let test = [params.get("src"), params.get("utm_source")].some((value) => String(value || "").trim().toLowerCase() === "test");
+  try { test ||= localStorage.getItem("demenzcoach.internal.v1") === "1"; } catch { /* privater Modus */ }
+  return { ...(ad ? { ad } : {}), ...(test ? { test: true } : {}) };
+}
 function sessionBody(options) {
   const stripePage = toStripePage(options);
   return { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
     ...window.DemenzTeller?.attribution(),
+    ...measureFields(),
     ...window.DemenzConsent?.metaContext?.(),
     hostedFallback: true,
     // Stripes eingebettete Zahlungsseite im Layer, wenn der Server sie anbietet (Daniel, 26. Nov 2026). Ältere Server ignorieren das Feld und liefern die gehostete Seite.
@@ -297,6 +309,7 @@ export async function mountApplePay(slot, options) {
           token,
           body: { plan: options.plan, termsVersion: publicConfig.textVersions?.terms, source: options.source, campaign: options.campaign,
             ...window.DemenzTeller?.attribution(),
+            ...measureFields(),
             ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
             ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
         });
@@ -329,6 +342,9 @@ export async function mountApplePay(slot, options) {
         options.onError?.("Die Zahlung hat nicht geklappt. Bitte versuch es noch einmal.");
       }
     });
+    // Tipp auf Stripes Apple-Pay-Knopf (iframe): Der Fokus wandert ins iframe, das Fenster verliert ihn. Nur für die Messung.
+    const onBlur = () => { if (document.body.contains(slot) && slot.contains(document.activeElement)) options.track?.("apple_pay_quick_tap"); };
+    window.addEventListener("blur", onBlur);
     express.mount(slot);
     return await visible;
   } catch (problem) {

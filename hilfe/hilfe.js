@@ -23,7 +23,14 @@ const campaign = clean(params.get('utm_campaign') || params.get('k'), 60);
 const track = (name, extra = {}, marketing = '') => {
   try { window.DemenzConsent?.track?.(name, { entry: source, ...extra }); } catch { /* ohne Einwilligung nichts */ }
   try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing); } catch { /* */ }
+  // Kauf-Trichter ohne Einwilligung (abo/zaehler.js, nur Summen je Tag): Apple-Pay-Tipp und -Bestätigung.
+  if (name === 'apple_pay_quick_tap') count('applepay');
+  if (name === 'apple_pay_quick_confirm') count('applepay_ok');
 };
+// Weg im Kauf-Trichter: „lp“ für /hilfe/, „kw“ für den Kurzweg (Quelle kw_<kanal>). Je Seitenaufruf höchstens einmal je Stufe.
+const way = /^kw_/u.test(source) || location.pathname.startsWith('/hilfe/kurz') ? 'kw' : 'lp';
+const count = stage => { try { window.DemenzZaehler?.once(`${way}_${stage}`); } catch { /* Zählen stört nie */ } };
+count('view');
 
 // ---- Preise: feste Werte, dann die Werte des Servers (dieselben wie in der Kasse) ----------------------------------
 let offer = { yearly: 6999, monthly: 1299, trialDays: 7 };
@@ -163,6 +170,7 @@ function select(key) {
 }
 const buy = where => {
   track('lp_checkout', { where, plan }, 'InitiateCheckout');
+  count('cta');
   const kasse = window.DemenzKasse;
   if (!kasse || !config.firebase?.apiKey) {
     location.href = `/abo/?plan=${plan}&src=${source}${campaign ? `&c=${campaign}` : ''}&weiter=1`;
@@ -170,6 +178,7 @@ const buy = where => {
   }
   // Zurück-Taste des Handys schließt die Kasse statt die Seite zu verlassen.
   history.pushState({ sheet: true }, '', location.href);
+  count('kasse');
   kasse.open({ plan, source, campaign, offer: checkoutOffer(), stripePage: where.endsWith('_andere'), track: name => track(name, { where }),
     onClose: () => { if (history.state?.sheet) history.back(); },
     // Fenster abgelaufen: normaler Preis wird angezeigt, der Kunde tippt erneut (wie /start/).
@@ -292,7 +301,7 @@ if ('IntersectionObserver' in window) {
   // Preis 1,5 Sekunden sichtbar: Kasse im Hintergrund vorbereiten, damit der Klick sofort zu Stripe führt.
   let timer = null;
   const warm = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) { clearTimeout(timer); timer = setTimeout(() => { prepare(); applePayWanted = true; mountApplePay(); warm.disconnect(); }, 1500); }
+    if (entries.some(entry => entry.isIntersecting)) { count('price'); clearTimeout(timer); timer = setTimeout(() => { prepare(); applePayWanted = true; mountApplePay(); warm.disconnect(); }, 1500); }
     else clearTimeout(timer);
   }, { threshold: .4 });
   for (const slot of slots) warm.observe(slot);
