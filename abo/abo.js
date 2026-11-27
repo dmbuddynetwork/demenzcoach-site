@@ -429,13 +429,15 @@ async function offerAccountLink() {
 }
 
 // --- Abo verwalten (Stripe-Kundenportal) ----------------------------------------------------------
+// Ohne eigenes Abo an diesem Zugang (anderes Gerät, anderer Browser) öffnet der E-Mail-Login des Portals (Daniel, 27. Nov 2026).
 async function openPortal() {
   try {
     await ensureFirebase();
-    if (!state.user) return show("account");
+    if (!state.user) { location.href = config.portalLoginURL; return; }
     const { url } = await api("/portal", { method: "POST", token: await state.user.getIdToken() });
     location.href = url;
   } catch {
+    if (config.portalLoginURL) { location.href = config.portalLoginURL; return; }
     fail("Die Abo-Verwaltung öffnet gerade nicht. Kündigen geht immer über „Verträge hier kündigen“ unten.");
   }
 }
@@ -537,6 +539,7 @@ if (params.get("status") === "fertig") {
       $("app-store-link").hidden = !active;
       $("payment-status-manage").hidden = !portalAvailable || active || outcome === "checking" || outcome === "elsewhere";
       $("payment-status-signin").hidden = outcome !== "elsewhere";
+      $("payment-status-portal-login").hidden = outcome !== "elsewhere";
       if (outcome === "elsewhere") $("payment-status-signin").href = emailAccountURL(location.pathname + location.search, location.origin, "signin");
       $("payment-status-retry").hidden = active;
       $("payment-status-retry").disabled = outcome === "checking";

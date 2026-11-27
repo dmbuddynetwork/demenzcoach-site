@@ -56,10 +56,10 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
     const intro = make("p", { class: "kasse-embed-terms" }, terms || "");
     const links = make("p", { class: "kasse-embed-links" });
     links.append("Online kündbar, ohne Anmeldung: ");
-    for (const [index, [href, text]] of [["/abo/kuendigen.html", "Verträge hier kündigen"], ["/abo/garantie.html", "30 Tage Geld-zurück-Garantie"],
+    for (const [index, [href, text]] of [["/abo/kuendigen.html", "Verträge hier kündigen"], ["https://billing.stripe.com/p/login/dRmbJ17QQ8TP85s79Z1ZS00", "Abo verwalten"], ["/abo/garantie.html", "30 Tage Geld-zurück-Garantie"],
       ["/nutzungsbedingungen.html", "Nutzungsbedingungen"], ["/abo/widerruf.html", "Widerrufsbelehrung"], ["/datenschutz.html", "Datenschutz"]].entries()) {
       if (index) links.append(" · ");
-      links.append(make("a", { href: base + href, target: "_blank", rel: "noopener" }, text));
+      links.append(make("a", { href: href.startsWith("https:") ? href : base + href, target: "_blank", rel: "noopener" }, text));
     }
     panel.append(heading, closeButton, intro, status, problem, box, links);
   } else {

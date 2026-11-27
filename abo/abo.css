@@ -65,6 +65,7 @@ legend { font-weight: 700; margin: 0 0 8px; padding: 0; }
 .abo-footer { font-size: var(--small); margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 18px; }
 .abo-footer a { color: var(--ink-2); }
 .abo-footer .abo-cancel-link { color: var(--purple); font-weight: 700; }
+.abo-footer .abo-portal-link { color: var(--purple); }
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media print { .abo-top, .abo-footer, .abo-noprint { display: none !important; } body { background: #fff; } }
