@@ -97,22 +97,14 @@ export function mountSharedNavigation(doc = document) {
   items.prepend(menuAccount);
   label.append(select); items.append(label, change, status);
   // Der App-Store-Knopf im Kopf (26. Nov) entfällt mit dem Landingpage-Kopf (27. Nov). „Zur App“ steht unten bei den Einstellungen und in der Fußzeile.
-  // Kopf wie eine Landingpage (Daniel, 27. Nov 2026: „mach es wie eine Landingpage … das Logo zentriert lieber und clean“).
-  // Auf normalen Seiten steht oben nur das Logo in der Mitte. Konto, Abo, Schrift, App und Sprache stehen unten über der Fußzeile.
-  const landing = container.matches('.e-header .e-wrap');
-  if (landing) {
+  // Kopf wie eine Landingpage (Daniel, 27. Nov 2026: „mach es wie eine Landingpage … das Logo zentriert lieber und clean“,
+  // dann: „aber biete kleines dezentes icon für menü an“). Auf normalen Seiten: Logo in der Mitte, rechts nur ein kleines Menü-Symbol.
+  // „Anmelden“ steht im Menü. Der Konto-Link bleibt unsichtbar im Kopf, weil der Menü-Eintrag seinen Klick auslöst.
+  if (container.matches('.e-header .e-wrap')) {
     container.classList.add('dc-landing-head');
-    menuAccount.remove(); account.classList.add('dc-foot-account'); items.classList.remove('e-menu-items');
-    const title = doc.createElement('h2'); title.className = 'dc-foot-title'; title.textContent = en ? 'Account and settings' : 'Konto und Einstellungen';
-    dock.classList.add('dc-foot-tools'); dock.setAttribute('aria-label', title.textContent); dock.setAttribute('role', 'region');
-    const row = doc.createElement('div'); row.className = 'dc-foot-row'; row.append(account);
-    dock.append(title, row, items);
-    const footer = doc.querySelector('footer.e-footer');
-    if (footer) footer.before(dock); else doc.body.append(dock);
-    menu.remove();
-  } else {
-    dock.append(account, menu); container.append(dock);
+    if (summary) { summary.setAttribute('aria-label', en ? 'Menu' : 'Menü'); summary.title = en ? 'Menu' : 'Menü'; }
   }
+  dock.append(account, menu); container.append(dock);
   if (oldNav) oldNav.remove();
   // Markenname bleibt einzeilig: erst „App“ weglassen, dann nur das Logo zeigen (Daniel, 26. Nov: „nicht zweizeilig“).
   const brandText = container.querySelector('.e-brand > span');

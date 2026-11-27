@@ -14,25 +14,22 @@ const android = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KH
       const p = await c.newPage(); const errors = []; p.on('pageerror', e => errors.push(e.message));
       await p.goto(`${preview.origin}/de/demenz-uebersetzer/wo-ist-mein-mann.html`);
       await p.getByRole('button', { name: 'Ziel ändern' }).waitFor(); await p.waitForTimeout(400);
-      // Kopf wie eine Landingpage (Daniel, 27. Nov 2026): nur Logo und Name, in der Mitte, eine Zeile, keine Knöpfe.
+      // Kopf wie eine Landingpage (Daniel, 27. Nov 2026): Logo in der Mitte, rechts nur ein kleines Menü-Symbol.
       const head = await p.evaluate(() => {
-        const h = document.querySelector('.e-header'), brand = h.querySelector('.e-brand'), r = brand.getBoundingClientRect(), span = brand.querySelector(':scope > span');
-        return { onlyBrand: h.querySelectorAll('a,button,summary,select').length === 1, centered: Math.abs((r.left + r.right) / 2 - innerWidth / 2) < 6, oneLine: span.getBoundingClientRect().height < 30, scroll: document.documentElement.scrollWidth > innerWidth };
+        const h = document.querySelector('.e-header'), brand = h.querySelector('.e-brand'), r = brand.getBoundingClientRect(), span = brand.querySelector(':scope > span'), s = h.querySelector('.dc-navigation-menu > summary'), sr = s.getBoundingClientRect();
+        const visible = [...h.querySelectorAll('a,button,summary,select')].filter(n => n.getClientRects().length && getComputedStyle(n).display !== 'none' && !n.closest('.dc-navigation-items'));
+        return { controls: visible.length, centered: Math.abs((r.left + r.right) / 2 - innerWidth / 2) < 6, oneLine: span.getBoundingClientRect().height < 30, noOverlap: r.right <= sr.left, icon: sr.width <= 48 && sr.height >= 44 && getComputedStyle(s).fontSize === '0px', label: s.getAttribute('aria-label'), scroll: document.documentElement.scrollWidth > innerWidth };
       });
-      assert.deepEqual(head, { onlyBrand: true, centered: true, oneLine: true, scroll: false }, `${view.n}: Kopf`);
+      assert.deepEqual(head, { controls: 2, centered: true, oneLine: true, noOverlap: true, icon: true, label: 'Menü', scroll: false }, `${view.n}: Kopf`);
       assert.equal(await p.locator('a.dc-navigation-store').count(), 0, `${view.n}: kein App-Store-Knopf im Kopf`);
-      // Konto, Abo, Schrift, App und Sprache stehen unten in der Karte über der Fußzeile.
-      const tools = p.locator('.dc-foot-tools');
-      assert.equal(await tools.count(), 1, `${view.n}: Karte unten`);
-      assert.ok(await tools.evaluate(n => n.nextElementSibling?.matches('footer.e-footer')), `${view.n}: Karte direkt über der Fußzeile`);
-      for (const label of ['Anmelden', '✓ Angemeldet', 'Konto bestätigen']) {
-        const m = await p.evaluate(label => { const a = document.querySelector('.dc-foot-tools .dc-navigation-account'); a.textContent = label; const r = a.getBoundingClientRect(); return { h: r.height >= 44, inside: r.right <= innerWidth, scroll: document.documentElement.scrollWidth > innerWidth }; }, label);
-        assert.deepEqual(m, { h: true, inside: true, scroll: false }, `${view.n} ${label}`);
-      }
-      for (const name of ['Abo verwalten', 'Zur App']) assert.ok(await tools.getByRole('link', { name, exact: true }).isVisible(), `${view.n}: ${name}`);
-      assert.ok(await tools.getByRole('button', { name: 'Schrift größer', exact: true }).isVisible(), `${view.n}: Schrift größer`);
-      assert.ok(await tools.locator('select').isVisible(), `${view.n}: Sprache`);
-      assert.equal(await tools.locator('.e-saved-toggle[hidden]').evaluateAll(n => n.filter(x => getComputedStyle(x).display !== 'none').length), 0, `${view.n}: leeres Herz bleibt versteckt`);
+      await p.locator('.dc-navigation-menu > summary').click();
+      const items = p.locator('.dc-navigation-items');
+      assert.ok(await items.locator('.dc-navigation-menu-account').isVisible(), `${view.n}: Anmelden im Menü`);
+      for (const name of ['Abo verwalten', 'Zur App']) assert.ok(await items.getByRole('link', { name, exact: true }).isVisible(), `${view.n}: ${name}`);
+      assert.ok(await items.getByRole('button', { name: 'Schrift größer', exact: true }).isVisible(), `${view.n}: Schrift größer`);
+      assert.ok(await items.locator('select').isVisible(), `${view.n}: Sprache`);
+      const box2 = await items.boundingBox(); assert.ok(box2.x >= 0 && box2.x + box2.width <= view.w + 1, `${view.n}: Menü im Bild`);
+      await p.keyboard.press('Escape'); assert.equal(await p.locator('.dc-navigation-menu').evaluate(n => n.open), false);
       const box = await p.evaluate(() => { const r = s => document.querySelector(s).getBoundingClientRect(); return { chosen: r('.translator-goal-chosen'), change: r('.translator-goal-change'), row: r('.translator-goal-row') }; });
       if (view.w < 720) { assert.ok(box.change.top >= box.chosen.bottom - 2, `${view.n}: „Ändern“ unter dem Ziel`); assert.ok(box.chosen.width >= box.row.width - 40, `${view.n}: Ziel volle Breite`); }
       assert.deepEqual(errors, []); cases.push(view.n); await c.close();
