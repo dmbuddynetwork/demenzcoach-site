@@ -1,5 +1,6 @@
 // Der Funnel-Layer von unten zeigt seit 27. Nov 2026 direkt die Angebotsseite (Daniel: Fragebogen nur für Ads), auch mit gespeichertem Stand.
-// Werbe-Besucher (src=meta) setzen ihren Fragebogen weiter fort.
+// Seit Daniels zweiter Vorgabe (27. Nov: „wenn Niemand den Fragebogen beantwortet …“) sehen auch Werbe-Besucher (src=meta)
+// die Angebotsseite. Den Fragebogen gibt es nur mit quiz=1; dort setzt er den gespeicherten Stand fort.
 // Der Anmelde-Layer und der Funnel-Layer verdecken außerdem die untere Eingabeleiste. Nur Testdaten.
 const assert = require('node:assert/strict');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -23,10 +24,13 @@ const { createPreviewServer } = require('./generator-preview.cjs');
     s = await open('?src=anmeldung', saved('anmeldung'));
     assert.equal(await s.p.evaluate(() => document.body.dataset.screen), 'plan', 'Website-Einstieg zeigt die Angebotsseite');
     await s.c.close(); cases.push('Website-Einstieg zeigt Angebotsseite');
-    s = await open('?src=meta', saved('meta'));
-    assert.doesNotMatch(await heading(s.p), /FÜR WEN SUCHST DU HILFE/, 'Werbe-Fragebogen setzt weiter fort');
-    assert.notEqual(await s.p.evaluate(() => document.body.dataset.screen), 'plan', 'Werbung bleibt im Fragebogen');
-    await s.c.close(); cases.push('Werbe-Fragebogen setzt fort');
+    s = await open('?src=meta&fbclid=t1&utm_source=facebook', saved('meta'));
+    assert.equal(await s.p.evaluate(() => document.body.dataset.screen), 'plan', 'Werbung zeigt die Angebotsseite');
+    await s.c.close(); cases.push('Werbe-Einstieg zeigt Angebotsseite');
+    s = await open('?src=meta&quiz=1', saved('meta'));
+    assert.doesNotMatch(await heading(s.p), /FÜR WEN SUCHST DU HILFE/, 'Fragebogen mit quiz=1 setzt weiter fort');
+    assert.notEqual(await s.p.evaluate(() => document.body.dataset.screen), 'plan', 'quiz=1 bleibt im Fragebogen');
+    await s.c.close(); cases.push('quiz=1 setzt Fragebogen fort');
     // Eingabeleiste: sichtbar ohne Layer, weg mit offenem Layer.
     const c = await browser.newContext({ viewport: { width: 390, height: 844 } }); c.setDefaultTimeout(8000);
     await c.addInitScript(() => { try { localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied'); localStorage.setItem('demenzcoach.marketingConsent.v1', 'denied'); } catch {} });
