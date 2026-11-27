@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Erinnerung abbestellen – Demenz Coach</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f6f5f2">
+  <link rel="icon" href="/assets/lovable-logo.jpg">
+  <link rel="stylesheet" href="abo.css">
+  <script src="abo-config.js"></script>
+</head>
+<body>
+  <!-- Abbestell-Link aus der Mail „Dein Plan – hier geht es weiter“ (backend/web-checkout-reminder.mjs). Erst der Knopf
+       löscht die geplante Erinnerung, damit E-Mail-Programme, die Links vorab öffnen, nichts versehentlich auslösen. -->
+  <main class="abo-page">
+    <div class="abo-top">
+      <a class="abo-brand" href="/de/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+    </div>
+    <p class="abo-error" id="error" role="alert" hidden></p>
+    <section id="ask">
+      <h1>Erinnerung abbestellen</h1>
+      <p>Du bekommst dann keine Erinnerung an deinen Plan. Andere E-Mails schicken wir dir sowieso nicht.</p>
+      <button class="abo-button" type="button" id="stop">Abbestellen</button>
+    </section>
+    <section id="done" hidden>
+      <h1>Abbestellt</h1>
+      <p>Es kommt keine Erinnerung. Den Link zu deinem Plan hast du weiter in der ersten E-Mail.</p>
+      <a class="abo-button abo-button-light" href="/start/?direkt=1&amp;src=erinnerung_stop">Zu deinem Plan</a>
+    </section>
+    <footer class="abo-footer">
+      <a class="abo-cancel-link" href="kuendigen.html">Verträge hier kündigen</a>
+      <a class="abo-portal-link" href="https://billing.stripe.com/p/login/dRmbJ17QQ8TP85s79Z1ZS00">Abo verwalten</a>
+      <a href="/impressum.html">Impressum</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+    </footer>
+  </main>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var error = document.getElementById("error");
+      document.getElementById("stop").addEventListener("click", function () {
+        var button = this;
+        button.disabled = true;
+        fetch(window.DEMENZ_ABO_CONFIG.endpoint + "/reminder/stop", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ k: params.get("k") || "", t: params.get("t") || "" })
+        }).then(function (response) {
+          if (!response.ok) throw new Error(String(response.status));
+          document.getElementById("ask").hidden = true;
+          document.getElementById("done").hidden = false;
+        }).catch(function () {
+          button.disabled = false;
+          error.textContent = "Das hat nicht geklappt. Bitte öffne den Link aus der E-Mail noch einmal oder schreib uns über das Impressum.";
+          error.hidden = false;
+        });
+      });
+    })();
+  </script>
+<script type="module" src="/shared-navigation.js"></script>
+</body>
+</html>
