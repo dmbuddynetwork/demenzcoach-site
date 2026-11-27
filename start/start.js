@@ -834,8 +834,29 @@
       el("p", { class: "start-pay-title" }, [el("span", { html: icons.lock }), "Sicher bezahlen, SSL-verschlüsselt"]),
       el("ul", { role: "list", "aria-label": "Zahlungswege" }, payLogos.map(([name, svg]) => el("li", { title: name, "aria-label": name, html: svg })))
     ]);
-    const guarantee = () => el("p", { class: "start-guarantee" }, [el("span", { html: icons.shield }),
-      el("span", {}, [el("strong", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }), " ", el("a", { href: "/abo/garantie.html", text: "Bedingungen" })])]);
+    // Vertrauen am Preis (27. Nov 2026, Konzept K3+K4): Garantie und eine echte Stimme direkt unter Knopf und Kleingedrucktem.
+    // Die Garantie gibt es schon (AGB 6a, /abo/garantie.html, Kündigungsart „garantie“); hier wird sie nur sichtbar gemacht.
+    const guarantee = () => el("div", { class: "start-guarantee" }, [el("span", { class: "start-guarantee-icon", html: icons.shield }),
+      el("p", {}, [el("strong", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }),
+        el("span", { text: "Hilft es dir nicht, bekommst du dein Geld zurück. Ohne Begründung. " }),
+        el("a", { href: "/abo/garantie.html", onclick: () => track("garantie_link"), text: "Bedingungen" })])]);
+    // Eine kurze echte Stimme (stimmen.js, Vorname mit Zustimmung, Text unverändert). Keine Sterne, keine Zahlen.
+    const voiceNearPrice = () => {
+      const all = Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : [];
+      const voice = all.find((entry) => entry.name === "Timo") || all[1];
+      if (!voice) return null;
+      return el("figure", { class: "start-voice-mini" }, [
+        el("blockquote", { text: `„${voice.text}“` }),
+        el("figcaption", {}, [el("strong", { text: `${voice.name}, ${voice.rolle}` }), el("span", { text: " · Vorname mit Zustimmung" })]),
+        el("button", { type: "button", class: "abo-link-button", text: `Alle ${all.length} Stimmen lesen`, onclick: () => {
+          track("stimmen_mehr");
+          const section = document.querySelector(".start-voices");
+          const list = section?.querySelector(".start-voices-all");
+          if (list) list.open = true;
+          section?.scrollIntoView({ behavior: "smooth", block: "start" });
+        } })
+      ]);
+    };
     const scrollToPlans = () => document.querySelector(".start-tiers")?.scrollIntoView({ behavior: "smooth", block: "center" });
 
     // Uhr nur mit echtem Ende: die Reservierung des Willkommenspreises vom Server (angebot.js, an die E-Mail gebunden).
@@ -1014,9 +1035,11 @@
       } else setTimeout(start, 400);
       return [wrap, alt];
     };
-    const offerBlock = () => applePayHere
-      ? [ticket(), table(), ...applePayCta(), fine(), payments()]
-      : [ticket(), table(), cta(), fine(), payments()];
+    // Oben (top): nach dem Kleingedruckten Garantie, Zahlungswege, eine Stimme. Unten folgt ohnehin die große Garantie-Karte.
+    // Kurze Zeile in der Lücke über dem Knopf: so steht die Garantie auch auf kleinen Handys im ersten Bild. Das Kleingedruckte bleibt direkt unter dem Knopf.
+    const guaranteeLine = () => el("p", { class: "start-guarantee-line" }, [el("span", { html: icons.shield }), `${guaranteeDays} Tage Geld-zurück-Garantie`]);
+    const offerBlock = (top) => [ticket(), table(), top ? guaranteeLine() : null, ...(applePayHere ? applePayCta() : [cta()]), fine(),
+      top ? guarantee() : null, payments(), top ? voiceNearPrice() : null];
 
 
     return [
@@ -1027,7 +1050,7 @@
       (result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null),
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
-      ...offerBlock(),
+      ...offerBlock(true),
       pair ? null : preview,
       el("h2", { class: "start-section start-center start-big-title", text: "Was du bekommst" }),
       shots,
