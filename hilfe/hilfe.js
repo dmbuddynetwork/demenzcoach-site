@@ -99,7 +99,7 @@ const voiceNearPrice = () => {
   return el('figure', { class: 'lp-voice-mini' }, [
     el('blockquote', { text: `„${voice.text}“` }),
     el('figcaption', {}, [el('strong', { text: `${voice.name}, ${voice.rolle}` }), el('span', { text: ' · Vorname mit Zustimmung' })]),
-    el('a', { class: 'lp-link', href: '#stimmen', onclick: () => { track('stimmen_mehr'); const list = document.querySelector('.lp-voices-all'); if (list) list.open = true; }, text: `Alle ${all.length} Stimmen lesen` })
+    document.getElementById('stimmen') && el('a', { class: 'lp-link', href: '#stimmen', onclick: () => { track('stimmen_mehr'); const list = document.querySelector('.lp-voices-all'); if (list) list.open = true; }, text: `Alle ${all.length} Stimmen lesen` })
   ]);
 };
 const mountBuy = slot => {
