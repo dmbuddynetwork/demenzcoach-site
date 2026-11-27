@@ -1052,7 +1052,8 @@
       hero,
       el("h1", { class: "start-center start-plan-title", text: pair ? "Dein Gesprächstraining ist bereit!" : directContext ? `Hilfe bei „${directContext.title}“` : directMode ? "Die richtigen Worte, wenn es schwierig wird" : (name ? `Deine Hilfe für Gespräche mit ${name} ist bereit!` : "Deine Hilfe für schwierige Gespräche ist bereit!") }),
       (result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null),
-      directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
+      // 27. Nov 2026: Seit auch Werbe-Besucher direkt hier landen, ohne Angaben zu machen, kein Satz mehr über „bisherige Angaben“.
+      directMode && directContext ? el("p", { class: "start-small", text: "Mit Satzideen für diese Situation und viele weitere aus dem Alltag." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
       ...offerBlock(true),
       pair ? null : preview,
