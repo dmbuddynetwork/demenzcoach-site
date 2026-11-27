@@ -213,25 +213,22 @@
     const value = softCadence(now);
     try { root.localStorage.setItem(softKey, JSON.stringify({ startedAt: value.startedAt, lastAt: now, count: value.count + 1 })); } catch {}
   }
+  // Daniel, 27. Nov 2026 („das ist nicht sales optimiert, nimm das raus“): keine eigene Karte, sondern unsere
+  // Angebotsseite als Layer (/start/?src=layer&embed=1&angebot=1). Schließen nur über das ×. Kurz warten, damit die Antwort zuerst sichtbar ist.
+  const softDelay = 6000;
   function softPaywall(doc = root.document) {
-    if (!softAllowed()) return null;
-    softShown();
-    const card = node(doc, 'section'); card.className = 'ki-angebot ki-angebot-weich';
-    card.setAttribute('aria-label', en ? 'DemenzCoach membership' : 'DemenzCoach Mitgliedschaft');
-    const close = node(doc, 'button', '×'); close.type = 'button'; close.className = 'ki-angebot-zu';
-    close.setAttribute('aria-label', en ? 'Close' : 'Schließen');
-    const dismiss = () => { card.remove(); exp()?.track('web_paywall_dismissed'); };
-    close.addEventListener('click', dismiss);
-    card.append(close, node(doc, 'h3', en ? 'More help with a membership' : 'Mehr Hilfe mit der Mitgliedschaft'),
-      node(doc, 'p', en ? 'You can keep asking here for free. A membership adds conversation practice, a weekly plan and a sheet for helpers.'
-        : 'Du kannst hier weiter kostenlos fragen. Mit der Mitgliedschaft bekommst du dazu: Gespräche üben, einen Wochenplan und ein Blatt für Helfer.'));
-    const link = node(doc, 'a', en ? 'View membership' : 'Mitgliedschaft ansehen');
-    link.className = 'ki-angebot-knopf'; link.href = `/abo/?src=${encodeURIComponent(exp()?.campaign() || 'web_translator')}`;
-    link.addEventListener('click', () => exp()?.track('web_checkout_clicked'));
-    const later = node(doc, 'button', en ? 'Not now' : 'Später'); later.type = 'button'; later.className = 'ki-angebot-spaeter';
-    later.addEventListener('click', dismiss);
-    card.append(link, later);
-    exp()?.track('web_paywall_shown'); return card;
+    if (en || !softAllowed()) return null;
+    root.setTimeout(async () => {
+      try {
+        if (doc.hidden || doc.querySelector('dialog[open]') || !softAllowed()) return;
+        const { openFunnelLayer } = await import('/abo/funnel-layer.js');
+        if (doc.querySelector('dialog[open]') || !softAllowed()) return;
+        const layer = openFunnelLayer({ doc, paywall: true, onClose: () => exp()?.track('web_paywall_dismissed') });
+        if (!layer) return;
+        softShown(); exp()?.track('web_paywall_shown');
+      } catch { /* Ohne Layer bleibt die Antwort einfach stehen. */ }
+    }, softDelay);
+    return null;
   }
   function afterAnswer(result, doc = root.document, { sentence = '' } = {}) {
     if (!enabled()) {
