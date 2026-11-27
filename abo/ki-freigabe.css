@@ -9,3 +9,13 @@
 .ki-angebot-klein { font-size: var(--e-small, .9375rem); color: var(--e-muted, #55525e); }
 .ki-angebot-klein a { color: var(--e-purple, #47408c); font-weight: 600; }
 .ki-angebot > :last-child { margin-bottom: 0; }
+/* Wegklickbare Paywall nach der Anmeldung (Daniel, 27. Nov 2026): Kreuz oben rechts und „Später“ darunter. */
+.ki-angebot-weich { position: relative; padding-top: 24px; }
+.ki-angebot.ki-angebot-weich h3 { margin: 0 0 8px; padding-right: 40px; }
+.ki-angebot-zu { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent;
+  color: var(--e-muted, #55525e); font-size: 1.75rem; line-height: 1; cursor: pointer; }
+.ki-angebot-zu:hover { background: var(--e-line, #d6d3dc); }
+.ki-angebot-spaeter { display: block; width: 100%; min-height: 48px; border: 0; background: transparent; color: var(--e-purple, #47408c);
+  font: inherit; font-weight: 600; cursor: pointer; }
+.ki-angebot-zu:focus { outline: none; }
+.ki-angebot-zu:focus-visible, .ki-angebot-spaeter:focus-visible { outline: 2px solid var(--e-purple, #47408c); outline-offset: 2px; }

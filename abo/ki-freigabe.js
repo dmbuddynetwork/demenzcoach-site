@@ -194,6 +194,45 @@
     }
     exp()?.track(signup ? 'web_signup_shown' : 'web_paywall_shown'); return card;
   }
+  // Daniel, 27. Nov 2026: nach der Anmeldung unbegrenzt fragen. Die Paywall kommt trotzdem, lässt sich aber wegklicken.
+  // Frequency Capping wie bei den Layern (content-invitation-policy.js): 30 Min. Pause, höchstens 3 pro 24 Std.
+  const softKey = 'demenzcoach.kiPaywallCadence.v1', softCooldown = 30 * 60000, softWindow = 24 * 3600000, softMax = 3;
+  function softCadence(now = Date.now()) {
+    try {
+      const value = JSON.parse(root.localStorage.getItem(softKey) || 'null');
+      if (value && Number.isFinite(value.startedAt) && Number.isFinite(value.lastAt) && Number.isInteger(value.count)
+        && value.startedAt <= now && value.startedAt + softWindow > now && value.lastAt <= now) return value;
+    } catch {}
+    return { startedAt: now, lastAt: 0, count: 0 };
+  }
+  function softAllowed(now = Date.now()) {
+    const value = softCadence(now);
+    return value.count < softMax && (value.lastAt === 0 || now - value.lastAt >= softCooldown);
+  }
+  function softShown(now = Date.now()) {
+    const value = softCadence(now);
+    try { root.localStorage.setItem(softKey, JSON.stringify({ startedAt: value.startedAt, lastAt: now, count: value.count + 1 })); } catch {}
+  }
+  function softPaywall(doc = root.document) {
+    if (!softAllowed()) return null;
+    softShown();
+    const card = node(doc, 'section'); card.className = 'ki-angebot ki-angebot-weich';
+    card.setAttribute('aria-label', en ? 'DemenzCoach membership' : 'DemenzCoach Mitgliedschaft');
+    const close = node(doc, 'button', '×'); close.type = 'button'; close.className = 'ki-angebot-zu';
+    close.setAttribute('aria-label', en ? 'Close' : 'Schließen');
+    const dismiss = () => { card.remove(); exp()?.track('web_paywall_dismissed'); };
+    close.addEventListener('click', dismiss);
+    card.append(close, node(doc, 'h3', en ? 'More help with a membership' : 'Mehr Hilfe mit der Mitgliedschaft'),
+      node(doc, 'p', en ? 'You can keep asking here for free. A membership adds conversation practice, a weekly plan and a sheet for helpers.'
+        : 'Du kannst hier weiter kostenlos fragen. Mit der Mitgliedschaft bekommst du dazu: Gespräche üben, einen Wochenplan und ein Blatt für Helfer.'));
+    const link = node(doc, 'a', en ? 'View membership' : 'Mitgliedschaft ansehen');
+    link.className = 'ki-angebot-knopf'; link.href = `/abo/?src=${encodeURIComponent(exp()?.campaign() || 'web_translator')}`;
+    link.addEventListener('click', () => exp()?.track('web_checkout_clicked'));
+    const later = node(doc, 'button', en ? 'Not now' : 'Später'); later.type = 'button'; later.className = 'ki-angebot-spaeter';
+    later.addEventListener('click', dismiss);
+    card.append(link, later);
+    exp()?.track('web_paywall_shown'); return card;
+  }
   function afterAnswer(result, doc = root.document, { sentence = '' } = {}) {
     if (!enabled()) {
       if (config.signIn?.offerAfterAnswer !== true || config.signIn?.emailLink !== true || invitationShown || result?.safetyLevel !== 'standard' || result?.safetyMessage) return null;
@@ -210,6 +249,7 @@
     if (!access || result.safetyLevel !== 'standard' || result.safetyMessage) return null;
     exp()?.track('web_answer_completed');
     if (!access.verified && !access.paid && (access.registeredAdditional > 0 || access.signupBeforePaywall === true) && (access.signupPlacement === 'after-first' || !access.remaining)) return offerCard({ reason: 'signup_required', doc, sentence });
+    if (access.unlimited === true && access.verified && !access.paid) return softPaywall(doc);
     if (!access.paid && !access.remaining) return offerCard({ reason: 'payment_required', doc });
     const notice = node(doc, 'p', access.paid ? (en ? 'Your membership is active.' : 'Deine Mitgliedschaft ist aktiv.') : (en ? `${access.remaining} introductory answers remaining.` : `Noch ${access.remaining} Antworten zum Ausprobieren.`)); notice.className = 'ki-angebot-klein'; return notice;
   }
@@ -241,6 +281,7 @@
         return;
       }
       notice.textContent = value.paid ? (en ? 'Your membership is active.' : 'Deine Mitgliedschaft ist aktiv.')
+        : value.verified && value.unlimited === true ? (en ? 'You can keep asking for free.' : 'Du kannst weiter kostenlos fragen.')
         : value.verified ? (en ? `${value.remaining} introductory answers left, then paid membership.` : `Noch ${value.remaining} Antworten zum Ausprobieren, danach kostenpflichtige Mitgliedschaft.`)
         : value.signupBeforePaywall === true ? (en ? `${value.remaining} introductory answer(s) remaining without an account. Then a free account and paid membership.` : `${value.remaining} Antwort(en) noch ohne Konto ausprobieren. Danach kostenloses Konto und Mitgliedschaft.`)
         : (en ? `${value.remaining} introductory answer(s) remaining without an account. ${value.registeredAdditional} more with a verified account, then paid membership.` : `${value.remaining} Antwort(en) noch ohne Konto ausprobieren. ${value.registeredAdditional} weitere mit verifiziertem Konto, danach kostenpflichtige Mitgliedschaft.`);
