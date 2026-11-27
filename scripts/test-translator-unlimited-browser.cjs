@@ -1,4 +1,4 @@
-// Daniel, 27 Nov 2026: 1 answer without an account, then unlimited after signup; dismissable paywall with 30-min/3-per-day capping.
+// Daniel, 27 Nov 2026: 1 answer without an account, then unlimited after signup; the offer page opens as a layer (× closes) after an answer, 30-min/3-per-day capping.
 // Real page + real backend quota (registeredUnlimited), simulated Firebase auth and model/payment I/O. Never touches the live checkout.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -86,36 +86,33 @@ export async function webAuth(){if(localStorage.getItem('test.auth.hang'))await 
         catch (error) { if (shots) await page.screenshot({ path: path.join(shots, `fail-${width}-${number}.png`), fullPage: true }); console.log('ask', number, (await page.locator('#translator-result').innerText()).slice(-600)); throw error; }
         await page.waitForTimeout(300);
       };
-      const soft = () => page.locator('.ki-angebot-weich');
+      const layer = () => page.locator('dialog.dc-funnel-layer[open]');
       const shot = async name => { if (shots) await page.screenshot({ path: path.join(shots, `${width}-${name}.png`), fullPage: false }); };
+      const waitLayer = async () => { await layer().waitFor({ timeout: 10000 }); assert.match(await layer().locator('iframe').getAttribute('src'), /\/start\/\?src=layer&embed=1&angebot=1$/); };
+      const noLayer = async () => { await page.waitForTimeout(6800); assert.equal(await layer().count(), 0); };
       await page.goto(base + '/de/', { waitUntil: 'domcontentloaded' });
       if (await page.locator('.consent-decline').isVisible()) await page.locator('.consent-decline').click();
-      // 1) Without an account: one answer, then the free signup card.
+      // 1) Without an account: one answer, then the free signup card, no paywall layer.
       await ask(1);
       await page.locator('.dc-signup input[type=email]').waitFor();
-      assert.equal(await soft().count(), 0); checks++;
-      // 2) Signed in: unlimited answers, dismissable paywall after the answer.
+      await noLayer(); checks++;
+      // 2) Signed in: unlimited answers; the offer page opens as a layer after the answer.
       await page.evaluate(() => localStorage.setItem('test.auth.verified', 'yes'));
       await ask(2);
-      await soft().waitFor();
-      assert.equal(await soft().locator('h3').innerText(), 'Mehr Hilfe mit der Mitgliedschaft');
-      assert.match(await soft().innerText(), /weiter kostenlos fragen/);
-      assert.doesNotMatch(await page.locator('body').innerText(), /aufgebraucht|999/); checks++;
-      await soft().scrollIntoViewIfNeeded(); await shot('1-paywall');
-      await soft().getByRole('button', { name: 'Später', exact: true }).click();
-      assert.equal(await soft().count(), 0); checks++;
-      await shot('2-weggeklickt');
-      // 3) Capping: within 30 minutes no paywall, and answers never stop.
-      for (const n of [3, 4, 5, 6, 7]) { await ask(n); assert.equal(await soft().count(), 0, `no paywall inside 30 min (ask ${n})`); }
+      assert.equal(await page.locator('.ki-angebot').count(), 0, 'no inline card');
+      await waitLayer(); checks++;
+      await page.waitForTimeout(2500); await shot('1-angebot-layer');
+      await layer().getByRole('button', { name: 'Schließen' }).click();
+      assert.equal(await layer().count(), 0); checks++;
+      // 3) Capping: within 30 minutes no layer, and answers never stop.
+      for (const n of [3, 4, 5]) { await ask(n); await noLayer(); }
       assert.equal(await page.locator('.ki-angebot').count(), 0, 'no hard payment card');
-      assert.equal(repository.records.get('browser-user').used, 7); checks++;
-      // 4) After 30 minutes it comes back; the X closes it too; at most 3 per 24 hours.
+      assert.equal(repository.records.get('browser-user').used, 5); checks++;
+      // 4) After 30 minutes it comes back; at most 3 per 24 hours.
       const age = () => page.evaluate(() => { const v = JSON.parse(localStorage.getItem('demenzcoach.kiPaywallCadence.v1')); v.lastAt -= 31 * 60000; v.startedAt -= 31 * 60000; localStorage.setItem('demenzcoach.kiPaywallCadence.v1', JSON.stringify(v)); });
-      await age(); await ask(8); await soft().waitFor();
-      await soft().getByRole('button', { name: 'Schließen' }).click(); assert.equal(await soft().count(), 0); checks++;
-      await age(); await ask(9); await soft().waitFor(); await soft().getByRole('button', { name: 'Später', exact: true }).click();
-      await age(); await ask(10); assert.equal(await soft().count(), 0, 'fourth paywall in 24 h is capped'); checks++;
-      assert.equal(repository.records.get('browser-user').used, 10); checks++;
+      for (const n of [6, 7]) { await age(); await ask(n); await waitLayer(); await layer().getByRole('button', { name: 'Schließen' }).click(); }
+      await age(); await ask(8); await noLayer(); checks++;
+      assert.equal(repository.records.get('browser-user').used, 8); checks++;
       assert.deepEqual(errors, []); await context.close();
       console.log(JSON.stringify({ width, checks, status: 'PASS' }));
     }
