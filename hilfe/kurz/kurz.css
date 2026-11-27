@@ -1,0 +1,57 @@
+/* Kurzweg: eine Spalte, warm-weiß, große Schrift. Grundlage ist /hilfe/hilfe.css (Farben, Knopf, Preisblock). */
+.kw-ask { padding-block: 8px 32px; text-align: center; }
+.kw-lead { color: var(--ink-2); margin: 12px auto 24px; max-width: 30ch; }
+.kw-lead-left { color: var(--ink-2); margin-top: 8px; }
+.kw-quiet { font-size: var(--small); color: var(--ink-2); }
+
+.kw-form { display: grid; gap: 12px; text-align: left; }
+.kw-label { font-size: var(--small); font-weight: 700; color: var(--ink); }
+.kw-form textarea { width: 100%; min-height: 128px; padding: 16px; resize: vertical;
+  border: 2px solid var(--line); border-radius: 16px; background: var(--card); color: var(--ink);
+  font: 400 var(--body)/1.45 var(--font); }
+.kw-form textarea:focus { outline: none; border-color: var(--purple); }
+.kw-form textarea::placeholder { color: #8a8794; }
+.kw-send { width: 100%; border: 0; font: 700 var(--body)/1.3 var(--font); cursor: pointer; }
+.kw-send:disabled { opacity: .6; cursor: default; }
+.kw-error { font-size: var(--small); font-weight: 700; color: #a3261b; }
+.kw-note { font-size: var(--small); color: var(--ink-2); margin-top: 12px; }
+
+.kw-examples { margin-top: 32px; }
+.kw-chips { display: grid; gap: 10px; margin-top: 10px; }
+.kw-chips button { min-height: 56px; padding: 10px 14px; border: 0; border-radius: 16px; background: var(--lav); color: var(--lav-ink);
+  font: 700 var(--small)/1.3 var(--font); cursor: pointer; text-align: left; }
+
+/* Warten: drei ruhige Punkte, drei Schritte nacheinander */
+.kw-wait { padding-block: 24px 32px; text-align: center; }
+.kw-wait-title { font-weight: 700; margin-top: 12px; }
+.kw-wait-steps { list-style: none; padding: 0; margin: 12px auto 0; display: grid; gap: 6px; max-width: 26ch; text-align: left; }
+.kw-wait-steps li { font-size: var(--small); color: #b4b1bb; padding-left: 28px; position: relative; transition: color .3s; }
+.kw-wait-steps li::before { content: ""; position: absolute; left: 0; top: .35em; width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; }
+.kw-wait-steps li.is-on { color: var(--ink); }
+.kw-wait-steps li.is-on::before { background: var(--purple); border-color: var(--purple); }
+.kw-dots { display: flex; justify-content: center; gap: 10px; }
+.kw-dots i { width: 14px; height: 14px; border-radius: 50%; background: var(--purple); animation: kw-dot 1.2s infinite ease-in-out; }
+.kw-dots i:nth-child(2) { animation-delay: .2s; }
+.kw-dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes kw-dot { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .kw-dots i { animation: none; opacity: .7; } }
+
+/* Antwort: keine Karte in der Karte, Abschnitte mit Überschrift, Sätze mit feinen Linien */
+.kw-result { padding-block: 8px 24px; scroll-margin-top: 12px; }
+#r-body { outline: none; }
+.kw-block { margin-top: 24px; }
+.kw-step { color: var(--purple); margin-bottom: 4px; }
+.kw-lines { margin-top: 0; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 0 18px; }
+.kw-avoid { margin-top: 12px; font-size: var(--small); color: var(--ink-2); }
+.kw-alert { margin-top: 20px; padding: 16px 18px; border-radius: 16px; background: #fde8e6; color: #5b1710; }
+.kw-alert h3 { margin-bottom: 4px; }
+.kw-call { margin-top: 14px; background: #a3261b; }
+.kw-call:hover { background: #7f1d14; }
+.kw-alert-soft { background: var(--lav); color: var(--lav-ink); }
+.kw-ai { margin-top: 20px; }
+
+/* Angebot direkt unter der Antwort */
+.kw-offer { padding-block: 32px 48px; border-top: 1px solid var(--line); scroll-margin-top: 12px; }
+.kw-gets { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 10px; }
+.kw-gets li { position: relative; padding-left: 32px; color: var(--ink-2); }
+.kw-gets li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--purple); font-weight: 700; }

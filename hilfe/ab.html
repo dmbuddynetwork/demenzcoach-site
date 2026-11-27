@@ -7,20 +7,22 @@
   <title>Weiter – Demenz Coach</title>
   <link rel="canonical" href="https://dementiacoachapp.com/hilfe/ab.html">
   <meta http-equiv="refresh" content="1; url=/start/">
-  <!-- A/B-Test für Werbung (Daniel, 26. Nov 2026): 50/50 zwischen dem alten Fragebogen /start/ (Arm a) und der neuen Verkaufsseite /hilfe/ (Arm b).
+  <!-- A/B-Test für Werbung (Daniel, 26. Nov 2026): alter Fragebogen /start/ (Arm a) gegen die Verkaufsseite /hilfe/ (Arm b).
+       27. Nov 2026: dritter Arm c = Kurzweg /hilfe/kurz/ (Situation eintippen → echte Antwort → Angebot). Je ein Drittel.
        Werbe-Link: https://dementiacoachapp.com/hilfe/ab.html?utm_source=meta&utm_campaign=… (alle Parameter bleiben erhalten).
-       Pro Tab-Sitzung gleich (sessionStorage, kein Cookie). ?arm=a oder ?arm=b legt den Arm fest; automatisierte Browser bekommen immer a. -->
+       Pro Tab-Sitzung gleich (sessionStorage, kein Cookie). ?arm=a, ?arm=b oder ?arm=c legt den Arm fest; automatisierte Browser bekommen immer a. -->
   <script>
     (function () {
       var key = "demenzcoach.lpArm.v1", params = new URLSearchParams(location.search), arm = params.get("arm");
+      var arms = { a: "/start/", b: "/hilfe/", c: "/hilfe/kurz/" };
       params.delete("arm");
       try {
-        if (arm !== "a" && arm !== "b") arm = sessionStorage.getItem(key);
-        if (arm !== "a" && arm !== "b") arm = !navigator.webdriver && Math.random() < 0.5 ? "b" : "a";
+        if (!arms[arm]) arm = sessionStorage.getItem(key);
+        if (!arms[arm]) arm = navigator.webdriver ? "a" : "abc".charAt(Math.floor(Math.random() * 3));
         sessionStorage.setItem(key, arm);
-      } catch (e) { if (arm !== "a" && arm !== "b") arm = "a"; }
+      } catch (e) { if (!arms[arm]) arm = "a"; }
       var query = params.toString();
-      location.replace((arm === "b" ? "/hilfe/" : "/start/") + (query ? "?" + query : "") + location.hash);
+      location.replace(arms[arm] + (query ? "?" + query : "") + location.hash);
     })();
   </script>
 </head>

@@ -18,7 +18,9 @@ const guessApp = () => {
 };
 // Quelle: „lp_“ + Kanal. So sind Käufe über diese Seite in Statistik und Kasse vom alten Weg (/start/) getrennt.
 const channel = clean(params.get('src') || params.get('utm_source')) || guessApp();
-const source = `lp_${channel}`.slice(0, 30);
+// Kurzweg (/hilfe/kurz/) nutzt denselben Preisblock mit eigenem Präfix: body[data-prefix="kw"] → „kw_<kanal>“.
+const prefix = clean(document.body?.dataset.prefix, 4) || 'lp';
+const source = `${prefix}_${channel}`.slice(0, 30);
 const campaign = clean(params.get('utm_campaign') || params.get('k'), 60);
 const track = (name, extra = {}, marketing = '') => {
   try { window.DemenzConsent?.track?.(name, { entry: source, ...extra }); } catch { /* ohne Einwilligung nichts */ }
