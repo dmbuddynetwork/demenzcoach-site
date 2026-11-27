@@ -919,13 +919,14 @@
 
     // Bilder aus dem Plan wie BetterMe: echte Bildschirme in hellen Handy-Rahmen. Das mittlere Handy ist groß, die Nachbarn schauen
     // seitlich hervor, darunter Punkte, kein Text (Daniel 20. Nov: „kleiner wie bei BetterMe, ohne Text darunter“). Der Text bleibt als Alt-Text.
+    // Daniel 27. Nov: Bildschirme der aktuellen App (wie im App Store), keine alten Übungs- oder Lernplan-Bilder.
     const shotList = [
-      ["ueben-waehlen", "Antwort wählen"],
-      ["ueben-rueckmeldung", "Sofort Rückmeldung"],
-      ["ueben-geschafft", "Die Person wird ruhig"],
-      ["app-result", "Passende Sätze"],
-      ["app-plan", "Jeden Tag ein Schritt"],
-      ["app-help", "Soforthilfe"]
+      ["app-antwort", "Mama sagt: Ich will nach Hause. Die App zeigt einen ruhigen Satz und was danach hilft."],
+      ["app-schreiben", "Schreib in eigenen Worten, was gerade los ist."],
+      ["app-ziel", "Wähle, was du gerade brauchst: beruhigen, verstehen oder Tipps."],
+      ["app-antwort-persoenlich", "Deine persönliche Antwort, passend zu dem, was du schreibst."],
+      ["app-sprechen", "Oder sprich einfach ein. Ein Tipp aufs Mikrofon genügt."],
+      ["app-abend", "Unruhig am Abend: ein ruhiger Satz und ein nächster Schritt."]
     ];
     const slides = shotList.map(([file, caption], index) => el("figure", { class: index === 0 ? "is-on" : "" }, [
       el("span", { class: "start-phone" }, [el("img", { src: `/assets/angebot/${file}.webp`, width: "720", height: "1566", loading: index < 3 ? "eager" : "lazy", decoding: "async", alt: caption })])
