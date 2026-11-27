@@ -270,6 +270,10 @@ body[data-screen="plan"] .start-page { padding-top: 0; }
 .start-day s { font-size: .875rem; color: var(--ink-2); }
 .start-day strong { font-size: 1.75rem; font-weight: 800; line-height: 1.1; color: var(--ink); }
 .start-day span { font-size: .875rem; color: var(--ink-2); }
+/* Probeabo wie BetterMe (27. Nov 2026, ?preis=probe): kleines graues Schild unter dem Namen, darunter der Preis der Woche. */
+.start-tier-probe { display: grid; justify-items: start; gap: 4px; }
+.start-tier-text .start-tier-chip { display: inline-block; padding: 2px 8px; border-radius: 6px; background: rgba(0, 0, 0, .06);
+  font-size: .75rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
 .start-cta { min-height: 62px; border-radius: 999px; font-size: 1.125rem; letter-spacing: .04em; text-transform: uppercase; }
 .start-fine { margin: 14px 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: #fff; font-size: var(--small); color: var(--ink-2); text-align: center; }
 .start-pay { margin: 0 0 12px; text-align: center; }

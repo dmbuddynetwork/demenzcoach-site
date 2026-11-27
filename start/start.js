@@ -111,8 +111,14 @@
     tries: [], goal: null, burden: null, minutes: null, email: "",
     age: null, personAge: null, reaction: null, visits: null, outings: null, meals: null, helpreact: null, feeling: null, sleep: null,
     breaks: null, work: null, when: null, joy: null, moments: [], calms: [], helpers: [], learn: [] };
-  let plan = params.get("plan") === "monthly" ? "monthly" : "yearly";
-  let offer = { yearly: 6999, monthly: 1299, currency: "eur", trialDays: 7, offers: null };
+  // Daniel, 27. Nov 2026 (Screenshot BetterMe „1-wöchiges Probeabo“): „bereite das schon mal vor“. Vorbereitete Variante ?preis=probe:
+  // bezahlte Probewoche statt Gratis-Test, aufgebaut wie bei BetterMe (Probeabo, 1 Monat, 12 Monate). Monat und Jahr starten dann ohne
+  // Gratis-Tage, die Probewoche geht danach in den Monatsplan über. Die Kasse sendet preis="probe" mit; der Server braucht dafür den
+  // Tarif „probe“ (Kassen-Thread). Bis dahin nur über den Link mit ?preis=probe zu sehen.
+  const probeMode = params.get("preis") === "probe";
+  const probeFrom = (data) => (probeMode ? { amount: Number.isInteger(data?.amount) ? data.amount : 100, days: Number.isInteger(data?.days) ? data.days : 7 } : null);
+  let plan = params.get("plan") === "monthly" ? "monthly" : probeMode && params.get("plan") === "probe" ? "probe" : "yearly";
+  let offer = { yearly: 6999, monthly: 1299, currency: "eur", trialDays: probeMode ? 0 : 7, offers: null, probe: probeFrom(null) };
   // Willkommenspreis (angebot.js): Preis vom Server; die Gültigkeit prüft die Kasse erneut.
   // Keine sichtbare Frist: eine dauerhaft bindende Begrenzung ist für den veröffentlichten Flow nicht belegt.
   const deals = window.DemenzAngebot;
@@ -781,7 +787,8 @@
     const perDay = (cents, days) => euro(Math.round(cents / days));
     const yearlyText = deal ? `${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} pro Jahr` : `${euro(offer.yearly)} pro Jahr`;
     // Preise immer mit Hinweis auf die Umsatzsteuer (PAngV § 6 Abs. 1 Nr. 1).
-    const priceText = (key) => `${key === "yearly" ? yearlyText : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
+    const probeText = () => `${euro(offer.probe.amount)} für ${offer.probe.days} Tage, danach ${euro(offer.monthly)} pro Monat`;
+    const priceText = (key) => `${key === "yearly" ? yearlyText : key === "probe" && offer.probe ? probeText() : `${euro(offer.monthly)} pro Monat`} inkl. MwSt.`;
     // Nur ein belegbarer Vergleich (Jahrespreis gegenüber 12 Monatszahlungen), keine unbelegte Spitzenstellung wie „Beliebt“.
     const saving = Math.floor((1 - offer.yearly / (offer.monthly * 12)) * 20) * 5;
     const name = forWho();
@@ -815,7 +822,12 @@
       const yearlyLine = deal
         ? el("span", {}, [el("s", { text: euro(offer.yearly) }), ` → ${euro(firstYear)} im 1. Jahr`])
         : el("span", { text: `${euro(offer.yearly)} pro Jahr` });
+      // Probeabo wie BetterMe: oben, mit kleinem Schild „Danach 1 Monat“ (BetterMe: „PLAN FÜR 4-WOCHE“), rechts der Tagespreis.
+      const probeTier = offer.probe ? tier("probe", "1-wöchiges Probeabo",
+        el("span", { class: "start-tier-probe" }, [el("small", { class: "start-tier-chip", text: "Danach 1 Monat" }), el("span", { text: `${euro(offer.probe.amount)} für ${offer.probe.days} Tage` })]),
+        offer.probe.amount, offer.probe.days, null, null) : null;
       const group = el("div", { role: "radiogroup", "aria-label": "Tarif", class: "start-tiers" }, [
+        probeTier,
         tier("monthly", "1 Monat", el("span", { text: `${euro(offer.monthly)} pro Monat` }), offer.monthly, 30, null, null),
         tier("yearly", "12 Monate", yearlyLine, firstYear, 365, deal ? offer.yearly : null, saving >= 10 ? `Bester Preis · Spare ${deal ? Math.floor((1 - firstYear / (offer.monthly * 12)) * 100) : saving} %` : "Bester Preis")
       ]);
@@ -823,7 +835,9 @@
       return group;
     };
     const cta = () => el("button", { type: "button", class: "abo-button start-cta", text: ctaText, onclick: () => { countDirect("direct_cta"); checkout(); } });
-    const fineText = () => (offer.trialDays > 0
+    const fineText = () => (plan === "probe" && offer.probe
+      ? `Heute zahlst du ${euro(offer.probe.amount)}. Kündige ich nicht vor Ablauf der ${offer.probe.days} Tage, kostet das Abo danach ${euro(offer.monthly)} pro Monat inkl. MwSt. und verlängert sich, bis ich kündige. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`
+      : offer.trialDays > 0
       ? `Heute zahlst du 0,00 €. Kündige ich nicht vor Ablauf der ${offer.trialDays} Tage, kostet das Abo danach ${priceText(plan)} und verlängert sich, bis ich kündige. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`
       : `Du zahlst ${priceText(plan)}, bis du kündigst. Online kündbar über „Verträge hier kündigen“, ohne Anmeldung.`);
     const fine = () => el("p", { class: "start-fine", "data-start-fine": "", text: fineText() });
@@ -878,7 +892,9 @@
 
     // Fester Kopf wie BetterMe: links die Uhr (oder die Probezeit), rechts „Plan anfordern“.
     const head = el("div", { class: "start-head" }, [
-      clock(false) || el("p", { class: "start-head-text" }, [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewähltes Abo" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
+      clock(false) || el("p", { class: "start-head-text" }, offer.probe
+        ? [el("strong", { text: `${offer.probe.days} Tage für ${euro(offer.probe.amount)}` }), el("span", { text: "Jederzeit kündbar" })]
+        : [el("strong", { text: offer.trialDays > 0 ? `${offer.trialDays} Tage kostenlos` : "Dein gewähltes Abo" }), el("span", { text: offer.trialDays > 0 ? "Heute 0,00 €" : `ab ${perDay(firstYear, 365)} pro Tag` })]),
       el("button", { type: "button", class: "start-head-button", text: offer.trialDays > 0 ? "Gratis freischalten" : "Freischalten", onclick: scrollToPlans })
     ]);
 
@@ -895,9 +911,9 @@
     const faq = [
       ["Was kostet es?", (deal
         ? `12 Monate: ${euro(firstYear)} im ersten Jahr, danach ${euro(offer.yearly)} im Jahr. 1 Monat: ${euro(offer.monthly)} im Monat.`
-        : `${euro(offer.yearly)} im Jahr oder ${euro(offer.monthly)} im Monat, je nach Wahl.`) + (offer.trialDays > 0 ? ` In den ${offer.trialDays} Tagen zahlst du nichts.` : " Alle Preise inkl. MwSt.")],
+        : `${euro(offer.yearly)} im Jahr oder ${euro(offer.monthly)} im Monat, je nach Wahl.`) + (offer.probe ? ` Probeabo: ${probeText()}.` : "") + (offer.trialDays > 0 ? ` In den ${offer.trialDays} Tagen zahlst du nichts.` : " Alle Preise inkl. MwSt.")],
       ["Was ist, wenn es uns nicht hilft?", `Dann bekommst du dein Geld zurück. Es gilt eine ${guaranteeDays} Tage Geld-zurück-Garantie ab der ersten Zahlung: Unter „Verträge hier kündigen“ die Garantie wählen, fertig. Die Bedingungen stehen auf der Seite Geld-zurück-Garantie.`],
-      ["Wie kündige ich?", `Online über „Verträge hier kündigen“ unten auf jeder Seite, ohne Anmeldung.${offer.trialDays > 0 ? " Kündigst du in der Probezeit, zahlst du nichts." : ""}`],
+      ["Wie kündige ich?", `Online über „Verträge hier kündigen“ unten auf jeder Seite, ohne Anmeldung.${offer.trialDays > 0 ? " Kündigst du in der Probezeit, zahlst du nichts." : offer.probe ? ` Kündigst du in der Probewoche, zahlst du nur die ${euro(offer.probe.amount)}.` : ""}`],
       ["Gilt das auch in der App?", "Ja. Du meldest dich in der iPhone-App mit demselben Konto an, dann ist alles freigeschaltet."],
       ["Ist das eine medizinische Beratung?", "Nein. Demenz Coach hilft bei Worten und Alltag. Es ersetzt keinen ärztlichen Rat. Im Notfall 112."],
       ["Was passiert mit meinen Antworten?", "Sie bleiben auf deinem Gerät. Wir senden sie nicht und speichern sie nicht."]
@@ -1011,15 +1027,16 @@
     const applePayHere = params.get("ap") === "1" || (params.get("ap") !== "0" && applePayDevice);
     const applePayCta = () => {
       const button = cta();
-      const slots = { yearly: el("div", { class: "start-tp-slot", "data-ap-slot": "yearly", hidden: "" }), monthly: el("div", { class: "start-tp-slot", "data-ap-slot": "monthly", hidden: "" }) };
-      const wrap = el("div", { class: "start-tp-cta-wrap start-ap-wrap" }, [button, slots.yearly, slots.monthly]);
+      const slotKeys = offer.probe ? ["probe", "yearly", "monthly"] : ["yearly", "monthly"];
+      const slots = Object.fromEntries(slotKeys.map((key) => [key, el("div", { class: "start-tp-slot", "data-ap-slot": key, hidden: "" })]));
+      const wrap = el("div", { class: "start-tp-cta-wrap start-ap-wrap" }, [button, ...slotKeys.map((key) => slots[key])]);
       const alt = el("button", { type: "button", class: "abo-link-button start-ap-alt", hidden: "", text: "Andere Zahlungsmöglichkeiten",
         onclick: () => { countDirect("direct_cta"); checkout({ stripePage: true }); } });
       const ready = {};
       const mounted = {};
       let near = false;
       const sync = () => {
-        for (const key of ["yearly", "monthly"]) slots[key].hidden = key !== plan || !ready[key];
+        for (const key of slotKeys) slots[key].hidden = key !== plan || !ready[key];
         alt.hidden = !ready[plan];
       };
       const mount = (key) => {
@@ -1027,7 +1044,7 @@
         mounted[key] = true;
         const meta = checkoutMeta();
         window.DemenzKasse.mountApplePay(slots[key], { plan: key, email: answers.email || undefined, offer: key === "yearly" && offer.offers ? deals?.forCheckout() : null,
-          source: meta.src, campaign: meta.campaign, track: trackApplePay, onError: () => { alt.hidden = false; } })
+          ...(probeMode ? { preis: "probe" } : {}), source: meta.src, campaign: meta.campaign, track: trackApplePay, onError: () => { alt.hidden = false; } })
           .then((shown) => { if (shown) { ready[key] = true; sync(); } else mounted[key] = false; });
       };
       applePayHooks.push(() => { sync(); setTimeout(() => { if (document.body.contains(wrap)) mount(plan); }, 400); });
@@ -1082,7 +1099,7 @@
         el("p", {}, ["Weitere Infos und Bedingungen findest du hier: ", el("a", { href: "/abo/garantie.html", text: "Geld-zurück-Garantie" }), "."])
       ]),
       el("p", { class: "start-small start-legal" }, [
-        `${offer.trialDays > 0 ? `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft` : "Das Abo beginnt sofort und läuft"} zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende.${deal ? " Der Sonderpreis gilt für das erste Jahr des Jahresplans." : ""} Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
+        `${offer.trialDays > 0 ? `Nach ${offer.trialDays} Tagen beginnt das Abo und läuft` : offer.probe ? `Das Abo beginnt sofort. Das Probeabo kostet ${euro(offer.probe.amount)} für ${offer.probe.days} Tage und geht danach in den Monatsplan über. Jedes Abo läuft` : "Das Abo beginnt sofort und läuft"} zum gewählten Preis weiter, bis du kündigst. Der Jahresplan hat eine Laufzeit von einem Jahr und ist danach mit einer Frist von einem Monat kündbar, der Monatsplan jederzeit zum Monatsende.${deal ? " Der Sonderpreis gilt für das erste Jahr des Jahresplans." : ""} Alle Preise inklusive gesetzlicher Umsatzsteuer. Kündigen geht online ohne Anmeldung. Es gelten die `,
         el("a", { href: "/nutzungsbedingungen.html", text: "Nutzungsbedingungen" }), " und die ",
         el("a", { href: "/abo/widerruf.html", text: "Widerrufsbelehrung" }),
         ". Allgemeine Kommunikations- und Alltagshilfe, kein Medizinprodukt."
@@ -1098,7 +1115,7 @@
     const email = validEmail(answers.email) ? answers.email : validEmail(knownEmail) ? knownEmail : "";
     if (!email && !walletEmail) return;
     const { campaign, src } = checkoutMeta();
-    kasse.prepare({ plan: forPlan, email, offer: forPlan === "yearly" && offer.offers ? deals?.forCheckout() : null, source: src, campaign });
+    kasse.prepare({ plan: forPlan, email, offer: forPlan === "yearly" && offer.offers ? deals?.forCheckout() : null, ...(probeMode ? { preis: "probe" } : {}), source: src, campaign });
   }
 
   // Bilder der Angebotsseite schon im Hintergrund laden, damit sie beim Wechsel zum Plan sofort da sind.
@@ -1144,12 +1161,12 @@
     const kasse = window.DemenzKasse;
     countDirect("direct_kasse");
     if (!kasse || !config.firebase?.apiKey) {
-      (window.top !== window ? window.top.location : location).href = `/abo/?plan=${plan}&src=${src}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
+      (window.top !== window ? window.top.location : location).href = `/abo/?plan=${plan}${probeMode ? "&preis=probe" : ""}&src=${src}${campaign ? `&c=${campaign}` : ""}&weiter=1`;
       return;
     }
     const deal = plan === "yearly" && offer.offers ? deals?.forCheckout() : null;
     history.pushState({ screen: "plan", sheet: true }, "", location.href);
-    kasse.open({ plan, email: answers.email, offer: deal, source: src, campaign, stripePage, track: (name) => track(name),
+    kasse.open({ plan, email: answers.email, offer: deal, ...(probeMode ? { preis: "probe" } : {}), source: src, campaign, stripePage, track: (name) => track(name),
       onClose: () => { if (history.state?.sheet) history.back(); },
       onOfferExpired: () => { if (deal) deals.drop(deal.kind); reservationEnded = true; render("plan"); } });
   }
@@ -1345,7 +1362,8 @@
     fetch(`${config.endpoint}/config`).then((response) => response.ok ? response.json() : null).then((data) => {
       if (!data?.plans) return;
       walletEmail = data.walletEmail === true;
-      offer = { yearly: data.plans.yearly.amount, monthly: data.plans.monthly.amount, currency: data.plans.yearly.currency || "eur", trialDays: data.trialDays ?? 7, offers: data.offers || null };
+      offer = { yearly: data.plans.yearly.amount, monthly: data.plans.monthly.amount, currency: data.plans.yearly.currency || "eur",
+        trialDays: probeMode ? 0 : data.trialDays ?? 7, offers: data.offers || null, probe: probeFrom(data.plans.probe) };
       if (current === "plan" || current === "reveal") render(current);
     }).catch(() => {});
   }
