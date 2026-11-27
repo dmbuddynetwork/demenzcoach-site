@@ -52,6 +52,8 @@ export function mountSharedNavigation(doc = document) {
   const pageLanguage = doc.documentElement.lang.split('-')[0];
   const homePath = `/${languages.includes(pageLanguage) ? pageLanguage : 'de'}/`;
   if (![...items.querySelectorAll('a')].some(a => a.getAttribute('href') === homePath)) { const home = doc.createElement('a'); home.href = homePath; home.textContent = en ? 'Everyday help' : 'Zur Alltagshilfe'; items.prepend(home); }
+  // „Abo verwalten“ im Menü: Stripe-Kundenportal mit E-Mail-Login, für alle Web-Käufer (Daniel, 27. Nov 2026). Link wie in /abo/abo-config.js.
+  if (!items.querySelector('.dc-navigation-portal')) { const portal = doc.createElement('a'); portal.className = 'dc-navigation-portal'; portal.href = 'https://billing.stripe.com/p/login/dRmbJ17QQ8TP85s79Z1ZS00'; portal.textContent = en ? 'Manage subscription' : 'Abo verwalten'; items.append(portal); }
   const label = doc.createElement('label'); label.className = 'dc-navigation-language'; label.textContent = en ? 'Language' : 'Sprache';
   const select = doc.createElement('select'); select.setAttribute('aria-label', label.textContent);
   for (const item of languageDestinations(doc)) {

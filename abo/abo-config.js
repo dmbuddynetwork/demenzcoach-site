@@ -21,6 +21,9 @@ window.DEMENZ_ABO_CONFIG = Object.freeze({
   }),
   // Answer links: backend creation must be enabled and approved first (docs/WEB_SNAPSHOT_LINKS.md in the app repo).
   snapshotLinks: Object.freeze({ enabled: true, mode: 'auto' }),
+  // Stripe-Kundenportal mit E-Mail-Login (Daniel, 27. Nov 2026: „Login-Link überall“). Kunde gibt die Kauf-E-Mail ein
+  // und bekommt einen Link per E-Mail. Öffentlich, kein Geheimnis. Gleicher Link in shared-navigation.js, den Abo-Fußzeilen und der Vertragsmail.
+  portalLoginURL: "https://billing.stripe.com/p/login/dRmbJ17QQ8TP85s79Z1ZS00",
   appStoreURL: "https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_abo&mt=8"
 });
 
