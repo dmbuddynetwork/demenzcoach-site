@@ -61,3 +61,36 @@ body .dc-navigation .dc-navigation-store .dc-navigation-store-text small{font-si
   body.einfach .e-header .dc-navigation-host{gap:6px!important}
   body.einfach .e-header .e-brand{gap:6px!important}
 }
+
+/* Kopf wie eine Landingpage (Daniel, 27. Nov 2026: „mach es wie eine Landingpage … das Logo zentriert lieber und clean“).
+   Oben nur Logo und Name in der Mitte. Keine Knöpfe. Konto, Abo, Schrift, App und Sprache stehen in einer ruhigen Karte über der Fußzeile. */
+.e-header{border-bottom-color:rgba(31,27,46,.07)!important;box-shadow:none!important}
+body.einfach .e-header{background:rgba(247,246,242,.94)!important;-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px)}
+.e-header .dc-navigation-host.dc-landing-head{justify-content:center!important;min-height:60px}
+.e-header .dc-landing-head .e-brand{flex:0 0 auto!important;gap:10px!important;color:#1f1b2e!important;text-decoration:none!important}
+.e-header .dc-landing-head .e-brand img{width:36px!important;height:36px!important;border-radius:9px;box-shadow:0 1px 2px rgba(31,27,46,.12)}
+body .e-header .dc-landing-head .e-brand>span{font-size:18px!important;font-weight:700!important;letter-spacing:-.01em;color:#1f1b2e!important}
+body .e-header .dc-landing-head .e-brand .dc-brand-app{display:inline!important;font-weight:500!important;color:#6b6478!important}
+@media(max-width:600px){
+  .e-header .dc-navigation-host.dc-landing-head{min-height:54px}
+  .e-header .dc-landing-head .e-brand img{width:32px!important;height:32px!important}
+  body .e-header .dc-landing-head .e-brand>span{font-size:17px!important}
+}
+/* Kleines, dezentes Menü-Symbol rechts (Daniel, 27. Nov 2026: „aber biete kleines dezentes icon für menü an“). Kein Rahmen, kein Wort sichtbar. */
+.e-header .dc-landing-head{position:relative}
+.e-header .dc-landing-head>.dc-navigation{position:absolute!important;inset-inline-end:max(4px,env(safe-area-inset-right));top:50%;transform:translateY(-50%);margin:0!important;gap:4px!important}
+.e-header .dc-landing-head .dc-navigation-account{display:none!important}
+.e-header .dc-landing-head .dc-navigation-items>.dc-navigation-menu-account{display:flex!important}
+body .e-header .dc-landing-head .dc-navigation-menu>summary{display:flex!important;align-items:center!important;justify-content:center!important;width:44px;height:44px!important;min-height:44px!important;padding:0!important;border:0!important;border-radius:12px!important;background:transparent!important;box-shadow:none!important;color:#4a4458!important;font-size:0!important;line-height:0!important;gap:0!important}
+body .e-header .dc-landing-head .dc-navigation-menu>summary:hover,body .e-header .dc-landing-head .dc-navigation-menu[open]>summary{background:rgba(31,27,46,.06)!important}
+body .e-header .dc-landing-head .dc-navigation-menu>summary::after,body .e-header .dc-landing-head .dc-navigation-menu>summary::before{content:none!important;display:none!important}
+.dc-menu-icon{display:inline-grid;gap:4px;width:20px}
+.dc-menu-icon i{display:block;height:2px;border-radius:2px;background:currentColor}
+/* Aufgeklapptes Menü: weiche Karte, ruhige Zeilen. */
+body .e-header .dc-landing-head .dc-navigation-items{border:0!important;border-radius:18px!important;box-shadow:0 0 0 1px rgba(31,27,46,.08),0 18px 40px -12px rgba(31,27,46,.28)!important;padding:10px!important;gap:2px!important}
+body .e-header .dc-landing-head .dc-navigation-items>a:not([hidden]),body .e-header .dc-landing-head .dc-navigation-items>button{display:flex!important;align-items:center;justify-content:flex-start!important;min-height:48px!important;padding:10px 14px!important;background:transparent!important;border:0!important;border-radius:12px!important;color:#1f1b2e!important;font-weight:600!important;text-align:start!important;text-decoration:none!important;box-shadow:none!important}
+body .e-header .dc-landing-head .dc-navigation-items>a:hover,body .e-header .dc-landing-head .dc-navigation-items>button:hover{background:#f2eff8!important}
+body .e-header .dc-landing-head .dc-navigation-items .dc-navigation-language{margin:6px 0 0!important;padding:12px 14px 4px!important;border-top:1px solid rgba(31,27,46,.08);color:#6b6478!important;font-weight:600}
+body .e-header .dc-landing-head .dc-navigation-items .dc-navigation-language select{border-radius:12px!important;border-color:rgba(31,27,46,.18)!important}
+body .e-header .dc-landing-head .dc-navigation-items .dc-navigation-language+button{background:#f2eff8!important;justify-content:center!important;margin-top:4px!important}
+@media(max-width:420px){.e-header .dc-landing-head>.dc-navigation .e-saved-toggle{display:none!important}}
