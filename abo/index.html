@@ -22,6 +22,8 @@
       var c = (q.get("c") || q.get("utm_campaign") || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 60);
       if (c) t.set("utm_campaign", c);
       if (q.get("plan") === "monthly") t.set("plan", "monthly");
+      // Zurück von Stripe ohne Kauf: /start/ bietet einmal „Später weitermachen“ an (abo/kasse.js).
+      if (q.get("status") === "abgebrochen") t.set("zurueck", "1");
       location.replace("/start/?" + t.toString());
     })();
   </script>

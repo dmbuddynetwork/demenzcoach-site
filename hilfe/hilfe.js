@@ -25,7 +25,14 @@ const campaign = clean(params.get('utm_campaign') || params.get('k'), 60);
 const track = (name, extra = {}, marketing = '') => {
   try { window.DemenzConsent?.track?.(name, { entry: source, ...extra }); } catch { /* ohne Einwilligung nichts */ }
   try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing); } catch { /* */ }
+  // Kauf-Trichter ohne Einwilligung (abo/zaehler.js, nur Summen je Tag): Apple-Pay-Tipp und -Bestätigung.
+  if (name === 'apple_pay_quick_tap') count('applepay');
+  if (name === 'apple_pay_quick_confirm') count('applepay_ok');
 };
+// Weg im Kauf-Trichter: „lp“ für /hilfe/, „kw“ für den Kurzweg (Quelle kw_<kanal>). Je Seitenaufruf höchstens einmal je Stufe.
+const way = /^kw_/u.test(source) || location.pathname.startsWith('/hilfe/kurz') ? 'kw' : 'lp';
+const count = stage => { try { window.DemenzZaehler?.once(`${way}_${stage}`); } catch { /* Zählen stört nie */ } };
+count('view');
 
 // ---- Preise: feste Werte, dann die Werte des Servers (dieselben wie in der Kasse) ----------------------------------
 let offer = { yearly: 6999, monthly: 1299, trialDays: 7 };
@@ -82,6 +89,28 @@ const legal = () => el('p', { class: 'lp-legal' }, [
   el('a', { href: '/abo/widerruf.html', text: 'Widerrufsbelehrung' }),
   '. Allgemeine Kommunikations- und Alltagshilfe, kein Medizinprodukt.'
 ]);
+const SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg>';
+// Die Garantie gibt es schon (AGB 6a, /abo/garantie.html, Kündigungsart „garantie“). Hier wird sie nur sichtbar gemacht.
+const guaranteeBox = where => {
+  const icon = el('span', { class: 'lp-guarantee-icon' });
+  icon.innerHTML = SHIELD;
+  return el('div', { class: 'lp-guarantee' }, [icon, el('p', {}, [
+    el('strong', { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }),
+    el('span', { text: 'Hilft es dir nicht, bekommst du dein Geld zurück. Ohne Begründung. ' }),
+    el('a', { href: '/abo/garantie.html', onclick: () => track('garantie_link', { where }), text: 'Bedingungen' })
+  ])]);
+};
+// Eine kurze echte Stimme (start/stimmen.js, Vorname mit Zustimmung, Text unverändert). Keine Sterne, keine Zahlen.
+const voiceNearPrice = () => {
+  const all = Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : [];
+  const voice = all.find(entry => entry.name === 'Timo') || all[1];
+  if (!voice) return null;
+  return el('figure', { class: 'lp-voice-mini' }, [
+    el('blockquote', { text: `„${voice.text}“` }),
+    el('figcaption', {}, [el('strong', { text: `${voice.name}, ${voice.rolle}` }), el('span', { text: ' · Vorname mit Zustimmung' })]),
+    document.getElementById('stimmen') && el('a', { class: 'lp-link', href: '#stimmen', onclick: () => { track('stimmen_mehr'); const list = document.querySelector('.lp-voices-all'); if (list) list.open = true; }, text: `Alle ${all.length} Stimmen lesen` })
+  ]);
+};
 const mountBuy = slot => {
   const where = slot.querySelector('[data-go]')?.dataset.go || 'buy';
   const cards = ['yearly', 'monthly'].map(key => planCard(key, where));
@@ -101,10 +130,10 @@ const mountBuy = slot => {
   const block = el('div', { class: 'lp-buy-block' }, [
     el('div', { class: 'lp-plans', role: 'radiogroup', 'aria-label': 'Plan wählen' }, cards),
     terms, pay?.mark, cta, pay?.alt,
-    el('ul', { class: 'lp-pills' }, [
-      el('li', {}, el('a', { href: '/abo/garantie.html', text: `${guaranteeDays} Tage Geld-zurück-Garantie` })),
-      el('li', { text: 'Online kündbar' })
-    ]),
+    // Vertrauen am Preis (27. Nov 2026, Konzept K3+K4): Garantie als Siegel unter dem Knopf, im ersten Block eine echte Stimme.
+    guaranteeBox(where),
+    el('ul', { class: 'lp-pills' }, [el('li', { text: 'Online kündbar, ohne Anmeldung' })]),
+    blocks.length === 0 ? voiceNearPrice() : null,
     legal()
   ]);
   slot.replaceChildren(block);
@@ -165,6 +194,7 @@ function select(key) {
 }
 const buy = where => {
   track('lp_checkout', { where, plan }, 'InitiateCheckout');
+  count('cta');
   const kasse = window.DemenzKasse;
   if (!kasse || !config.firebase?.apiKey) {
     location.href = `/abo/?plan=${plan}&src=${source}${campaign ? `&c=${campaign}` : ''}&weiter=1`;
@@ -172,6 +202,7 @@ const buy = where => {
   }
   // Zurück-Taste des Handys schließt die Kasse statt die Seite zu verlassen.
   history.pushState({ sheet: true }, '', location.href);
+  count('kasse');
   kasse.open({ plan, source, campaign, offer: checkoutOffer(), stripePage: where.endsWith('_andere'), track: name => track(name, { where }),
     onClose: () => { if (history.state?.sheet) history.back(); },
     // Fenster abgelaufen: normaler Preis wird angezeigt, der Kunde tippt erneut (wie /start/).
@@ -294,7 +325,7 @@ if ('IntersectionObserver' in window) {
   // Preis 1,5 Sekunden sichtbar: Kasse im Hintergrund vorbereiten, damit der Klick sofort zu Stripe führt.
   let timer = null;
   const warm = new IntersectionObserver(entries => {
-    if (entries.some(entry => entry.isIntersecting)) { clearTimeout(timer); timer = setTimeout(() => { prepare(); applePayWanted = true; mountApplePay(); warm.disconnect(); }, 1500); }
+    if (entries.some(entry => entry.isIntersecting)) { count('price'); clearTimeout(timer); timer = setTimeout(() => { prepare(); applePayWanted = true; mountApplePay(); warm.disconnect(); }, 1500); }
     else clearTimeout(timer);
   }, { threshold: .4 });
   for (const slot of slots) warm.observe(slot);

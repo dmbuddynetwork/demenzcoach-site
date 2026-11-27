@@ -834,8 +834,29 @@
       el("p", { class: "start-pay-title" }, [el("span", { html: icons.lock }), "Sicher bezahlen, SSL-verschlüsselt"]),
       el("ul", { role: "list", "aria-label": "Zahlungswege" }, payLogos.map(([name, svg]) => el("li", { title: name, "aria-label": name, html: svg })))
     ]);
-    const guarantee = () => el("p", { class: "start-guarantee" }, [el("span", { html: icons.shield }),
-      el("span", {}, [el("strong", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }), " ", el("a", { href: "/abo/garantie.html", text: "Bedingungen" })])]);
+    // Vertrauen am Preis (27. Nov 2026, Konzept K3+K4): Garantie und eine echte Stimme direkt unter Knopf und Kleingedrucktem.
+    // Die Garantie gibt es schon (AGB 6a, /abo/garantie.html, Kündigungsart „garantie“); hier wird sie nur sichtbar gemacht.
+    const guarantee = () => el("div", { class: "start-guarantee" }, [el("span", { class: "start-guarantee-icon", html: icons.shield }),
+      el("p", {}, [el("strong", { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }),
+        el("span", { text: "Hilft es dir nicht, bekommst du dein Geld zurück. Ohne Begründung. " }),
+        el("a", { href: "/abo/garantie.html", onclick: () => track("garantie_link"), text: "Bedingungen" })])]);
+    // Eine kurze echte Stimme (stimmen.js, Vorname mit Zustimmung, Text unverändert). Keine Sterne, keine Zahlen.
+    const voiceNearPrice = () => {
+      const all = Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : [];
+      const voice = all.find((entry) => entry.name === "Timo") || all[1];
+      if (!voice) return null;
+      return el("figure", { class: "start-voice-mini" }, [
+        el("blockquote", { text: `„${voice.text}“` }),
+        el("figcaption", {}, [el("strong", { text: `${voice.name}, ${voice.rolle}` }), el("span", { text: " · Vorname mit Zustimmung" })]),
+        el("button", { type: "button", class: "abo-link-button", text: `Alle ${all.length} Stimmen lesen`, onclick: () => {
+          track("stimmen_mehr");
+          const section = document.querySelector(".start-voices");
+          const list = section?.querySelector(".start-voices-all");
+          if (list) list.open = true;
+          section?.scrollIntoView({ behavior: "smooth", block: "start" });
+        } })
+      ]);
+    };
     const scrollToPlans = () => document.querySelector(".start-tiers")?.scrollIntoView({ behavior: "smooth", block: "center" });
 
     // Uhr nur mit echtem Ende: die Reservierung des Willkommenspreises vom Server (angebot.js, an die E-Mail gebunden).
@@ -1002,7 +1023,7 @@
         mounted[key] = true;
         const meta = checkoutMeta();
         window.DemenzKasse.mountApplePay(slots[key], { plan: key, email: answers.email || undefined, offer: key === "yearly" && offer.offers ? deals?.forCheckout() : null,
-          source: meta.src, campaign: meta.campaign, track: (name) => track(name), onError: () => { alt.hidden = false; } })
+          source: meta.src, campaign: meta.campaign, track: trackApplePay, onError: () => { alt.hidden = false; } })
           .then((shown) => { if (shown) { ready[key] = true; sync(); } else mounted[key] = false; });
       };
       applePayHooks.push(() => { sync(); setTimeout(() => { if (document.body.contains(wrap)) mount(plan); }, 400); });
@@ -1014,9 +1035,11 @@
       } else setTimeout(start, 400);
       return [wrap, alt];
     };
-    const offerBlock = () => applePayHere
-      ? [ticket(), table(), ...applePayCta(), fine(), payments()]
-      : [ticket(), table(), cta(), fine(), payments()];
+    // Oben (top): nach dem Kleingedruckten Garantie, Zahlungswege, eine Stimme. Unten folgt ohnehin die große Garantie-Karte.
+    // Kurze Zeile in der Lücke über dem Knopf: so steht die Garantie auch auf kleinen Handys im ersten Bild. Das Kleingedruckte bleibt direkt unter dem Knopf.
+    const guaranteeLine = () => el("p", { class: "start-guarantee-line" }, [el("span", { html: icons.shield }), `${guaranteeDays} Tage Geld-zurück-Garantie`]);
+    const offerBlock = (top) => [ticket(), table(), top ? guaranteeLine() : null, ...(applePayHere ? applePayCta() : [cta()]), fine(),
+      top ? guarantee() : null, payments(), top ? voiceNearPrice() : null];
 
 
     return [
@@ -1027,7 +1050,7 @@
       (result ? el("p", { class: "start-result-line" }, [el("strong", { text: result.calm ? "Das hat bei dir geklappt: " : "Beim nächsten Mal: " }), result.text]) : null),
       directMode && directContext ? el("p", { class: "start-small", text: "Wenn du fortfährst, findest du diese Situation in deiner Übersicht in diesem Browser wieder. Deine bisherigen Angaben bleiben erhalten." }) : null,
       // Reihenfolge wie BetterMe: Titel, Promo-Code, Tarife, Knopf; die Situation folgt darunter.
-      ...offerBlock(),
+      ...offerBlock(true),
       pair ? null : preview,
       el("h2", { class: "start-section start-center start-big-title", text: "Was du bekommst" }),
       shots,
@@ -1185,11 +1208,19 @@
   };
   const countStep = (name) => countEvent(directMode ? "direct" : name);
   // Direkt-Angebot: Tipp auf den Hauptknopf, E-Mail, Kasse. Je Seitenaufruf höchstens einmal je Schritt (nur im Speicher).
+  // 27. Nov 2026: Im Fragebogen zählen dieselben Tipps als quiz_cta/quiz_kasse/quiz_applepay (vorher gar nicht gezählt).
   const directCounted = new Set();
   const countDirect = (step) => {
-    if (!directMode || directCounted.has(step)) return;
-    directCounted.add(step);
-    countEvent(step);
+    const name = directMode ? step : step === "direct_email" ? "" : step.replace(/^direct_/u, "quiz_");
+    if (!name || directCounted.has(name)) return;
+    directCounted.add(name);
+    countEvent(name);
+  };
+  // Stripes Apple-Pay-Knopf (kasse.js meldet Tipp und Bestätigung) zählt wie ein Kaufknopf.
+  const trackApplePay = (name) => {
+    track(name);
+    if (name === "apple_pay_quick_tap") countDirect("direct_applepay");
+    if (name === "apple_pay_quick_confirm") countDirect("direct_applepay_ok");
   };
   // Layer: die erste Frage passt ohne inneres Scrollen. Die Bilder werden so klein wie nötig (zwei Bildreihen).
   function fitLayer() {
@@ -1204,6 +1235,8 @@
   }
   if (embedded) window.addEventListener("resize", () => { if (current === "relation") fitLayer(); });
   function render(name) {
+    // Neu zeichnen derselben Seite (Willkommenspreis geladen, Angebot abgelaufen) ist kein neuer Besuch und zählt nicht doppelt.
+    const again = current === name;
     current = name;
     clearTimeout(revealTimer);
     // Die E-Mail vor der Kasse zählt nicht als Quiz-Schritt „email“.
@@ -1216,7 +1249,7 @@
       return;
     }
     if (name === "building") askAccountEmail();
-    if (!(name === "email" && emailForCheckout)) countStep(name);
+    if (!again && !(name === "email" && emailForCheckout)) countStep(name);
     const screen = $("screen");
     if (rootClasses.contains("start-pointer")) document.activeElement?.blur?.();
     screen.replaceChildren(...screens[name]().filter(Boolean));

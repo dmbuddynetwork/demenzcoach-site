@@ -198,8 +198,20 @@ body[data-screen="plan"] .start-top, body[data-screen="plan"] .start-count { dis
 .start-scratch-gone { opacity: 0; pointer-events: none; }
 
 /* Geld-zurück-Garantie */
-.start-guarantee { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 0 6px; font-size: var(--small); }
-.start-guarantee svg { width: 22px; height: 22px; color: var(--purple); flex: none; }
+/* Am Preis (27. Nov 2026): Siegel links, zwei Zeilen rechts. Grün = sicher, wie BetterMe-Siegel; flach, keine zweite Karte. */
+.start-guarantee { display: flex; align-items: flex-start; gap: 12px; margin: 14px 0 4px; padding: 12px 14px; border-radius: 14px; background: #eef6f0; color: var(--ink); text-align: left; }
+.start-guarantee-icon svg { display: block; width: 30px; height: 30px; color: #2f7d4f; flex: none; }
+.start-guarantee p { margin: 0; font-size: var(--small); line-height: 1.4; color: var(--ink-2); }
+.start-guarantee strong { display: block; font-size: 1.0625rem; color: var(--ink); }
+.start-guarantee a { color: var(--ink-2); text-underline-offset: 3px; }
+.start-guarantee-line { display: flex; align-items: center; justify-content: center; gap: 6px; margin: -32px 0 12px; font-size: var(--small); font-weight: 600; color: #2f7d4f; }
+.start-guarantee-line svg { width: 20px; height: 20px; flex: none; }
+.start-voices { scroll-margin-top: 90px; }
+.start-voice-mini { margin: 14px 0 0; padding: 14px 16px; border-left: 4px solid var(--purple); background: var(--card); border-radius: 0 14px 14px 0; }
+.start-voice-mini blockquote { margin: 0 0 6px; font-size: 1.0625rem; line-height: 1.45; color: var(--ink); }
+.start-voice-mini figcaption { font-size: var(--small); color: var(--ink-2); }
+.start-voice-mini figcaption strong { color: var(--purple); }
+.start-voice-mini .abo-link-button { display: block; min-height: 44px; margin-top: 2px; }
 .start-guarantee-card { margin: 20px 0 0; padding: 20px; text-align: center; background: var(--card); border: 2px solid var(--purple); border-radius: 16px; }
 .start-guarantee-card svg { width: 44px; height: 44px; color: var(--purple); }
 .start-guarantee-card h2 { margin: 6px 0 8px; }
@@ -469,7 +481,7 @@ body[data-screen="plan"] .start-faq details p { font-size: 1.125rem; line-height
   /* Daniel, 26. Nov: „nicht alles breit, nur was Sinn ergibt, und nicht volle Breite“. Seite höchstens 1000 px.
      Breit: Überschriften, App-Bilder, Stimmen. Schmal und mittig (600 px): Tarife, Knopf, Hinweise, Garantie. Leistungen und Fragen 720 px. */
   html:not(.start-embedded) body[data-screen="plan"] .start-page { max-width: 1000px; padding-left: 32px; padding-right: 32px; }
-  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > :is(.start-ticket, .start-tiers, .start-cta, .start-tp-cta-wrap, .start-fine, .start-pay, .start-safe, .start-ended, .start-guarantee-card, .start-legal, .start-small, .start-result-line, .start-tp) { max-width: 600px; margin-left: auto; margin-right: auto; }
+  html:not(.start-embedded) body[data-screen="plan"] .start-page > section > :is(.start-ticket, .start-tiers, .start-cta, .start-tp-cta-wrap, .start-fine, .start-pay, .start-safe, .start-ended, .start-guarantee-card, .start-guarantee, .start-guarantee-line, .start-voice-mini, .start-legal, .start-small, .start-result-line, .start-tp) { max-width: 600px; margin-left: auto; margin-right: auto; }
   html:not(.start-embedded) body[data-screen="plan"] .start-page > section > :is(.start-hero, .start-included, .start-faq, .start-card, .start-weekcard) { max-width: 720px; margin-left: auto; margin-right: auto; }
   html:not(.start-embedded) body[data-screen="plan"] .start-page > section > .start-head { max-width: none; }
   html:not(.start-embedded) body[data-screen="plan"] .start-plan-title { margin: 28px 0 24px; font-size: 3rem; }
@@ -509,6 +521,9 @@ body[data-screen="plan"] .start-head-button { font-weight: 800; box-shadow: 0 6p
 @media (max-width: 520px) {
   body[data-screen="plan"] .start-head { flex-wrap: nowrap; }
   body[data-screen="plan"] .start-head-button { padding: 10px 18px; font-size: 1.0625rem; white-space: nowrap; }
+  /* iPhone SE (375 px): „kostenlos“ brach mitten im Wort um. Umbruch nur zwischen Wörtern. */
+  body[data-screen="plan"] .start-head-text { overflow-wrap: normal; }
+  body[data-screen="plan"] .start-head-text span { white-space: nowrap; }
 }
 /* Daniel 26. Nov: Preis-Kacheln „dezent, kleiner wie bei einer mobile Paywall“. Schmale Zeilen: Radio links, Preis rechts,
    kleines Abzeichen auf der oberen Kante statt schwarzer Balken. Der Knopf bleibt das Auffälligste. */
