@@ -18,7 +18,7 @@ export function createPaymentStatusController({ sessionID, loadStatus, render, a
         && ["paid", "unpaid", "no_payment_required"].includes(status.paymentStatus);
       const active = status.status === "complete" && status.active === true && ["paid", "trialing", "no_payment_due"].includes(status.outcome);
       const outcome = legacy ? "legacy" : active ? status.outcome
-        : ["failed", "action_required", "pending"].includes(status.outcome) ? status.outcome : "unverified";
+        : ["failed", "action_required", "pending", "elsewhere"].includes(status.outcome) ? status.outcome : "unverified";
       render(outcome);
       if (!verifiedOnce && status.status === "complete" && typeof status.active === "boolean"
         && ["paid", "trialing", "no_payment_due", "pending", "failed", "action_required"].includes(status.outcome)) {
@@ -43,6 +43,8 @@ export const paymentStatusText = Object.freeze({
   pending: ["Deine Zahlung wird noch geprüft", "Bei einer Lastschrift kann die Bestätigung mehrere Werktage dauern. Dein Zugang wird nach der Bestätigung freigeschaltet. Bitte schließe kein zweites Abo ab."],
   failed: ["Dein Zugang ist noch nicht freigeschaltet", "Die Zahlung wurde nicht bestätigt oder das Abo wurde beendet. Prüfe den Stand unter „Abo verwalten“. Dort kannst du auch die Zahlungsart ändern."],
   action_required: ["Bitte prüfe deine Zahlung", "Deine Zahlung braucht noch eine Bestätigung. Öffne „Abo verwalten“, um den nächsten Schritt zu sehen."],
+  // Bezahlt, aber in einem anderen Browser oder einer App (z. B. WhatsApp). Freischaltung nur nach Anmeldung mit der Kauf-E-Mail.
+  elsewhere: ["Deine Zahlung ist eingegangen", "Du hast in einem anderen Browser oder in einer App bezahlt, zum Beispiel in WhatsApp. Melde dich mit der E-Mail-Adresse vom Kauf an. Dann ist dein Abo auch hier freigeschaltet. Bitte schließe kein zweites Abo ab."],
   unverified: ["Zahlungsstatus noch nicht bestätigt", "Wir konnten deinen Zahlungsstatus nicht prüfen. Nutze denselben Browser und dasselbe Konto wie beim Abschluss und versuche es erneut. Bitte schließe kein zweites Abo ab."],
   paid: ["Deine Zahlung ist bestätigt", "Dein Abo ist aktiv. Eine Vertragsbestätigung kommt per E-Mail."],
   trialing: ["Deine Probezeit ist aktiv", "Deine kostenlose Probezeit hat begonnen. Heute wurde nichts berechnet. Eine Vertragsbestätigung kommt per E-Mail."],

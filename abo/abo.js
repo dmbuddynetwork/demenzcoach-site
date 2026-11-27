@@ -533,7 +533,9 @@ if (params.get("status") === "fertig") {
       $("done-plan").hidden = !active;
       $("done-plan-link").hidden = !active;
       $("app-store-link").hidden = !active;
-      $("payment-status-manage").hidden = !portalAvailable || active || outcome === "checking";
+      $("payment-status-manage").hidden = !portalAvailable || active || outcome === "checking" || outcome === "elsewhere";
+      $("payment-status-signin").hidden = outcome !== "elsewhere";
+      if (outcome === "elsewhere") $("payment-status-signin").href = emailAccountURL(location.pathname + location.search, location.origin, "signin");
       $("payment-status-retry").hidden = active;
       $("payment-status-retry").disabled = outcome === "checking";
     },
