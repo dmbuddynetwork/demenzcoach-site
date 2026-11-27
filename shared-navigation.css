@@ -62,61 +62,34 @@ body .dc-navigation .dc-navigation-store .dc-navigation-store-text small{font-si
   body.einfach .e-header .e-brand{gap:6px!important}
 }
 
-/* Hochwertiger Kopf (Daniel, 27. Nov 2026: „das sieht billig aus mit dem Menu Button und Apple Button. Lass es hochwertig erscheinen“).
-   Eine Formensprache für alle Knöpfe: gleiche Höhe (42 px), runde Pillen, ruhige Farben. App Store als dunkle Pille in einer Zeile,
-   Menü und Konto als helle Pillen ohne harten Rahmen. Logo etwas größer, Name in Tinte statt Lila, feine Linie unten. */
-.e-header{border-bottom-color:rgba(31,27,46,.08)!important;box-shadow:0 8px 20px -18px rgba(31,27,46,.35)}
-body.einfach .e-header{background:rgba(247,246,242,.92)!important;-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px)}
-.e-header .dc-navigation-host .e-brand{gap:10px!important;color:#1f1b2e!important;text-decoration:none!important}
-.e-header .dc-navigation-host .e-brand img{width:36px!important;height:36px!important;border-radius:9px;box-shadow:0 1px 2px rgba(31,27,46,.12)}
-body .e-header .dc-navigation-host .e-brand>span{font-size:17px!important;font-weight:700!important;letter-spacing:-.01em;color:#1f1b2e!important}
-body .e-header .dc-navigation-host .e-brand .dc-brand-app{font-weight:500!important;color:#6b6478!important}
-body .e-header .dc-navigation{gap:8px!important;align-items:center}
-/* App Store: dunkle Pille, eine Zeile. */
-body .e-header .dc-navigation .dc-navigation-store{height:42px!important;gap:7px!important;padding:0 16px 0 14px!important;border-radius:999px!important;background:#1f1b2e!important;color:#fff!important;box-shadow:0 1px 2px rgba(31,27,46,.18)}
-body .e-header .dc-navigation .dc-navigation-store:hover{background:#2c2640!important}
-body .e-header .dc-navigation .dc-navigation-store svg{width:17px!important;height:17px!important;margin-top:-2px!important}
-body .e-header .dc-navigation .dc-navigation-store .dc-navigation-store-text{display:inline!important;font-size:15px!important;font-weight:600!important;line-height:1!important;letter-spacing:.005em}
-.dc-navigation-store .dc-store-short{display:none}
-/* Menü und Konto: helle Pillen, gleiche Höhe, kein harter Rahmen. */
-body .e-header .dc-navigation-menu>summary{height:42px!important;min-height:42px!important;box-sizing:border-box;gap:9px!important;padding:0 16px 0 14px!important;border:0!important;border-radius:999px!important;background:#fff!important;color:#1f1b2e!important;
-  font-size:15px!important;font-weight:600!important;line-height:1!important;box-shadow:0 0 0 1px rgba(31,27,46,.10),0 1px 2px rgba(31,27,46,.06)!important}
-body .e-header .dc-navigation-menu>summary:hover{background:#faf9fc!important}
-body .e-header .dc-navigation-menu>summary::after,body .e-header .dc-navigation-menu>summary::before{content:none!important;display:none!important}
-body .e-header .dc-navigation-menu[open]>summary{background:#f2eff8!important}
-.dc-menu-icon{display:inline-grid;gap:3.5px;width:16px}
-.dc-menu-icon i{display:block;height:2px;border-radius:2px;background:currentColor}
-.dc-navigation-menu[open] .dc-menu-icon i:nth-child(2){opacity:0}
-body .e-header .dc-navigation .dc-navigation-account{height:42px;min-height:42px!important;box-sizing:border-box;padding:0 14px!important;border-radius:999px;color:#1f1b2e!important;font-weight:600}
-body .e-header .dc-navigation .dc-navigation-account:hover{background:rgba(31,27,46,.05)}
-body .e-header .dc-navigation .dc-navigation-account[data-account-state=signed-in]{color:#27663f!important}
-/* Aufgeklapptes Menü: weiche Karte. */
-body .e-header .dc-navigation-menu .dc-navigation-items{border:0!important;border-radius:18px!important;box-shadow:0 0 0 1px rgba(31,27,46,.08),0 18px 40px -12px rgba(31,27,46,.28)!important;padding:10px!important;gap:4px!important}
-body .e-header .dc-navigation-items>a,body .e-header .dc-navigation-items>button{display:flex!important;align-items:center;justify-content:flex-start!important;min-height:48px!important;padding:10px 14px!important;background:transparent!important;border:0!important;border-radius:12px!important;
-  color:#1f1b2e!important;font-weight:600!important;text-align:start!important;text-decoration:none!important;box-shadow:none!important}
-body .e-header .dc-navigation-items .dc-navigation-language{margin:6px 0 0!important;padding:12px 14px 4px!important;border-top:1px solid rgba(31,27,46,.08);color:#6b6478!important;font-weight:600}
-body .e-header .dc-navigation-items .dc-navigation-language select{border-radius:12px!important;border-color:rgba(31,27,46,.18)!important}
-body .e-header .dc-navigation-items .dc-navigation-language+button{background:#f2eff8!important;justify-content:center!important;margin-top:2px!important}
-body .e-header .dc-navigation-items>a:hover,body .e-header .dc-navigation-items>button:hover{background:#f2eff8!important}
+/* Kopf wie eine Landingpage (Daniel, 27. Nov 2026: „mach es wie eine Landingpage … das Logo zentriert lieber und clean“).
+   Oben nur Logo und Name in der Mitte. Keine Knöpfe. Konto, Abo, Schrift, App und Sprache stehen in einer ruhigen Karte über der Fußzeile. */
+.e-header{border-bottom-color:rgba(31,27,46,.07)!important;box-shadow:none!important}
+body.einfach .e-header{background:rgba(247,246,242,.94)!important;-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px)}
+.e-header .dc-navigation-host.dc-landing-head{justify-content:center!important;min-height:60px}
+.e-header .dc-landing-head .e-brand{flex:0 0 auto!important;gap:10px!important;color:#1f1b2e!important;text-decoration:none!important}
+.e-header .dc-landing-head .e-brand img{width:36px!important;height:36px!important;border-radius:9px;box-shadow:0 1px 2px rgba(31,27,46,.12)}
+body .e-header .dc-landing-head .e-brand>span{font-size:18px!important;font-weight:700!important;letter-spacing:-.01em;color:#1f1b2e!important}
+body .e-header .dc-landing-head .e-brand .dc-brand-app{display:inline!important;font-weight:500!important;color:#6b6478!important}
 @media(max-width:600px){
-  body .e-header .dc-navigation{gap:6px!important}
-  body .e-header .dc-navigation .dc-navigation-store{height:40px!important;padding:0 13px 0 12px!important;gap:6px!important}
-  body .e-header .dc-navigation-host{gap:8px!important}
-  body .e-header .dc-navigation-menu.e-menu>summary,body .e-header .dc-navigation-menu>summary{height:40px!important;min-height:40px!important;padding:0 13px 0 11px!important;gap:7px!important}
-  /* Auf dem Handy kein doppeltes „App“: der Name steht ohne „App“, die dunkle Pille sagt „App Store“. */
-  .e-header .dc-navigation-host .e-brand .dc-brand-app{display:none!important}
-  .e-header .dc-navigation-host .e-brand img{width:32px!important;height:32px!important}
-  .e-header .dc-navigation-host .e-brand{gap:8px!important}
-  body .e-header .dc-navigation-host .e-brand>span{font-size:16px!important}
+  .e-header .dc-navigation-host.dc-landing-head{min-height:54px}
+  .e-header .dc-landing-head .e-brand img{width:32px!important;height:32px!important}
+  body .e-header .dc-landing-head .e-brand>span{font-size:17px!important}
 }
-@media(max-width:600px){
-  .e-header .dc-navigation-store .dc-store-long{display:none}
-  .e-header .dc-navigation-store .dc-store-short{display:inline}
-}
-@media(max-width:380px){
-  /* Kleine Handys (360 px): etwas mehr Luft zwischen Name und Knöpfen. */
-  body .e-header .dc-navigation-host .e-brand>span{font-size:15px!important}
-  .e-header .dc-navigation-host .e-brand img{width:30px!important;height:30px!important}
-  body .e-header .dc-navigation .dc-navigation-store{padding:0 11px 0 10px!important}
-  body .e-header .dc-navigation-menu.e-menu>summary,body .e-header .dc-navigation-menu>summary{padding:0 11px 0 10px!important;gap:6px!important}
-}
+/* Karte „Konto und Einstellungen“ über der Fußzeile. Große Ziele für Menschen über 60. */
+.dc-navigation.dc-foot-tools{display:block;box-sizing:border-box;width:min(720px,calc(100% - 32px));margin:48px auto 0;padding:18px 18px 14px;border-radius:18px;background:#fff;box-shadow:0 0 0 1px rgba(31,27,46,.08);color:#1f1b2e;font:600 17px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body .dc-foot-tools,body .dc-foot-tools *{font-size:17px!important;line-height:1.35!important}
+body .dc-foot-tools .dc-foot-title{margin:0 0 12px!important;font-size:17px!important;font-weight:700!important;color:#1f1b2e!important}
+.dc-foot-tools .dc-foot-row{display:flex;margin:0 0 6px}
+body .dc-foot-tools .dc-foot-account{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px!important;border-radius:999px;background:#1f1b2e;color:#fff!important;text-decoration:none!important;font-weight:600}
+body .dc-foot-tools .dc-foot-account[data-account-state=signed-in]{background:#e8f3ec;color:#1f5b35!important}
+body .dc-foot-tools .dc-navigation-items{position:static!important;width:auto!important;max-height:none!important;overflow:visible!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:none!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px;margin:0;padding:0}
+body .dc-foot-tools .dc-navigation-items>a:not([hidden]),body .dc-foot-tools .dc-navigation-items>button:not(.dc-navigation-language+button){display:flex!important;align-items:center;justify-content:flex-start!important;width:100%;min-height:48px!important;margin:0!important;padding:8px 2px!important;border:0!important;border-bottom:1px solid rgba(31,27,46,.07)!important;border-radius:0!important;background:transparent!important;color:#1f1b2e!important;font-weight:600!important;text-align:start!important;text-decoration:none!important;box-shadow:none!important;min-width:0!important}
+body .dc-foot-tools .dc-navigation-items>a:hover,body .dc-foot-tools .dc-navigation-items>button:hover{color:#4b3aa0!important}
+body .dc-foot-tools .e-font-toggle[aria-pressed=true]{color:#4b3aa0!important}
+.dc-foot-tools .dc-navigation-language{grid-column:1/-1;display:grid;gap:8px;margin:10px 0 0;padding:0;color:#6b6478}
+body .dc-foot-tools .dc-navigation-language{font-weight:600!important;color:#6b6478!important}
+.dc-foot-tools .dc-navigation-language select{width:100%;min-height:48px;border:1px solid rgba(31,27,46,.18);border-radius:12px;padding:8px 12px;background:#fff;color:#1f1b2e}
+body .dc-foot-tools .dc-navigation-language+button{grid-column:1/-1;display:flex!important;align-items:center;justify-content:center!important;text-align:center!important;min-height:48px;margin:6px 0 0!important;border:0;border-radius:999px;background:#f2eff8!important;color:#1f1b2e!important;font-weight:600!important;cursor:pointer}
+.dc-foot-tools .dc-navigation-status{grid-column:1/-1}
+body .dc-foot-tools .dc-navigation-items>[hidden]{display:none!important}

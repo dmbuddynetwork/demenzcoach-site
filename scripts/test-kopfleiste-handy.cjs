@@ -1,4 +1,4 @@
-// Kopfleiste einzeilig, App-Store-Knopf und Ziel-Box auf dem Handy (Daniel, 26. Nov). Nur lokale Vorschau.
+// Kopf wie eine Landingpage (Daniel, 27. Nov), Konto-Karte unten und Ziel-Box auf dem Handy (26. Nov). Nur lokale Vorschau.
 const assert = require('node:assert/strict');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const { createPreviewServer } = require('./generator-preview.cjs');
@@ -14,23 +14,25 @@ const android = 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KH
       const p = await c.newPage(); const errors = []; p.on('pageerror', e => errors.push(e.message));
       await p.goto(`${preview.origin}/de/demenz-uebersetzer/wo-ist-mein-mann.html`);
       await p.getByRole('button', { name: 'Ziel ändern' }).waitFor(); await p.waitForTimeout(400);
+      // Kopf wie eine Landingpage (Daniel, 27. Nov 2026): nur Logo und Name, in der Mitte, eine Zeile, keine Knöpfe.
+      const head = await p.evaluate(() => {
+        const h = document.querySelector('.e-header'), brand = h.querySelector('.e-brand'), r = brand.getBoundingClientRect(), span = brand.querySelector(':scope > span');
+        return { onlyBrand: h.querySelectorAll('a,button,summary,select').length === 1, centered: Math.abs((r.left + r.right) / 2 - innerWidth / 2) < 6, oneLine: span.getBoundingClientRect().height < 30, scroll: document.documentElement.scrollWidth > innerWidth };
+      });
+      assert.deepEqual(head, { onlyBrand: true, centered: true, oneLine: true, scroll: false }, `${view.n}: Kopf`);
+      assert.equal(await p.locator('a.dc-navigation-store').count(), 0, `${view.n}: kein App-Store-Knopf im Kopf`);
+      // Konto, Abo, Schrift, App und Sprache stehen unten in der Karte über der Fußzeile.
+      const tools = p.locator('.dc-foot-tools');
+      assert.equal(await tools.count(), 1, `${view.n}: Karte unten`);
+      assert.ok(await tools.evaluate(n => n.nextElementSibling?.matches('footer.e-footer')), `${view.n}: Karte direkt über der Fußzeile`);
       for (const label of ['Anmelden', '✓ Angemeldet', 'Konto bestätigen']) {
-        const m = await p.evaluate(async label => {
-          document.querySelector('.dc-navigation-account').textContent = label; dispatchEvent(new Event('load')); await new Promise(r => setTimeout(r, 30));
-          const span = document.querySelector('.e-header .e-brand > span'), dock = document.querySelector('.e-header .dc-navigation'), brand = document.querySelector('.e-header .e-brand');
-          const shown = getComputedStyle(span).display !== 'none';
-          return { oneLine: !shown || span.getBoundingClientRect().height < 26, clipped: shown && span.scrollWidth > span.clientWidth + 1, sameRow: Math.abs(dock.getBoundingClientRect().top - brand.getBoundingClientRect().top) < 8, scroll: document.documentElement.scrollWidth > innerWidth };
-        }, label);
-        assert.deepEqual(m, { oneLine: true, clipped: false, sameRow: true, scroll: false }, `${view.n} ${label}`);
+        const m = await p.evaluate(label => { const a = document.querySelector('.dc-foot-tools .dc-navigation-account'); a.textContent = label; const r = a.getBoundingClientRect(); return { h: r.height >= 44, inside: r.right <= innerWidth, scroll: document.documentElement.scrollWidth > innerWidth }; }, label);
+        assert.deepEqual(m, { h: true, inside: true, scroll: false }, `${view.n} ${label}`);
       }
-      // Handy: „Anmelden“ nur im Menü; Computer: in der Kopfleiste.
-      const acct = await p.evaluate(() => ({ head: getComputedStyle(document.querySelector('.e-header .dc-navigation-account')).display !== 'none', menu: !!document.querySelector('.dc-navigation-items > .dc-navigation-menu-account') }));
-      assert.deepEqual(acct, { head: view.w > 600, menu: true }, `${view.n}: Anmelden-Ort`);
-      if (view.w <= 600) { await p.locator('.dc-navigation-menu > summary').click(); assert.ok(await p.locator('.dc-navigation-menu-account').isVisible(), `${view.n}: Anmelden im Menü sichtbar`); await p.keyboard.press('Escape'); }
-      const store = p.locator('.e-header a.dc-navigation-store');
-      if (view.store && view.w <= 600) assert.ok(/App Store/.test(await store.innerText()), `${view.n}: Text „App Store“ sichtbar`);
-      assert.equal(await store.count(), view.store ? 1 : 0, `${view.n}: App-Store-Knopf`);
-      if (view.store) { assert.match(await store.getAttribute('href'), /^https:\/\/apps\.apple\.com\/app\/apple-store\/id6790763941\?/); assert.ok(await store.isVisible()); assert.ok((await store.boundingBox()).height >= 44); }
+      for (const name of ['Abo verwalten', 'Zur App']) assert.ok(await tools.getByRole('link', { name, exact: true }).isVisible(), `${view.n}: ${name}`);
+      assert.ok(await tools.getByRole('button', { name: 'Schrift größer', exact: true }).isVisible(), `${view.n}: Schrift größer`);
+      assert.ok(await tools.locator('select').isVisible(), `${view.n}: Sprache`);
+      assert.equal(await tools.locator('.e-saved-toggle[hidden]').evaluateAll(n => n.filter(x => getComputedStyle(x).display !== 'none').length), 0, `${view.n}: leeres Herz bleibt versteckt`);
       const box = await p.evaluate(() => { const r = s => document.querySelector(s).getBoundingClientRect(); return { chosen: r('.translator-goal-chosen'), change: r('.translator-goal-change'), row: r('.translator-goal-row') }; });
       if (view.w < 720) { assert.ok(box.change.top >= box.chosen.bottom - 2, `${view.n}: „Ändern“ unter dem Ziel`); assert.ok(box.chosen.width >= box.row.width - 40, `${view.n}: Ziel volle Breite`); }
       assert.deepEqual(errors, []); cases.push(view.n); await c.close();
