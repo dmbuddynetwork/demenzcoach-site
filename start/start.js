@@ -1002,7 +1002,7 @@
         mounted[key] = true;
         const meta = checkoutMeta();
         window.DemenzKasse.mountApplePay(slots[key], { plan: key, email: answers.email || undefined, offer: key === "yearly" && offer.offers ? deals?.forCheckout() : null,
-          source: meta.src, campaign: meta.campaign, track: (name) => track(name), onError: () => { alt.hidden = false; } })
+          source: meta.src, campaign: meta.campaign, track: trackApplePay, onError: () => { alt.hidden = false; } })
           .then((shown) => { if (shown) { ready[key] = true; sync(); } else mounted[key] = false; });
       };
       applePayHooks.push(() => { sync(); setTimeout(() => { if (document.body.contains(wrap)) mount(plan); }, 400); });
@@ -1185,11 +1185,19 @@
   };
   const countStep = (name) => countEvent(directMode ? "direct" : name);
   // Direkt-Angebot: Tipp auf den Hauptknopf, E-Mail, Kasse. Je Seitenaufruf höchstens einmal je Schritt (nur im Speicher).
+  // 27. Nov 2026: Im Fragebogen zählen dieselben Tipps als quiz_cta/quiz_kasse/quiz_applepay (vorher gar nicht gezählt).
   const directCounted = new Set();
   const countDirect = (step) => {
-    if (!directMode || directCounted.has(step)) return;
-    directCounted.add(step);
-    countEvent(step);
+    const name = directMode ? step : step === "direct_email" ? "" : step.replace(/^direct_/u, "quiz_");
+    if (!name || directCounted.has(name)) return;
+    directCounted.add(name);
+    countEvent(name);
+  };
+  // Stripes Apple-Pay-Knopf (kasse.js meldet Tipp und Bestätigung) zählt wie ein Kaufknopf.
+  const trackApplePay = (name) => {
+    track(name);
+    if (name === "apple_pay_quick_tap") countDirect("direct_applepay");
+    if (name === "apple_pay_quick_confirm") countDirect("direct_applepay_ok");
   };
   // Layer: die erste Frage passt ohne inneres Scrollen. Die Bilder werden so klein wie nötig (zwei Bildreihen).
   function fitLayer() {
@@ -1204,6 +1212,8 @@
   }
   if (embedded) window.addEventListener("resize", () => { if (current === "relation") fitLayer(); });
   function render(name) {
+    // Neu zeichnen derselben Seite (Willkommenspreis geladen, Angebot abgelaufen) ist kein neuer Besuch und zählt nicht doppelt.
+    const again = current === name;
     current = name;
     clearTimeout(revealTimer);
     // Die E-Mail vor der Kasse zählt nicht als Quiz-Schritt „email“.
@@ -1216,7 +1226,7 @@
       return;
     }
     if (name === "building") askAccountEmail();
-    if (!(name === "email" && emailForCheckout)) countStep(name);
+    if (!again && !(name === "email" && emailForCheckout)) countStep(name);
     const screen = $("screen");
     if (rootClasses.contains("start-pointer")) document.activeElement?.blur?.();
     screen.replaceChildren(...screens[name]().filter(Boolean));
