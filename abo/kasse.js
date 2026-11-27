@@ -174,7 +174,7 @@ export async function open(options) {
   const node = el("div", { class: "kasse", role: "dialog", "aria-modal": "true", "aria-labelledby": "kasse-title" }, card);
   const onKey = (event) => { if (event.key === "Escape") close(); };
   document.addEventListener("keydown", onKey);
-  sheet = { node, plan: options.plan, email: options.email, pending: true,
+  sheet = { node, plan: options.plan, email: options.email, source: options.source, track: options.track, pending: true,
     detach: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); },
     onClose: () => { clearTimeout(loadingTimer); document.removeEventListener("keydown", onKey); options.onClose?.(); } };
   document.body.append(node);
@@ -214,7 +214,7 @@ export async function open(options) {
         sheet = null;
         document.body.classList.remove("start-noscroll"); // das Layer sperrt das Scrollen selbst und gibt es beim Schließen wieder frei
         await showEmbeddedCheckout({ session, publishableKey: publicConfig.publishableKey, title: title.textContent, terms: termsFor(session),
-          onClose: () => options.onClose?.(), onRetry: () => { preparedSessions.clear(); open({ ...options }); },
+          onClose: () => { options.onClose?.(); offerLater(options); }, onRetry: () => { preparedSessions.clear(); open({ ...options }); },
           onOpen: (handle) => { embedded = handle; }, onDispose: () => { embedded = null; }, track: options.track });
         options.track?.("checkout_sheet_ready");
         return;
@@ -338,8 +338,145 @@ export async function mountApplePay(slot, options) {
   }
 }
 
+// --- „Später weitermachen“ nach Kassen-Abbruch (27. Nov 2026, Hebel K6) ------------------------------------------------
+// Wer die Kasse ohne Kauf schließt (× im Layer, Zurück von Stripes Seite), bekommt einmal das Angebot, den Link zum Plan per
+// E-Mail zu bekommen. Diese Mail ist angefordert. Eine Erinnerung am nächsten Tag kommt nur mit dem eigenen, leeren Häkchen
+// (Einwilligung, § 7 UWG); Stripe kann das in Deutschland nicht. Höchstens alle 3 Tage, nach dem Senden nie wieder.
+// Server: backend/web-checkout-reminder.mjs (Route /reminder). Ohne reminderMail in /config erscheint nichts.
+const LATER_KEY = "demenzCoachLater.v1";
+const LATER_PAUSE_MS = 3 * 24 * 60 * 60_000;
+function laterBlocked() {
+  try {
+    const value = JSON.parse(localStorage.getItem(LATER_KEY) || "null");
+    return Boolean(value && (value.sent || Date.now() - Number(value.at) < LATER_PAUSE_MS));
+  } catch { return false; }
+}
+function rememberLater(sent) { try { localStorage.setItem(LATER_KEY, JSON.stringify({ at: Date.now(), sent: Boolean(sent) })); } catch { /* privater Modus */ } }
+function knownEmail(options) {
+  const valid = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(String(value || "")) ? String(value) : "";
+  let stored = "";
+  try { stored = sessionStorage.getItem("demenzCoachEmail") || ""; } catch { /* */ }
+  return valid(options?.email) || valid(auth?.currentUser?.email) || valid(stored);
+}
+const LATER_STYLE = `
+.dc-later{border:0;padding:0;background:transparent;max-width:none;max-height:none;width:100%;height:100%;inset:0;margin:0;outline:none}
+.dc-later::backdrop{background:rgba(28,27,31,.32)}
+.dc-later-wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.dc-later-card{position:relative;width:100%;max-width:460px;background:#fffdf9;border-radius:20px;padding:30px 24px 22px;box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#1c1b1f;box-shadow:0 18px 50px rgba(28,27,31,.18)}
+.dc-later-card h2{font-size:25px;line-height:1.25;margin:0 36px 12px 0;font-weight:750;outline:none}
+.dc-later-close:focus:not(:focus-visible),.dc-later-no:focus:not(:focus-visible),.dc-later-send:focus:not(:focus-visible){outline:none}
+.dc-later-card p{font-size:18px;line-height:1.5;margin:0 0 16px}
+.dc-later-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border:0;border-radius:50%;background:#f1eee8;color:#1c1b1f;font-size:26px;line-height:1;cursor:pointer}
+.dc-later-label{display:block;font-size:16px;font-weight:600;margin:0 0 6px}
+.dc-later-input{width:100%;box-sizing:border-box;font-size:19px;padding:14px 16px;border:2px solid #d9d4cc;border-radius:14px;background:#fff;color:#1c1b1f;outline:none}
+.dc-later-input:focus{border-color:#47408c}
+.dc-later-check{display:flex;gap:12px;align-items:flex-start;margin:16px 0 4px;font-size:17px;line-height:1.45;font-weight:500;cursor:pointer}
+.dc-later-check input{width:24px;height:24px;margin:1px 0 0;flex:none;accent-color:#47408c}
+.dc-later-send{display:block;width:100%;margin:20px 0 8px;border:0;border-radius:999px;background:#47408c;color:#fff;font-size:19px;font-weight:700;padding:17px 20px;cursor:pointer}
+.dc-later-send[disabled]{opacity:.6}
+.dc-later-no{display:block;margin:0 auto;border:0;background:none;color:#5b5666;font-size:17px;text-decoration:underline;padding:10px;cursor:pointer}
+.dc-later-small{font-size:14px!important;line-height:1.45!important;color:#6b6676;margin:12px 0 0!important}
+.dc-later-small a{color:#47408c}
+.dc-later-error{color:#a3262a;font-size:16px!important;margin:10px 0 0!important}
+`;
+let laterOpen = false;
+// offerLater({ plan, email, source, track }) → zeigt das Angebot, wenn der Server es anbietet und es nicht gesperrt ist.
+export async function offerLater(options = {}) {
+  if (laterOpen || laterBlocked() || !config.endpoint) return false;
+  let loaded;
+  try { loaded = await loadConfig(); } catch { return false; }
+  const offer = loaded?.reminderMail;
+  if (!offer?.consentVersion || laterOpen) return false;
+  laterOpen = true;
+  rememberLater(false);
+  const host = hostWindow();
+  const doc = host.document;
+  if (!doc.getElementById("dc-later-style")) {
+    const style = doc.createElement("style");
+    style.id = "dc-later-style"; style.textContent = LATER_STYLE;
+    doc.head.append(style);
+  }
+  const make = (tag, props = {}, text) => { const node = doc.createElement(tag); for (const [key, value] of Object.entries(props)) node.setAttribute(key, value); if (text) node.textContent = text; return node; };
+  const dialog = make("dialog", { class: "dc-later", "aria-labelledby": "dc-later-title" });
+  const card = make("div", { class: "dc-later-card" });
+  const closeButton = make("button", { type: "button", class: "dc-later-close", "aria-label": "Schließen" }, "×");
+  const form = make("form", { novalidate: "" });
+  const input = make("input", { class: "dc-later-input", id: "dc-later-email", type: "email", inputmode: "email", autocomplete: "email", placeholder: "name@beispiel.de", required: "" });
+  input.value = knownEmail(options);
+  const tick = make("input", { type: "checkbox", id: "dc-later-tick" });
+  const check = make("label", { class: "dc-later-check", for: "dc-later-tick" });
+  check.append(tick, make("span", {}, offer.consentText));
+  const send = make("button", { type: "submit", class: "dc-later-send" }, "Link schicken");
+  const no = make("button", { type: "button", class: "dc-later-no" }, "Nein danke");
+  const error = make("p", { class: "dc-later-error", role: "alert", hidden: "" });
+  const small = make("p", { class: "dc-later-small" }, "Kein Newsletter. Wir nutzen deine Adresse nur für diese E-Mail und, wenn du es ankreuzt, für eine Erinnerung. ");
+  const privacy = make("a", { href: "/datenschutz.html#spaeter", target: "_blank", rel: "noopener" }, "Datenschutz");
+  small.append(privacy);
+  form.append(make("label", { class: "dc-later-label", for: "dc-later-email" }, "Deine E-Mail-Adresse"), input, check, error, send, no, small);
+  const heading = make("h2", { id: "dc-later-title", tabindex: "-1" }, "Später in Ruhe weitermachen?");
+  input.addEventListener("input", () => { error.hidden = true; });
+  card.append(closeButton, heading,
+    make("p", {}, "Wir schicken dir den Link zu deinem Plan per E-Mail. Dann findest du ihn sofort wieder."), form);
+  const wrap = make("div", { class: "dc-later-wrap" });
+  wrap.append(card);
+  dialog.append(wrap);
+  const finish = () => { laterOpen = false; try { if (dialog.open) dialog.close(); } catch { /* */ } dialog.remove(); };
+  closeButton.addEventListener("click", () => { options.track?.("later_closed"); finish(); });
+  no.addEventListener("click", () => { options.track?.("later_no"); finish(); });
+  // Schließen nur über × oder „Nein danke“ (Daniel: Layer schließen nur per X); Esc bleibt erlaubt.
+  dialog.addEventListener("cancel", (event) => { event.preventDefault(); finish(); });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    error.hidden = true;
+    const email = input.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u.test(email)) { error.textContent = "Bitte gib eine gültige E-Mail-Adresse ein."; error.hidden = false; input.focus(); return; }
+    send.disabled = true;
+    send.textContent = "Wird gesendet …";
+    try {
+      const user = await signedInUser();
+      const token = await user.getIdToken();
+      const result = await api("/reminder", { method: "POST", token, body: { email, plan: options.plan === "monthly" ? "monthly" : "yearly",
+        source: options.source, followUp: tick.checked, ...(tick.checked ? { consentVersion: offer.consentVersion } : {}) } });
+      rememberLater(true);
+      options.track?.(tick.checked ? "later_sent_reminder" : "later_sent");
+      card.replaceChildren(closeButton, make("h2", { id: "dc-later-title" }, result?.reason === "already_subscribed" ? "Du hast schon ein Abo" : "Gesendet"),
+        make("p", {}, result?.reason === "already_subscribed"
+          ? "Dein Plan ist schon freigeschaltet. Du findest ihn unter „Mein Plan“."
+          : "Schau gleich in dein Postfach. Kommt nichts an? Sieh bitte auch im Spam-Ordner nach."));
+      const done = make("button", { type: "button", class: "dc-later-send" }, "Schließen");
+      done.addEventListener("click", finish);
+      card.append(done);
+    } catch {
+      send.disabled = false;
+      send.textContent = "Link schicken";
+      error.textContent = "Das hat nicht geklappt. Bitte versuch es gleich noch einmal.";
+      error.hidden = false;
+    }
+  });
+  doc.body.append(dialog);
+  try { dialog.showModal(); } catch { dialog.setAttribute("open", ""); }
+  // Fokus auf die Überschrift, nicht aufs × (kein Fokusrahmen beim Öffnen, Daniel).
+  heading.focus({ preventScroll: true });
+  options.track?.("later_shown");
+  return true;
+}
+
 // Zurück von Stripes Seite: Der Browser zeigt die alte Seite samt Ladefenster wieder an, darum schließen wir es.
-window.addEventListener("pageshow", (event) => { if (event.persisted && sheet?.redirected) close(); });
+// Danach einmal „Später weitermachen“ anbieten (wer bezahlt hat, landet nicht hier, sondern auf der Erfolgsseite).
+window.addEventListener("pageshow", (event) => {
+  if (!(event.persisted && sheet?.redirected)) return;
+  const last = { plan: sheet.plan, email: sheet.email, source: sheet.source, track: sheet.track };
+  close();
+  offerLater(last);
+});
+// Stripes Zurück-Link (cancel_url /abo/?status=abgebrochen) kommt über /abo/ mit zurueck=1 hierher.
+if (window.top === window && /[?&]zurueck=1\b/u.test(location.search)) {
+  const params = new URLSearchParams(location.search);
+  params.delete("zurueck");
+  try { history.replaceState(history.state, "", `${location.pathname}${params.size ? `?${params}` : ""}${location.hash}`); } catch { /* */ }
+  setTimeout(() => offerLater({ plan: params.get("plan") === "monthly" ? "monthly" : "yearly", source: "stripe_zurueck" }), 900);
+}
 
 export const isOpen = () => Boolean(sheet || embedded);
-window.DemenzKasse = Object.freeze({ open, close, isOpen, mountApplePay, prepare });
+window.DemenzKasse = Object.freeze({ open, close, isOpen, mountApplePay, prepare, offerLater });
