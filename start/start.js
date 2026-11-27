@@ -100,7 +100,17 @@
   const requestedContext = params.get("s") || params.get("m") || "";
   const contextCandidate = window.DemenzSituationContext?.resolve(requestedContext) || null;
   // Invalid or excluded keys use the existing general entry, never an invented situation.
-  const directMode = params.get("direkt") === "1" && (!requestedContext || Boolean(contextCandidate));
+  // Daniel, 27. Nov 2026: „Zeige lieber die Angebotsseite direkt – Fragebogen nutzen wir dann für Ads.“
+  // Website-Besucher (alle Links mit src=situation, home, trick, ratgeber, layer …) sehen sofort die Angebotsseite.
+  // Den Fragebogen bekommt nur Werbe-Verkehr: Klick-Kennungen, utm_*, Kampagne (k=), Werbe-Quelle, In-App-Browser der
+  // Netzwerke oder ausdrücklich quiz=1 (z. B. /hilfe/ab.html Arm a). direkt=1 gewinnt immer (Kurzweg-Knopf nach der KI-Antwort).
+  const adSources = /^(ads?|meta|fb|facebook|ig|instagram|tiktok|google|gads|lp_|fb_app|ig_app|tiktok_app)/u;
+  const inAppBrowser = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|musical_ly|BytedanceWebview|TikTok/iu.test(navigator.userAgent || "");
+  const adVisit = params.get("quiz") === "1" || Boolean(kampagne)
+    || ["fbclid", "gclid", "ttclid", "wbraid", "gbraid", "utm_source", "utm_medium", "utm_campaign"].some((key) => params.has(key))
+    || adSources.test(String(params.get("src") || "").toLowerCase()) || inAppBrowser;
+  const forcedDirect = params.get("direkt") === "1";
+  const directMode = forcedDirect ? (!requestedContext || Boolean(contextCandidate)) : !adVisit;
   const directContext = directMode ? contextCandidate : null;
 
   const answers = { relation: null, name: "", situation: null, frequency: null, dayTime: null, duration: null, living: null,
