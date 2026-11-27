@@ -12,7 +12,9 @@ const firebaseVersion = "12.16.0";
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
 const state = {
-  plan: params.get("plan") === "monthly" ? "monthly" : "yearly",
+  // Probewochen-Modus (?preis=probe, 27. Nov 2026): plan=probe bleibt die Probewoche; Monat und Jahr dann ohne Gratis-Tage.
+  preis: params.get("preis") === "probe" ? "probe" : "",
+  plan: params.get("plan") === "monthly" ? "monthly" : params.get("plan") === "probe" && params.get("preis") === "probe" ? "probe" : "yearly",
   source: (params.get("src") || "abo").replace(/[^a-z0-9_-]/giu, "").slice(0, 40),
   // Kampagne aus der Anzeige (utm_campaign über den Fragebogen): landet im Stripe-Abo, damit der Wert je Anzeige messbar ist.
   campaign: (params.get("c") || params.get("utm_campaign") || "").toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60),
@@ -101,6 +103,12 @@ async function apiWithRetry(path, options) {
 function renderPlans() {
   for (const button of document.querySelectorAll("[data-plan]")) {
     button.setAttribute("aria-checked", String(button.dataset.plan === state.plan));
+  }
+  const probe = state.offer?.plans?.probe;
+  if (state.preis === "probe") {
+    $("trial-note").hidden = !(state.plan === "probe" && probe);
+    if (probe) $("trial-note").textContent = `${probe.days} Tage für ${euro(probe.amount, probe.currency)}, danach ${euro(probe.monthly, probe.currency)} pro Monat inkl. MwSt.`;
+    return renderQuick();
   }
   const trialDays = state.offer?.trialDays ?? 7;
   $("trial-note").hidden = trialDays === 0;
@@ -194,6 +202,8 @@ function hideQuick() {
   $("plan-next").textContent = "Weiter";
 }
 function renderQuick() {
+  // Probewoche: Apple Pay läuft hier nicht (kein Platz dafür), der Weiter-Knopf führt auf Stripes Seite.
+  if (state.plan === "probe") { $("quick-pay").hidden = true; return; }
   if (!quick.enabled || quick.dead || !state.offer || !quickSupported()) return;
   $("quick-pay").hidden = false;
   $("plan-next").textContent = "Mit Karte oder PayPal weiter";
@@ -219,7 +229,8 @@ async function mountQuick(plan) {
       token,
       body: { plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
-        ...(state.offer?.walletEmail === true ? { emailLater: true } : {}), ...(deal ? { offer: deal } : {}) }
+        ...(state.offer?.walletEmail === true ? { emailLater: true } : {}), ...(deal ? { offer: deal } : {}),
+        ...(state.preis ? { preis: state.preis } : {}) }
     });
     if (!session.clientSecret) throw new Error("no_client_secret");
     await loadStripe();
@@ -303,6 +314,7 @@ function emailReturn() {
   if (params.get("status") === "fertig") return `/abo/${location.search}`;
   const query = new URLSearchParams({ plan: state.plan, src: state.source, weiter: "1" });
   if (state.campaign) query.set("c", state.campaign);
+  if (state.preis) query.set("preis", state.preis);
   return `/abo/?${query}`;
 }
 function refreshEmailEntry() {
@@ -355,7 +367,7 @@ async function startCheckout(email, preparedWindow) {
       body: { plan: attempt.plan, checkoutMode: "hosted", hostedFallback: true, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...window.DemenzConsent?.metaContext?.(),
-        ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}) }
+        ...(deal ? { offer: deal } : {}), ...(email ? { email } : {}), ...(state.preis ? { preis: state.preis } : {}) }
     });
     if (!currentAttempt(attempt)) throw new Error("checkout_attempt_changed");
     if (redirectHostedCheckout(session, { attempt, isCurrent: () => currentAttempt(attempt) })) {
@@ -510,6 +522,7 @@ if (params.get("status") === "fertig") {
   show("done");
   let portalAvailable = false;
   let metaTrialSent = false;
+  let trialFee = 0;
   const checkStatus = createPaymentStatusController({
     sessionID: params.get("session_id"),
     loadStatus: async (sessionID) => {
@@ -522,7 +535,9 @@ if (params.get("status") === "fertig") {
       // Das eigene Firebase-Gastkonto sichern, unabhängig vom Zahlungsstatus.
       // Es wird keine Kundenzuordnung aus einer öffentlichen Session übernommen.
       if (!state.user.emailVerified && $("link-card").hidden) await offerAccountLink();
-      return api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
+      const status = await api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
+      trialFee = Number.isInteger(status?.trialFee) && status.trialFee > 0 ? status.trialFee : 0;
+      return status;
     },
     render: (outcome) => {
       // Probezeit läuft = StartTrial im Pixel (nur mit Werbe-Einwilligung). Gleiche event_id wie der Server, Meta zählt einmal.
@@ -531,7 +546,10 @@ if (params.get("status") === "fertig") {
         track("trial_started", { source: state.source }, { event: "StartTrial", values: { currency: "EUR", value: 0 }, eventID: `st_${params.get("session_id")}` });
       }
       const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
-      const [title, text] = paymentStatusText[outcome];
+      // Bezahlte Probewoche (27. Nov 2026): heute wurde der Probepreis berechnet, nicht „nichts“.
+      const [title, text] = outcome === "trialing" && trialFee
+        ? ["Deine Probewoche ist aktiv", `Deine Probewoche hat begonnen. Heute wurden ${euro(trialFee, "eur")} berechnet. Eine Vertragsbestätigung kommt per E-Mail.`]
+        : paymentStatusText[outcome];
       $("done-title").textContent = title;
       $("done-status").textContent = text;
       $("done-plan").hidden = !active;

@@ -99,6 +99,15 @@ function close() {
 // Pflichtangaben über Stripes Formular (ui_mode "form" kennt keine eigenen Texte): Preis inkl. MwSt., Laufzeit, Kündigung, Probezeit.
 const euro = (cents) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
 function termsFor(session) {
+  // Bezahlte Probewoche (27. Nov 2026, Server-Tarif „probe“): Monatspreis mit 7 Tagen für 1,00 €. Wer schon getestet hat,
+  // bekommt vom Server trialFee 0 und das normale Monatsabo; dann gelten die Monats-Texte.
+  if (session?.plan === "probe") {
+    const monthly = publicConfig?.plans?.monthly?.amount;
+    if (!Number.isFinite(monthly)) return "";
+    const monthlyTerms = `${euro(monthly)} pro Monat inkl. MwSt. Verlängert sich monatlich, jederzeit zum Monatsende kündbar.`;
+    if (!(session.trialFee > 0) || !(session.trialDays > 0)) return monthlyTerms;
+    return `${session.trialDays} Tage für ${euro(session.trialFee)}, dann ${monthlyTerms} Kündigst du vorher, zahlst du nur die Probewoche.`;
+  }
   const amount = publicConfig?.plans?.[session?.plan]?.amount;
   if (!Number.isFinite(amount)) return "";
   const trial = session.trialDays > 0 ? `${session.trialDays} Tage kostenlos, dann ` : "";
@@ -140,11 +149,13 @@ function sessionBody(options) {
     // Stripes kürzeres Formular (Daniel, 26. Nov 2026: Bezahlknopf direkt sichtbar). ?kasse=seite zeigt zum Vergleich die bisherige Stripe-Seite.
     ...(publicConfig.form === true && !stripePage && !/[?&]kasse=seite\b/u.test(location.search) ? { form: true } : {}),
     ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
-    ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) };
+    ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}),
+    // Seite im Probewochen-Modus (?preis=probe): der Server gibt Monat und Jahr dann ohne Gratis-Tage.
+    ...(options.preis === "probe" ? { preis: "probe" } : {}) };
 }
 function sessionFor(options, user, token) {
   const meta = window.DemenzConsent?.metaContext?.()?.meta?.consent === true;
-  const key = JSON.stringify([user.uid, options.plan, options.email || "", options.offer || null, options.source || "", options.campaign || "", meta, toStripePage(options)]);
+  const key = JSON.stringify([user.uid, options.plan, options.preis || "", options.email || "", options.offer || null, options.source || "", options.campaign || "", meta, toStripePage(options)]);
   const hit = preparedSessions.get(key);
   if (hit && Date.now() - hit.at < PREPARED_MAX_AGE) return hit.promise;
   const promise = api("/session", { method: "POST", token, body: sessionBody(options) });
@@ -176,7 +187,7 @@ export async function open(options) {
   const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
   const loading = el("p", { class: "kasse-loading", role: "status", text: "Die sichere Zahlung wird geöffnet …" });
   let loadingTimer = null;
-  const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : "Monatsplan starten" });
+  const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : options.plan === "probe" ? "Probewoche starten" : "Monatsplan starten" });
   const card = el("div", { class: "kasse-card" }, [
     el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": "Schließen", text: "×", onclick: () => close() })]),
     error,
@@ -298,7 +309,7 @@ export async function mountApplePay(slot, options) {
   try {
     const [loadedConfig, user] = await Promise.all([loadConfig(), signedInUser()]);
     // Die Apple-Pay-Sitzung gehört genau zu diesem Konto. Wechselt das Konto, entsteht eine neue Sitzung.
-    key = `${user.uid}|${options.plan}|${options.offer?.kind ?? ""}|${options.email ?? ""}`;
+    key = `${user.uid}|${options.plan}|${options.preis ?? ""}|${options.offer?.kind ?? ""}|${options.email ?? ""}`;
     publicConfig = loadedConfig;
     await window.DemenzTeller?.ready;
     if (!quickSessions.has(key)) {
@@ -311,7 +322,8 @@ export async function mountApplePay(slot, options) {
             ...window.DemenzTeller?.attribution(),
             ...measureFields(),
             ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
-            ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}) }
+            ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}),
+            ...(options.preis === "probe" ? { preis: "probe" } : {}) }
         });
         if (!session.clientSecret) throw new Error("no_client_secret");
         return session.clientSecret;
@@ -452,7 +464,7 @@ export async function offerLater(options = {}) {
     try {
       const user = await signedInUser();
       const token = await user.getIdToken();
-      const result = await api("/reminder", { method: "POST", token, body: { email, plan: options.plan === "monthly" ? "monthly" : "yearly",
+      const result = await api("/reminder", { method: "POST", token, body: { email, plan: options.plan === "monthly" || options.plan === "probe" ? "monthly" : "yearly",
         source: options.source, followUp: tick.checked, ...(tick.checked ? { consentVersion: offer.consentVersion } : {}) } });
       rememberLater(true);
       options.track?.(tick.checked ? "later_sent_reminder" : "later_sent");
