@@ -80,7 +80,17 @@ a { color: var(--purple); }
 .lp-plan-tag { padding: 4px 10px; border-radius: 999px; background: var(--lav); color: var(--lav-ink); font-size: var(--small); font-weight: 700; white-space: nowrap; }
 .lp-terms { font-size: var(--small); color: var(--ink-2); margin-bottom: 16px; }
 .lp-buy .lp-btn, .lp-sticky .lp-btn { width: 100%; border: 0; font: 700 var(--body)/1.3 var(--font); cursor: pointer; }
-.lp-buy .lp-pills { margin-top: 12px; }
+.lp-buy .lp-pills { margin-top: 8px; }
+/* Garantie-Siegel und eine Stimme am Preis (27. Nov 2026). Gleiches Bild wie /start/. */
+.lp-guarantee { display: flex; align-items: flex-start; gap: 12px; margin: 16px 0 0; padding: 12px 14px; border-radius: 14px; background: #eef6f0; text-align: left; }
+.lp-guarantee-icon svg { display: block; width: 30px; height: 30px; color: #2f7d4f; }
+.lp-guarantee p { font-size: var(--small); line-height: 1.4; color: var(--ink-2); }
+.lp-guarantee strong { display: block; color: var(--ink); }
+.lp-guarantee a { color: var(--ink-2); text-underline-offset: 3px; }
+.lp-voice-mini { display: grid; margin: 16px 0 0; padding: 14px 16px 4px; border-left: 4px solid var(--purple); background: var(--card); border-radius: 0 14px 14px 0; text-align: left; }
+.lp-voice-mini blockquote { margin: 0 0 6px; line-height: 1.45; }
+.lp-voice-mini figcaption { font-size: var(--small); color: var(--ink-2); }
+.lp-voice-mini figcaption strong { color: var(--purple); }
 .lp-pills a { color: var(--ink-2); }
 /* Apple Pay (nur erster Preisblock, nur auf Geräten mit Apple Pay): der Stripe-Knopf liegt unsichtbar über unserem Knopf. */
 .lp-cta-wrap { position: relative; }

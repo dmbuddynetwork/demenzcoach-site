@@ -87,6 +87,28 @@ const legal = () => el('p', { class: 'lp-legal' }, [
   el('a', { href: '/abo/widerruf.html', text: 'Widerrufsbelehrung' }),
   '. Allgemeine Kommunikations- und Alltagshilfe, kein Medizinprodukt.'
 ]);
+const SHIELD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg>';
+// Die Garantie gibt es schon (AGB 6a, /abo/garantie.html, Kündigungsart „garantie“). Hier wird sie nur sichtbar gemacht.
+const guaranteeBox = where => {
+  const icon = el('span', { class: 'lp-guarantee-icon' });
+  icon.innerHTML = SHIELD;
+  return el('div', { class: 'lp-guarantee' }, [icon, el('p', {}, [
+    el('strong', { text: `${guaranteeDays} Tage Geld-zurück-Garantie` }),
+    el('span', { text: 'Hilft es dir nicht, bekommst du dein Geld zurück. Ohne Begründung. ' }),
+    el('a', { href: '/abo/garantie.html', onclick: () => track('garantie_link', { where }), text: 'Bedingungen' })
+  ])]);
+};
+// Eine kurze echte Stimme (start/stimmen.js, Vorname mit Zustimmung, Text unverändert). Keine Sterne, keine Zahlen.
+const voiceNearPrice = () => {
+  const all = Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : [];
+  const voice = all.find(entry => entry.name === 'Timo') || all[1];
+  if (!voice) return null;
+  return el('figure', { class: 'lp-voice-mini' }, [
+    el('blockquote', { text: `„${voice.text}“` }),
+    el('figcaption', {}, [el('strong', { text: `${voice.name}, ${voice.rolle}` }), el('span', { text: ' · Vorname mit Zustimmung' })]),
+    document.getElementById('stimmen') && el('a', { class: 'lp-link', href: '#stimmen', onclick: () => { track('stimmen_mehr'); const list = document.querySelector('.lp-voices-all'); if (list) list.open = true; }, text: `Alle ${all.length} Stimmen lesen` })
+  ]);
+};
 const mountBuy = slot => {
   const where = slot.querySelector('[data-go]')?.dataset.go || 'buy';
   const cards = ['yearly', 'monthly'].map(key => planCard(key, where));
@@ -106,10 +128,10 @@ const mountBuy = slot => {
   const block = el('div', { class: 'lp-buy-block' }, [
     el('div', { class: 'lp-plans', role: 'radiogroup', 'aria-label': 'Plan wählen' }, cards),
     terms, pay?.mark, cta, pay?.alt,
-    el('ul', { class: 'lp-pills' }, [
-      el('li', {}, el('a', { href: '/abo/garantie.html', text: `${guaranteeDays} Tage Geld-zurück-Garantie` })),
-      el('li', { text: 'Online kündbar' })
-    ]),
+    // Vertrauen am Preis (27. Nov 2026, Konzept K3+K4): Garantie als Siegel unter dem Knopf, im ersten Block eine echte Stimme.
+    guaranteeBox(where),
+    el('ul', { class: 'lp-pills' }, [el('li', { text: 'Online kündbar, ohne Anmeldung' })]),
+    blocks.length === 0 ? voiceNearPrice() : null,
     legal()
   ]);
   slot.replaceChildren(block);
