@@ -510,6 +510,7 @@ if (params.get("status") === "fertig") {
   show("done");
   let portalAvailable = false;
   let metaTrialSent = false;
+  let trialFee = 0;
   const checkStatus = createPaymentStatusController({
     sessionID: params.get("session_id"),
     loadStatus: async (sessionID) => {
@@ -522,7 +523,9 @@ if (params.get("status") === "fertig") {
       // Das eigene Firebase-Gastkonto sichern, unabhängig vom Zahlungsstatus.
       // Es wird keine Kundenzuordnung aus einer öffentlichen Session übernommen.
       if (!state.user.emailVerified && $("link-card").hidden) await offerAccountLink();
-      return api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
+      const status = await api(`/session-status?session_id=${encodeURIComponent(sessionID)}`, { token });
+      trialFee = Number.isInteger(status?.trialFee) && status.trialFee > 0 ? status.trialFee : 0;
+      return status;
     },
     render: (outcome) => {
       // Probezeit läuft = StartTrial im Pixel (nur mit Werbe-Einwilligung). Gleiche event_id wie der Server, Meta zählt einmal.
@@ -531,7 +534,10 @@ if (params.get("status") === "fertig") {
         track("trial_started", { source: state.source }, { event: "StartTrial", values: { currency: "EUR", value: 0 }, eventID: `st_${params.get("session_id")}` });
       }
       const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
-      const [title, text] = paymentStatusText[outcome];
+      // Bezahlte Probewoche (27. Nov 2026): heute wurde der Probepreis berechnet, nicht „nichts“.
+      const [title, text] = outcome === "trialing" && trialFee
+        ? ["Deine Probewoche ist aktiv", `Deine Probewoche hat begonnen. Heute wurden ${euro(trialFee, "eur")} berechnet. Eine Vertragsbestätigung kommt per E-Mail.`]
+        : paymentStatusText[outcome];
       $("done-title").textContent = title;
       $("done-status").textContent = text;
       $("done-plan").hidden = !active;
