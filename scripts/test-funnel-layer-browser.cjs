@@ -34,7 +34,8 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
           if (variant === 'funnel') {
             const dialog = p.locator('dialog.dc-funnel-layer'); await dialog.waitFor();
             const frame = p.frameLocator('iframe.dc-funnel-layer-frame');
-            await frame.getByRole('heading', { name: /Tipps und Tricks zum Ausdrucken/ }).waitFor();
+            // Seit 27. Nov 2026 (Daniel: Fragebogen nur für Ads) zeigt der Layer direkt die Angebotsseite.
+            await frame.getByRole('heading', { name: /Die richtigen Worte, wenn es schwierig wird/ }).waitFor();
             await p.waitForTimeout(500);
             const box = await dialog.boundingBox();
             assert.ok(Math.abs(box.y + box.height - view.h) < 2, 'Layer sitzt unten');
@@ -42,11 +43,8 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
             // Layer von unten, breit, Seite dahinter abgedunkelt erkennbar (Daniel, 26. Nov 2026).
             assert.ok(box.width >= Math.min(view.w, 1100) - 2 && box.height < view.h - 10, 'breiter Layer von unten, kein Vollbild');
             if (shots) await p.screenshot({ path: path.join(shots, `layer-funnel-${view.n}-1.png`) });
-            // Nur die erste Frage im Layer: danach eigene Fragebogen-Seite mit dem Stand aus diesem Tab.
-            await Promise.all([p.waitForURL(/\/start\/\?src=layer&weiter=1/), frame.getByRole('button', { name: /Mutter/ }).first().click()]);
-            await p.waitForFunction(() => document.body.dataset.screen === 'age');
-            if (shots) await p.screenshot({ path: path.join(shots, `layer-funnel-${view.n}-2.png`) });
-            await p.goBack(); // frische Seite für Bild 1
+            await frame.locator('.start-tier').first().waitFor();
+            assert.ok(await frame.locator('.start-cta').count() >= 1, 'Kaufknopf im Layer');
           }
           if (variant === 'anmeldung') { await p.locator('dialog.dc-signup-sheet').waitFor(); await p.waitForTimeout(700); if (shots) await p.screenshot({ path: path.join(shots, `layer-anmeldung-${view.n}.png`) }); }
           cases++;

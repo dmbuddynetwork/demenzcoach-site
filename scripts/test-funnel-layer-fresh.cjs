@@ -1,4 +1,5 @@
-// Der Funnel-Layer von unten startet immer bei der ersten Frage, auch mit gespeichertem Stand aus einer früheren Runde.
+// Der Funnel-Layer von unten zeigt seit 27. Nov 2026 direkt die Angebotsseite (Daniel: Fragebogen nur für Ads), auch mit gespeichertem Stand.
+// Werbe-Besucher (src=meta) setzen ihren Fragebogen weiter fort.
 // Der Anmelde-Layer und der Funnel-Layer verdecken außerdem die untere Eingabeleiste. Nur Testdaten.
 const assert = require('node:assert/strict');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -16,12 +17,16 @@ const { createPreviewServer } = require('./generator-preview.cjs');
     const saved = (src) => ({ version: 1, at: Date.now(), context: JSON.stringify([src, '']), screen: 'situation', choices: { relation: 'mama' }, tries: [], multi: {} });
     const heading = async (p) => ((await p.locator('#screen').innerText()) || '').toUpperCase();
     let s = await open('?src=layer&embed=1', saved('layer'));
-    assert.match(await heading(s.p), /FÜR WEN SUCHST DU HILFE/, 'Layer beginnt bei der ersten Frage');
-    assert.equal(await s.p.evaluate(() => sessionStorage.getItem('demenzCoachQuizProgress.v1')), null, 'alter Stand ist gelöscht');
-    await s.c.close(); cases.push('Layer ignoriert alten Stand');
+    assert.equal(await s.p.evaluate(() => document.body.dataset.screen), 'plan', 'Layer zeigt die Angebotsseite');
+    assert.match(await heading(s.p), /GRATIS FREISCHALTEN|12 MONATE/, 'Tarife sichtbar');
+    await s.c.close(); cases.push('Layer zeigt Angebotsseite');
     s = await open('?src=anmeldung', saved('anmeldung'));
-    assert.doesNotMatch(await heading(s.p), /FÜR WEN SUCHST DU HILFE/, 'normaler Funnel setzt weiter fort');
-    await s.c.close(); cases.push('normaler Funnel setzt fort');
+    assert.equal(await s.p.evaluate(() => document.body.dataset.screen), 'plan', 'Website-Einstieg zeigt die Angebotsseite');
+    await s.c.close(); cases.push('Website-Einstieg zeigt Angebotsseite');
+    s = await open('?src=meta', saved('meta'));
+    assert.doesNotMatch(await heading(s.p), /FÜR WEN SUCHST DU HILFE/, 'Werbe-Fragebogen setzt weiter fort');
+    assert.notEqual(await s.p.evaluate(() => document.body.dataset.screen), 'plan', 'Werbung bleibt im Fragebogen');
+    await s.c.close(); cases.push('Werbe-Fragebogen setzt fort');
     // Eingabeleiste: sichtbar ohne Layer, weg mit offenem Layer.
     const c = await browser.newContext({ viewport: { width: 390, height: 844 } }); c.setDefaultTimeout(8000);
     await c.addInitScript(() => { try { localStorage.setItem('demenzcoach.analyticsConsent.v1', 'denied'); localStorage.setItem('demenzcoach.marketingConsent.v1', 'denied'); } catch {} });
