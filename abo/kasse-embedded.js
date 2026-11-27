@@ -31,8 +31,9 @@ function ensureStyle(doc) {
 }
 
 // showEmbeddedCheckout({ host, session, publishableKey, title, terms, onClose, onRetry, onOpen, onDispose, track }) → { close }
-// session.checkoutMode "form": Stripes kürzeres Formular (ui_mode form, ca. 740 statt 1.020 px). Es zeigt keine eigenen Texte,
-// darum stehen Preis, Laufzeit und Kündigung (terms) direkt darüber und die Links darunter.
+// session.checkoutMode "form": Stripes kürzeres Formular (ui_mode form). Es zeigt keine eigenen Texte. Preis, Laufzeit und
+// Kündigung (terms) stehen klein direkt unter Stripes Kaufknopf, darunter die Links (Daniel, 27. Nov 2026: „Es soll KEIN Text
+// darüber angezeigt werden. Wenn darunter, in klein! Der Kaufbutton soll direkt sichtbar sein.“).
 // onOpen({ close }) kommt sofort, wenn das Fenster steht (noch vor dem Laden von Stripe), onDispose, sobald es weg ist (×, Esc, Zurück, Wiederholen).
 export async function showEmbeddedCheckout({ host = hostWindow(), session, publishableKey, title, terms, onClose, onRetry, onOpen, onDispose, track }) {
   const doc = host.document;
@@ -61,7 +62,7 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
       if (index) links.append(" · ");
       links.append(make("a", { href: href.startsWith("https:") ? href : base + href, target: "_blank", rel: "noopener" }, text));
     }
-    panel.append(heading, closeButton, intro, status, problem, box, links);
+    panel.append(heading, closeButton, status, problem, box, intro, links);
   } else {
     panel.append(heading, closeButton, status, problem, box);
   }
