@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Was sage ich jetzt? – Demenz Coach</title>
+  <meta name="description" content="Schreib in deinen Worten, was gerade passiert. Demenz Coach zeigt dir sofort einen Satz, den du sagen kannst.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#f6f5f2">
+  <link rel="canonical" href="https://dementiacoachapp.com/hilfe/kurz/">
+  <link rel="icon" href="/assets/lovable-logo.jpg">
+  <link rel="preconnect" href="https://europe-west1-dementica-df17b.cloudfunctions.net" crossorigin>
+  <link rel="prefetch" href="/start/">
+  <link rel="stylesheet" href="/hilfe/hilfe.css">
+  <link rel="stylesheet" href="kurz.css">
+  <script src="/kampagnen/data.js"></script>
+  <script src="/start/kampagne-utm.js"></script>
+  <script src="/abo/abo-config.js"></script>
+  <script src="/abo/zaehler.js"></script>
+  <script src="/demenz-uebersetzer/translator-ai.js"></script>
+  <script src="/eingabe-beispiele.js" defer></script>
+  <script type="module" src="kurz.js"></script>
+</head>
+<body data-marketing-pixels>
+  <!-- Kurzweg (27. Nov 2026, Hebel 2 der Konzeptseite): dritter Arm der Werbe-Weiche /hilfe/ab.html.
+       Ablauf: Situation eintippen → sofort eine echte KI-Antwort (/api/v1/translator-web, derselbe Dienst wie der Übersetzer)
+       → darunter ein Knopf zur bestehenden Angebotsseite /start/?direkt=1 (Daniel, 27. Nov: „Verwende die Angebotsseite, die wir haben“),
+       Quelle src=kw_<kanal> (in der Kasse „direkt_kw_<kanal>“), alle Werbe-Parameter bleiben erhalten.
+       Eine kostenlose Antwort je Browser. Kein Fragebogen, keine Anmeldung vor der Antwort. -->
+  <header class="lp-top">
+    <a class="lp-brand" href="/de/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
+  </header>
+
+  <main>
+    <section class="lp-wrap kw-ask" id="ask">
+      <p class="lp-eyebrow">Für Angehörige von Menschen mit Demenz</p>
+      <h1>Was ist gerade passiert?</h1>
+      <p class="kw-lead">Schreib es in deinen Worten. Du bekommst sofort einen Satz, den du sagen kannst.</p>
+
+      <form class="kw-form" id="form" novalidate>
+        <label class="kw-label" for="text">Deine Situation</label>
+        <textarea id="text" name="text" rows="3" maxlength="200" autocomplete="off" enterkeyhint="send"
+          placeholder="Zum Beispiel: Mama will jeden Abend nach Hause."></textarea>
+        <p class="kw-error" id="error" role="alert" hidden></p>
+        <button class="lp-btn kw-send" type="submit" id="send">Antwort zeigen</button>
+      </form>
+      <p class="kw-note">Kostenlos und ohne Anmeldung.</p>
+
+      <div class="kw-examples" id="examples">
+        <p class="kw-quiet">Oder tippe ein Beispiel an:</p>
+        <div class="kw-chips">
+          <button type="button" data-example="Mama will jeden Abend nach Hause, obwohl sie zu Hause ist.">„Ich will nach Hause.“</button>
+          <button type="button" data-example="Papa sagt, ich hätte sein Geld gestohlen.">„Du hast mein Geld gestohlen.“</button>
+          <button type="button" data-example="Mama fragt immer wieder nach ihrer Mutter, die lange tot ist.">„Wo ist meine Mutter?“</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-wrap kw-wait" id="wait" hidden aria-live="polite">
+      <div class="kw-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+      <p class="kw-wait-title">Einen Moment.</p>
+      <ol class="kw-wait-steps" id="wait-steps">
+        <li>Ich lese deine Situation.</li>
+        <li>Ich suche ruhige Worte.</li>
+        <li>Ich prüfe die Antwort.</li>
+      </ol>
+    </section>
+
+    <section class="lp-wrap kw-result" id="result" hidden>
+      <p class="kw-quiet" id="r-quote"></p>
+      <div id="r-body" tabindex="-1"></div>
+      <p class="kw-quiet kw-ai">Vorschlag der KI. Bitte prüfe ihn. Kein ärztlicher Rat. Im Notfall 112.</p>
+    </section>
+
+    <section class="lp-wrap kw-offer" id="offer" hidden>
+      <h2 id="offer-title">So hast du für jeden Moment einen Satz</h2>
+      <ul class="kw-gets">
+        <li>Frag nach, so oft du willst. Die Antwort kennt deine Situation.</li>
+        <li>Speichere gute Sätze und teile sie mit der Familie.</li>
+        <li>Im Web und in der iPhone-App mit demselben Konto.</li>
+      </ul>
+      <a class="lp-btn kw-next" id="next" href="/start/?direkt=1&amp;src=kw_ads">7 Tage kostenlos testen</a>
+      <p class="kw-note">Du siehst den Preis, bevor du startest.</p>
+    </section>
+  </main>
+
+  <footer class="lp-footer">
+    <nav aria-label="Rechtliches">
+      <a href="/abo/kuendigen.html">Verträge hier kündigen</a>
+      <a href="/abo/widerruf.html">Widerruf</a>
+      <a href="/nutzungsbedingungen.html">AGB</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+      <a href="/impressum.html">Impressum</a>
+    </nav>
+    <p>Allgemeine Kommunikations- und Alltagshilfe für Angehörige. Kein Medizinprodukt, kein Ersatz für ärztlichen Rat. Im Notfall 112.</p>
+  </footer>
+
+  <script src="/lovable-home.js?v=20261108a"></script>
+  <noscript><p class="lp-quiet lp-center">Bitte JavaScript einschalten oder direkt zur <a href="/de/">Startseite</a>.</p></noscript>
+</body>
+</html>
