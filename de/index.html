@@ -123,7 +123,7 @@
        Verkaufsseite (de/verkauf.js). Je Gerät fest (localStorage), ?home=a oder ?home=b legt den Arm fest. Suchmaschinen und
        automatisierte Browser bekommen immer a. Quelle und Kampagne werden hier gemerkt, weil die Seite die utm-Parameter später entfernt. -->
   <script>(function(){/* Daniel, 28. Nov 2026: neue Verkaufs-Startseite für alle (kein A/B-Test mehr). ?home=a zeigt die alte Seite. */var d=document.documentElement,u=new URLSearchParams(location.search),a=u.get("home")==="a"?"a":"b";try{localStorage.removeItem("demenzcoach.homeArm.v1")}catch(e){}d.dataset.homeArm=a;d.dataset.homeSrc=(u.get("src")||u.get("utm_source")||"").slice(0,40);d.dataset.homeCampaign=(u.get("utm_campaign")||u.get("k")||"").slice(0,80);/* Reel-Links (28. Nov): Reel und UTM beim Laden merken, nur im Seitenspeicher. Die erste Antwort leert die Adresse. */d.dataset.homeAd=(u.get("utm_content")||u.get("a")||"").toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,60);var q=new URLSearchParams();["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k){var v=u.get(k);if(v)q.set(k,v.slice(0,80))});d.dataset.homeUtm=q.toString();if(a==="b")d.classList.add("home-b")})();</script>
-  <link rel="stylesheet" href="/de/verkauf.css?v=20261128f">
+  <link rel="stylesheet" href="/de/verkauf.css?v=20261128h">
 </head>
 <body class="einfach homepage-v2" data-page-type="translator-home" data-page-language="de" data-page-slug="home-de" data-translator-input-position="top">
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
@@ -137,10 +137,10 @@
     <section id="top" class="e-hero e-home" aria-labelledby="home-title">
       <div class="e-wrap">
         <div class="home-intro">
-          <h1 id="home-title">Demenz: Was sage ich jetzt?</h1>
+          <h1 id="home-title">Demenz: <span class="home-line">Was sage ich jetzt?</span></h1>
         </div>
         <form class="translator-card" id="translator-form" data-access-notice="on-action" autocomplete="off" data-empty-hint="Bitte zuerst einen Satz eintippen – oder eine Situation auswählen." data-chat-after-input>
-          <label class="translator-form-label" for="translator-input">Beschreibe eure Situation</label><p class="translator-form-intro" id="translator-form-intro">Schreib, was passiert. Du bekommst passende Worte.</p>
+          <label class="translator-form-label" for="translator-input">Beschreibe eure Situation</label><p class="translator-form-intro" id="translator-form-intro"><span class="home-line">Schreib, was passiert.</span> <span class="home-line">Du bekommst passende Worte.</span></p>
           <div class="translator-input-row">
             <textarea id="translator-input" rows="2" maxlength="200" placeholder="Meine Mutter will nach Hause." enterkeyhint="go" aria-describedby="translator-form-intro translator-empty-hint translator-privacy-note"></textarea>
             <button class="button" type="submit"><svg class="e-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" fill="currentColor"><path d="M21.6 2.4a.9.9 0 0 0-.95-.2L2.9 9.1a.9.9 0 0 0-.05 1.67l7.2 3.17 3.17 7.2a.9.9 0 0 0 1.67-.05l6.9-17.75a.9.9 0 0 0-.2-.95ZM10.6 12.2 5.6 10l12.2-4.75-7.2 6.95Zm1.2 1.2 6.95-7.2L14 18.4l-2.2-5Z"/></svg><span>Antwort finden</span></button>
@@ -390,7 +390,7 @@
   <script src="/demenz-uebersetzer/translator-saved.js"></script>
   <script src="/demenz-uebersetzer/translator.js"></script>
   <script type="module" src="/content-feed.js"></script>
-  <script type="module" src="/de/verkauf.js?v=20261128g"></script>
+  <script type="module" src="/de/verkauf.js?v=20261128h"></script>
   <script>(function(){var b=window.DemenzTranslatorSignup&&window.DemenzTranslatorSignup.box();if(b){document.getElementById('home-signup').append(b);}else{document.getElementById('liste').hidden=true;}})();</script>
 </body>
 </html>

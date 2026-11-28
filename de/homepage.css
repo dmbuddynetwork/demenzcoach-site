@@ -171,8 +171,15 @@ body.homepage-v2 .home-situations{margin-bottom:28px}
     text-align: center;
   }
   body.homepage-v2 .home-situations .e-tile img { width: 72px; height: 72px; }
-  body.homepage-v2 .home-situations .e-tile span { overflow-wrap: break-word; hyphens: auto; }
+  body.homepage-v2 .home-situations .e-tile span { overflow-wrap: normal; hyphens: manual; -webkit-hyphens: manual; text-wrap: balance; }
 }
 @media (min-width: 1000px) {
   body.homepage-v2 .home-situations .e-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
+
+/* Daniel, 28. Nov: saubere Zeilenumbrüche. Keine Silbentrennung, Sinnabschnitte bleiben zusammen. */
+body.homepage-v2 .home-situations a.e-tile { overflow-wrap: normal; hyphens: manual; -webkit-hyphens: manual; }
+body.homepage-v2 .home-situations .e-tile span { overflow-wrap: normal; hyphens: manual; -webkit-hyphens: manual; text-wrap: balance; }
+body.homepage-v2 #home-title, body.homepage-v2 #translator-form-intro { hyphens: manual; -webkit-hyphens: manual; overflow-wrap: normal; text-wrap: balance; }
+body.homepage-v2 .home-line { display: inline-block; font-size: inherit !important; font-weight: inherit !important; line-height: inherit !important; color: inherit !important; }
+body.homepage-v2 #translator-privacy-note a { white-space: nowrap; }

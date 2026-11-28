@@ -1287,7 +1287,7 @@
   // Rein gestalterisch: die Schritte laufen per CSS, die Antwort erscheint, sobald sie da ist.
   // quick: dieselbe Ansicht kurz auch vor bekannten Antworten (Daniel, 9. Nov: „das Ergebnis kommt sofort, das verwirrt“).
   const aiWaiting = (quick = false) => element('div', { className: quick ? 'translator-ai-wait translator-ai-wait-quick' : 'translator-ai-wait', attributes: { role: 'status' } }, [
-    element('p', { className: 'translator-ai-wait-title' }, [element('span', { className: 'translator-spinner', attributes: { 'aria-hidden': 'true' } }), tr(quick ? 'Deine Antwort wird zusammengestellt …' : 'Deine Antwort wird geschrieben …')]),
+    element('p', { className: 'translator-ai-wait-title' }, [element('span', { className: 'translator-spinner', attributes: { 'aria-hidden': 'true' } }), tr(quick ? 'Deine Antwort wird zusammengestellt …' : 'Deine Antwort wird geschrieben …').replace(/ …$/u, '\u00a0…')]),
     element('span', { className: 'translator-ai-wait-bar', attributes: { 'aria-hidden': 'true' } }),
     sceneArt(data.waitImage),
     element('ol', { className: 'translator-ai-steps', attributes: { 'aria-hidden': 'true' } }, [
@@ -1663,9 +1663,11 @@
       // Wait for the choice layout to settle; keep a warning/question's own focus.
       requestAnimationFrame(() => requestAnimationFrame(() => {
         if (!box.isConnected || selectedKey !== key || document.activeElement !== heading) return;
-        const headerBottom = document.querySelector('.e-header')?.getBoundingClientRect().bottom || 0;
-        const top = heading.getBoundingClientRect().top;
-        if (top < headerBottom) window.scrollBy({ top: top - headerBottom - 12, behavior: 'instant' });
+        // Daniel, 28. Nov: nach der Wahl sofort so scrollen, dass „Dein Ziel“ oben steht und die Lade-Animation darunter
+        // zu sehen ist. Die Antwort ersetzt die Animation an derselben Stelle.
+        const headerBottom = Math.max(0, document.querySelector('.e-header')?.getBoundingClientRect().bottom || 0);
+        const shift = heading.getBoundingClientRect().top - headerBottom - 12;
+        if (Math.abs(shift) > 4) window.scrollBy({ top: shift, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
       }));
     };
     const own = element('input', { className: 'translator-own-goal-input', attributes: { type: 'text', maxlength: '160', minlength: '3', required: '', autocomplete: 'off', placeholder: en ? 'Or: your own goal …' : 'Oder: Eigenes Ziel …' } });
@@ -1680,7 +1682,7 @@
     });
     const ownDetails = element('section', { className: 'translator-own-goal-details' }, [ownForm]);
     const waiting = aiWaiting();
-    waiting.querySelector('.translator-ai-wait-title').lastChild.textContent = en ? 'Finding goals for your situation …' : 'Ziele für deine Situation finden …';
+    waiting.querySelector('.translator-ai-wait-title').lastChild.textContent = en ? 'Finding goals for your situation\u00a0…' : 'Ziele für deine Situation finden\u00a0…';
     waiting.querySelectorAll('.translator-ai-steps li').forEach((step,index) => { step.textContent = (en ? ['Understand the situation','Find possible goals','Prepare your choices'] : ['Situation verstehen','Mögliche Ziele finden','Deine Auswahl vorbereiten'])[index]; });
     const load = async () => {
       if (busy) return;
