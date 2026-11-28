@@ -57,13 +57,11 @@ function mount() {
   };
   const checks = items => el('ul', { class: 'hs-checks' }, items.map(text => el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text })])));
 
-  // ---- 0. Direkt unter dem Eingabefeld: Kaufknopf und Vertrauen (kein Text über dem Knopf) ---------------------------
-  const heroNote = el('p', { class: 'hs-note' });
+  // ---- 0. Direkt unter dem Eingabefeld: nur der Nutzen. Daniel, 28. Nov: kein Kaufknopf und kein Kostenhinweis im
+  // ersten Bildschirm („das verschreckt jeden Nutzer“). Preis und Kauf kommen erst weiter unten.
   const hero = el('div', { class: 'hs-hero-cta' }, [
-    buyButton('yearly', 'hero'),
-    heroNote,
-    el('ul', { class: 'hs-chips', 'aria-label': 'Das Wichtigste' }, ['30 Tage Geld-zurück-Garantie', 'Online kündbar', 'Im Web und als iPhone-App', '']
-      .map(text => el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text, 'data-per-day': text ? undefined : 'yearly' })])))
+    el('ul', { class: 'hs-chips', 'aria-label': 'Das Wichtigste' }, ['Antwort in wenigen Sekunden', 'Erste Antwort ohne Anmeldung', 'Ruhige Worte und kleine Tricks']
+      .map(text => el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text })])))
   ]);
 
   // ---- Demo-Handys (Daniel, 28. Nov: „du sollst ja zeigen wie man sachen eingibt, welche antworten erscheinen, das als demo“)
