@@ -66,6 +66,86 @@ function mount() {
       .map(text => el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text, 'data-per-day': text ? undefined : 'yearly' })])))
   ]);
 
+  // ---- Demo-Handys (Daniel, 28. Nov: „du sollst ja zeigen wie man sachen eingibt, welche antworten erscheinen, das als demo“)
+  // Drei kleine Handys spielen den Ablauf vor: Text wird getippt, die Antwort erscheint, dann eine Nachfrage. Sie laufen nur,
+  // solange sie zu sehen sind, und wiederholen sich. Mit „weniger Bewegung“ zeigen sie gleich das fertige Bild.
+  const DEMO = {
+    typed: 'Mama packt jeden Abend ihre Tasche, weil sie angeblich zur Arbeit muss.',
+    says: 'Ich muss zur Arbeit!',
+    answer: 'Du warst immer so fleißig. Erzähl mir, was heute ansteht.',
+    next: 'Gib ihr danach eine kleine Aufgabe, zum Beispiel Handtücher falten.',
+    ask: 'Sie wird trotzdem unruhig.',
+    reply: 'Setz dich zu ihr und sag: „Ich bleibe bei dir. Wir machen das zusammen.“'
+  };
+  const demoRuns = [];
+  const demoPhone = (index, label) => {
+    const screen = el('div', { class: 'hs-ph-screen', 'aria-hidden': 'true' });
+    const phone = el('div', { class: 'hs-phone', role: 'img', 'aria-label': label }, [
+      el('div', { class: 'hs-ph-bar' }, [el('span', { text: '09:41' }), el('span', { class: 'hs-ph-island' }), el('span', { class: 'hs-ph-icons', text: '●●● ▮' })]), screen
+    ]);
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const typeInto = async (node, text, speed, run) => {
+      node.textContent = '';
+      for (const char of text) { if (run.stop) return false; node.textContent += char; await wait(speed); }
+      return true;
+    };
+    const build = [
+      () => {
+        const field = el('p', { class: 'hs-ph-field' }), caret = el('span', { class: 'hs-ph-caret' });
+        const button = el('p', { class: 'hs-ph-btn', text: 'Hilfe finden →' });
+        screen.replaceChildren(el('p', { class: 'hs-ph-title', text: 'Was ist gerade mit Mama los?' }), el('div', { class: 'hs-ph-input' }, [field, caret]),
+          el('p', { class: 'hs-ph-small', text: 'Oder tippe auf einen typischen Moment:' }),
+          el('div', { class: 'hs-ph-chips' }, ['Will nach Hause', 'Will nichts essen', 'Sucht etwas', 'Unruhig am Abend'].map(text => el('span', { text }))), button);
+        return { field, button };
+      },
+      () => {
+        const card = el('div', { class: 'hs-ph-card' }), sentence = el('p', { class: 'hs-ph-say' }), after = el('p', { class: 'hs-ph-next' });
+        const dots = el('p', { class: 'hs-ph-dots', html: '<span></span><span></span><span></span>' });
+        card.append(el('p', { class: 'hs-ph-label', text: 'Sag ruhig:' }), sentence, el('p', { class: 'hs-ph-label', text: 'Danach:' }), after);
+        screen.replaceChildren(el('p', { class: 'hs-ph-head', text: 'Deine Hilfe' }), el('p', { class: 'hs-ph-label', text: 'Mama sagt:' }),
+          el('p', { class: 'hs-ph-heard', text: `„${DEMO.says}“` }), dots, card);
+        return { card, sentence, after, dots };
+      },
+      () => {
+        const field = el('p', { class: 'hs-ph-chat-field' }), mine = el('p', { class: 'hs-ph-mine' }), dots = el('p', { class: 'hs-ph-dots', html: '<span></span><span></span><span></span>' });
+        const reply = el('div', { class: 'hs-ph-card' }, [el('p', { class: 'hs-ph-label', text: 'Versuch es so:' }), el('p', { class: 'hs-ph-say', text: DEMO.reply })]);
+        const practice = el('p', { class: 'hs-ph-btn hs-ph-btn-light', text: 'Gespräch üben' });
+        screen.replaceChildren(el('p', { class: 'hs-ph-head', text: 'Deine Hilfe' }),
+          el('div', { class: 'hs-ph-card is-old' }, [el('p', { class: 'hs-ph-label', text: 'Sag ruhig:' }), el('p', { class: 'hs-ph-say', text: `„${DEMO.answer}“` })]),
+          mine, dots, reply, practice, el('div', { class: 'hs-ph-chat' }, [field, el('span', { class: 'hs-ph-send', text: '↑' })]));
+        return { field, mine, dots, reply, practice };
+      }
+    ][index];
+    const show = (node, on = true) => node.classList.toggle('is-shown', on);
+    const finalState = () => {
+      const parts = build();
+      if (index === 0) { parts.field.textContent = DEMO.typed; show(parts.button); }
+      if (index === 1) { parts.sentence.textContent = `„${DEMO.answer}“`; parts.after.textContent = DEMO.next; show(parts.card); }
+      if (index === 2) { parts.mine.textContent = DEMO.ask; show(parts.mine); show(parts.reply); show(parts.practice); }
+    };
+    const loop = async run => {
+      while (!run.stop) {
+        const parts = build();
+        if (index === 0) {
+          await wait(500); if (!(await typeInto(parts.field, DEMO.typed, 55, run))) return;
+          await wait(500); show(parts.button); parts.button.classList.add('is-pressed'); await wait(2600);
+        } else if (index === 1) {
+          await wait(400); show(parts.dots); await wait(1400); show(parts.dots, false); show(parts.card);
+          if (!(await typeInto(parts.sentence, `„${DEMO.answer}“`, 38, run))) return;
+          await wait(500); if (!(await typeInto(parts.after, DEMO.next, 22, run))) return; await wait(3200);
+        } else {
+          await wait(600); if (!(await typeInto(parts.field, DEMO.ask, 65, run))) return;
+          await wait(400); parts.mine.textContent = DEMO.ask; parts.field.textContent = ''; show(parts.mine);
+          await wait(500); show(parts.dots); await wait(1400); show(parts.dots, false); show(parts.reply);
+          await wait(900); show(parts.practice); await wait(3200);
+        }
+      }
+    };
+    finalState();
+    demoRuns.push({ phone, start: () => { const run = { stop: false }; loop(run); return run; } });
+    return phone;
+  };
+
   // ---- 1. So funktioniert es --------------------------------------------------------------------------------------
   const steps = section('hs-band', 'So einfach geht es', 'Drei Schritte. Ohne Vorwissen.', [
     el('ol', { class: 'hs-steps' }, [
@@ -73,7 +153,7 @@ function mount() {
       ['app-antwort.webp', 'Lies, was du sagen kannst', 'Ein ruhiger Satz für den Moment. Dazu eine kleine Idee für danach.', 'Antwort der App mit einem ruhigen Satz zum Sagen.'],
       ['app-antwort-persoenlich.webp', 'Frag nach oder übe', 'Passt der Satz nicht? Frag weiter. Oder übe das Gespräch vorher in Ruhe.', 'Persönliche Antwort der App mit Knöpfen zum Nachfragen.']
     ].map(([img, title, text, alt], index) => el('li', {}, [
-      el('img', { src: `/assets/angebot/${img}`, width: 720, height: 1566, alt, loading: 'lazy', decoding: 'async' }),
+      demoPhone(index, alt),
       el('div', {}, [el('p', { class: 'hs-step-no', text: `Schritt ${index + 1}` }), el('h3', { text: title }), el('p', { text })])
     ])))
   ], 'so-gehts');
@@ -258,6 +338,20 @@ function mount() {
   anchor.after(sales);
   // Abwechselnd heller und getönter Hintergrund, egal wie viele Abschnitte es gibt.
   [...sales.children].filter(node => node.matches('.hs-section:not(.hs-cta-band):not(.hs-final)')).forEach((node, index) => node.classList.toggle('hs-band', index % 2 === 0));
+
+  // Demo-Handys laufen nur, solange sie zu sehen sind.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+    const running = new Map();
+    const demoWatch = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        const demo = demoRuns.find(item => item.phone === entry.target);
+        if (!demo) continue;
+        if (entry.isIntersecting && !running.has(demo)) running.set(demo, demo.start());
+        else if (!entry.isIntersecting && running.has(demo)) { running.get(demo).stop = true; running.delete(demo); }
+      }
+    }, { threshold: .35 });
+    demoRuns.forEach(item => demoWatch.observe(item.phone));
+  }
 
   // ---- Bewegung (Daniel, 28. Nov: „kannst du die Sachen animiert machen, also die Bilder?“) ----------------------------
   // Beim Scrollen gleiten Bilder und Karten sanft herein. Handy-Bilder schweben leicht. In den Beispielen erscheinen die
