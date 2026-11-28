@@ -1,6 +1,6 @@
 // Web-Kasse: Angebot wählen, mit demselben Firebase-Konto wie die App anmelden, über Stripe bezahlen.
 // Netzwerk nur zu unserem Backend (DEMENZ_ABO_CONFIG.endpoint), zu Firebase Auth und zu Stripe.
-import { createPaymentStatusController, paymentStatusText } from "./payment-status.js";
+import { createPaymentStatusController, paymentStatusText, paymentStatusTextEn } from "./payment-status.js";
 import { emailAccountURL } from "./email-auth.js";
 import { createHostedCheckoutRedirect, reserveCheckoutWindow } from "./checkout-redirect.js";
 const redirectHostedCheckout = createHostedCheckoutRedirect((url, attempt) => {
@@ -11,6 +11,9 @@ const config = window.DEMENZ_ABO_CONFIG;
 const firebaseVersion = "12.16.0";
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
+// Rückkehr von der englischen Kasse (/en/, 28. Nov 2026): die Erfolgsseite spricht Englisch.
+const EN = params.get("lang") === "en";
+const t = (de, en) => (EN ? en : de);
 const state = {
   // Probewochen-Modus (?preis=probe, 27. Nov 2026): plan=probe bleibt die Probewoche; Monat und Jahr dann ohne Gratis-Tage.
   preis: params.get("preis") === "probe" ? "probe" : "",
@@ -58,7 +61,7 @@ const track = (name, values = {}, marketing = null) => {
   try { if (marketing) window.DemenzConsent?.trackMarketing?.(marketing.event, marketing.values, marketing.eventID ? { eventID: marketing.eventID } : {}); } catch { /* */ }
 };
 
-const euro = (cents, currency = "eur") => new Intl.NumberFormat("de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
+const euro = (cents, currency = "eur") => new Intl.NumberFormat(EN ? "en-US" : "de-DE", { style: "currency", currency: currency.toUpperCase() }).format(cents / 100);
 const dateText = (date) => new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
 
 async function api(path, { method = "GET", body, token } = {}) {
@@ -450,7 +453,7 @@ async function openPortal() {
     location.href = url;
   } catch {
     if (config.portalLoginURL) { location.href = config.portalLoginURL; return; }
-    fail("Die Abo-Verwaltung öffnet gerade nicht. Kündigen geht immer über „Verträge hier kündigen“ unten.");
+    fail(t("Die Abo-Verwaltung öffnet gerade nicht. Kündigen geht immer über „Verträge hier kündigen“ unten.", "Subscription management is not opening right now. You can always cancel through “Cancel contracts here” below."));
   }
 }
 $("manage-button").addEventListener("click", openPortal);
@@ -473,14 +476,17 @@ async function offerYearlySwitch() {
     card.className = "abo-card abo-upgrade";
     const title = document.createElement("p");
     title.innerHTML = "<strong></strong>";
-    title.firstChild.textContent = saving >= 10 ? `Jahresabo statt Monat: spare ${saving} %` : "Lieber das Jahresabo?";
+    title.firstChild.textContent = saving >= 10 ? t(`Jahresabo statt Monat: spare ${saving} %`, `Yearly instead of monthly: save ${saving}%`) : t("Lieber das Jahresabo?", "Prefer the yearly plan?");
     const text = document.createElement("p");
     text.className = "abo-muted";
-    text.textContent = yearly ? `${euro(yearly.amount, yearly.currency)} im Jahr statt ${euro(monthly.amount * 12, monthly.currency)} bei monatlicher Zahlung, jeweils inkl. MwSt. Den Preis für den Wechsel siehst du vor der Bestätigung.` : "Den Preis für den Wechsel siehst du vor der Bestätigung.";
+    text.textContent = yearly
+      ? t(`${euro(yearly.amount, yearly.currency)} im Jahr statt ${euro(monthly.amount * 12, monthly.currency)} bei monatlicher Zahlung, jeweils inkl. MwSt. Den Preis für den Wechsel siehst du vor der Bestätigung.`,
+        `${euro(yearly.amount, yearly.currency)} a year instead of ${euro(monthly.amount * 12, monthly.currency)} when paying monthly, incl. VAT. You see the price for the switch before you confirm.`)
+      : t("Den Preis für den Wechsel siehst du vor der Bestätigung.", "You see the price for the switch before you confirm.");
     const button = document.createElement("button");
     button.type = "button";
     button.className = "abo-button";
-    button.textContent = "Zum Jahresabo wechseln";
+    button.textContent = t("Zum Jahresabo wechseln", "Switch to yearly");
     button.addEventListener("click", async () => {
       button.disabled = true;
       track("upgrade_yearly_click", { source: state.source });
@@ -489,7 +495,7 @@ async function offerYearlySwitch() {
         location.href = url;
       } catch {
         button.disabled = false;
-        fail("Der Wechsel geht gerade nicht. Du kannst ihn später unter „Abo verwalten“ machen.");
+        fail(t("Der Wechsel geht gerade nicht. Du kannst ihn später unter „Abo verwalten“ machen.", "The switch is not possible right now. You can do it later under “Manage subscription”."));
       }
     });
     card.append(title, text, button);
@@ -508,14 +514,52 @@ function translatorReturn() {
     const link = document.createElement("a");
     link.className = "abo-button";
     link.href = path;
-    link.textContent = /gespraeche-ueben|practice-conversations/u.test(path) ? "Zurück zum Üben" : "Zurück zum Übersetzer";
+    link.textContent = /gespraeche-ueben|practice-conversations/u.test(path) ? t("Zurück zum Üben", "Back to practice") : t("Zurück zum Übersetzer", "Back to the translator");
     const first = $(section).querySelector(".abo-button");
     first?.classList.add("abo-button-light");
     $(section).insertBefore(link, first);
   }
 }
 
+// Englische Erfolgsseite: feste Texte der Seite tauschen, Links auf die englischen Rechtstexte.
+function localizeEnglish() {
+  if (!EN) return;
+  document.documentElement.lang = "en";
+  document.title = "Dementia Coach Premium";
+  const text = (selector, value) => { const node = document.querySelector(selector); if (node) node.textContent = value; };
+  const link = (selector, href, value) => { const node = document.querySelector(selector); if (node) { node.href = href; node.textContent = value; } };
+  text(".abo-brand span", "Dementia Coach");
+  document.querySelector(".abo-brand")?.setAttribute("href", "/en/");
+  text("#manage-button", "Manage subscription");
+  text("#payment-status-signin", "Sign in with the email you paid with");
+  text("#payment-status-portal-login", "Manage subscription");
+  text("#payment-status-manage", "Check payment status in subscription management");
+  text("#payment-status-retry", "Check status again");
+  const plan = $("done-plan")?.querySelectorAll("p");
+  if (plan?.length === 2) {
+    plan[0].replaceChildren(Object.assign(document.createElement("strong"), { textContent: "Your personal help is ready." }), " Describe the situation on your mind and get the right words.");
+    plan[1].textContent = "With a confirmed email login you can open your membership again later on the website.";
+  }
+  const linkCard = $("link-card")?.querySelectorAll("p");
+  if (linkCard?.length === 2) {
+    linkCard[0].replaceChildren(Object.assign(document.createElement("strong"), { textContent: "Secure your email login" }));
+    linkCard[1].textContent = "Link a confirmed email address to this login, so you can get back to your membership later. No newsletter is ordered.";
+  }
+  text("#email-link-after", "Set up email login");
+  link("#done-plan-link", "/en/", "Go to your personal help");
+  text("#app-store-link", "For iPhone: get Dementia Coach");
+  // Die Kündigungsseite gibt es nur auf Deutsch; der Pflichtknopf bleibt erreichbar.
+  link(".abo-footer .abo-cancel-link", "/abo/kuendigen.html", "Cancel contracts here");
+  link(".abo-footer .abo-portal-link", config.portalLoginURL || "https://billing.stripe.com/p/login/dRmbJ17QQ8TP85s79Z1ZS00", "Manage subscription");
+  link('.abo-footer a[href="widerruf.html"]', "/terms-en.html#abo-web", "Withdrawal");
+  link('.abo-footer a[href="/nutzungsbedingungen.html"]', "/terms-en.html", "Terms of Use");
+  link('.abo-footer a[href="/datenschutz.html"]', "/privacy-en.html", "Privacy");
+  link('.abo-footer a[href="/impressum.html"]', "/imprint-en.html", "Imprint");
+  text(".abo-footer p", "General communication and everyday help for family carers. Not a medical device and no substitute for medical advice. In an emergency, call your local emergency number (911, 999 or 112).");
+}
+
 // --- Start ---------------------------------------------------------------------------------------
+localizeEnglish();
 $("app-store-link").href = config.appStoreURL;
 translatorReturn();
 if (params.get("status") === "fertig") {
@@ -548,8 +592,9 @@ if (params.get("status") === "fertig") {
       const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
       // Bezahlte Probewoche (27. Nov 2026): heute wurde der Probepreis berechnet, nicht „nichts“.
       const [title, text] = outcome === "trialing" && trialFee
-        ? ["Deine Probewoche ist aktiv", `Deine Probewoche hat begonnen. Heute wurden ${euro(trialFee, "eur")} berechnet. Eine Vertragsbestätigung kommt per E-Mail.`]
-        : paymentStatusText[outcome];
+        ? t(["Deine Probewoche ist aktiv", `Deine Probewoche hat begonnen. Heute wurden ${euro(trialFee, "eur")} berechnet. Eine Vertragsbestätigung kommt per E-Mail.`],
+          ["Your trial week has started", `Your trial week is active. You were charged ${euro(trialFee, "eur")} today. A contract confirmation is on its way by email.`])
+        : (EN ? paymentStatusTextEn : paymentStatusText)[outcome];
       $("done-title").textContent = title;
       $("done-status").textContent = text;
       $("done-plan").hidden = !active;
