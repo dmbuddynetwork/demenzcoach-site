@@ -9,12 +9,15 @@ const matrix=[
  [['Ruhig eine Grenze setzen','boundary'],['Einen Teil meines Eises teilen','sharing'],['Das Verhalten verstehen','understand']],
  [['Den Alltag vorbereiten','planning'],['Tipps für Gespräche über früher','memory'],['Sicher nach Hause begleiten','orientation']],
  [['Beim Duschen unterstützen','personal-care'],['Über ihre Arbeit sprechen','work'],['Über Geld sprechen','money']],
- [['Die Person schützen','safety'],['Eine ruhige Antwort finden','conversation'],['Ein anderes Anliegen','question']]
+ [['Die Person schützen','safety'],['Eine ruhige Antwort finden','conversation'],['Ein anderes Anliegen','conversation']],
+ [['Gemeinsam die Brille suchen','search'],['Ihm eine Aufgabe geben','task'],['Sanft auf etwas anderes lenken','redirect']],
+ [['Sie trösten, wenn sie traurig ist','comfort'],['Jetzt beruhigen','comfort'],['Mit meiner Trauer umgehen','comfort']]
 ];
 const counterexamples=[
  ['Heute nichts von meinem Eis abgeben','boundary'],
  ['Mein Eis nicht teilen müssen','boundary'],
- ['Pay attention to her feelings','question']
+ ['Pay attention to her feelings','conversation'],
+ ['Den Besuch genießen','conversation']
 ];
 if(process.argv.includes('--icons-only')){
  const source=fs.readFileSync(path.join(__dirname,'../demenz-uebersetzer/translator.js'),'utf8');
@@ -50,13 +53,13 @@ if(process.argv.includes('--icons-only')){
    assert.deepEqual(await choices.allTextContents(),mother.goals);
    assert.deepEqual(await choices.locator('[data-goal-icon]').evaluateAll(nodes=>nodes.map(n=>n.dataset.goalIcon)),['conversation','understand','memory']);
    for(const choice of await choices.all()){
-    assert.ok((await choice.boundingBox()).height>=44);assert.equal(await choice.locator('.translator-goal-icon').getAttribute('aria-hidden'),'true');assert.equal(await choice.locator('svg').getAttribute('focusable'),'false');
+    assert.ok((await choice.boundingBox()).height>=44);assert.equal(await choice.locator('.translator-goal-icon').getAttribute('aria-hidden'),'true');assert.equal(await choice.locator('.translator-goal-icon svg').getAttribute('focusable'),'false');
    }
    await choices.nth(0).click();await page.locator('.translator-ai-answer').waitFor();
    assert.deepEqual(requests[1].goal,{id:'choice_1',label:mother.goals[0]},JSON.stringify(requests.map(r=>({keys:Object.keys(r||{}),goal:r?.goal}))));
    const section=page.locator('.translator-other-goals'),own=section.locator('input'),cta=section.getByRole('button',{name:'Antwort zu meinem Ziel',exact:true});
    assert.equal(await own.getAttribute('type'),'text');assert.equal(await own.getAttribute('maxlength'),'160');assert.equal(await own.getAttribute('minlength'),'3');assert.equal(await own.getAttribute('required'),'');
-   assert.equal(await page.getByLabel('Was möchtest du erreichen?',{exact:true}).count(),1);assert.equal(await own.getAttribute('placeholder'),'Zum Beispiel: Ruhig Nein sagen');
+   assert.equal(await page.getByLabel('Was möchtest du erreichen?',{exact:true}).count(),1);assert.equal(await own.getAttribute('placeholder'),'Oder: Eigenes Ziel …');
    assert.equal(await own.evaluate(n=>!!n.closest('details')),false);assert.equal(await own.isVisible(),true);assert.equal(await section.locator('textarea').count(),0);
    assert.ok((await own.boundingBox()).height>=44);assert.ok((await own.boundingBox()).height<=56);assert.ok((await cta.boundingBox()).height>=44);assert.ok(await own.evaluate(n=>parseFloat(getComputedStyle(n).fontSize))>=16);
    const box=await own.boundingBox(),button=await cta.boundingBox();if(width===1280)assert.ok(Math.abs(box.y+box.height-button.y-button.height)<2&&button.x>=box.x+box.width,'Desktop field and CTA share a row aligned at their lower edge');else assert.ok(button.y>=box.y+box.height,'Mobile field and CTA stack');

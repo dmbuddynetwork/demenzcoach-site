@@ -677,6 +677,11 @@
     arbeit: "<rect x=\"3.5\" y=\"7.5\" width=\"17\" height=\"12\" rx=\"1.5\"/><path d=\"M9 7.5V5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\"/><path d=\"M3.5 12.5h17\"/>",
     waschen: "<path d=\"M5 21V6a3 3 0 0 1 6 0\"/><path d=\"M8.5 9h5a2.5 2.5 0 0 0-5 0Z\"/><path d=\"M10 13v1.2M13 13v1.2M16 13v1.2M11.5 16.5v1.2M14.5 16.5v1.2\"/>",
     shield: "<path d=\"M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6z\"/><path d=\"m9 12 2 2 4-4\"/>",
+    // Neue Ziele der KI (Daniel, 28. Nov: Fragezeichen statt passender Symbole): trösten, suchen, Aufgabe geben, lenken.
+    heart: "<path d=\"M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20Z\"/>",
+    search: "<circle cx=\"10.5\" cy=\"10.5\" r=\"6\"/><path d=\"m15 15 5 5\"/>",
+    hand: "<path d=\"M8 12V6a1.5 1.5 0 0 1 3 0v5M11 10.5V4.5a1.5 1.5 0 0 1 3 0v6M14 10.5V6a1.5 1.5 0 0 1 3 0v5.5M17 11.5V9.5a1.5 1.5 0 0 1 3 0V14a7 7 0 0 1-7 7h-.6a6.4 6.4 0 0 1-4.9-2.3l-3.2-3.9a1.6 1.6 0 0 1 2.4-2.1L8 14\"/>",
+    redirect: "<path d=\"M4 19v-4.5A5.5 5.5 0 0 1 9.5 9H20\"/><path d=\"m16 5 4 4-4 4\"/>",
     gift: "<rect x=\"4\" y=\"9\" width=\"16\" height=\"11\" rx=\"1.5\"/><path d=\"M3 9h18v-.5A1.5 1.5 0 0 0 19.5 7h-15A1.5 1.5 0 0 0 3 8.5z\"/><path d=\"M12 7v13\"/><path d=\"M12 7c-1.5-3-5-3.5-5-1.2C7 7 9.5 7 12 7zm0 0c1.5-3 5-3.5 5-1.2C17 7 14.5 7 12 7z\"/>",
   };
   const goalIcon = goal => {
@@ -693,10 +698,19 @@
     if (/geld|bezahlen|finanz|money|\bpayments?\b|financ/.test(label)) return ['money', meaningIcons.geld];
     if (/schutz|sicher|safe|protect/.test(label)) return ['safety', meaningIcons.shield];
     if (/plan|vorbereit|organisier|ablauf|alltag|schritt|tipps|prepare|routine|next step|tips/.test(label)) return ['planning', goalIcons.tipps];
+    if (/trost|trosten|beruhig|trauer|comfort|reassur|griev/.test(label)) return ['comfort', meaningIcons.heart];
+    if (/\bsuch|gesucht|wiederfind|verlegt|verloren|\bsearch|\bfind\b|\blost\b/.test(label)) return ['search', meaningIcons.search];
+    if (/aufgabe|beschaftig|mithelf|helfen lassen|mitmachen|\btask|keep .*busy|\bhelp with\b/.test(label)) return ['task', meaningIcons.hand];
+    if (/lenk|einladen|umleit|spazier|gemeinsam etwas|zusammen etwas|redirect|distract|invite/.test(label)) return ['redirect', meaningIcons.redirect];
     if (/sag|sprech|gesprach|antwort|worte|satz|speak|talk|say|answer|words|sentence/.test(label)) return ['conversation', goalIcons.jetzt];
-    if (goal.id === 'verstehen') return ['understand', goalIcons.verstehen];
-    if (goal.id === 'tipps') return ['planning', goalIcons.tipps];
-    return ['question', meaningIcons.wer];
+    if (/trost|trosten|beruhig|ruhig|geborgen|beistehen|nah sein|trauer|abschied|verstorb|\btod\b|kraft|durchatmen|pause|entlast|ich selbst|mir selbst|mich selbst|fur mich|comfort|calm|reassur|griev|myself|self-care/.test(label)) return ['comfort', meaningIcons.heart];
+    // Danach der Zieltyp vom Server (act_now, prepare_talk, rephrase, understand, organize, self_care) oder vom Katalog.
+    const id = String(goal.id || '');
+    if (id === 'verstehen' || id === 'understand') return ['understand', goalIcons.verstehen];
+    if (id === 'tipps' || id === 'organize') return ['planning', goalIcons.tipps];
+    if (id === 'self_care') return ['comfort', meaningIcons.heart];
+    // Nie ein Fragezeichen: Ohne Treffer zeigt der Knopf die Sprechblase „etwas sagen“.
+    return ['conversation', goalIcons.jetzt];
   };
   const goalSvg = (paths, className = 'translator-goal-icon') => {
     const span = element('span', { className, attributes: { 'aria-hidden': 'true' } });
