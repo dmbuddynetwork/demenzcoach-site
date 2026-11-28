@@ -283,16 +283,20 @@ function mount() {
   const miniCta = where => el('div', { class: 'hs-mini-cta' }, [buyButton('yearly', where), el('p', { class: 'hs-note' })]);
   for (const [block, where] of [[steps, 'schritte'], [examples, 'beispiele'], [voices, 'stimmen']]) block.querySelector('.hs-wrap').append(miniCta(where));
 
-  // Kauf-Block unter jeder Antwort: Jahresplan wie im Preisblock, mit Garantie. Nicht für Kunden mit Abo, nicht bei Sicherheitshinweisen.
+  // Kauf-Block unter jeder Antwort: Überschrift, Nutzen, sofort der Knopf, Preis klein darunter (Daniel 28 Nov: Preis nicht über dem Knopf). Nicht für Kunden mit Abo, nicht bei Sicherheitshinweisen.
+  const answerVoice = () => {
+    const voice = VOICES_EN.find(entry => entry.name === 'Timo');
+    if (!voice) return null;
+    return el('figure', { class: 'hs-answer-buy-voice' }, [el('img', { src: '/assets/stimmen/stimme-timo.webp', width: 492, height: 560, alt: '', loading: 'lazy', decoding: 'async' }), el('div', {}, [el('blockquote', { text: `“${voice.text}”` }), el('figcaption', { text: `${voice.name}, ${voice.rolle}` })])]);
+  };
   const answerBuy = () => el('aside', { class: 'hs-answer-buy', 'aria-label': 'Unlock Dementia Coach' }, [
-    el('p', { class: 'hs-answer-buy-kicker', text: 'For every hard moment' }),
     el('h3', { text: 'Get answers like this whenever you need them' }),
-    el('p', { class: 'hs-answer-buy-price', 'data-answer-price': '' }),
-    el('p', { class: 'hs-plan-day', 'data-per-day': 'yearly' }),
+    el('ul', { class: 'hs-answer-buy-list' }, [el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'The right words for any situation' })]), el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'Ask follow-ups and practise talks' })]), el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'There day and night' })])]),
     buyButton('yearly', 'antwort'),
     el('p', { class: 'hs-note' }),
-    el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30-day money-back guarantee' })])
-  ]);
+    el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30-day money-back guarantee' })]),
+    answerVoice()
+  ].filter(Boolean));
   const placeAnswerBuy = () => {
     if (window.DemenzKiFreigabe?.isPaid?.()) { document.querySelectorAll('.hs-answer-buy').forEach(node => node.remove()); return; }
     let added = false;
