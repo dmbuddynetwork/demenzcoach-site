@@ -32,9 +32,10 @@
   const formStartNext = form.nextSibling;
   const keepInputAtTop = document.body.dataset.translatorInputPosition === 'top';
   const initialPlaceholder = input.getAttribute('placeholder') ?? '';
-  // Wechselnde Beispielsätze im leeren Feld (Daniel, 26. Nov): gemeinsame Liste in /eingabe-beispiele.js, nur auf Deutsch.
+  // Wechselnde Beispielsätze im leeren Feld (Daniel, 26. Nov): gemeinsame Liste in /eingabe-beispiele.js, auf Deutsch und
+  // seit 28. Nov auch auf Englisch (eigene Liste dort, gewählt nach <html lang>). Andere Sprachen behalten den festen Platzhalter.
   const withExamples = (run) => {
-    if (ui) return;
+    if (ui && !/^en(?:-|$)/i.test(document.documentElement.lang || '')) return;
     if (window.DcBeispiele) { run(window.DcBeispiele); return; }
     const script = document.createElement('script');
     script.src = '/eingabe-beispiele.js';
@@ -2407,7 +2408,7 @@
     const field = element('input', { className: 'translator-chat-input', attributes: { type: 'text', maxlength: input.maxLength > 0 ? String(input.maxLength) : '200', autocomplete: 'off', enterkeyhint: 'send', placeholder: en ? 'What happened?' : 'Was ist passiert?', 'aria-label': en ? 'Your situation' : 'Deine Situation' } });
     const send = element('button', { className: 'translator-chat-send', text: en ? 'Find an answer' : 'Antwort finden', attributes: { type: 'submit' } });
     const chatForm = element('form', { className: 'translator-chat-form' }, [field, send]);
-    withExamples((examples) => examples.attach(field, { prefix: 'z. B. ', maxChars: innerWidth < 480 ? 29 : 44 }));
+    withExamples((examples) => examples.attach(field, { prefix: /^en(?:-|$)/i.test(document.documentElement.lang || '') ? 'e.g. ' : 'z. B. ', maxChars: innerWidth < 480 ? 29 : 44 }));
     // Unter einer Antwort (Daniel, 26. Nov): eine Eingabezeile „Frag weiter …“ im ChatGPT-Stil und daneben ein runder
     // Knopf „+“ für eine neue Situation. Ein Tipp auf „+“ wechselt zu „Was ist passiert?“, derselbe Knopf zeigt dann „×“ (zurück).
     const plusIcon = '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';

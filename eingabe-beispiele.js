@@ -17,6 +17,19 @@
     'Sie fragt immer wieder dasselbe.',
     'Er erkennt mich nicht mehr.'
   ];
+  // Englische Seiten (Daniel, 28. Nov: Englisch wie Deutsch): eigene, natürliche Beispiele statt Übersetzung.
+  if (/^en(?:-|$)/i.test(document.documentElement.lang || '')) EXAMPLES = [
+    'Mom wants to go home.',
+    'Dad keeps asking for his wife.',
+    'She won’t take a shower.',
+    'He says: “I’ve already eaten.”',
+    'She is looking for her dog.',
+    'He wants to get up at night.',
+    'Mom says: “You stole my money.”',
+    'Dad won’t take his pills.',
+    'She asks the same question again and again.',
+    'He doesn’t recognize me anymore.'
+  ];
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var TYPE_MS = 70;      // pro Buchstabe: langsam genug zum Mitlesen
   var HOLD_MS = 3200;    // fertiger Satz bleibt stehen
