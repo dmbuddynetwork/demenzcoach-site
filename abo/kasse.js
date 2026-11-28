@@ -158,7 +158,9 @@ function sessionBody(options) {
     ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
     ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}),
     // Seite im Probewochen-Modus (?preis=probe): der Server gibt Monat und Jahr dann ohne Gratis-Tage.
-    ...(options.preis === "probe" ? { preis: "probe" } : {}) };
+    ...(options.preis === "probe" ? { preis: "probe" } : {}),
+    // Englische Seiten (28. Nov 2026): Stripe-Seite, Erfolgsseite und Vertragsmail auf Englisch. Ältere Server ignorieren das Feld.
+    ...(EN ? { locale: "en" } : {}) };
 }
 function sessionFor(options, user, token) {
   const meta = window.DemenzConsent?.metaContext?.()?.meta?.consent === true;
@@ -330,7 +332,8 @@ export async function mountApplePay(slot, options) {
             ...measureFields(),
             ...(publicConfig.walletEmail === true && !options.email ? { emailLater: true } : {}),
             ...(options.offer ? { offer: options.offer } : {}), ...(options.email ? { email: options.email } : {}),
-            ...(options.preis === "probe" ? { preis: "probe" } : {}) }
+            ...(options.preis === "probe" ? { preis: "probe" } : {}),
+            ...(EN ? { locale: "en" } : {}) }
         });
         if (!session.clientSecret) throw new Error("no_client_secret");
         return session.clientSecret;

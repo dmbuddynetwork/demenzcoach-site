@@ -15,6 +15,11 @@
     // ?ap=1 und ?alt=1 (alte Planwahl für Tests und Notfall-Rückbau).
     (function () {
       var q = new URLSearchParams(location.search);
+      // Englische Kasse (28. Nov 2026): Erfolgsseite auf Englisch, Abbruch zurück zu den Preisen auf /en/.
+      if (q.get("lang") === "en") {
+        if (q.get("status") === "abgebrochen") { location.replace("/en/" + (q.get("src") ? "?src=" + (q.get("src") || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 30) : "") + "#preise"); return; }
+        document.documentElement.lang = "en";
+      }
       if ((q.has("status") && q.get("status") !== "abgebrochen") || q.has("session_id") || q.get("weiter") === "1" || q.get("ap") === "1" || q.get("alt") === "1") return;
       var t = new URLSearchParams({ direkt: "1" });
       var src = (q.get("src") || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 30);

@@ -50,3 +50,17 @@ export const paymentStatusText = Object.freeze({
   trialing: ["Deine Probezeit ist aktiv", "Deine kostenlose Probezeit hat begonnen. Heute wurde nichts berechnet. Eine Vertragsbestätigung kommt per E-Mail."],
   no_payment_due: ["Dein Abo ist aktiv", "Für deine aktuelle Rechnung ist keine Zahlung fällig. Eine Vertragsbestätigung kommt per E-Mail."]
 });
+
+// Englische Rückkehr von Stripe (?lang=en, 28. Nov 2026): dieselben Zustände, natürliches Englisch.
+export const paymentStatusTextEn = Object.freeze({
+  checking: ["Checking your payment", "We are checking your payment. Please do not start a second subscription."],
+  legacy: ["Check your payment status", "We cannot confirm your payment status here yet. Please check it under “Manage subscription”. Please do not start a second subscription."],
+  pending: ["Your payment is still being checked", "With a bank debit, confirmation can take a few working days. Your access opens once the payment is confirmed. Please do not start a second subscription."],
+  failed: ["Your access is not open yet", "The payment was not confirmed or the subscription has ended. Please check under “Manage subscription”. You can also change the payment method there."],
+  action_required: ["Please check your payment", "Your payment still needs a confirmation. Open “Manage subscription” to see the next step."],
+  elsewhere: ["Your payment has arrived", "Your subscription is linked to another login. Sign in with the email address you used to pay. Then your subscription is active here too. Please do not start a second subscription."],
+  unverified: ["Payment status not confirmed yet", "We could not check your payment status. Use the same browser and account as when you paid, and try again. Please do not start a second subscription."],
+  paid: ["Your payment is confirmed", "Your subscription is active. A contract confirmation is on its way by email."],
+  trialing: ["Your free trial has started", "Your free trial is active. You were not charged today. A contract confirmation is on its way by email."],
+  no_payment_due: ["Your subscription is active", "No payment is due for your current invoice. A contract confirmation is on its way by email."]
+});
