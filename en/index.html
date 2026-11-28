@@ -114,7 +114,7 @@
        shared with de/verkauf.css). Everyone gets it; ?home=a shows the old page. Source and campaign are kept here because the
        page removes utm parameters later. -->
   <script>(function(){var d=document.documentElement,u=new URLSearchParams(location.search),a=u.get("home")==="a"?"a":"b";d.dataset.homeArm=a;d.dataset.homeSrc=(u.get("src")||u.get("utm_source")||"").slice(0,40);d.dataset.homeCampaign=(u.get("utm_campaign")||u.get("k")||"").slice(0,80);/* Reel-Links (28. Nov): Reel und UTM beim Laden merken, nur im Seitenspeicher. Die erste Antwort leert die Adresse. */d.dataset.homeAd=(u.get("utm_content")||u.get("a")||"").toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,60);var q=new URLSearchParams();["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k){var v=u.get(k);if(v)q.set(k,v.slice(0,80))});d.dataset.homeUtm=q.toString();if(a==="b")d.classList.add("home-b")})();</script>
-  <link rel="stylesheet" href="/de/verkauf.css?v=20261128i">
+  <link rel="stylesheet" href="/de/verkauf.css?v=20261128k">
 </head>
 <body class="einfach homepage-v2" data-page-type="translator-home" data-page-language="en" data-page-slug="home-en" data-translator-input-position="top">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -236,7 +236,7 @@
   <script src="/abo/ki-freigabe.js"></script>
   <script src="/demenz-uebersetzer/translator-ai.js"></script>
   <script src="/demenz-uebersetzer/translator.js"></script>
-  <script type="module" src="/en/sales.js?v=20261128i"></script>
+  <script type="module" src="/en/sales.js?v=20261128k"></script>
   <script>(function(){var list=document.getElementById('e-tiles'),end=document.getElementById('e-tiles-end');if(!list||!end||!('IntersectionObserver' in window))return;var step=6,items=[].slice.call(list.children);items.forEach(function(li,i){if(i>=step)li.hidden=true;});function rest(){return list.querySelectorAll('li[hidden]');}var io=new IntersectionObserver(function(e){if(!e[0].isIntersecting)return;var h=rest();for(var i=0;i<step&&i<h.length;i++)h[i].hidden=false;if(!rest().length)io.disconnect();else{io.unobserve(end);io.observe(end);}},{rootMargin:'400px 0px'});io.observe(end);})();</script>
 </body>
 </html>

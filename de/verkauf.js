@@ -289,16 +289,20 @@ function mount() {
   const miniCta = where => el('div', { class: 'hs-mini-cta' }, [buyButton('yearly', where), el('p', { class: 'hs-note' })]);
   for (const [block, where] of [[steps, 'schritte'], [examples, 'beispiele'], [voices, 'stimmen']]) block.querySelector('.hs-wrap').append(miniCta(where));
 
-  // Kauf-Block unter jeder Antwort: Jahresplan wie im Preisblock, mit Garantie. Nicht für Kunden mit Abo, nicht bei Sicherheitshinweisen.
+  // Kauf-Block unter jeder Antwort: Überschrift, Nutzen, sofort der Knopf, Preis klein darunter (Daniel 28 Nov: Preis nicht über dem Knopf). Nicht für Kunden mit Abo, nicht bei Sicherheitshinweisen.
+  const answerVoice = () => {
+    const voice = (Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : []).find(entry => entry.name === 'Timo');
+    if (!voice) return null;
+    return el('figure', { class: 'hs-answer-buy-voice' }, [el('img', { src: '/assets/stimmen/stimme-timo.webp', width: 492, height: 560, alt: '', loading: 'lazy', decoding: 'async' }), el('div', {}, [el('blockquote', { text: `„${voice.text}“` }), el('figcaption', { text: `${voice.name}, ${voice.rolle}` })])]);
+  };
   const answerBuy = () => el('aside', { class: 'hs-answer-buy', 'aria-label': 'Demenz Coach freischalten' }, [
-    el('p', { class: 'hs-answer-buy-kicker', text: 'Für jeden schweren Moment' }),
     el('h3', { text: 'Hol dir solche Antworten, wann immer du sie brauchst' }),
-    el('p', { class: 'hs-answer-buy-price', 'data-answer-price': '' }),
-    el('p', { class: 'hs-plan-day', 'data-per-day': 'yearly' }),
+    el('ul', { class: 'hs-answer-buy-list' }, [el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'Passende Worte für jede Situation' })]), el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'Nachfragen und Gespräche üben' })]), el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'Tag und Nacht sofort da' })])]),
     buyButton('yearly', 'antwort'),
     el('p', { class: 'hs-note' }),
-    el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30 Tage Geld\u2011zurück\u2011Garantie' })])
-  ]);
+    el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30 Tage Geld\u2011zurück\u2011Garantie' })]),
+    answerVoice()
+  ].filter(Boolean));
   const placeAnswerBuy = () => {
     if (window.DemenzKiFreigabe?.isPaid?.()) { document.querySelectorAll('.hs-answer-buy').forEach(node => node.remove()); return; }
     let added = false;
