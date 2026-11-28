@@ -15,6 +15,8 @@
     // ?ap=1 und ?alt=1 (alte Planwahl für Tests und Notfall-Rückbau).
     (function () {
       var q = new URLSearchParams(location.search);
+      // Nach dem Kauf (Daniel, 28. Nov 2026: „Zeige keine extra Seite“): nur ein ruhiges Laden, abo.js prüft still und leitet weiter.
+      if (q.get("status") === "fertig") document.documentElement.classList.add("abo-quiet");
       // Englische Kasse (28. Nov 2026): Erfolgsseite auf Englisch, Abbruch zurück zu den Preisen auf /en/.
       if (q.get("lang") === "en") {
         if (q.get("status") === "abgebrochen") { location.replace("/en/" + (q.get("src") ? "?src=" + (q.get("src") || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 30) : "") + "#preise"); return; }
@@ -38,6 +40,7 @@
   <script type="module" src="abo.js"></script>
 </head>
 <body data-marketing-pixels>
+  <div class="abo-quiet-loader" role="status" aria-live="polite"><span class="abo-spinner" aria-hidden="true"></span><span id="abo-quiet-text">Einen Moment …</span></div>
   <main class="abo-page">
     <div class="abo-top">
       <a class="abo-brand" href="/de/"><img src="/assets/lovable-logo.jpg" width="40" height="40" alt=""><span>Demenz Coach</span></a>
