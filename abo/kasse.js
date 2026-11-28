@@ -157,7 +157,10 @@ function measureFields() {
   let search = location.search;
   try { search = hostWindow().location.search || search; } catch { /* fremder Rahmen */ }
   const params = new URLSearchParams(search);
-  const ad = String(params.get("utm_content") || params.get("a") || "").toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
+  // Die Startseite merkt sich das Reel beim Laden (data-home-ad), weil die erste Antwort die Adresse leert (28. Nov 2026).
+  let landingAd = "";
+  try { landingAd = hostWindow().document.documentElement.dataset.homeAd || ""; } catch { /* fremder Rahmen */ }
+  const ad = String(params.get("utm_content") || params.get("a") || landingAd || "").toLowerCase().replace(/[^a-z0-9_-]/gu, "").slice(0, 60);
   let test = [params.get("src"), params.get("utm_source")].some((value) => String(value || "").trim().toLowerCase() === "test");
   try { test ||= localStorage.getItem("demenzcoach.internal.v1") === "1"; } catch { /* privater Modus */ }
   return { ...(ad ? { ad } : {}), ...(test ? { test: true } : {}) };

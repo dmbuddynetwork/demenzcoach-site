@@ -281,3 +281,23 @@ test("Verwaltung: Schreibweisen umgehen das Tor nicht", async () => {
 test("Geräte-Markierung /intern/ bleibt frei, ohne Passwort", async () => {
   for (const p of ["/intern/", "/intern/index.html"]) { const r = await gated(p); assert.equal(r.status, 200, p); }
 });
+
+// Reel-Kurz-Links (28. Nov 2026): /fb/<reel> usw. leiten sofort auf die Verkaufs-Startseite mit fester Quelle.
+test("Reel-Kurz-Links leiten mit Quelle und Reel-Namen auf /de/", async () => {
+  for (const [path, platform, source, reel] of [
+    ["/fb/mama-nach-hause", "fbreel", "facebook", "mama-nach-hause"],
+    ["/ig/Teller_Trick", "igreel", "instagram", "tellertrick"],
+    ["/tt/", "ttreel", "tiktok", "bio"],
+    ["/yt", "ytreel", "youtube", "bio"],
+    ["/FB/r12/?fbclid=abc", "fbreel", "facebook", "r12"]
+  ]) {
+    const response = await request(path);
+    assert.equal(response.status, 302, path);
+    const target = new URL(response.headers.get("Location"));
+    assert.equal(target.origin + target.pathname, "https://dementiacoachapp.com/de/", path);
+    assert.deepEqual(Object.fromEntries(target.searchParams), { src: platform, utm_source: source, utm_medium: "reel", utm_campaign: "reels", utm_content: reel }, path);
+    assert.equal(response.headers.get("Cache-Control"), "no-store");
+  }
+  for (const path of ["/fb/a/b", "/fbx/a", "/facebook/a"]) assert.notEqual((await request(path)).status, 302, path);
+  assert.equal((await request("/fb/a", "POST")).status === 302, false);
+});

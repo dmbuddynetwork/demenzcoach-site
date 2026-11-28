@@ -18,6 +18,21 @@ function mount() {
   const source = `home_${clean(root.dataset.homeSrc || params.get('src') || params.get('utm_source')) || 'direkt'}`.slice(0, 30);
   const campaign = clean(root.dataset.homeCampaign || params.get('utm_campaign') || params.get('k'), 60);
   const load = src => new Promise(resolve => { const s = document.createElement('script'); s.src = src; s.onload = s.onerror = resolve; document.head.append(s); });
+  // Zähler ohne Einwilligung (abo/zaehler.js, nur Summen je Tag und Schritt, keine Quelle und kein Reel-Name): Weg „reel“ für
+  // Besucher über die Reel-Kurz-Links (src=fbreel, igreel …), sonst „home“ (Daniel, 28. Nov 2026, Thread „Reels direkt auf die Startseite“).
+  const way = /reel$/.test(clean(root.dataset.homeSrc || params.get('src'))) ? 'reel' : 'home';
+  const tallyReady = load('/abo/zaehler.js');
+  const tally = stage => { tallyReady.then(() => window.DemenzZaehler?.once(`${way}_${stage}`)); };
+  const tallyCheckout = name => {
+    if (name === 'checkout_sheet_ready') tally('kasse');
+    else if (name === 'apple_pay_quick_tap') tally('applepay');
+    else if (name === 'apple_pay_quick_confirm') tally('applepay_ok');
+  };
+  tally('view');
+  document.addEventListener('submit', event => {
+    const input = document.getElementById('translator-input');
+    if (event.target?.id === 'translator-form' && input?.value.trim()) tally('ask');
+  }, true);
 
   // ---- Preise: feste Werte, dann die Werte des Servers (wie /hilfe/ und /start/) ------------------------------------
   let offer = { yearly: 6999, monthly: 1299, trialDays: 7 };
@@ -419,11 +434,12 @@ function mount() {
   });
   const buy = async (plan, where) => {
     track('home_sales_checkout', { where, plan });
+    tally('cta');
     try { window.DemenzConsent?.trackMarketing?.('InitiateCheckout'); } catch { /* */ }
     const api = await kasse();
     if (!api || !config.firebase?.apiKey) { location.href = `/abo/?plan=${plan}&src=${source}${campaign ? `&c=${campaign}` : ''}&weiter=1`; return; }
     history.pushState({ sheet: true }, '', location.href);
-    api.open({ plan, source, campaign, offer: checkoutOffer(plan), stripePage: where.endsWith('_andere'), track: name => track(name, { where }),
+    api.open({ plan, source, campaign, offer: checkoutOffer(plan), stripePage: where.endsWith('_andere'), track: name => { tallyCheckout(name); track(name, { where }); },
       onClose: () => { if (history.state?.sheet) history.back(); },
       onOfferExpired: () => { const gone = deal(); if (gone) window.DemenzAngebot.drop(gone.kind); refresh(); } });
   };
@@ -441,7 +457,7 @@ function mount() {
     const slot = document.getElementById('hs-ap-yearly');
     if (!api?.mountApplePay || !config.firebase?.apiKey || !slot || slot.dataset.mounted) return;
     slot.dataset.mounted = '1';
-    api.mountApplePay(slot, { plan: 'yearly', offer: checkoutOffer('yearly'), source, campaign, track: name => track(name, { where: 'preis_jahr' }),
+    api.mountApplePay(slot, { plan: 'yearly', offer: checkoutOffer('yearly'), source, campaign, track: name => { tallyCheckout(name); track(name, { where: 'preis_jahr' }); },
       onError: message => { prices.querySelector('[data-plan-card="yearly"] [data-terms]').textContent = message; } })
       .then(shown => { if (shown) { slot.hidden = false; prices.querySelector('.hs-ap-alt').hidden = false; } else delete slot.dataset.mounted; });
   });
@@ -469,7 +485,7 @@ function mount() {
   if ('IntersectionObserver' in window) {
     let timer = null;
     const warm = new IntersectionObserver(entries => {
-      if (entries.some(entry => entry.isIntersecting)) { clearTimeout(timer); timer = setTimeout(() => { track('home_sales_price_seen'); prepare('yearly'); mountApplePay(); warm.disconnect(); }, 1500); }
+      if (entries.some(entry => entry.isIntersecting)) { clearTimeout(timer); timer = setTimeout(() => { track('home_sales_price_seen'); tally('price'); prepare('yearly'); mountApplePay(); warm.disconnect(); }, 1500); }
       else clearTimeout(timer);
     // Mittleres Band des Bildschirms statt Anteil: Der Preisblock ist auf dem Handy höher als drei Bildschirme.
     }, { rootMargin: '-30% 0px -30% 0px', threshold: 0 });
