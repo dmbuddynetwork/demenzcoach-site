@@ -22,9 +22,9 @@ const server = http.createServer((req, res) => { try {
   await new Promise(r => server.listen(0, '127.0.0.1', r));
   const origin = 'http://127.0.0.1:' + server.address().port;
   let browser, cases = 0;
-  const run = async ({ query, applePay, stripeApple = true, email, embedded = false, viewport = { width: 390, height: 844 } }, check) => {
+  const run = async ({ query, applePay, stripeApple = true, email, embedded = false, failFirst = 0, viewport = { width: 390, height: 844 } }, check) => {
     const context = await browser.newContext({ viewport, isMobile: true, hasTouch: true });
-    const page = await context.newPage(), sessions = [], stripeScripts = [];
+    const page = await context.newPage(), sessions = [], stripeScripts = [], faults = []; let failed = 0;
     if (applePay) await page.addInitScript(() => { window.ApplePaySession = { canMakePayments: () => true }; });
     if (email) await page.addInitScript(e => { try { sessionStorage.setItem('demenzCoachEmail', e); } catch {} }, email);
     await context.route('**/*', async route => {
@@ -38,6 +38,8 @@ const server = http.createServer((req, res) => { try {
       if (url.hostname === 'checkout.stripe.com') return route.fulfill({ contentType: 'text/html', body: '<h1>Stripe hosted fixture</h1>' });
       if (url.hostname.endsWith('cloudfunctions.net')) {
         if (url.pathname.endsWith('/config')) return route.fulfill({ headers, json: { checkoutMode: 'elements', ...(embedded ? { embedded: true, form: true } : {}), hostedFallback: true, walletEmail: true, plans: { yearly: { amount: 6999, currency: 'eur' }, monthly: { amount: 1299, currency: 'eur' } }, trialDays: 7, textVersions: { terms: 'fx' }, publishableKey: 'pk_test_fx' } });
+        if (url.pathname.endsWith('/client-error')) { faults.push(JSON.parse(req.postData()).kind); return route.fulfill({ status: 204, headers }); }
+        if (url.pathname.endsWith('/session') && !req.postDataJSON().hostedFallback && failed < failFirst) { failed++; sessions.push({ ...req.postDataJSON(), failed: true }); return route.fulfill({ status: 502, headers, json: { code: 'stripe_error', message: 'x' } }); }
         if (url.pathname.endsWith('/session')) { { const body = req.postDataJSON(); if (body.hostedFallback) (sessions.hosted ||= []).push(body); else sessions.push(body); } return route.fulfill({ headers, json: req.postDataJSON().hostedFallback ? { checkoutMode: 'hosted', url: 'https://checkout.stripe.com/c/pay/cs_fx', trialDays: 7, plan: 'yearly', firstYear: null } : { clientSecret: 'cs_fx_secret', trialDays: 7, plan: 'yearly', firstYear: null } }); }
         return route.fulfill({ headers, json: {} });
       }
@@ -49,7 +51,7 @@ const server = http.createServer((req, res) => { try {
       if (await decline.count()) await decline.click();
       page.on('console', m => process.env.DBG && console.log('console:', m.text())); page.on('pageerror', e => process.env.DBG && console.log('pageerror:', e.message));
       await page.locator('.start-cta').first().waitFor();
-      await check({ page, sessions, stripeScripts });
+      await check({ page, sessions, stripeScripts, faults });
       cases++;
     } finally { await context.close(); }
   };
@@ -103,6 +105,26 @@ const server = http.createServer((req, res) => { try {
       await page.locator('.start-ap-wrap').last().scrollIntoViewIfNeeded();
       await page.waitForFunction(() => window.__ece.mounted.filter(x => x === 'yearly').length === 2);
       assert.ok(sessions.length <= 2, 'höchstens eine Sitzung je Knopf');
+    });
+    // 3a) Kassenfehler 502 vom 28. Nov 2026: Die erste Sitzung scheitert (Stripe-Konflikt). Nach 1,5 s kommt ein zweiter Versuch,
+    //     Apple Pay bleibt sichtbar, und beide Ereignisse werden ohne Text gezählt.
+    await run({ query: '?direkt=1', applePay: true, failFirst: 1 }, async ({ page, sessions, faults }) => {
+      await page.waitForFunction(() => window.__ece?.mounted.includes('yearly'), null, { timeout: 8000 });
+      assert.equal(sessions.filter(x => x.plan === 'yearly').length, 2, 'ein zweiter Versuch');
+      assert.equal(sessions[0].failed, true);
+      await page.waitForTimeout(200);
+      assert.deepEqual(faults, ['checkout_session_502_stripe_error', 'checkout_session_retry_ok']);
+      assert.equal(await page.locator('.start-ap-alt').first().isVisible(), true);
+      if (process.env.SHOTS) { await page.locator('.start-ap-wrap').first().scrollIntoViewIfNeeded(); await page.screenshot({ path: path.join(process.env.SHOTS, 'apple-pay-nach-zweitem-versuch.png') }); }
+    });
+    // 3a2) Scheitert auch der zweite Versuch, bleibt der lila Knopf (Stripes Seite) und der Fehler wird gezählt.
+    await run({ query: '?direkt=1', applePay: true, failFirst: 2 }, async ({ page, sessions, faults }) => {
+      await page.waitForFunction(() => document.querySelector('.start-ap-wrap'), null, { timeout: 8000 });
+      await page.waitForTimeout(2500);
+      assert.equal(sessions.filter(x => x.failed).length, 2);
+      assert.ok(faults.includes('checkout_quick_502_stripe_error'), faults.join());
+      assert.equal(await page.locator('.start-cta').first().isVisible(), true);
+      if (process.env.SHOTS) { await page.locator('.start-cta').first().scrollIntoViewIfNeeded(); await page.screenshot({ path: path.join(process.env.SHOTS, 'ohne-apple-pay-lila-knopf-bleibt.png') }); }
     });
     // 3b) ?ap=0 und Geräte ohne Apple Pay: normale Seite ohne Stripe.js, ohne Sitzung, ohne Link.
     for (const [query, applePay] of [['?direkt=1&ap=0', true], ['?direkt=1', false]]) {

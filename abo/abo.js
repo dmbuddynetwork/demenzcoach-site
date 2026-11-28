@@ -90,6 +90,31 @@ async function api(path, { method = "GET", body, token } = {}) {
 
 // Kurze Störungen (Netz, Zeitüberschreitung, Serverfehler) versuchen wir selbst noch zweimal, bevor wir den Kunden stören.
 const isTransient = (problem) => problem?.code === "network" || problem?.code === "timeout" || problem?.status >= 500;
+// Kassenfehler zählen (28. Nov 2026, backend/client-error-counter.mjs im App-Repo): nur Art und Seitenpfad, nie Text,
+// Konto oder Kennung. Darum ohne Einwilligung. Je Seitenaufruf jede Art einmal, insgesamt höchstens 8.
+const checkoutFaults = new Set();
+const faultName = (problem) => [problem?.status, problem?.code].filter(Boolean).join("_").toLowerCase().replace(/[^a-z0-9_]+/gu, "_").slice(0, 36) || "error";
+function reportCheckoutFault(kind) {
+  if (checkoutFaults.has(kind) || checkoutFaults.size >= 8) return;
+  checkoutFaults.add(kind);
+  const gate = config.translatorGate?.endpoint || "https://europe-west1-dementica-df17b.cloudfunctions.net/api/v1/translator-web";
+  try {
+    fetch(gate.replace(/\/v1\/translator-web$/u, "/v1/client-error"), { method: "POST", headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ kind, page: location.pathname }), keepalive: true }).catch(() => {});
+  } catch { /* Zählen darf nie etwas kaputt machen */ }
+}
+// Neue Konten: Jahr und Monat holen ihre Sitzung gleichzeitig. Ein kurzer Konflikt (502/409, Netz) bekommt einen zweiten Versuch
+// nach 1,5 s, bevor Apple Pay verschwindet (Kassenfehler 502 vom 28. Nov 2026).
+async function sessionWithRetry(post) {
+  try { return await post(); } catch (problem) {
+    if (problem?.code === "already_subscribed" || problem?.status === 429 || !(isTransient(problem) || problem?.status === 409)) throw problem;
+    reportCheckoutFault(`checkout_session_${faultName(problem)}`);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const session = await post();
+    reportCheckoutFault("checkout_session_retry_ok");
+    return session;
+  }
+}
 async function apiWithRetry(path, options) {
   for (let tries = 0; ; tries++) {
     try { return await api(path, options); } catch (problem) {
@@ -227,14 +252,14 @@ async function mountQuick(plan) {
     const token = await user.getIdToken();
     const deal = plan === "yearly" && currentDeal() ? window.DemenzAngebot.forCheckout() : null;
     await window.DemenzTeller?.ready;
-    const session = await api("/session", {
+    const session = await sessionWithRetry(() => api("/session", {
       method: "POST",
       token,
       body: { plan, termsVersion: state.offer?.textVersions?.terms, source: state.source, campaign: state.campaign,
         ...window.DemenzTeller?.attribution(),
         ...(state.offer?.walletEmail === true ? { emailLater: true } : {}), ...(deal ? { offer: deal } : {}),
         ...(state.preis ? { preis: state.preis } : {}) }
-    });
+    }));
     if (!session.clientSecret) throw new Error("no_client_secret");
     await loadStripe();
     const stripe = window.Stripe(state.offer.publishableKey, { locale: "de" });
@@ -261,6 +286,7 @@ async function mountQuick(plan) {
     express.mount($(`quick-slot-${plan}`));
   } catch (error) {
     delete quick.slots[plan];
+    if (error?.code !== "already_subscribed") reportCheckoutFault(`checkout_quick_${faultName(error)}`);
     // Rate-Limit, bereits ein Abo oder ein Fehler: still auf den normalen Weg zurück, nichts blockieren.
     hideQuick();
     if (error?.code === "already_subscribed") show("already");
