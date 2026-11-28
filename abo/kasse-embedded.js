@@ -41,9 +41,10 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
   ensureStyle(doc);
   const make = (tag, props = {}, text) => { const node = doc.createElement(tag); for (const [key, value] of Object.entries(props)) node.setAttribute(key, value); if (text) node.textContent = text; return node; };
   const dialog = make("dialog", { class: "kasse-embed", "aria-labelledby": "kasse-embed-title" });
-  const closeButton = make("button", { type: "button", class: "kasse-embed-close", "aria-label": "Schließen" }, "×");
+  const en = /^en(?:-|$)/iu.test(doc.documentElement.lang || "");
+  const closeButton = make("button", { type: "button", class: "kasse-embed-close", "aria-label": en ? "Close" : "Schließen" }, "×");
   const heading = make("h2", { id: "kasse-embed-title", tabindex: "-1" }, title);
-  const status = make("p", { class: "kasse-embed-status", role: "status" }, "Die sichere Zahlung wird geladen …");
+  const status = make("p", { class: "kasse-embed-status", role: "status" }, en ? "Loading secure payment …" : "Die sichere Zahlung wird geladen …");
   const problem = make("div", { class: "kasse-embed-problem", hidden: "", role: "alert" });
   const box = make("div", { class: "kasse-embed-box" });
   // Daniel, 26. Nov 2026: kein sichtbarer Titel über Stripe, damit der Bezahlknopf möglichst ohne Scrollen sichtbar ist.
@@ -56,9 +57,13 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
     const base = "https://dementiacoachapp.com";
     const intro = make("p", { class: "kasse-embed-terms" }, terms || "");
     const links = make("p", { class: "kasse-embed-links" });
-    links.append("Online kündbar, ohne Anmeldung: ");
-    for (const [index, [href, text]] of [["/abo/kuendigen.html", "Verträge hier kündigen"], ["https://billing.stripe.com/p/login/dRmbJ17QQ8TP85s79Z1ZS00", "Abo verwalten"], ["/abo/garantie.html", "30 Tage Geld-zurück-Garantie"],
-      ["/nutzungsbedingungen.html", "Nutzungsbedingungen"], ["/abo/widerruf.html", "Widerrufsbelehrung"], ["/datenschutz.html", "Datenschutz"]].entries()) {
+    links.append(en ? "Cancel online, no login needed: " : "Online kündbar, ohne Anmeldung: ");
+    const linkList = en
+      ? [["/abo/kuendigen.html", "Cancel contracts here"], ["https://billing.stripe.com/p/login/dRmbJ17QQ8TP85s79Z1ZS00", "Manage subscription"], ["/terms-en.html#abo-web", "30-day money-back guarantee"],
+        ["/terms-en.html", "Terms of Use"], ["/terms-en.html#abo-web", "Right of withdrawal"], ["/privacy-en.html", "Privacy"]]
+      : [["/abo/kuendigen.html", "Verträge hier kündigen"], ["https://billing.stripe.com/p/login/dRmbJ17QQ8TP85s79Z1ZS00", "Abo verwalten"], ["/abo/garantie.html", "30 Tage Geld-zurück-Garantie"],
+        ["/nutzungsbedingungen.html", "Nutzungsbedingungen"], ["/abo/widerruf.html", "Widerrufsbelehrung"], ["/datenschutz.html", "Datenschutz"]];
+    for (const [index, [href, text]] of linkList.entries()) {
       if (index) links.append(" · ");
       links.append(make("a", { href: href.startsWith("https:") ? href : base + href, target: "_blank", rel: "noopener" }, text));
     }
@@ -96,9 +101,9 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
     status.hidden = true;
     problem.hidden = false;
     problem.replaceChildren(make("p", { class: "abo-error" }, message));
-    const retry = make("button", { type: "button", class: "abo-button" }, "Erneut versuchen");
+    const retry = make("button", { type: "button", class: "abo-button" }, en ? "Try again" : "Erneut versuchen");
     retry.addEventListener("click", () => { if (dispose()) onRetry?.(); });
-    const help = make("a", { class: "kasse-help", href: "/kontakt.html" }, "Klappt es nicht? Schreib uns, wir helfen sofort.");
+    const help = make("a", { class: "kasse-help", href: en ? "/contact-en.html" : "/kontakt.html" }, en ? "Not working? Write to us, we’ll help right away." : "Klappt es nicht? Schreib uns, wir helfen sofort.");
     problem.append(retry, help);
     track?.("checkout_embedded_failed");
   };
@@ -130,7 +135,7 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
 
   try {
     await loadStripe(host);
-    const stripe = host.Stripe(publishableKey);
+    const stripe = en ? host.Stripe(publishableKey, { locale: "en" }) : host.Stripe(publishableKey);
     if (isForm) {
       await mountForm(stripe);
     } else {
@@ -147,12 +152,12 @@ export async function showEmbeddedCheckout({ host = hostWindow(), session, publi
     const poll = () => {
       if (finished) return;
       if (box.querySelector("iframe")) { status.hidden = true; track?.("checkout_embedded_ready"); return; }
-      if (Date.now() - started > LOAD_LIMIT_MS) return fail("Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt.");
+      if (Date.now() - started > LOAD_LIMIT_MS) return fail(en ? "The payment could not load. This is usually the internet connection. You have not paid anything." : "Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt.");
       watchdog = setTimeout(poll, 100);
     };
     poll();
   } catch {
-    fail("Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt.");
+    fail(en ? "The payment could not load. This is usually the internet connection. You have not paid anything." : "Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt.");
   }
   return { close };
 }

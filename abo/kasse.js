@@ -11,6 +11,9 @@ const redirectHostedCheckout = createHostedCheckoutRedirect((url) => {
   location.assign(url);
 });
 const config = window.DEMENZ_ABO_CONFIG || {};
+// Englische Seiten (lang="en", Daniel 28. Nov 2026: englische Startseite): Texte dieses Fensters auf Englisch, deutsche Seiten unverändert.
+const EN = /^en(?:-|$)/iu.test(document.documentElement.lang || "");
+const t = (de, en) => (EN ? en : de);
 const firebaseVersion = "12.16.0";
 
 let firebase = null;
@@ -68,7 +71,7 @@ async function initAuth() {
   ]);
   firebase = authModule;
   auth = firebase.getAuth(initializeApp(config.firebase));
-  auth.languageCode = "de";
+  auth.languageCode = EN ? "en" : "de";
   await new Promise((resolve) => { const stop = firebase.onAuthStateChanged(auth, () => { stop(); resolve(); }); });
 }
 async function signedInUser() {
@@ -97,26 +100,30 @@ function close() {
 }
 
 // Pflichtangaben über Stripes Formular (ui_mode "form" kennt keine eigenen Texte): Preis inkl. MwSt., Laufzeit, Kündigung, Probezeit.
-const euro = (cents) => new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
+const euro = (cents) => new Intl.NumberFormat(EN ? "en-US" : "de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);
 function termsFor(session) {
   // Bezahlte Probewoche (27. Nov 2026, Server-Tarif „probe“): Monatspreis mit 7 Tagen für 1,00 €. Wer schon getestet hat,
   // bekommt vom Server trialFee 0 und das normale Monatsabo; dann gelten die Monats-Texte.
   if (session?.plan === "probe") {
     const monthly = publicConfig?.plans?.monthly?.amount;
     if (!Number.isFinite(monthly)) return "";
-    const monthlyTerms = `${euro(monthly)} pro Monat inkl. MwSt. Verlängert sich monatlich, jederzeit zum Monatsende kündbar.`;
+    const monthlyTerms = t(`${euro(monthly)} pro Monat inkl. MwSt. Verlängert sich monatlich, jederzeit zum Monatsende kündbar.`,
+      `${euro(monthly)} a month incl. VAT. Renews monthly, cancel anytime effective at the end of the month.`);
     if (!(session.trialFee > 0) || !(session.trialDays > 0)) return monthlyTerms;
-    return `${session.trialDays} Tage für ${euro(session.trialFee)}, dann ${monthlyTerms} Kündigst du vorher, zahlst du nur die Probewoche.`;
+    return t(`${session.trialDays} Tage für ${euro(session.trialFee)}, dann ${monthlyTerms} Kündigst du vorher, zahlst du nur die Probewoche.`,
+      `${session.trialDays} days for ${euro(session.trialFee)}, then ${monthlyTerms} If you cancel before, you only pay for the trial week.`);
   }
   const amount = publicConfig?.plans?.[session?.plan]?.amount;
   if (!Number.isFinite(amount)) return "";
-  const trial = session.trialDays > 0 ? `${session.trialDays} Tage kostenlos, dann ` : "";
+  const trial = session.trialDays > 0 ? t(`${session.trialDays} Tage kostenlos, dann `, `${session.trialDays} days free, then `) : "";
+  const noCharge = trial ? t(" Kündigst du vorher, zahlst du nichts.", " If you cancel before, you pay nothing.") : "";
   if (session.plan === "yearly") {
     const first = Number.isFinite(session.firstYear) ? session.firstYear : amount;
-    const price = first !== amount ? `${euro(first)} im ersten Jahr, danach ${euro(amount)} pro Jahr` : `${euro(amount)} pro Jahr`;
-    return `${trial}${price} inkl. MwSt. 1 Jahr Mindestlaufzeit, danach unbefristet mit 1 Monat Kündigungsfrist.${trial ? " Kündigst du vorher, zahlst du nichts." : ""}`;
+    const price = first !== amount ? t(`${euro(first)} im ersten Jahr, danach ${euro(amount)} pro Jahr`, `${euro(first)} for the first year, then ${euro(amount)} a year`)
+      : t(`${euro(amount)} pro Jahr`, `${euro(amount)} a year`);
+    return `${trial}${price}${t(" inkl. MwSt. 1 Jahr Mindestlaufzeit, danach unbefristet mit 1 Monat Kündigungsfrist.", " incl. VAT. 1-year minimum term, then ongoing with 1 month’s notice.")}${noCharge}`;
   }
-  return `${trial}${euro(amount)} pro Monat inkl. MwSt. Verlängert sich monatlich, jederzeit zum Monatsende kündbar.${trial ? " Kündigst du vorher, zahlst du nichts." : ""}`;
+  return `${trial}${euro(amount)}${t(" pro Monat inkl. MwSt. Verlängert sich monatlich, jederzeit zum Monatsende kündbar.", " a month incl. VAT. Renews monthly, cancel anytime effective at the end of the month.")}${noCharge}`;
 }
 
 // Tempo (Daniel, 26. Nov 2026: die Zahlung muss sofort kommen): Konto, Konfiguration und die Stripe-Sitzung werden schon
@@ -185,11 +192,11 @@ export async function open(options) {
   const attempt = {};
   const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
   const fail = (message) => { error.textContent = message; error.hidden = false; error.scrollIntoView({ block: "nearest", behavior: "smooth" }); };
-  const loading = el("p", { class: "kasse-loading", role: "status", text: "Die sichere Zahlung wird geöffnet …" });
+  const loading = el("p", { class: "kasse-loading", role: "status", text: t("Die sichere Zahlung wird geöffnet …", "Opening secure payment …") });
   let loadingTimer = null;
-  const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? "Jahresplan starten" : options.plan === "probe" ? "Probewoche starten" : "Monatsplan starten" });
+  const title = el("h2", { id: "kasse-title", tabindex: "-1", text: options.plan === "yearly" ? t("Jahresplan starten", "Start yearly plan") : options.plan === "probe" ? t("Probewoche starten", "Start trial week") : t("Monatsplan starten", "Start monthly plan") });
   const card = el("div", { class: "kasse-card" }, [
-    el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": "Schließen", text: "×", onclick: () => close() })]),
+    el("div", { class: "kasse-head" }, [title, el("button", { type: "button", class: "kasse-close", "aria-label": t("Schließen", "Close"), text: "×", onclick: () => close() })]),
     error,
     loading
   ]);
@@ -204,7 +211,7 @@ export async function open(options) {
   document.body.classList.add("start-noscroll");
   title.focus();
   loadingTimer = setTimeout(() => {
-    if (sheet?.node === node && !loading.hidden) loading.textContent = "Das Laden dauert länger. Du kannst die Kasse schließen und erneut öffnen.";
+    if (sheet?.node === node && !loading.hidden) loading.textContent = t("Das Laden dauert länger. Du kannst die Kasse schließen und erneut öffnen.", "This is taking longer. You can close the payment window and open it again.");
   }, 15_000);
 
   let checkoutUID = null;
@@ -227,7 +234,7 @@ export async function open(options) {
       if (!requireCurrentAccount()) return;
       // Daniel, 24. Nov 2026: kein eigenes eingebettetes Stripe-Formular. Apple Pay und Google Pay stehen auf der gehosteten
       // Stripe-Seite oben, die E-Mail kommt von Stripe, wenn sie hier noch nicht bekannt ist.
-      loading.textContent = "Weiter zur sicheren Zahlung bei Stripe …";
+      loading.textContent = t("Weiter zur sicheren Zahlung bei Stripe …", "Continuing to secure payment with Stripe …");
       const session = await sessionFor(options, user, token);
       if (!requireCurrentAccount()) return;
       if (session?.checkoutMode === "embedded" || session?.checkoutMode === "form") {
@@ -250,7 +257,7 @@ export async function open(options) {
       try { await begin(); break; } catch (problem) {
         if (!isTransient(problem) || tries >= AUTO_RETRIES || sheet?.node !== node) throw problem;
         options.track?.("checkout_auto_retry");
-        loading.textContent = "Die Verbindung ist langsam. Ich versuche es noch einmal …";
+        loading.textContent = t("Die Verbindung ist langsam. Ich versuche es noch einmal …", "The connection is slow. Trying again …");
         await wait(1500 * (tries + 1));
         if (sheet?.node !== node) return;
       }
@@ -260,28 +267,28 @@ export async function open(options) {
     loading.hidden = true;
     if (!sheet || sheet.node !== node) return;
     if (problem.code === "checkout_account_changed") {
-      fail("Dein Konto hat sich geändert. Öffne die Zahlung für dein aktuelles Konto erneut.");
-      card.append(el("button", { type: "button", class: "abo-button", text: "Erneut versuchen",
+      fail(t("Dein Konto hat sich geändert. Öffne die Zahlung für dein aktuelles Konto erneut.", "Your account has changed. Please open the payment again for your current account."));
+      card.append(el("button", { type: "button", class: "abo-button", text: t("Erneut versuchen", "Try again"),
         onclick: () => { if (sheet?.node === node) open({ ...options, email: auth?.currentUser?.email || undefined }); } }));
       return;
     }
     if (problem.code === "already_subscribed") {
-      card.append(el("p", { text: "Du hast schon ein Abo. Dein Plan ist freigeschaltet." }), el("a", { class: "abo-button", href: "/abo/mein-plan.html", text: "Zu deinem Plan" }));
+      card.append(el("p", { text: t("Du hast schon ein Abo. Dein Plan ist freigeschaltet.", "You already have a subscription. Your plan is unlocked.") }), el("a", { class: "abo-button", href: "/abo/mein-plan.html", text: t("Zu deinem Plan", "Go to your plan") }));
       return;
     }
     if (problem.code === "offer_expired" || problem.code === "invalid_offer") {
       close();
       return options.onOfferExpired?.();
     }
-    if (problem.code === "email_required") return fail("Bitte gib deine E-Mail-Adresse ein. Geh dafür einen Schritt zurück.");
-    if (problem.code === "terms_outdated") return fail("Die Seite ist nicht mehr aktuell. Bitte lade sie neu.");
+    if (problem.code === "email_required") return fail(t("Bitte gib deine E-Mail-Adresse ein. Geh dafür einen Schritt zurück.", "Please enter your email address. Go back one step to do this."));
+    if (problem.code === "terms_outdated") return fail(t("Die Seite ist nicht mehr aktuell. Bitte lade sie neu.", "This page is out of date. Please reload it."));
     options.track?.("checkout_load_failed");
     fail(isTransient(problem)
-      ? "Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt."
-      : "Die Zahlung kann gerade nicht starten. Du hast nichts bezahlt. Bitte versuch es noch einmal.");
+      ? t("Die Zahlung konnte nicht geladen werden. Das liegt meist an der Internetverbindung. Du hast nichts bezahlt.", "The payment could not load. This is usually the internet connection. You have not paid anything.")
+      : t("Die Zahlung kann gerade nicht starten. Du hast nichts bezahlt. Bitte versuch es noch einmal.", "The payment cannot start right now. You have not paid anything. Please try again."));
     card.append(
-      el("button", { type: "button", class: "abo-button", text: "Erneut versuchen", onclick: () => { if (sheet?.node === node) open(options); } }),
-      el("a", { class: "kasse-help", href: "/kontakt.html", text: "Klappt es nicht? Schreib uns, wir helfen sofort." })
+      el("button", { type: "button", class: "abo-button", text: t("Erneut versuchen", "Try again"), onclick: () => { if (sheet?.node === node) open(options); } }),
+      el("a", { class: "kasse-help", href: EN ? "/contact-en.html" : "/kontakt.html", text: t("Klappt es nicht? Schreib uns, wir helfen sofort.", "Not working? Write to us, we’ll help right away.") })
     );
   } finally {
     if (sheet?.node === node) sheet.pending = false;
@@ -332,7 +339,7 @@ export async function mountApplePay(slot, options) {
     }
     const clientSecret = await quickSessions.get(key);
     await loadStripeScript();
-    const stripe = window.Stripe(publicConfig.publishableKey, { locale: "de" });
+    const stripe = window.Stripe(publicConfig.publishableKey, { locale: EN ? "en" : "de" });
     const init = stripe.initCheckoutElementsSdk ?? stripe.initCheckout;
     const checkout = await init.call(stripe, { clientSecret, elementsOptions: { appearance: { theme: "stripe", variables: { colorPrimary: "#47408c", borderRadius: "999px" } } } });
     const express = checkout.createExpressCheckoutElement({
@@ -411,7 +418,8 @@ const LATER_STYLE = `
 let laterOpen = false;
 // offerLater({ plan, email, source, track }) → zeigt das Angebot, wenn der Server es anbietet und es nicht gesperrt ist.
 export async function offerLater(options = {}) {
-  if (laterOpen || laterBlocked() || !config.endpoint) return false;
+  // Die Mail „Später weitermachen“ ist nur auf Deutsch. Englische Seiten bieten sie darum (noch) nicht an.
+  if (EN || laterOpen || laterBlocked() || !config.endpoint) return false;
   let loaded;
   try { loaded = await loadConfig(); } catch { return false; }
   const offer = loaded?.reminderMail;
