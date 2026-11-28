@@ -80,6 +80,29 @@ export const tellerTarget = (request, random = () => crypto.getRandomValues(new 
   return target.toString();
 };
 
+// Reel-Kurz-Links (Daniel, 28. Nov 2026, Lehre A der Diagnose: „jedes Reel verlinkt die Verkaufs-Startseite mit eigener Quelle“).
+// /fb/<reel>, /ig/<reel>, /tt/<reel>, /yt/<reel> leiten sofort (302) auf /de/ mit fester Quelle je Plattform und dem Reel als
+// utm_content. Ohne Reel-Namen (/fb, /fb/) gilt „bio“ (Link in der Bio). Neue Reels brauchen keinen neuen Code. Der Name wird
+// auf a-z, 0-9 und - gekürzt; sonst wird nichts übernommen (kein Eingabetext, keine Klick-IDs). Kein Cookie, keine Kennung.
+const REEL_PLATFORMS = Object.freeze({ fb: 'facebook', ig: 'instagram', tt: 'tiktok', yt: 'youtube' });
+export const reelTarget = (request) => {
+  if (!['GET', 'HEAD'].includes(request.method)) return null;
+  const input = new URL(request.url);
+  const match = /^\/(fb|ig|tt|yt)(?:\/([^/]*)\/?)?$/i.exec(input.pathname);
+  if (!match) return null;
+  const platform = match[1].toLowerCase();
+  let name = '';
+  try { name = decodeURIComponent(match[2] || ''); } catch { name = ''; }
+  const reel = name.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 40) || 'bio';
+  const target = new URL('/de/', input.origin);
+  target.searchParams.set('src', `${platform}reel`);
+  target.searchParams.set('utm_source', REEL_PLATFORMS[platform]);
+  target.searchParams.set('utm_medium', 'reel');
+  target.searchParams.set('utm_campaign', 'reels');
+  target.searchParams.set('utm_content', reel);
+  return target.toString();
+};
+
 // Verwaltung (/intern/…): nur mit Passwort. Das Passwort steht als Secret INTERN_PASSWORD im Cloudflare-Worker, nie im Repo.
 // Fehlt das Secret oder ist es zu kurz, bleibt alles gesperrt (503), nie offen. Nur die Geräte-Markierung /intern/ ist frei,
 // sie speichert nur ein Merkzeichen im eigenen Browser. Antworten werden nie zwischengespeichert und nie indexiert.
@@ -117,6 +140,10 @@ export default {
     const url = new URL(request.url);
     const blocked = await internGate(request, env);
     if (blocked) return blocked;
+    const reel = reelTarget(request);
+    if (reel) {
+      return new Response(null, { status: 302, headers: { Location: reel, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer', 'X-Robots-Tag': 'noindex' } });
+    }
     if (url.pathname === '/teller/liste.html') {
       return new Response(null, { status: 301, headers: { Location: 'https://dementiacoachapp.com/de/demenz-alltagstipps.html', 'Referrer-Policy': 'no-referrer' } });
     }

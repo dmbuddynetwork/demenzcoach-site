@@ -195,6 +195,17 @@ const websiteAnalytics = (() => {
   // Google Analytics bekommt dann traffic_type=internal und kann diese Zugriffe per Datenfilter ausschließen.
   const internalTraffic = (() => { try { return localStorage.getItem('demenzcoach.internal.v1') === '1'; } catch { return false; } })();
 
+  // Reel-Links (28. Nov 2026): Die Startseite merkt sich die UTM-Werte beim Laden (data-home-utm im <head>). Der Übersetzer leert
+  // die Adresse schon beim Laden und nach der Antwort, bevor gtag.js sie liest. Darum bekommt GA4 die Kampagne immer von hier,
+  // sonst zählt jeder Reel- und Newsletter-Besuch als „direct“.
+  const landingCampaign = () => {
+    let landing;
+    try { landing = new URLSearchParams(document.documentElement.dataset.homeUtm || ''); } catch { return {}; }
+    if (!landing.get('utm_source')) return {};
+    const fields = { campaign_source: 'utm_source', campaign_medium: 'utm_medium', campaign_name: 'utm_campaign', campaign_content: 'utm_content' };
+    return Object.fromEntries(Object.entries(fields).map(([field, key]) => [field, landing.get(key)]).filter(([, value]) => value));
+  };
+
   const loadTag = () => {
     if (tagLoaded || window.DemenzTeller?.redirecting()) return;
     tagLoaded = true;
@@ -218,6 +229,7 @@ const websiteAnalytics = (() => {
       allow_ad_personalization_signals: false,
       content_group: pageContext.page_type,
       ...pageContext,
+      ...landingCampaign(),
       ...(internalTraffic ? { traffic_type: 'internal' } : {})
     });
     addScript(`https://www.googletagmanager.com/gtag/js?id=${measurementID}`);

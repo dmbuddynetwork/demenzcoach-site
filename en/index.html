@@ -113,7 +113,7 @@
   <!-- English sales homepage (Daniel, 28 Nov 2026: „stelle auch englisch so online“). Same page as /de/ (en/sales.js, styles
        shared with de/verkauf.css). Everyone gets it; ?home=a shows the old page. Source and campaign are kept here because the
        page removes utm parameters later. -->
-  <script>(function(){var d=document.documentElement,u=new URLSearchParams(location.search),a=u.get("home")==="a"?"a":"b";d.dataset.homeArm=a;d.dataset.homeSrc=(u.get("src")||u.get("utm_source")||"").slice(0,40);d.dataset.homeCampaign=(u.get("utm_campaign")||u.get("k")||"").slice(0,80);if(a==="b")d.classList.add("home-b")})();</script>
+  <script>(function(){var d=document.documentElement,u=new URLSearchParams(location.search),a=u.get("home")==="a"?"a":"b";d.dataset.homeArm=a;d.dataset.homeSrc=(u.get("src")||u.get("utm_source")||"").slice(0,40);d.dataset.homeCampaign=(u.get("utm_campaign")||u.get("k")||"").slice(0,80);/* Reel-Links (28. Nov): Reel und UTM beim Laden merken, nur im Seitenspeicher. Die erste Antwort leert die Adresse. */d.dataset.homeAd=(u.get("utm_content")||u.get("a")||"").toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,60);var q=new URLSearchParams();["utm_source","utm_medium","utm_campaign","utm_content"].forEach(function(k){var v=u.get(k);if(v)q.set(k,v.slice(0,80))});d.dataset.homeUtm=q.toString();if(a==="b")d.classList.add("home-b")})();</script>
   <link rel="stylesheet" href="/de/verkauf.css?v=20261128f">
 </head>
 <body class="einfach homepage-v2" data-page-type="translator-home" data-page-language="en" data-page-slug="home-en" data-translator-input-position="top">
