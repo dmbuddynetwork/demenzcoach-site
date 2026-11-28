@@ -115,6 +115,7 @@ const server = http.createServer((req, res) => { try {
       await page.waitForTimeout(200);
       assert.deepEqual(faults, ['checkout_session_502_stripe_error', 'checkout_session_retry_ok']);
       assert.equal(await page.locator('.start-ap-alt').first().isVisible(), true);
+      if (process.env.SHOTS) { await page.locator('.start-ap-wrap').first().scrollIntoViewIfNeeded(); await page.screenshot({ path: path.join(process.env.SHOTS, 'apple-pay-nach-zweitem-versuch.png') }); }
     });
     // 3a2) Scheitert auch der zweite Versuch, bleibt der lila Knopf (Stripes Seite) und der Fehler wird gezählt.
     await run({ query: '?direkt=1', applePay: true, failFirst: 2 }, async ({ page, sessions, faults }) => {
@@ -123,6 +124,7 @@ const server = http.createServer((req, res) => { try {
       assert.equal(sessions.filter(x => x.failed).length, 2);
       assert.ok(faults.includes('checkout_quick_502_stripe_error'), faults.join());
       assert.equal(await page.locator('.start-cta').first().isVisible(), true);
+      if (process.env.SHOTS) { await page.locator('.start-cta').first().scrollIntoViewIfNeeded(); await page.screenshot({ path: path.join(process.env.SHOTS, 'ohne-apple-pay-lila-knopf-bleibt.png') }); }
     });
     // 3b) ?ap=0 und Geräte ohne Apple Pay: normale Seite ohne Stripe.js, ohne Sitzung, ohne Link.
     for (const [query, applePay] of [['?direkt=1&ap=0', true], ['?direkt=1', false]]) {
