@@ -22,6 +22,31 @@
   const validFixedSafety = value => value?.kind === 'safety' && (value.safetyLevel === 'urgent'
     || value.safetyLevel === 'concern' && typeof value.message === 'string' && value.message.trim().length > 0);
 
+  // Fehler-Zähler (28. Nov 2026, Daniel: „Tracke solche Fehler auch, damit wir sie beheben können“).
+  // Gesendet werden nur Art und Seitenpfad, ohne Satz, Antwort, Kennung oder Konto. Der Server zählt Summen je Tag
+  // (backend/client-error-counter.mjs im App-Repo). Je Seitenaufruf jede Art höchstens einmal, insgesamt höchstens 8.
+  const faultEndpoint = endpoint.replace(/\/v1\/translator-web$/u, '/v1/client-error');
+  const reportedFaults = new Set();
+  const reportFault = kind => {
+    try {
+      const value = String(kind || '').toLowerCase().replace(/[^a-z0-9_]+/gu, '_').replace(/^_+|_+$/gu, '').slice(0, 60);
+      if (!value || reportedFaults.has(value) || reportedFaults.size >= 8 || typeof fetch !== 'function') return;
+      reportedFaults.add(value);
+      const page = String(root.location?.pathname || '/').slice(0, 120);
+      fetch(faultEndpoint, { method: 'POST', body: JSON.stringify({ kind: value, page }), keepalive: true,
+        credentials: 'omit', referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'text/plain' } }).catch(() => {});
+    } catch { /* Zählen darf die Seite nie stören */ }
+  };
+  const errorCode = value => /^[a-z_]{1,40}$/u.test(String(value || '')) ? value : 'unknown';
+  // Skriptfehler unserer eigenen Dateien (nicht von Fremdskripten): Art = js_<dateiname>.
+  root.addEventListener?.('error', event => {
+    try {
+      const file = String(event?.filename || '');
+      if (!file.startsWith(root.location.origin + '/')) return;
+      reportFault('js_' + file.split('?')[0].split('/').pop().replace(/\.js$/u, ''));
+    } catch { /* nie stören */ }
+  });
+
   const normalizedText = text => String(text).normalize('NFC').trim();
   const bodyFor = (text, { formal = false, goal, previous } = {}) => ({ text,
     formal: language === 'en' ? false : formal === true, ...(language ? { language } : {}), ...(goal ? { goal } : {}),
@@ -54,7 +79,13 @@
     if (typeof snapshot?.onResult !== 'function') return;
     try { snapshot.onResult({ proof: response.headers.get('X-Translator-Snapshot-Proof') || null, error: response.headers.get('X-Translator-Snapshot-Error') || null }); } catch { /* sharing never blocks care */ }
   };
-  const ask = async (text, options = {}) => { const result = await askOnce(text, options); remember(result); return result; };
+  let lastFault = '';
+  const ask = async (text, options = {}) => {
+    lastFault = '';
+    const result = await askOnce(text, options);
+    if (lastFault) reportFault(lastFault);
+    remember(result); return result;
+  };
   const askOnce = async (text, { formal = false, correctionOf = "", requestID = "", goal, snapshot } = {}) => {
     const accessContext = root.DemenzKiFreigabe?.createAccessContext?.();
     const finish = result => root.DemenzKiFreigabe?.bindAccessResult?.(result, accessContext) || result;
@@ -67,26 +98,34 @@
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await fetch(endpoint + '?response_contract=clarification-v1&goal_contract=' + outcomesContract, {
+      const send = async (fresh = false) => fetch(endpoint + '?response_contract=clarification-v1&goal_contract=' + outcomesContract, {
         method: 'POST',
         mode: 'cors',
         credentials: 'omit',
         referrerPolicy: 'no-referrer',
-        headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID, accessContext }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}), ...snapshotHeaders(snapshot) },
+        headers: { 'Content-Type': 'application/json', ...await root.DemenzKiFreigabe?.requestContext({ requestID, accessContext, fresh }), ...(correctionOf ? { 'X-Translator-Correction-Of': correctionOf } : {}), ...snapshotHeaders(snapshot) },
         body: JSON.stringify(payload),
         signal: controller.signal
       });
-      if (response.status === 429) return { kind: 'error', reason: 'busy' };
+      let response = await send();
+      // 28. Nov 2026: War die Anmeldung im Browser noch nicht fertig, sagt der Server 401 (nichts wurde verbraucht).
+      // Dann einmal mit frischem Ausweis neu fragen, statt die Fehlerkarte zu zeigen.
+      if (response.status === 401 && root.DemenzKiFreigabe?.enabled()) {
+        const first = await response.clone().json().catch(() => ({}));
+        if (first.code === 'authentication_required') { reportFault('answer_auth_retry'); response = await send(true); }
+      }
+      if (response.status === 429) { lastFault = 'answer_busy'; return { kind: 'error', reason: 'busy' }; }
       if (response.ok) reportSnapshot(snapshot, response);
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
+        if (!['signup_required', 'payment_required'].includes(error.code)) lastFault = `answer_${response.status}_${errorCode(error.code)}`;
         if ([401, 402, 409, 410, 503].includes(response.status) && ['signup_required', 'payment_required', 'authentication_required', 'access_unavailable', 'request_in_progress', 'request_completed', 'correction_unavailable', 'answer_recovery_credit', 'answer_unavailable'].includes(error.code)) return finish({ kind: 'access', reason: error.code, access: error.access });
         return { kind: 'error', reason: 'unavailable' };
       }
       const result = await response.json();
       const hasText = (value) => typeof value === 'string' && value.trim().length > 0;
       const receivedGeneralInfo = generalSafetyInfo(result?.generalSafetyInfo);
-      const invalid = () => ({ kind: 'error', reason: 'unavailable', safetyLevel: result?.safetyLevel,
+      const invalid = () => (lastFault = 'answer_invalid', { kind: 'error', reason: 'unavailable', safetyLevel: result?.safetyLevel,
         safetyMessage: hasText(result?.safetyMessage) ? result.safetyMessage : '',
         ...(receivedGeneralInfo ? { generalSafetyInfo: receivedGeneralInfo } : {}) });
       if (!result || typeof result.kind !== 'string') return invalid();
@@ -119,7 +158,8 @@
       // Alle Antworttypen benutzen denselben Textvertrag, auch error/off_topic
       // oder unbekannte Typen mit einem bereits empfangenen Sicherheitssignal.
       return finish({ ...result, safetyMessage: hasText(result.safetyMessage) ? result.safetyMessage : '' });
-    } catch {
+    } catch (error) {
+      lastFault = error?.name === 'AbortError' ? 'answer_timeout' : 'answer_network';
       return { kind: 'error', reason: 'unavailable' };
     } finally {
       clearTimeout(timer);
@@ -154,6 +194,8 @@
     const previous = previousFor(textValue);
     const issue = requestIssue(textValue, { formal, previous });
     if (issue) return { kind: 'error', reason: issue };
+    // Die Anmeldung schon jetzt starten: Während die Ziele laden, wird der Ausweis für die Antwort fertig.
+    root.DemenzKiFreigabe?.warm?.();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
     try {
@@ -161,7 +203,7 @@
         referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'application/json', ...snapshotHeaders(snapshot) },
         body: JSON.stringify(bodyFor(textValue, { formal, previous })), signal: controller.signal });
       if (response.ok) reportSnapshot(snapshot, response);
-      if (!response.ok) return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' };
+      if (!response.ok) { reportFault(`goals_${response.status}`); return { kind: 'error', reason: response.status === 429 ? 'busy' : 'unavailable' }; }
       const value = await response.json();
       if (validFixedSafety(value)) return value;
       if (value && Object.hasOwn(value, 'generalSafetyInfo') && !generalSafetyInfo(value.generalSafetyInfo)) return { kind: 'error', reason: 'unavailable' };
@@ -185,8 +227,8 @@
         || value.goals.some(g => !ids.includes(g?.goal) || typeof g.label !== 'string' || !g.label.trim() || g.label.length > 64)
         || new Set(value.goals.map(g => g.goal)).size !== value.goals.length) return { kind: 'error', reason: 'unavailable' };
       return value;
-    } catch { return { kind: 'error', reason: 'unavailable' }; }
+    } catch (error) { reportFault(error?.name === 'AbortError' ? 'goals_timeout' : 'goals_network'); return { kind: 'error', reason: 'unavailable' }; }
     finally { clearTimeout(timer); }
   };
-  root.DemenzTranslatorAI = { ask, askGoals, share, requestIssue, generalSafetyInfo, endpoint, remember };
+  root.DemenzTranslatorAI = { ask, askGoals, share, requestIssue, generalSafetyInfo, endpoint, remember, reportFault };
 })(typeof window !== 'undefined' ? window : globalThis);
