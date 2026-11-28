@@ -1088,3 +1088,5 @@ body.einfach[data-translator-state="goal"] > .translator-chat { display: none !i
   body.einfach .translator-answer .translator-goal-row .translator-goal-chosen { flex: 1 1 100%; font-size: 1.25rem !important; line-height: 1.3 !important; }
   body.einfach .translator-answer .translator-goal-row .translator-goal-change { margin-left: 30px; padding: 4px 6px; font-size: 1rem; }
 }
+/* 28. Nov 2026: Auf schmalen Handys stehen Ziel-Knöpfe untereinander. Zwei nebeneinander brachen Wörter mitten im Wort. */
+@media(max-width:560px){ body.einfach .translator-other-goals .translator-ai-goal-choice, body.einfach .translator-ai-goals-selected > .translator-ai-goal-choices button { flex-basis:100%; } }
