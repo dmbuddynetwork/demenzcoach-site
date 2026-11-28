@@ -14,7 +14,7 @@ const shots = process.env.BEISPIEL_SHOTS || '';
       const shot = async (name) => { if (shots) await p.screenshot({ path: path.join(shots, `${name}-${view.n}.png`) }); };
       // 1 Startseite: Platzhalter tippt sich ein und wechselt.
       await p.goto(`${preview.origin}/de/`);
-      const decline = p.getByRole('button', { name: 'Ablehnen', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
+      const decline = p.getByRole('button', { name:'Nein, danke', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
       const big = p.locator('#translator-input');
       const ph = () => big.getAttribute('placeholder');
       await p.waitForFunction(() => document.querySelector('#translator-input')?.placeholder.length > 'Zum Beispiel: '.length + 8 && document.querySelector('#translator-input').placeholder.startsWith('Zum Beispiel: '));

@@ -130,7 +130,7 @@ const server = http.createServer((req,res)=>{try {
  }
  async function open(page,origin,mode,plan){
   await page.goto(origin+'/abo/?alt=1&plan='+plan);
-  const decline=page.getByRole('button',{name:'Ablehnen',exact:true});
+  const decline=page.getByRole('button',{name:'Nein, danke',exact:true});
   if(await decline.count())await decline.click();
   if(mode==='page'){
    await page.getByRole('button',{name:'Weiter',exact:true}).click();

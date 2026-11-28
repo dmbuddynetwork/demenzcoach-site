@@ -15,7 +15,7 @@ const shots = process.env.GOAL_SHOTS || '';
       const goalHeading = p.getByRole('heading', { name: 'Was möchtest du jetzt erreichen?' });
       // 1 Kachel auf der Startseite führt zur Zielfrage, es ist nichts vorausgewählt.
       await p.goto(`${preview.origin}/de/`);
-      const decline = p.getByRole('button', { name: 'Ablehnen', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
+      const decline = p.getByRole('button', { name:'Nein, danke', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
       await p.locator('a.e-tile[data-translator-key]').first().click();
       await goalHeading.waitFor();
       assert.equal(await p.locator('.translator-goal-chosen').count(), 0, 'kein Ziel vorausgewählt');

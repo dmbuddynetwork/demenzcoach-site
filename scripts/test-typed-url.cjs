@@ -10,7 +10,7 @@ const { createPreviewServer } = require('./generator-preview.cjs');
     await c.route('**/*', r => new URL(r.request().url()).origin === preview.origin ? r.continue() : r.abort());
     const p = await c.newPage(); const errors = []; p.on('pageerror', e => errors.push(e.message));
     await p.goto(`${preview.origin}/de/`);
-    const decline = p.getByRole('button', { name: 'Ablehnen', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
+    const decline = p.getByRole('button', { name:'Nein, danke', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
     await p.locator('#translator-input').fill('Ich ziehe mich nicht um.'); await p.keyboard.press('Enter');
     await p.waitForFunction(() => location.pathname.includes('ich-ziehe-mich-nicht-um'));
     await p.goBack(); await p.waitForFunction(() => location.pathname === '/de/');

@@ -24,7 +24,7 @@ const googleModule = `export function createGoogleAccess(){return{begin:async()=
         const p = await c.newPage(); const errors = []; p.on('pageerror', e => errors.push(e.message));
         try {
           await p.goto(`${preview.origin}/de/${variant === 'funnel' ? '?anmeldung=funnel' : ''}`);
-          const decline = p.getByRole('button', { name: 'Ablehnen', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
+          const decline = p.getByRole('button', { name:'Nein, danke', exact: true }); if (await decline.count()) await decline.click().catch(() => {});
           await p.evaluate(async () => {
             window.DemenzKiFreigabe = { refresh: async () => ({ enabled: true, verified: false, paid: false }), takePending() {} };
             const { mountInlineSignup } = await import('/abo/inline-signup.js');

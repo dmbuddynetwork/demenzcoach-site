@@ -47,7 +47,7 @@ const server = http.createServer((req, res) => { try {
     });
     try {
       await page.goto(origin + '/abo/' + query);
-      const decline = page.getByRole('button', { name: 'Ablehnen', exact: true });
+      const decline = page.getByRole('button', { name:'Nein, danke', exact: true });
       if (await decline.count()) await decline.click();
       await page.waitForSelector('#yearly-price:not(:empty)');
       await check({ page, sessions, stripeScripts, origin });
