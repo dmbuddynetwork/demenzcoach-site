@@ -149,7 +149,8 @@
       const value = JSON.parse(raw || 'null'); return value?.until > Date.now() && typeof value.text === 'string' ? value.text.slice(0, 200) : '';
     } catch { return ''; }
   }
-  function offerCard({ sentence = '', reason = 'payment_required', doc = root.document, value, onRetry } = {}) {
+  const signupDelay = 6000;
+  function offerCard({ sentence = '', reason = 'payment_required', doc = root.document, value, onRetry, delay = 0 } = {}) {
     if (value && !currentAccess(value)) { value = undefined; reason = 'access_unavailable'; }
     accept(value);
     const card = node(doc, 'section'); card.className = 'ki-angebot';
@@ -188,9 +189,11 @@
     if (!signup) { const login = node(doc, 'a', en ? 'Already a member? Sign in' : 'Schon Mitglied? Anmelden'); login.href = accountURL(); login.addEventListener('click', () => remember(sentence)); card.append(login); }
     card.append(node(doc, 'p', en ? 'Safety information and public guides remain free.' : 'Sicherheitshinweise und öffentliche Ratgeber bleiben kostenlos.'));
     if (signup && config.signIn?.emailLink === true) {
-      import('/abo/inline-signup.js').then(({ mountInlineSignup }) => {
+      // Daniel, 28. Nov 2026: Man soll zuerst sehen, dass es funktioniert. Nach einer Antwort kommt die Anmeldung darum erst
+      // nach 6 Sekunden als Layer über der Antwort (delay aus afterAnswer). Bis dahin steht die Karte mit dem Link „Kostenloses Konto einrichten“ unter der Antwort.
+      root.setTimeout(() => import('/abo/inline-signup.js').then(({ mountInlineSignup }) => {
         if (card.isConnected) return mountInlineSignup(card, { bonus, en, purpose: enabled() ? 'intro' : 'invitation', signupCopy: access?.signupCopy, creditActive: creditEligible, returnTo: returnPath(), onBegin: () => remember(sentence) });
-      }).catch(() => { /* The existing accessible account link remains usable. */ });
+      }).catch(() => { /* The existing accessible account link remains usable. */ }), delay);
     }
     exp()?.track(signup ? 'web_signup_shown' : 'web_paywall_shown'); return card;
   }
@@ -245,7 +248,7 @@
     accept(result.access);
     if (!access || result.safetyLevel !== 'standard' || result.safetyMessage) return null;
     exp()?.track('web_answer_completed');
-    if (!access.verified && !access.paid && (access.registeredAdditional > 0 || access.signupBeforePaywall === true) && (access.signupPlacement === 'after-first' || !access.remaining)) return offerCard({ reason: 'signup_required', doc, sentence });
+    if (!access.verified && !access.paid && (access.registeredAdditional > 0 || access.signupBeforePaywall === true) && (access.signupPlacement === 'after-first' || !access.remaining)) return offerCard({ reason: 'signup_required', doc, sentence, delay: signupDelay });
     if (access.unlimited === true && access.verified && !access.paid) return softPaywall(doc);
     if (!access.paid && !access.remaining) return offerCard({ reason: 'payment_required', doc });
     const notice = node(doc, 'p', access.paid ? (en ? 'Your membership is active.' : 'Deine Mitgliedschaft ist aktiv.') : (en ? `${access.remaining} introductory answers remaining.` : `Noch ${access.remaining} Antworten zum Ausprobieren.`)); notice.className = 'ki-angebot-klein'; return notice;
