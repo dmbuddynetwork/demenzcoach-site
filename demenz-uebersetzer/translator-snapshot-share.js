@@ -152,15 +152,8 @@
       if (!node.isConnected) return;
       chain.activated = true;
       setAddress(readToken);
-      status.textContent = text.autoNotice;
-      const removeButton = btn(text.remove, 'translator-copy translator-snapshot-remove', async () => {
-        removeButton.disabled = true; status.textContent = text.removing;
-        const result = await api.remove(readToken, deleteToken);
-        if (result.ok || result.status === 404) { root.DemenzSnapshotStore.remove(readToken); clearAddress(); node.remove(); }
-        else { removeButton.disabled = false; status.textContent = text.removeFailed; }
-      });
-      node.append(el('div', { className: 'translator-snapshot-actions' }, [removeButton]));
-      node.hidden = false;
+      // Daniel, 28. Nov: kein Hinweistext und kein Knopf „Link löschen“ unter der Antwort. Der Link steht still in der
+      // Adresszeile und bleibt dauerhaft gültig.
     })();
     return node;
   };

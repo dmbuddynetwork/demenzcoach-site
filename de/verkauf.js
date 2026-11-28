@@ -303,10 +303,19 @@ function mount() {
     el('span', { text: 'Hilft es dir nicht, bekommst du dein Geld zurück. Ohne Begründung. ' }),
     el('a', { href: '/abo/garantie.html', onclick: () => track('home_sales_garantie'), text: 'Bedingungen' })
   ])]);
+  // Hinweis auf die iPhone-App (Daniel, 28. Nov). Nur weiter unten, nie im ersten Bildschirm. Nicht auf Android.
+  const appHint = place => /Android/i.test(navigator.userAgent) ? el('span', { hidden: true }) : el('a', {
+    class: 'hs-app', href: `https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_de_home_${place}&mt=8`,
+    'data-store-link': `home-${place}`, onclick: () => track('home_sales_app', { place })
+  }, [
+    el('img', { src: '/assets/lovable-logo.jpg', width: 56, height: 56, alt: '', loading: 'lazy', decoding: 'async' }),
+    el('span', { class: 'hs-app-text' }, [el('strong', { text: 'Auch als iPhone-App' }), el('span', { text: 'Gleiches Konto. Alles freigeschaltet.' })]),
+    el('span', { class: 'hs-app-btn', text: 'Im App Store laden' })
+  ]);
   const priceVoice = el('figure', { class: 'hs-voice-mini', hidden: true });
   const legal = el('p', { class: 'hs-legal' });
   const prices = section('', 'Wähle deinen Plan', null, [
-    el('div', { class: 'hs-plans' }, [planCard('yearly'), planCard('monthly')]), guarantee, priceVoice, legal
+    el('div', { class: 'hs-plans' }, [planCard('yearly'), planCard('monthly')]), guarantee, priceVoice, legal, appHint('preise')
   ], 'preise');
 
   // ---- 8. Vorteile ------------------------------------------------------------------------------------------------
@@ -334,7 +343,7 @@ function mount() {
     el('img', { src: '/assets/zeichnungen/v-umarmung.webp', width: 480, height: 489, alt: 'Eine Tochter umarmt ihre lachende Mutter', loading: 'lazy', decoding: 'async' }),
     el('h2', { text: 'Fang heute an. In Ruhe.' }),
     el('p', { class: 'hs-sub', text: 'Probiere Demenz Coach 7 Tage aus. Passt es nicht, kündigst du online.' }),
-    buyButton('yearly', 'schluss'), el('p', { class: 'hs-note' })
+    buyButton('yearly', 'schluss'), el('p', { class: 'hs-note' }), appHint('schluss')
   ])]);
   const more = el('h2', { class: 'hs-more-title', text: 'Noch mehr Situationen und Alltagstricks' });
 
