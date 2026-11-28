@@ -297,7 +297,7 @@ function mount() {
     el('p', { class: 'hs-plan-day', 'data-per-day': 'yearly' }),
     buyButton('yearly', 'antwort'),
     el('p', { class: 'hs-note' }),
-    el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30 Tage Geld-zurück-Garantie' })])
+    el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30 Tage Geld\u2011zurück\u2011Garantie' })])
   ]);
   const placeAnswerBuy = () => {
     if (window.DemenzKiFreigabe?.isPaid?.()) { document.querySelectorAll('.hs-answer-buy').forEach(node => node.remove()); return; }
@@ -427,7 +427,7 @@ function mount() {
     for (const note of document.querySelectorAll('.hs-note')) note.textContent = shortTerms('yearly');
     for (const node of document.querySelectorAll('[data-per-day]')) node.textContent = perDayText(node.dataset.perDay);
     for (const button of document.querySelectorAll('[data-hs-buy]:not(.hs-link)')) button.textContent = startText();
-    for (const node of document.querySelectorAll('[data-answer-price]')) node.replaceChildren(el('strong', { text: `${euro(Math.round(firstYear() / 12))} im Monat` }), el('span', { text: deal() ? ` · ${euro(firstYear())} im ersten Jahr` : ` · ${euro(offer.yearly)} im Jahr` }));
+    for (const node of document.querySelectorAll('[data-answer-price]')) node.replaceChildren(el('strong', { text: `${euro(Math.round(firstYear() / 12))} im Monat` }), el('span', { text: deal() ? `${euro(firstYear())} im ersten Jahr` : `${euro(offer.yearly)} im Jahr` }));
     const yearly = prices.querySelector('[data-plan-card="yearly"]'), monthly = prices.querySelector('[data-plan-card="monthly"]');
     yearly.querySelector('[data-price]').replaceChildren(el('strong', { text: euro(Math.round(firstYear() / 12)) }), el('span', { text: ' im Monat' }));
     yearly.querySelector('[data-then]').textContent = deal() ? `${euro(firstYear())} im ersten Jahr, danach ${euro(offer.yearly)} im Jahr` : `${euro(offer.yearly)} im Jahr`;
