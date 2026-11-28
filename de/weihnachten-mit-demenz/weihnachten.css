@@ -1,0 +1,92 @@
+/* Weihnachts-Seite: eine Spalte, warm-weiß, große Schrift. Grundlage ist /hilfe/hilfe.css (Farben, Knopf, Fuß). */
+.xm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.xm-ask { padding-block: 0 32px; text-align: center; }
+.xm-hero { width: 136px; height: auto; margin: 0 auto 4px; }
+@media (min-width: 900px) { .xm-hero { width: 240px; } }
+.xm-ask h1 { max-width: 16ch; margin: 0 auto; }
+.xm-lead { color: var(--ink-2); margin: 10px auto 16px; max-width: 30ch; }
+.xm-lead-left { color: var(--ink-2); margin-top: 8px; }
+.xm-quiet { font-size: var(--small); color: var(--ink-2); }
+.xm-sub { color: var(--ink-2); margin-bottom: 20px; }
+
+.xm-form { display: grid; gap: 12px; text-align: left; }
+.xm-form textarea { width: 100%; min-height: 104px; padding: 16px; resize: vertical;
+  border: 2px solid var(--line); border-radius: 16px; background: var(--card); color: var(--ink);
+  font: 400 var(--body)/1.45 var(--font); }
+.xm-form textarea:focus { outline: none; border-color: var(--purple); }
+.xm-form textarea::placeholder { color: #8a8794; }
+.xm-send { width: 100%; min-height: 64px; border: 0; gap: 10px; font: 700 var(--body)/1.3 var(--font); cursor: pointer; }
+.xm-send:disabled { opacity: .6; cursor: default; }
+.xm-error { font-size: var(--small); font-weight: 700; color: #a3261b; }
+.xm-terms { font-size: 11px; line-height: 1.4; color: var(--ink-2); margin-top: 10px; }
+.xm-terms a { color: var(--ink-2); }
+.xm-note { font-size: var(--small); color: var(--ink-2); margin-top: 12px; text-align: center; }
+
+/* Sechs Momente: Zeichnung, Satz, eine kurze Zeile. Antippen = fragen. */
+.xm-moments { padding-block: 8px 48px; text-align: center; }
+.xm-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; }
+@media (min-width: 900px) { .xm-tiles { grid-template-columns: repeat(3, 1fr); } }
+.xm-tile { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 12px 12px 16px; border: 0; border-radius: 18px;
+  background: var(--card); box-shadow: 0 1px 0 var(--line), 0 0 0 1px var(--line) inset; color: var(--ink); font: inherit; cursor: pointer; text-align: left; }
+.xm-tile:hover { box-shadow: 0 0 0 2px var(--purple) inset; }
+.xm-tile img { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; margin-bottom: 4px; }
+.xm-tile b { font-size: var(--small); line-height: 1.3; color: var(--lav-ink); }
+.xm-tile span { font-size: var(--small); line-height: 1.3; color: var(--ink-2); }
+
+/* Warten */
+.xm-wait { padding-block: 24px 32px; text-align: center; }
+.xm-wait-title { font-weight: 700; margin-top: 12px; }
+.xm-wait-steps { list-style: none; padding: 0; margin: 12px auto 0; display: grid; gap: 6px; max-width: 26ch; text-align: left; }
+.xm-wait-steps li { font-size: var(--small); color: #b4b1bb; padding-left: 28px; position: relative; transition: color .3s; }
+.xm-wait-steps li::before { content: ""; position: absolute; left: 0; top: .35em; width: 14px; height: 14px; border-radius: 50%; border: 2px solid currentColor; }
+.xm-wait-steps li.is-on { color: var(--ink); }
+.xm-wait-steps li.is-on::before { background: var(--purple); border-color: var(--purple); }
+.xm-dots { display: flex; justify-content: center; gap: 10px; }
+.xm-dots i { width: 14px; height: 14px; border-radius: 50%; background: var(--purple); animation: xm-dot 1.2s infinite ease-in-out; }
+.xm-dots i:nth-child(2) { animation-delay: .2s; }
+.xm-dots i:nth-child(3) { animation-delay: .4s; }
+@keyframes xm-dot { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .xm-dots i { animation: none; opacity: .7; } }
+
+/* Antwort */
+.xm-result { padding-block: 8px 24px; scroll-margin-top: 12px; }
+#r-body { outline: none; }
+.xm-block { margin-top: 24px; }
+.xm-step { color: var(--purple); margin-bottom: 4px; }
+.xm-lines { margin-top: 0; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 0 18px; }
+.xm-avoid { margin-top: 12px; font-size: var(--small); color: var(--ink-2); }
+.xm-alert { margin-top: 20px; padding: 16px 18px; border-radius: 16px; background: #fde8e6; color: #5b1710; }
+.xm-alert h3 { margin-bottom: 4px; }
+.xm-call { margin-top: 14px; background: #a3261b; }
+.xm-call:hover { background: #7f1d14; }
+.xm-alert-soft { background: var(--lav); color: var(--lav-ink); }
+.xm-ai { margin-top: 20px; }
+
+/* Angebot (unter der Antwort und weiter unten). Nie im ersten Bildschirm. */
+.xm-offer, .xm-band-offer { padding-block: 32px 48px; scroll-margin-top: 12px; }
+.xm-offer { border-top: 1px solid var(--line); }
+.xm-gets { list-style: none; padding: 0; margin: 0 0 24px; display: grid; gap: 10px; }
+.xm-gets li { position: relative; padding-left: 32px; color: var(--ink-2); }
+.xm-gets li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--purple); font-weight: 700; }
+.xm-next { width: 100%; min-height: 64px; }
+
+/* Tricks */
+.xm-tricks { list-style: none; padding: 0; margin: 8px 0 0; counter-reset: trick; display: grid; gap: 16px; }
+.xm-tricks li { counter-increment: trick; position: relative; padding-left: 52px; min-height: 40px; color: var(--ink-2); }
+.xm-tricks li::before { content: counter(trick); position: absolute; left: 0; top: 0; width: 38px; height: 38px; border-radius: 50%;
+  background: var(--lav); color: var(--lav-ink); font-weight: 700; display: grid; place-items: center; }
+.xm-tricks b { color: var(--ink); }
+.xm-share { margin-top: 32px; padding: 20px; border-radius: 18px; background: var(--lav); color: var(--lav-ink); text-align: center; }
+.xm-share-btn { margin-top: 14px; width: 100%; min-height: 56px; border: 2px solid var(--purple); border-radius: 16px; background: var(--card);
+  color: var(--purple); font: 700 var(--body)/1.3 var(--font); cursor: pointer; }
+
+/* Fragen */
+.xm-faq { padding-block: 16px 48px; }
+.xm-faq details { border-top: 1px solid var(--line); padding: 4px 0; }
+.xm-faq details:last-of-type { border-bottom: 1px solid var(--line); }
+.xm-faq summary { min-height: 56px; display: flex; align-items: center; font-weight: 700; cursor: pointer; list-style: none; padding-right: 32px; position: relative; }
+.xm-faq summary::-webkit-details-marker { display: none; }
+.xm-faq summary::after { content: "+"; position: absolute; right: 4px; color: var(--purple); font-size: 1.5em; }
+.xm-faq details[open] summary::after { content: "–"; }
+.xm-faq details p { color: var(--ink-2); padding-bottom: 16px; }
+.xm-more { margin-top: 24px; text-align: center; font-size: var(--small); }

@@ -40,7 +40,8 @@
     var opts = options || {};
     var prefix = opts.prefix || '';
     var maxChars = opts.maxChars || 0;
-    var list = EXAMPLES.filter(function (text) { return !maxChars || (prefix + text).length <= maxChars; });
+    // opts.examples: eigene Liste einer Seite (z. B. Weihnachts-Seite), sonst die gemeinsame Liste.
+    var list = (Array.isArray(opts.examples) && opts.examples.length ? opts.examples : EXAMPLES).filter(function (text) { return !maxChars || (prefix + text).length <= maxChars; });
     if (!list.length) return;
     field.dataset.dcBeispieleAktiv = '1';
     var index = Math.floor(Math.random() * list.length);

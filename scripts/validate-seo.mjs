@@ -101,7 +101,8 @@ for (const file of htmlFiles) {
   const printLayout = inspectPrintListLayout({pathname: '/' + file, html,
     css: file === 'de/demenz-alltagstipps.html' && fs.existsSync(path.join(root, 'teller/liste.css')) ? read('teller/liste.css') : ''});
   printLayout.errors.forEach(message => fail(`${file}: ${message}`));
-  if (!printLayout.registered && !/href=["'][^"']*lovable-home\.css\?v=/.test(html) && !/href=["'][^"']*einfach\.css["']/.test(html)) fail(`${file}: missing current shared layout`);
+  // Aktions-Seiten (z. B. /de/weihnachten-mit-demenz/, 28. Nov 2026) nutzen das schlichte Werbeseiten-Layout /hilfe/hilfe.css.
+  if (!printLayout.registered && !/href=["']\/hilfe\/hilfe\.css["']/.test(html) && !/href=["'][^"']*lovable-home\.css\?v=/.test(html) && !/href=["'][^"']*einfach\.css["']/.test(html)) fail(`${file}: missing current shared layout`);
   if (/href=["'][^"']*\/(?:styles)\.css|href=["']styles\.css/.test(html)) fail(`${file}: legacy stylesheet remains`);
   if (/src=["'][^"']*\bscript\.js["']/.test(html)) fail(`${file}: legacy navigation script remains`);
   if (!description && file !== "404.html") fail(`${file}: missing meta description`);
