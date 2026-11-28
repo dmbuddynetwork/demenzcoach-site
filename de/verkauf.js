@@ -1,5 +1,5 @@
 // Verkaufs-Startseite (Daniel, 27. Nov 2026: „eine optimierte Sales-Startseite … relativ lang … typisch aufgebaut wie
-// Sales-Seiten, wie zB bei Propstage“). A/B-Test gegen die heutige Startseite: Arm b bekommt diese Abschnitte, Arm a bleibt
+// Sales-Seiten, wie zB bei Propstage“). Seit 28. Nov für alle Besucher (Daniel: „stelle die neue 100% online“); ?home=a zeigt die alte Seite, sie bleibt
 // unverändert. Die Zuteilung passiert schon im <head> von /de/ (Klasse html.home-b), damit nichts flackert.
 // Aufbau wie Propstage: Ausprobieren oben (unser Eingabefeld), Vertrauen, drei Schritte, Vorher/Nachher, Stimmen, Vergleich,
 // viele Situationen, Preis mit Garantie, Vorteile, Fragen, Schluss. Jeder Kaufknopf öffnet sofort die Kasse (abo/kasse.js).
@@ -258,6 +258,31 @@ function mount() {
   anchor.after(sales);
   // Abwechselnd heller und getönter Hintergrund, egal wie viele Abschnitte es gibt.
   [...sales.children].filter(node => node.matches('.hs-section:not(.hs-cta-band):not(.hs-final)')).forEach((node, index) => node.classList.toggle('hs-band', index % 2 === 0));
+
+  // ---- Bewegung (Daniel, 28. Nov: „kannst du die Sachen animiert machen, also die Bilder?“) ----------------------------
+  // Beim Scrollen gleiten Bilder und Karten sanft herein. Handy-Bilder schweben leicht. In den Beispielen erscheinen die
+  // Sätze nacheinander wie Nachrichten. Ohne IntersectionObserver oder mit „weniger Bewegung“ steht alles sofort da.
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!calm && 'IntersectionObserver' in window) {
+    root.classList.add('hs-anim');
+    const groups = [
+      ['.hs-steps li', 'side'], ['.hs-example:not([hidden])', 'up'], ['.hs-swap li', 'up'], ['.hs-voice', 'pop'], ['.hs-way', 'up'],
+      ['.hs-cases li', 'pop'], ['.hs-tricks li', 'pop'], ['.hs-plan', 'up'], ['.hs-guarantee', 'up'], ['.hs-perks li', 'up'], ['.hs-final img', 'pop']
+    ];
+    const reveal = new IntersectionObserver(entries => {
+      for (const entry of entries) if (entry.isIntersecting) { entry.target.classList.add('is-in'); reveal.unobserve(entry.target); }
+    }, { rootMargin: '0px 0px -12% 0px', threshold: .12 });
+    for (const [selector, kind] of groups) {
+      sales.querySelectorAll(selector).forEach((node, index) => { node.dataset.hsReveal = kind; node.style.setProperty('--hs-i', String(index % 3)); reveal.observe(node); });
+    }
+    // Beispiel: Sätze nacheinander, auch nach jedem Wechsel der Situation.
+    const playExample = panel => { panel.classList.remove('is-playing'); void panel.offsetWidth; panel.classList.add('is-playing'); };
+    const exampleWatch = new IntersectionObserver(entries => {
+      for (const entry of entries) if (entry.isIntersecting) { playExample(entry.target); exampleWatch.unobserve(entry.target); }
+    }, { threshold: .35 });
+    examplePanels.forEach(panel => exampleWatch.observe(panel));
+    exampleTabs.addEventListener('click', () => { const open = examplePanels.find(panel => !panel.hidden); if (open) { open.classList.add('is-in'); playExample(open); } });
+  }
 
   // ---- Inhalte füllen ---------------------------------------------------------------------------------------------
   const refresh = () => {
