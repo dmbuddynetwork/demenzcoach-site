@@ -42,7 +42,8 @@
     document.head.append(script);
   };
   const examplesOn = (field, on) => { if (on) delete field.dataset.dcBeispiele; else field.dataset.dcBeispiele = 'off'; };
-  withExamples((examples) => examples.attach(input, { prefix: 'Zum Beispiel: ' }));
+  // Daniel, 28. Nov: ohne „Zum Beispiel:“. Das Beispiel tippt sich selbst ins leere Feld.
+  withExamples((examples) => examples.attach(input));
   let syncChat = () => {};
   let syncHelpful = () => {};
   const setViewState = (state) => {

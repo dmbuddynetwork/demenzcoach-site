@@ -323,3 +323,22 @@ html.hs-anim .hs-steps li:nth-child(n)[data-hs-reveal="side"].is-in .hs-phone, h
 /* Demo-Handys: feste kleine Schrift, auch gegen die großen Seitenregeln. */
 body.einfach .hs .hs-ph-next { font-size: 14px !important; line-height: 1.35 !important; color: #3d3a4a; }
 body.einfach .hs .hs-ph-chips span { font-size: 12.5px !important; line-height: 1.3 !important; }
+/* Daniel, 28. Nov: erster Bildschirm für Erstbesucher (60+). Ruhig, wenig Text, großer beschrifteter Knopf unter dem Feld. */
+html.home-b body.einfach #translator-form .translator-input-row { padding: 0 12px 12px; }
+html.home-b body.einfach #translator-form #translator-input { min-height: 96px; padding: 18px 12px 10px; }
+html.home-b body.einfach #translator-form .translator-input-row .button {
+  position: static; display: flex; width: 100% !important; height: 60px; min-height: 60px; gap: 10px; padding: 0 20px; border-radius: 16px;
+  font-size: 1.25rem !important; font-weight: 700; line-height: 1.2;
+}
+html.home-b body.einfach #translator-form .translator-input-row .button::before { content: none; }
+html.home-b body.einfach #translator-form .translator-input-row .button > span { display: inline !important; font-size: 1.25rem !important; }
+html.home-b body.einfach #translator-form .translator-input-row .button::after {
+  content: "" !important; display: block; width: 22px; height: 22px; background: #fff;
+  -webkit-mask: var(--e-send-arrow) center / contain no-repeat; mask: var(--e-send-arrow) center / contain no-repeat; transform: rotate(90deg);
+}
+html.home-b body.einfach[data-translator-input-position="top"] #translator-form .translator-form-intro { margin: 0 0 16px !important; font-size: 1.25rem !important; line-height: 1.45 !important; color: var(--e-text, #1f1d29) !important; }
+html.home-b body.einfach[data-translator-input-position="top"] #translator-form .translator-privacy,
+html.home-b body.einfach[data-translator-input-position="top"] #translator-form .translator-privacy * { font-size: .6875rem !important; line-height: 1.35 !important; }
+html.home-b body.einfach[data-translator-input-position="top"] #translator-form .translator-privacy { margin: 8px 0 0 !important; text-align: center; }
+html.home-b body.einfach .home-situations { margin-top: 28px; }
+html.home-b body.einfach .e-home h1 { text-wrap: balance; }

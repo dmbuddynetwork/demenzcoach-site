@@ -57,12 +57,8 @@ function mount() {
   };
   const checks = items => el('ul', { class: 'hs-checks' }, items.map(text => el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text })])));
 
-  // ---- 0. Direkt unter dem Eingabefeld: nur der Nutzen. Daniel, 28. Nov: kein Kaufknopf und kein Kostenhinweis im
-  // ersten Bildschirm („das verschreckt jeden Nutzer“). Preis und Kauf kommen erst weiter unten.
-  const hero = el('div', { class: 'hs-hero-cta' }, [
-    el('ul', { class: 'hs-chips', 'aria-label': 'Das Wichtigste' }, ['Antwort in wenigen Sekunden', 'Erste Antwort ohne Anmeldung', 'Ruhige Worte und kleine Tricks']
-      .map(text => el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text })])))
-  ]);
+  // ---- 0. Erster Bildschirm (Daniel, 28. Nov): nur Überschrift, Eingabe mit beschriftetem Knopf und die Situationen.
+  // Kein Kaufknopf, kein Preis, keine Zusatz-Häkchen („zu viel text, zu unruhig“).
 
   // ---- Demo-Handys (Daniel, 28. Nov: „du sollst ja zeigen wie man sachen eingibt, welche antworten erscheinen, das als demo“)
   // Drei kleine Handys spielen den Ablauf vor: Text wird getippt, die Antwort erscheint, dann eine Nachfrage. Sie laufen nur,
@@ -331,7 +327,6 @@ function mount() {
   const situationsBlock = document.querySelector('.home-situations');
   const anchor = situationsBlock || document.getElementById('translator-result');
   if (!anchor) return;
-  situationsBlock?.before(hero);
   const sales = el('div', { class: 'hs', id: 'verkauf' }, [steps, examples, swap, voices, ways, situations, tricks, band, prices, perks, faq, final, more]);
   anchor.after(sales);
   // Abwechselnd heller und getönter Hintergrund, egal wie viele Abschnitte es gibt.
