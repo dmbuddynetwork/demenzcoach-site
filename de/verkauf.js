@@ -285,6 +285,33 @@ function mount() {
     buyButton('yearly', 'band'), el('p', { class: 'hs-note' })
   ])]);
 
+  // ---- Mehr Kaufstellen (Daniel, 28. Nov: „Bau mehr Kaufmöglichkeiten ein“). Nie im ersten Bildschirm.
+  const miniCta = where => el('div', { class: 'hs-mini-cta' }, [buyButton('yearly', where), el('p', { class: 'hs-note' })]);
+  for (const [block, where] of [[steps, 'schritte'], [examples, 'beispiele'], [voices, 'stimmen']]) block.querySelector('.hs-wrap').append(miniCta(where));
+
+  // Kauf-Block unter jeder Antwort: Jahresplan wie im Preisblock, mit Garantie. Nicht für Kunden mit Abo, nicht bei Sicherheitshinweisen.
+  const answerBuy = () => el('aside', { class: 'hs-answer-buy', 'aria-label': 'Demenz Coach freischalten' }, [
+    el('p', { class: 'hs-answer-buy-kicker', text: 'Für jeden schweren Moment' }),
+    el('h3', { text: 'Hol dir solche Antworten, wann immer du sie brauchst' }),
+    el('p', { class: 'hs-answer-buy-price', 'data-answer-price': '' }),
+    el('p', { class: 'hs-plan-day', 'data-per-day': 'yearly' }),
+    buyButton('yearly', 'antwort'),
+    el('p', { class: 'hs-note' }),
+    el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30 Tage Geld-zurück-Garantie' })])
+  ]);
+  const placeAnswerBuy = () => {
+    if (window.DemenzKiFreigabe?.isPaid?.()) { document.querySelectorAll('.hs-answer-buy').forEach(node => node.remove()); return; }
+    let added = false;
+    for (const answer of document.querySelectorAll('#translator-result .translator-goal-answer .translator-ai-answer')) {
+      const box = answer.closest('.translator-goal-answer > *');
+      if (!box || box.classList.contains('hs-answer-buy') || box.parentElement.querySelector(':scope > .hs-answer-buy') || box.querySelector('.safety-note')) continue;
+      box.after(answerBuy()); added = true; track('home_sales_answer_buy_view');
+    }
+    if (added) refresh();
+  };
+  const resultRoot = document.getElementById('translator-result');
+  if (resultRoot) new MutationObserver(() => placeAnswerBuy()).observe(resultRoot, { childList: true, subtree: true });
+
   // ---- 7. Preis ---------------------------------------------------------------------------------------------------
   const features = ['Sätze für jeden schweren Moment', 'Nachfragen, bis es passt', 'Gespräche in Ruhe üben', 'Meine Sätze speichern und drucken', 'Im Web und in der iPhone-App'];
   const planCard = plan => el('article', { class: `hs-plan${plan === 'yearly' ? ' is-best' : ''}`, 'data-plan-card': plan }, [
@@ -400,6 +427,7 @@ function mount() {
     for (const note of document.querySelectorAll('.hs-note')) note.textContent = shortTerms('yearly');
     for (const node of document.querySelectorAll('[data-per-day]')) node.textContent = perDayText(node.dataset.perDay);
     for (const button of document.querySelectorAll('[data-hs-buy]:not(.hs-link)')) button.textContent = startText();
+    for (const node of document.querySelectorAll('[data-answer-price]')) node.replaceChildren(el('strong', { text: `${euro(Math.round(firstYear() / 12))} im Monat` }), el('span', { text: deal() ? ` · ${euro(firstYear())} im ersten Jahr` : ` · ${euro(offer.yearly)} im Jahr` }));
     const yearly = prices.querySelector('[data-plan-card="yearly"]'), monthly = prices.querySelector('[data-plan-card="monthly"]');
     yearly.querySelector('[data-price]').replaceChildren(el('strong', { text: euro(Math.round(firstYear() / 12)) }), el('span', { text: ' im Monat' }));
     yearly.querySelector('[data-then]').textContent = deal() ? `${euro(firstYear())} im ersten Jahr, danach ${euro(offer.yearly)} im Jahr` : `${euro(offer.yearly)} im Jahr`;

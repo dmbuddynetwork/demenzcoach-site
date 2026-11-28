@@ -301,7 +301,7 @@
       notice.textContent = en ? 'Access is temporarily unavailable. Safety information remains available.' : 'Der Zugang ist gerade nicht verfügbar. Sicherheitshinweise bleiben erreichbar.';
     }
   }
-  root.DemenzKiFreigabe = Object.freeze({ enabled, warm, createAccessContext, bindAccessResult, requestContext, refresh, accept, afterAnswer, supporterCard, offerCard, takePending, mount, accountURL,
+  root.DemenzKiFreigabe = Object.freeze({ isPaid: () => access?.paid === true, enabled, warm, createAccessContext, bindAccessResult, requestContext, refresh, accept, afterAnswer, supporterCard, offerCard, takePending, mount, accountURL,
     check: async () => ({ allowed: true, reason: 'server_enforced' }), noteAnswer(result) { accept(result?.access); }, returnPath, offerURL, signInURL: accountURL() });
   root.addEventListener?.('demenz-auth-changed', () => {
     if (observedAuth) observeAuth(observedAuth); else authGeneration++;
