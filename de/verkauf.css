@@ -387,3 +387,9 @@ body.einfach .hs-answer-buy .hs-answer-buy-voice figcaption { margin-top: 4px; f
 body.einfach .hs-answer-buy .hs-note { font-size: .875rem !important; line-height: 1.4 !important; }
 body.einfach .hs-answer-buy .hs-answer-buy-seal { font-size: .875rem !important; color: #3d3850; }
 body.einfach .hs-answer-buy .hs-answer-buy-voice blockquote { font-weight: 500 !important; }
+/* Apple Pay auf allen Jahres-Knöpfen: Hülle so breit wie der Knopf vorher. */
+.hs-mini-cta > .hs-cta-wrap, .hs-answer-buy > .hs-cta-wrap { width: 100%; }
+.hs-answer-buy > .hs-cta-wrap { max-width: 420px; }
+.hs-answer-buy > .hs-cta-wrap .hs-btn { max-width: none; }
+.hs-ap-alt[hidden] { display: none !important; }
+body.einfach .hs-ap-alt { font-size: .9375rem !important; line-height: 1.4 !important; }

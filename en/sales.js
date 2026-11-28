@@ -59,6 +59,23 @@ function mount() {
     el('div', { class: 'hs-wrap' }, [title && el('h2', { id: id ? `${id}-title` : undefined, text: title }), sub && el('p', { class: 'hs-sub', text: sub }), ...children])
   ]);
   const buyButton = (plan, where, label) => el('button', { type: 'button', class: 'hs-btn', 'data-hs-buy': where, 'data-plan': plan, text: label || startText() });
+  // Apple Pay sofort auf jedem Jahres-Knopf (Daniel 28 Nov): Stripes unsichtbarer Express-Knopf liegt über unserem Knopf.
+  // Nur auf Geräten mit Apple Pay. Alle Knöpfe teilen eine Stripe-Sitzung (kasse.js merkt sie sich je Konto und Plan).
+  const canApplePay = (() => { try { return window.ApplePaySession?.canMakePayments?.() === true; } catch { return false; } })();
+  let apObserver = null;
+  // Beobachtet wird die Hülle: Der Platz für Apple Pay ist bis zum Einbau versteckt und hätte keine Fläche.
+  const apWatch = wrap => {
+    if (!canApplePay || !('IntersectionObserver' in window)) return;
+    apObserver ||= new IntersectionObserver(entries => { for (const entry of entries) if (entry.isIntersecting) { apObserver.unobserve(entry.target); mountSlot(entry.target.querySelector('.hs-ap-slot')); } }, { rootMargin: '400px 0px' });
+    apObserver.observe(wrap);
+  };
+  const yearlyCta = where => {
+    const wrap = el('div', { class: 'hs-cta-wrap' }, [buyButton('yearly', where), el('div', { class: 'hs-ap-slot', hidden: true, 'data-ap': where })]);
+    apWatch(wrap);
+    // Reihenfolge: Knopf, Preis direkt darunter, dann der Link zu anderen Zahlarten.
+    return [wrap, el('p', { class: 'hs-note' }),
+      el('button', { type: 'button', class: 'hs-link hs-ap-alt', 'data-hs-buy': `${where}_andere`, 'data-plan': 'yearly', hidden: true, text: 'Pay by card or another method' })];
+  };
   const ICON = {
     check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
     shield: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.4 3 8.3 7 9.5 4-1.2 7-5.1 7-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg>',
@@ -276,11 +293,11 @@ function mount() {
   const band = el('section', { class: 'hs-section hs-cta-band' }, [el('div', { class: 'hs-wrap hs-narrow' }, [
     el('h2', { text: 'Next time, you’ll have a sentence ready' }),
     el('p', { class: 'hs-sub', text: 'You don’t need an answer for everything. But you can have a place to start.' }),
-    buyButton('yearly', 'band'), el('p', { class: 'hs-note' })
+    ...yearlyCta('band')
   ])]);
 
   // ---- Mehr Kaufstellen (wie /de/, Daniel, 28. Nov: „Bau mehr Kaufmöglichkeiten ein“). Nie im ersten Bildschirm.
-  const miniCta = where => el('div', { class: 'hs-mini-cta' }, [buyButton('yearly', where), el('p', { class: 'hs-note' })]);
+  const miniCta = where => el('div', { class: 'hs-mini-cta' }, [...yearlyCta(where)]);
   for (const [block, where] of [[steps, 'schritte'], [examples, 'beispiele'], [voices, 'stimmen']]) block.querySelector('.hs-wrap').append(miniCta(where));
 
   // Kauf-Block unter jeder Antwort: Überschrift, Nutzen, sofort der Knopf, Preis klein darunter (Daniel 28 Nov: Preis nicht über dem Knopf). Nicht für Kunden mit Abo, nicht bei Sicherheitshinweisen.
@@ -292,8 +309,7 @@ function mount() {
   const answerBuy = () => el('aside', { class: 'hs-answer-buy', 'aria-label': 'Unlock Dementia Coach' }, [
     el('h3', { text: 'Get answers like this whenever you need them' }),
     el('ul', { class: 'hs-answer-buy-list' }, [el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'The right words for any situation' })]), el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'Ask follow-ups and practise talks' })]), el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text: 'There day and night' })])]),
-    buyButton('yearly', 'antwort'),
-    el('p', { class: 'hs-note' }),
+    ...yearlyCta('antwort'),
     el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30-day money-back guarantee' })]),
     answerVoice()
   ].filter(Boolean));
@@ -318,7 +334,7 @@ function mount() {
     el('p', { class: 'hs-plan-price', 'data-price': '' }),
     el('p', { class: 'hs-plan-then', 'data-then': '' }),
     el('p', { class: 'hs-plan-day', 'data-per-day': plan }),
-    plan === 'yearly' ? el('div', { class: 'hs-cta-wrap' }, [buyButton('yearly', 'preis_jahr'), el('div', { class: 'hs-ap-slot', id: 'hs-ap-yearly', hidden: true })]) : buyButton('monthly', 'preis_monat'),
+    plan === 'yearly' ? el('div', { class: 'hs-cta-wrap' }, [buyButton('yearly', 'preis_jahr'), el('div', { class: 'hs-ap-slot', id: 'hs-ap-yearly', hidden: true, 'data-ap': 'preis_jahr' })]) : buyButton('monthly', 'preis_monat'),
     plan === 'yearly' ? el('button', { type: 'button', class: 'hs-link hs-ap-alt', 'data-hs-buy': 'preis_jahr_andere', 'data-plan': 'yearly', hidden: true, text: 'Pay by card or another method' }) : null,
     el('p', { class: 'hs-plan-terms', 'data-terms': '' }),
     checks(features)
@@ -368,7 +384,7 @@ function mount() {
     el('img', { src: '/assets/zeichnungen/v-umarmung.webp', width: 480, height: 489, alt: 'A daughter hugs her laughing mother', loading: 'lazy', decoding: 'async' }),
     el('h2', { text: 'Start today. At your own pace.' }),
     el('p', { class: 'hs-sub', text: 'Try Dementia Coach for 7 days. If it’s not for you, cancel online.' }),
-    buyButton('yearly', 'schluss'), el('p', { class: 'hs-note' }), appHint('schluss')
+    ...yearlyCta('schluss'), appHint('schluss')
   ])]);
 
   // ---- Einhängen: nach den Beispielsituationen, vor den Tipps --------------------------------------------------------
@@ -486,14 +502,17 @@ function mount() {
   document.addEventListener('pointerdown', event => { const target = event.target.closest('[data-hs-buy]'); if (target) prepare(target.dataset.plan === 'monthly' ? 'monthly' : 'yearly'); }, { passive: true });
 
   // Apple Pay auf dem Jahresplan (wie /hilfe/ und /start/): Stripes unsichtbarer Express-Knopf liegt über unserem Knopf.
-  const mountApplePay = () => kasse().then(api => {
-    const slot = document.getElementById('hs-ap-yearly');
-    if (!api?.mountApplePay || !config.firebase?.apiKey || !slot || slot.dataset.mounted) return;
+  const mountSlot = slot => kasse().then(api => {
+    if (!slot || !api?.mountApplePay || !config.firebase?.apiKey || slot.dataset.mounted) return;
     slot.dataset.mounted = '1';
-    api.mountApplePay(slot, { plan: 'yearly', offer: checkoutOffer('yearly'), source, campaign, track: name => track(name, { where: 'preis_jahr' }),
-      onError: message => { prices.querySelector('[data-plan-card="yearly"] [data-terms]').textContent = message; } })
-      .then(shown => { if (shown) { slot.hidden = false; prices.querySelector('.hs-ap-alt').hidden = false; } else delete slot.dataset.mounted; });
+    const where = slot.dataset.ap || 'preis_jahr';
+    const wrap = slot.closest('.hs-cta-wrap');
+    const alt = wrap?.parentElement?.querySelector(':scope > .hs-ap-alt') || null;
+    api.mountApplePay(slot, { plan: 'yearly', offer: checkoutOffer('yearly'), source, campaign, track: name => track(name, { where }),
+      onError: message => { const note = wrap?.parentElement?.querySelector('[data-terms], .hs-note'); if (note) note.textContent = message; } })
+      .then(shown => { if (shown) { slot.hidden = false; if (alt) alt.hidden = false; } else delete slot.dataset.mounted; });
   });
+  const mountApplePay = () => mountSlot(document.getElementById('hs-ap-yearly'));
 
   // ---- Server-Preise und Willkommenspreis ----------------------------------------------------------------------------
   if (config.endpoint) {
