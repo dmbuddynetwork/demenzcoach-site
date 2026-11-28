@@ -80,7 +80,11 @@
     if (typeof exp()?.acceptAccess === 'function') exp().acceptAccess(access);
     else exp()?.accept(value.exposure);
   }
-  async function requestContext({ requestID, anonymous = true, accessContext } = {}) {
+  // 28. Nov 2026 (Daniel, erster Test auf dem iPhone): Die Anmeldung im Hintergrund (Firebase laden, anonym anmelden, Token holen)
+  // dauert auf dem Handy oft länger als 1,5 Sekunden. Dann ging die Frage ohne Ausweis raus, der Server sagte 401 und die Seite
+  // zeigte „Der Zugang konnte gerade nicht geprüft werden“. Darum warten wir bis zu 10 Sekunden und starten die Anmeldung früher (warm).
+  const authWaitMs = 10000;
+  async function requestContext({ requestID, anonymous = true, accessContext, fresh = false } = {}) {
     if (!enabled()) return {};
     // Always negotiate the new contract, even if authentication is temporarily
     // unavailable. Omitting it would silently select the legacy free path.
@@ -103,23 +107,28 @@
         const generation = authGeneration;
         if (!user) return { headers: {}, origin, generation };
         const signature = identityOf(auth);
-        const token = await user.getIdToken();
+        const token = await user.getIdToken(fresh === true);
         observeAuth(auth);
         if (identityOf(auth) !== signature || generation !== authGeneration) throw new Error('auth_changed');
         return { headers: { Authorization: `Bearer ${token}` }, origin, generation };
       };
       let pending;
-      if (anonymous) {
+      if (anonymous && !fresh) {
         headerPromise ||= readHeaders().finally(() => { if (headerPromise === pending) headerPromise = null; });
         pending = headerPromise;
       } else pending = readHeaders();
       let timer;
-      const resolved = await Promise.race([pending, new Promise((resolve) => { timer = setTimeout(() => resolve(null), 1500); })]).finally(() => clearTimeout(timer));
+      const resolved = await Promise.race([pending, new Promise((resolve) => { timer = setTimeout(() => resolve(null), authWaitMs); })]).finally(() => clearTimeout(timer));
       if (!resolved) { if (headerPromise === pending) headerPromise = null; return operation; }
       if (resolved.origin !== origin || resolved.generation !== currentGeneration()) throw new Error('auth_changed');
       if (accessContext && requestGenerations.has(accessContext)) requestGenerations.set(accessContext, resolved.generation);
       return { ...resolved.headers, ...exp()?.headers(), ...operation };
     } catch { return operation; } // Still call the server, so its free safety path runs.
+  }
+  // Startet die anonyme Anmeldung, sobald jemand eine Situation abschickt. Bis das Ziel gewählt ist, liegt der Ausweis bereit.
+  function warm() {
+    if (!enabled()) return;
+    void requestContext({}).catch(() => {});
   }
   async function refresh() {
     if (!enabled()) return null;
@@ -292,7 +301,7 @@
       notice.textContent = en ? 'Access is temporarily unavailable. Safety information remains available.' : 'Der Zugang ist gerade nicht verfügbar. Sicherheitshinweise bleiben erreichbar.';
     }
   }
-  root.DemenzKiFreigabe = Object.freeze({ enabled, createAccessContext, bindAccessResult, requestContext, refresh, accept, afterAnswer, supporterCard, offerCard, takePending, mount, accountURL,
+  root.DemenzKiFreigabe = Object.freeze({ enabled, warm, createAccessContext, bindAccessResult, requestContext, refresh, accept, afterAnswer, supporterCard, offerCard, takePending, mount, accountURL,
     check: async () => ({ allowed: true, reason: 'server_enforced' }), noteAnswer(result) { accept(result?.access); }, returnPath, offerURL, signInURL: accountURL() });
   root.addEventListener?.('demenz-auth-changed', () => {
     if (observedAuth) observeAuth(observedAuth); else authGeneration++;
