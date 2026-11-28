@@ -25,6 +25,8 @@ const walk = (directory, prefix = "") => {
     if (!prefix && entry.name === "vorschau") continue;
     // teller/ und plate/ (EN): Landingpages für Social-Media-Traffic (noindex), eigenes Layout.
     if (!prefix && (entry.name === "teller" || entry.name === "plate")) continue;
+    // weihnachten/: kurze Reel-Adresse, leitet nur auf /de/weihnachten-mit-demenz/ weiter (noindex).
+    if (!prefix && entry.name === "weihnachten") continue;
     // abo/, start/, hilfe/ und intern/: Kassen-, Werbe- und Team-Seiten mit eigenen Regeln (noindex), keine SEO-Seiten.
     if (!prefix && (entry.name === "abo" || entry.name === "start" || entry.name === "hilfe" || entry.name === "intern")) continue;
     // Shared answer links: noindex shells without SEO content (token in the URL fragment).
@@ -101,7 +103,8 @@ for (const file of htmlFiles) {
   const printLayout = inspectPrintListLayout({pathname: '/' + file, html,
     css: file === 'de/demenz-alltagstipps.html' && fs.existsSync(path.join(root, 'teller/liste.css')) ? read('teller/liste.css') : ''});
   printLayout.errors.forEach(message => fail(`${file}: ${message}`));
-  if (!printLayout.registered && !/href=["'][^"']*lovable-home\.css\?v=/.test(html) && !/href=["'][^"']*einfach\.css["']/.test(html)) fail(`${file}: missing current shared layout`);
+  // Aktions-Seiten (z. B. /de/weihnachten-mit-demenz/, 28. Nov 2026) nutzen das schlichte Werbeseiten-Layout /hilfe/hilfe.css.
+  if (!printLayout.registered && !/href=["']\/hilfe\/hilfe\.css["']/.test(html) && !/href=["'][^"']*lovable-home\.css\?v=/.test(html) && !/href=["'][^"']*einfach\.css["']/.test(html)) fail(`${file}: missing current shared layout`);
   if (/href=["'][^"']*\/(?:styles)\.css|href=["']styles\.css/.test(html)) fail(`${file}: legacy stylesheet remains`);
   if (/src=["'][^"']*\bscript\.js["']/.test(html)) fail(`${file}: legacy navigation script remains`);
   if (!description && file !== "404.html") fail(`${file}: missing meta description`);
