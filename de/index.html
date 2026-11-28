@@ -119,6 +119,11 @@
   ]
 }</script>
 <link rel="stylesheet" href="/abo/web-access.css">
+  <!-- A/B-Test Startseite (Daniel, 27. Nov 2026: „optimierte Sales-Startseite … wie Propstage“). Arm a = heutige Seite, Arm b = lange
+       Verkaufsseite (de/verkauf.js). Je Gerät fest (localStorage), ?home=a oder ?home=b legt den Arm fest. Suchmaschinen und
+       automatisierte Browser bekommen immer a. Quelle und Kampagne werden hier gemerkt, weil die Seite die utm-Parameter später entfernt. -->
+  <script>(function(){var k="demenzcoach.homeArm.v1",d=document.documentElement,a="a",u=new URLSearchParams(location.search),q=u.get("home"),bot=navigator.webdriver||/bot|crawl|spider|slurp|lighthouse|preview|facebookexternalhit/i.test(navigator.userAgent||"");try{if(q==="a"||q==="b"){a=q;localStorage.setItem(k,a)}else{a=localStorage.getItem(k);if(a!=="a"&&a!=="b"){a=bot?"a":(Math.random()<.5?"a":"b");if(!bot)localStorage.setItem(k,a)}}}catch(e){a=q==="b"?"b":"a"}d.dataset.homeArm=a;d.dataset.homeSrc=(u.get("src")||u.get("utm_source")||"").slice(0,40);d.dataset.homeCampaign=(u.get("utm_campaign")||u.get("k")||"").slice(0,80);if(a==="b")d.classList.add("home-b")})();</script>
+  <link rel="stylesheet" href="/de/verkauf.css?v=20261127a">
 </head>
 <body class="einfach homepage-v2" data-page-type="translator-home" data-page-language="de" data-page-slug="home-de" data-translator-input-position="top">
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
@@ -386,6 +391,7 @@
   <script src="/demenz-uebersetzer/translator-saved.js"></script>
   <script src="/demenz-uebersetzer/translator.js"></script>
   <script type="module" src="/content-feed.js"></script>
+  <script type="module" src="/de/verkauf.js?v=20261127a"></script>
   <script>(function(){var b=window.DemenzTranslatorSignup&&window.DemenzTranslatorSignup.box();if(b){document.getElementById('home-signup').append(b);}else{document.getElementById('liste').hidden=true;}})();</script>
 </body>
 </html>
