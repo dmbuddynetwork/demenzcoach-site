@@ -1058,8 +1058,8 @@
     };
     // Oben (top): nach dem Kleingedruckten Garantie, Zahlungswege, eine Stimme. Unten folgt ohnehin die große Garantie-Karte.
     // Kurze Zeile in der Lücke über dem Knopf: so steht die Garantie auch auf kleinen Handys im ersten Bild. Das Kleingedruckte bleibt direkt unter dem Knopf.
-    const guaranteeLine = () => el("p", { class: "start-guarantee-line" }, [el("span", { html: icons.shield }), `${guaranteeDays} Tage Geld-zurück-Garantie`]);
-    const offerBlock = (top) => [ticket(), table(), top ? guaranteeLine() : null, ...(applePayHere ? applePayCta() : [cta()]), fine(),
+    // Daniel, 28. Nov 2026: die grüne Zeile „30 Tage Geld-zurück-Garantie“ unter den Tarifen ist raus („nimm den hinweis raus“).
+    const offerBlock = (top) => [ticket(), table(), ...(applePayHere ? applePayCta() : [cta()]), fine(),
       top ? guarantee() : null, payments(), top ? voiceNearPrice() : null];
 
 
