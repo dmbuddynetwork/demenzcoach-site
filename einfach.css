@@ -882,7 +882,7 @@ body.einfach .translator-phrase-menu > * { display: inline-flex; flex: 1 1 140px
 body.einfach .translator-phrase-menu > *::after { content: none !important; }
 body.einfach .translator-phrase-menu .translator-menu-save span:first-child { font-size: 1.35rem; line-height: 1; }
 body.einfach .translator-phrase-menu .translator-menu-save[aria-pressed="true"] { background: var(--e-lav) !important; color: var(--e-purple) !important; }
-body.einfach .translator-phrases:has(> .translator-phrase-tappable)::before { content: "Tippe auf einen Satz, um ihn zu merken oder zu teilen."; display: block; margin: -4px 0 2px; color: var(--e-muted, #5d5a6b); font-size: var(--e-small, .95rem); font-weight: 500; }
+/* Daniel, 28. Nov 2026: Hinweis „Tippe auf einen Satz, um ihn zu merken oder zu teilen.“ entfernt. */
 /* Kurzer Hinweis nach dem Merken. */
 .translator-saved-toast { position: fixed; z-index: 70; left: 16px; right: 16px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; justify-content: space-between; gap: 14px; width: fit-content; max-width: 480px; margin: 0 auto; padding: 14px 18px; background: #24203f; color: #fff; border-radius: 14px; box-shadow: 0 10px 30px rgba(20, 16, 50, .3); font-weight: 700; animation: e-toast-in .3s ease-out both; }
 .translator-saved-toast span { white-space: nowrap; }
