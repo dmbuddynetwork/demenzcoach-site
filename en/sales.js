@@ -329,11 +329,22 @@ function mount() {
     el('a', { href: '/terms-en.html#abo-web', onclick: () => track('home_sales_garantie'), text: 'Terms' })
   ])]);
   // Hinweis auf die iPhone-App (wie /de/, Daniel, 28. Nov). Nur weiter unten, nie im ersten Bildschirm. Nicht auf Android.
+  // App-Bewertung (Daniel, 28. Nov: „zeige hier den namen der app und 5 sterne rating“). Echter Wert aus dem App Store
+  // (iTunes-Lookup id6790763941, country=de, 28. Nov 2026: 5,0 bei 1 Bewertung). Kein Abruf beim Besucher (keine Daten an Apple).
+  // Wert prüfen, wenn sich die Bewertung ändert: curl -s 'https://itunes.apple.com/lookup?id=6790763941&country=de'
+  // Englisch: Sterne erst, wenn der US-Store eigene Bewertungen hat (dort 28. Nov: keine).
+  const SHOW_STARS_EN = false;
+  const appStars = (text, label) => el('span', { class: 'hs-app-stars', role: 'img', 'aria-label': label }, [
+    el('span', { class: 'hs-app-star-row', 'aria-hidden': 'true', html: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.6 7.7l5.8-.8z" fill="currentColor"/></svg>'.repeat(5) }), el('span', { 'aria-hidden': 'true', text })
+  ]);
   const appHint = place => /Android/i.test(navigator.userAgent) ? el('span', { hidden: true }) : el('a', {
     class: 'hs-app', href: `https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_en_home_${place}&mt=8`,
     'data-store-link': `home-${place}`, onclick: () => track('home_sales_app', { place })
   }, [
-    el('img', { src: '/assets/lovable-logo.jpg', width: 56, height: 56, alt: '', loading: 'lazy', decoding: 'async' }),
+    el('span', { class: 'hs-app-head' }, [
+      el('img', { src: '/assets/lovable-logo.jpg', width: 56, height: 56, alt: '', loading: 'lazy', decoding: 'async' }),
+      el('span', { class: 'hs-app-name' }, [el('strong', { text: 'Dementia Coach' }), ...(SHOW_STARS_EN ? [appStars('5.0 on the App Store', '5.0 out of 5 stars on the App Store')] : [])])
+    ]),
     el('span', { class: 'hs-app-text' }, [el('strong', { text: 'Also as an iPhone app' }), el('span', { text: 'Same account. Everything unlocked.' })]),
     el('span', { class: 'hs-app-btn', text: 'Get it on the App Store' })
   ]);

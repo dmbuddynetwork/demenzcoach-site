@@ -335,11 +335,20 @@ function mount() {
     el('a', { href: '/abo/garantie.html', onclick: () => track('home_sales_garantie'), text: 'Bedingungen' })
   ])]);
   // Hinweis auf die iPhone-App (Daniel, 28. Nov). Nur weiter unten, nie im ersten Bildschirm. Nicht auf Android.
+  // App-Bewertung (Daniel, 28. Nov: „zeige hier den namen der app und 5 sterne rating“). Echter Wert aus dem App Store
+  // (iTunes-Lookup id6790763941, country=de, 28. Nov 2026: 5,0 bei 1 Bewertung). Kein Abruf beim Besucher (keine Daten an Apple).
+  // Wert prüfen, wenn sich die Bewertung ändert: curl -s 'https://itunes.apple.com/lookup?id=6790763941&country=de'
+  const appStars = (text, label) => el('span', { class: 'hs-app-stars', role: 'img', 'aria-label': label }, [
+    el('span', { class: 'hs-app-star-row', 'aria-hidden': 'true', html: '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 1.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.6 7.7l5.8-.8z" fill="currentColor"/></svg>'.repeat(5) }), el('span', { 'aria-hidden': 'true', text })
+  ]);
   const appHint = place => /Android/i.test(navigator.userAgent) ? el('span', { hidden: true }) : el('a', {
     class: 'hs-app', href: `https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_de_home_${place}&mt=8`,
     'data-store-link': `home-${place}`, onclick: () => track('home_sales_app', { place })
   }, [
-    el('img', { src: '/assets/lovable-logo.jpg', width: 56, height: 56, alt: '', loading: 'lazy', decoding: 'async' }),
+    el('span', { class: 'hs-app-head' }, [
+      el('img', { src: '/assets/lovable-logo.jpg', width: 56, height: 56, alt: '', loading: 'lazy', decoding: 'async' }),
+      el('span', { class: 'hs-app-name' }, [el('strong', { text: 'Demenz Coach' }), appStars('5,0 im App Store', '5,0 von 5 Sternen im App Store')])
+    ]),
     el('span', { class: 'hs-app-text' }, [el('strong', { text: 'Auch als iPhone-App' }), el('span', { text: 'Gleiches Konto. Alles freigeschaltet.' })]),
     el('span', { class: 'hs-app-btn', text: 'Im App Store laden' })
   ]);

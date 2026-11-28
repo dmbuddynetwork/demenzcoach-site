@@ -387,3 +387,14 @@ body.einfach .hs-answer-buy .hs-answer-buy-voice figcaption { margin-top: 4px; f
 body.einfach .hs-answer-buy .hs-note { font-size: .875rem !important; line-height: 1.4 !important; }
 body.einfach .hs-answer-buy .hs-answer-buy-seal { font-size: .875rem !important; color: #3d3850; }
 body.einfach .hs-answer-buy .hs-answer-buy-voice blockquote { font-weight: 500 !important; }
+/* App-Hinweis mit Name und Sternen (Daniel, 28. Nov): Kopfzeile Symbol + Name + Sterne, darunter Text und Knopf. */
+.hs-app { flex-wrap: wrap; }
+.hs-app-head { display: flex; align-items: center; gap: 14px; flex: 1 1 100%; }
+.hs-app-name { display: grid; gap: 4px; min-width: 0; }
+body.einfach .hs .hs-app-name strong { font-size: 1.25rem !important; line-height: 1.25 !important; color: var(--hs-ink, #1f1b2e); }
+.hs-app-stars { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.hs-app-star-row { display: inline-flex; gap: 2px; color: #f5a623; }
+.hs-app-star-row svg { width: 20px; height: 20px; }
+body.einfach .hs .hs-app-stars > span:last-child { font-size: .9375rem !important; font-weight: 600; color: var(--hs-muted, #5b5668); }
+.hs-app-text { flex: 1 1 100%; }
+body.einfach .hs .hs-app-btn { flex: 1 1 100%; text-align: center; padding: 12px 16px; }
