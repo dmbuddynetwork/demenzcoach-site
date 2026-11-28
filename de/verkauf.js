@@ -27,6 +27,9 @@ function mount() {
   const euro = cents => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(cents / 100);
   const saving = () => Math.floor((1 - firstYear() / (offer.monthly * 12)) * 100);
   const trial = () => offer.trialDays > 0;
+  // Preis pro Tag nur als Zusatz (Daniel, 28. Nov). Der Gesamtpreis bleibt groß und klar (Preisangabenverordnung).
+  const perDay = plan => Math.ceil((plan === 'yearly' ? firstYear() : offer.monthly * 12) / 365);
+  const perDayText = plan => `Weniger als ${perDay(plan)} Cent am Tag`;
   const startText = () => (trial() ? `${offer.trialDays} Tage kostenlos testen` : 'Jetzt starten');
   const shortTerms = plan => `${trial() ? `${offer.trialDays} Tage kostenlos, dann ` : ''}${plan === 'yearly'
     ? (deal() ? `${euro(firstYear())} im ersten Jahr` : `${euro(offer.yearly)} im Jahr`) : `${euro(offer.monthly)} im Monat`}. Online kündbar.`;
@@ -59,8 +62,8 @@ function mount() {
   const hero = el('div', { class: 'hs-hero-cta' }, [
     buyButton('yearly', 'hero'),
     heroNote,
-    el('ul', { class: 'hs-chips', 'aria-label': 'Das Wichtigste' }, ['30 Tage Geld-zurück-Garantie', 'Online kündbar', 'Im Web und als iPhone-App', 'Kein Fachwissen nötig']
-      .map(text => el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text })])))
+    el('ul', { class: 'hs-chips', 'aria-label': 'Das Wichtigste' }, ['30 Tage Geld-zurück-Garantie', 'Online kündbar', 'Im Web und als iPhone-App', '']
+      .map(text => el('li', {}, [el('span', { class: 'hs-ico', html: ICON.check }), el('span', { text, 'data-per-day': text ? undefined : 'yearly' })])))
   ]);
 
   // ---- 1. So funktioniert es --------------------------------------------------------------------------------------
@@ -74,6 +77,72 @@ function mount() {
       el('div', {}, [el('p', { class: 'hs-step-no', text: `Schritt ${index + 1}` }), el('h3', { text: title }), el('p', { text })])
     ])))
   ], 'so-gehts');
+
+  // ---- 1b. So sieht eine Antwort aus (echte Antworten der Seite, mit Zeichnungen; Daniel, 28. Nov) --------------------
+  const EXAMPLES = [
+    { tab: 'Will nach Hause', img: 'nach-hause.webp', w: 480, h: 664, says: 'Ich will nach Hause.', href: '/de/ratgeber/demenz-nach-hause-was-sagen.html',
+      phrases: ['Du möchtest nach Hause. Erzähl mir, wie es da ist.', 'Du fühlst dich hier gerade nicht wohl. Ich bin bei dir.', 'Wollen wir zusammen eine kleine Runde gehen?'],
+      todo: 'Geht zusammen ein paar Schritte, zum Beispiel ans Fenster oder in den Garten. Danach gibt es etwas zu trinken.',
+      trick: ['Fotoalbum', 'Schaut zusammen ein Album mit alten Fotos an. Bilder von früher geben Gesprächsstoff.', 'illu-trick-fotoalbum'] },
+    { tab: 'Wirft Diebstahl vor', img: 's-money.webp', w: 480, h: 396, says: 'Du hast mein Geld gestohlen!', href: '/de/demenz-uebersetzer/du-hast-mein-geld-gestohlen.html',
+      phrases: ['Das ist schlimm, wenn das Geld weg ist. Ich helfe dir beim Suchen.', 'Du möchtest, dass deine Sachen sicher sind. Das verstehe ich.', 'Lass uns gemeinsam schauen, wo es sein könnte.'],
+      todo: 'Merke dir Lieblingsverstecke. Oft tauchen Dinge an denselben Orten wieder auf.',
+      trick: ['Eigenes Portemonnaie', 'Gib der Person ein Portemonnaie mit etwas Kleingeld, das sie behalten darf.', 'illu-trick-portemonnaie'] },
+    { tab: 'Will nicht duschen', img: 'tuch-mama.webp', w: 480, h: 505, says: 'Ich will nicht duschen.', href: '/de/demenz-uebersetzer/ich-will-nicht-duschen.html',
+      phrases: ['Möchtest du lieber jetzt oder nach dem Kaffee?', 'Das Bad ist schön warm. Ich lege dir das Handtuch bereit.', 'Du machst das Gesicht, ich helfe dir beim Rücken.'],
+      todo: 'Wärme das Bad vor und lege ein Handtuch um die Schultern, damit weniger Haut unbedeckt ist.',
+      trick: ['Bad vorwärmen', 'Wärme das Bad vor und lege ein großes Handtuch um die Schultern. Decke beim Waschen ab, was gerade nicht dran ist.', 'illu-tuch-towel'] }
+  ];
+  const exampleCard = (ex, index) => el('article', { class: 'hs-example', id: `hs-example-${index}`, role: 'tabpanel', 'aria-labelledby': `hs-example-tab-${index}`, hidden: index > 0 }, [
+    el('div', { class: 'hs-ex-head' }, [
+      el('img', { src: `/assets/zeichnungen/${ex.img}`, width: ex.w, height: ex.h, alt: '', loading: 'lazy', decoding: 'async' }),
+      el('div', {}, [el('p', { class: 'hs-ex-label', text: 'Du hörst' }), el('p', { class: 'hs-ex-says', text: `„${ex.says}“` })])
+    ]),
+    el('p', { class: 'hs-ex-label', text: 'Das kannst du sagen' }),
+    el('ul', { class: 'hs-ex-phrases' }, ex.phrases.map(text => el('li', { text }))),
+    el('p', { class: 'hs-ex-label', text: 'Das kannst du tun' }),
+    el('p', { class: 'hs-ex-todo', text: ex.todo }),
+    el('div', { class: 'hs-ex-trick' }, [
+      el('img', { src: `/alltagstricks/img/${ex.trick[2]}.webp`, width: 600, height: 472, alt: '', loading: 'lazy', decoding: 'async' }),
+      el('div', {}, [el('p', { class: 'hs-ex-label', text: 'Dieser Trick hilft' }), el('h3', { text: ex.trick[0] }), el('p', { text: ex.trick[1] })])
+    ]),
+    el('a', { class: 'hs-link', href: ex.href, onclick: () => track('home_sales_example_open', { example: index }), text: 'Ganze Antwort ansehen' })
+  ]);
+  const exampleTabs = el('div', { class: 'hs-ex-tabs', role: 'tablist', 'aria-label': 'Beispiele' }, EXAMPLES.map((ex, index) => el('button', {
+    type: 'button', role: 'tab', id: `hs-example-tab-${index}`, 'aria-controls': `hs-example-${index}`, 'aria-selected': String(index === 0), text: ex.tab,
+    onclick: event => {
+      for (const tab of exampleTabs.children) tab.setAttribute('aria-selected', String(tab === event.currentTarget));
+      for (const [i, panel] of examplePanels.entries()) panel.hidden = i !== index;
+      track('home_sales_example', { example: index });
+    }
+  })));
+  const examplePanels = EXAMPLES.map(exampleCard);
+  const tryOwn = el('button', { type: 'button', class: 'hs-btn hs-btn-light', text: 'Mit deiner Situation ausprobieren', onclick: () => {
+    track('home_sales_try');
+    const input = document.getElementById('translator-input');
+    if (!input) return;
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => input.focus({ preventScroll: true }), 450);
+  } });
+  const examples = section('', 'So sieht eine Antwort aus', 'Drei echte Beispiele. Tippe auf eine Situation.', [exampleTabs, ...examplePanels,
+    el('p', { class: 'hs-ex-try' }, [tryOwn, el('span', { class: 'hs-quiet', text: 'Kostenlos und ohne Anmeldung.' })])], 'beispiele');
+
+  // ---- 5b. Alltagstricks mit Zeichnungen (aus /alltagstricks/) -------------------------------------------------------
+  const TRICKS = [
+    ['roter-teller', 'illu-plate-red', 'Roter Teller', 'Auf einem roten Teller hebt sich das Essen deutlich ab.'],
+    ['antwort-zettel', 'illu-trick-zettel', 'Antwort auf den Zettel', 'Schreib die Antwort groß auf. Bei der nächsten Frage zeigst du den Zettel.'],
+    ['abends-vorhaenge-zu', 'illu-trick-abends-vorhaenge-zu', 'Abends Vorhänge zu', 'Vor der Dämmerung Vorhänge zu und drinnen helles Licht an.'],
+    ['waesche-falten', 'illu-trick-waesche', 'Wäsche falten', 'Eine bekannte Handarbeit gibt das Gefühl, gebraucht zu werden.'],
+    ['erst-riechen', 'illu-trick-riechen', 'Erst riechen lassen', 'Biete das Essen zuerst zum Riechen an. Der Duft macht Appetit.'],
+    ['armband', 'illu-trick-armband', 'Armband mit Telefonnummer', 'Name und deine Nummer am Handgelenk helfen, wenn sie sich verläuft.']
+  ];
+  const tricks = section('', 'Kleine Tricks für den Alltag', 'Zu vielen Antworten gibt es einen Trick, der den nächsten Tag leichter macht.', [
+    el('ul', { class: 'hs-tricks', role: 'list' }, TRICKS.map(([id, img, title, text]) => el('li', {}, [el('a', { class: 'hs-trick', href: `/alltagstricks/${id}.html`, onclick: () => track('home_sales_trick', { trick: id }) }, [
+      el('img', { src: `/alltagstricks/img/${img}.webp`, width: 600, height: 472, alt: '', loading: 'lazy', decoding: 'async' }),
+      el('span', {}, [el('strong', { text: title }), el('span', { text })])
+    ])]))),
+    el('p', { class: 'hs-center' }, [el('a', { class: 'hs-link', href: '/alltagstricks/', onclick: () => track('home_sales_tricks_all'), text: 'Alle Alltagstricks ansehen' })])
+  ], 'tricks');
 
   // ---- 2. Vorher / nachher ----------------------------------------------------------------------------------------
   const swap = section('', 'Ein Satz macht den Unterschied', 'Erklären und Korrigieren endet oft im Streit. Ein Satz, der das Gefühl aufgreift, macht den Moment oft ruhiger.', [
@@ -89,7 +158,7 @@ function mount() {
 
   // ---- 3. Stimmen (echt, per Skript) ------------------------------------------------------------------------------
   const voices = section('hs-band', 'Das sagen Angehörige', null, [el('div', { class: 'hs-voices', role: 'list' }),
-    el('p', { class: 'hs-quiet', text: 'Stimmen von Angehörigen, die Demenz Coach ausprobiert haben. Vornamen mit Zustimmung. Einzelne Erfahrungen, kein Versprechen für dein Ergebnis.' })], 'stimmen');
+    el('p', { class: 'hs-quiet', text: 'Stimmen von Angehörigen, die Demenz Coach ausprobiert haben. Vornamen mit Zustimmung. Die Zeichnungen zeigen die Geschichte, nicht die Personen. Einzelne Erfahrungen, kein Versprechen für dein Ergebnis.' })], 'stimmen');
   voices.hidden = true;
 
   // ---- 4. Drei Wege im Vergleich -----------------------------------------------------------------------------------
@@ -134,6 +203,7 @@ function mount() {
     el('h3', { text: plan === 'yearly' ? '12-Monats-Plan' : '1-Monats-Plan' }),
     el('p', { class: 'hs-plan-price', 'data-price': '' }),
     el('p', { class: 'hs-plan-then', 'data-then': '' }),
+    el('p', { class: 'hs-plan-day', 'data-per-day': plan }),
     plan === 'yearly' ? el('div', { class: 'hs-cta-wrap' }, [buyButton('yearly', 'preis_jahr'), el('div', { class: 'hs-ap-slot', id: 'hs-ap-yearly', hidden: true })]) : buyButton('monthly', 'preis_monat'),
     plan === 'yearly' ? el('button', { type: 'button', class: 'hs-link hs-ap-alt', 'data-hs-buy': 'preis_jahr_andere', 'data-plan': 'yearly', hidden: true, text: 'Mit Karte oder anderer Zahlart bezahlen' }) : null,
     el('p', { class: 'hs-plan-terms', 'data-terms': '' }),
@@ -184,12 +254,15 @@ function mount() {
   const anchor = situationsBlock || document.getElementById('translator-result');
   if (!anchor) return;
   situationsBlock?.before(hero);
-  const sales = el('div', { class: 'hs', id: 'verkauf' }, [steps, swap, voices, ways, situations, band, prices, perks, faq, final, more]);
+  const sales = el('div', { class: 'hs', id: 'verkauf' }, [steps, examples, swap, voices, ways, situations, tricks, band, prices, perks, faq, final, more]);
   anchor.after(sales);
+  // Abwechselnd heller und getönter Hintergrund, egal wie viele Abschnitte es gibt.
+  [...sales.children].filter(node => node.matches('.hs-section:not(.hs-cta-band):not(.hs-final)')).forEach((node, index) => node.classList.toggle('hs-band', index % 2 === 0));
 
   // ---- Inhalte füllen ---------------------------------------------------------------------------------------------
   const refresh = () => {
     for (const note of document.querySelectorAll('.hs-note')) note.textContent = shortTerms('yearly');
+    for (const node of document.querySelectorAll('[data-per-day]')) node.textContent = perDayText(node.dataset.perDay);
     for (const button of document.querySelectorAll('[data-hs-buy]:not(.hs-link)')) button.textContent = startText();
     const yearly = prices.querySelector('[data-plan-card="yearly"]'), monthly = prices.querySelector('[data-plan-card="monthly"]');
     yearly.querySelector('[data-price]').replaceChildren(el('strong', { text: euro(Math.round(firstYear() / 12)) }), el('span', { text: ' im Monat' }));
@@ -211,11 +284,14 @@ function mount() {
   const mountVoices = () => {
     const all = Array.isArray(window.DemenzStimmen) ? window.DemenzStimmen : [];
     if (!all.length) return;
-    const card = voice => el('figure', { class: 'hs-voice', role: 'listitem' }, [el('blockquote', { text: `„${voice.text}“` }), el('figcaption', { text: `${voice.name}, ${voice.rolle}` })]);
+    // Zeichnung zur Geschichte der Stimme (Daniel, 28. Nov: Bilder zu den Stimmen). Keine Fotos, keine echten Gesichter.
+    const DRAWN = { Monika: [560, 411], Gesa: [560, 553], Kemal: [560, 505], Doreen: [554, 560], Rike: [560, 422], Lisa: [560, 406], Timo: [492, 560] };
+    const drawing = voice => (DRAWN[voice.name] ? el('img', { class: 'hs-voice-img', src: `/assets/stimmen/stimme-${voice.name.toLowerCase()}.webp`, width: DRAWN[voice.name][0], height: DRAWN[voice.name][1], alt: '', loading: 'lazy', decoding: 'async' }) : null);
+    const card = voice => el('figure', { class: 'hs-voice', role: 'listitem' }, [drawing(voice), el('blockquote', { text: `„${voice.text}“` }), el('figcaption', { text: `${voice.name}, ${voice.rolle}` })]);
     voices.querySelector('.hs-voices').replaceChildren(...[0, 2, 3, 5, 10, 8].map(index => all[index]).filter(Boolean).map(card));
     voices.hidden = false;
     const mini = all.find(entry => entry.name === 'Timo') || all[1];
-    if (mini) { priceVoice.replaceChildren(el('blockquote', { text: `„${mini.text}“` }), el('figcaption', { text: `${mini.name}, ${mini.rolle} · Vorname mit Zustimmung` })); priceVoice.hidden = false; }
+    if (mini) { priceVoice.replaceChildren(...[drawing(mini)].filter(Boolean), el('blockquote', { text: `„${mini.text}“` }), el('figcaption', { text: `${mini.name}, ${mini.rolle} · Vorname mit Zustimmung` })); priceVoice.hidden = false; }
   };
   load('/start/stimmen.js').then(mountVoices);
 
@@ -283,7 +359,8 @@ function mount() {
     const warm = new IntersectionObserver(entries => {
       if (entries.some(entry => entry.isIntersecting)) { clearTimeout(timer); timer = setTimeout(() => { track('home_sales_price_seen'); prepare('yearly'); mountApplePay(); warm.disconnect(); }, 1500); }
       else clearTimeout(timer);
-    }, { threshold: .3 });
+    // Mittleres Band des Bildschirms statt Anteil: Der Preisblock ist auf dem Handy höher als drei Bildschirme.
+    }, { rootMargin: '-30% 0px -30% 0px', threshold: 0 });
     warm.observe(prices);
     const depth = new IntersectionObserver(entries => {
       for (const entry of entries) if (entry.isIntersecting) { track('home_sales_section', { section: entry.target.id || entry.target.className.split(' ').pop() }); depth.unobserve(entry.target); }
