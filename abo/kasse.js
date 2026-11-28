@@ -16,6 +16,24 @@ const EN = /^en(?:-|$)/iu.test(document.documentElement.lang || "");
 const t = (de, en) => (EN ? en : de);
 const firebaseVersion = "12.16.0";
 
+// Nach dem Kauf direkt zum Ergebnis (Daniel, 28. Nov 2026: „Zeige keine extra Seite“). Vor dem Öffnen der Zahlung merken wir,
+// wohin es danach geht und welche Situation zuletzt eingegeben wurde. /abo/?status=fertig prüft die Zahlung still und leitet weiter.
+const AFTER_PURCHASE_KEY = "demenzcoach.nachKauf.v1";
+function rememberAfterPurchase() {
+  try {
+    const host = hostWindow();
+    const path = host.location.pathname;
+    // Übersetzer-Seiten (Start-, Situations- und Tipp-Seiten) bekommen die Antwort zurück; die Angebotsseite /start/ den Plan.
+    const destination = /^\/(?:de|en|demenz-uebersetzer|alltagstricks)\//u.test(path) ? path
+      : /^\/start\//u.test(path) ? "/abo/mein-plan.html"
+      : EN ? "/en/" : "/de/";
+    let text = String(host.document.getElementById("translator-input")?.value || "").trim();
+    if (!text) { try { text = String(host.sessionStorage.getItem("demenzcoach.letzteSituation.v1") || ""); } catch { /* */ } }
+    if (!text) { try { text = String(JSON.parse(host.sessionStorage.getItem("demenzCoachKiOffen") || "null")?.text || ""); } catch { /* */ } }
+    host.localStorage.setItem(AFTER_PURCHASE_KEY, JSON.stringify({ path: destination, text: text.slice(0, 200), until: Date.now() + 3 * 3600_000 }));
+  } catch { /* ohne Speicher: die Erfolgsseite nimmt die Startseite */ }
+}
+
 let firebase = null;
 let auth = null;
 let publicConfig = null;
@@ -190,6 +208,7 @@ export function prepare(options) {
 // open({ plan, email, offer, source, campaign, onClose, onOfferExpired, track })
 export async function open(options) {
   if (sheet?.pending && sheet.plan === options.plan && sheet.email === options.email && (!sheet.uid || sheet.uid === auth?.currentUser?.uid)) return;
+  rememberAfterPurchase();
   close();
   const attempt = {};
   const error = el("p", { class: "abo-error", role: "alert", hidden: "" });
@@ -356,6 +375,7 @@ export async function mountApplePay(slot, options) {
     });
     express.on("confirm", async (event) => {
       options.track?.("apple_pay_quick_confirm");
+      rememberAfterPurchase();
       try {
         const loaded = await checkout.loadActions?.();
         const result = await (loaded?.actions ?? checkout).confirm({ expressCheckoutConfirmEvent: event });

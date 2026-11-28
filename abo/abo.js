@@ -562,11 +562,35 @@ function localizeEnglish() {
 localizeEnglish();
 $("app-store-link").href = config.appStoreURL;
 translatorReturn();
+// Nach dem Kauf direkt zum Ergebnis (Daniel, 28. Nov 2026: „Zeige keine extra Seite, wo auf die Trial/Payment hingewiesen wird“).
+// Ziel und Situation hat abo/kasse.js vor der Zahlung gemerkt. Die Übersetzer-Seite beantwortet die Situation sofort (demenzCoachKiOffen).
+function afterPurchaseTarget() {
+  const safe = (path) => typeof path === "string" && /^\/[A-Za-z0-9/_.-]{0,120}$/u.test(path) && !path.startsWith("//") && !path.startsWith("/abo/index") && path !== "/abo/";
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem("demenzcoach.nachKauf.v1") || "null"); } catch { /* */ }
+  if (saved && !(saved.until > Date.now())) saved = null;
+  let path = safe(saved?.path) ? saved.path : "";
+  if (!path) { try { const back = String(JSON.parse(localStorage.getItem("demenzCoachKi") || "{}").returnTo || ""); if (safe(back)) path = back; } catch { /* */ } }
+  return { path: path || (EN ? "/en/" : "/de/"), text: typeof saved?.text === "string" ? saved.text.slice(0, 200) : "" };
+}
+function goToResult() {
+  const { path, text } = afterPurchaseTarget();
+  try { localStorage.removeItem("demenzcoach.nachKauf.v1"); } catch { /* */ }
+  try { if (text) sessionStorage.setItem("demenzCoachKiOffen", JSON.stringify({ text, until: Date.now() + 900000 })); } catch { /* */ }
+  // Kurz warten, damit die Messung (Probezeit/Kauf) noch abgeht, dann ohne Zwischenseite weiter. replace: „Zurück“ führt nicht hierher.
+  setTimeout(() => location.replace(path), 500);
+}
+
 if (params.get("status") === "fertig") {
+  document.documentElement.classList.add("abo-quiet");
+  if (EN) $("abo-quiet-text").textContent = "One moment …";
   show("done");
   let portalAvailable = false;
   let metaTrialSent = false;
   let trialFee = 0;
+  // Still nachprüfen: Stripe meldet die Zahlung manchmal erst nach ein, zwei Sekunden. Erst wenn das nicht reicht, zeigt die Seite den Stand.
+  let quietTries = 0;
+  const reveal = () => document.documentElement.classList.remove("abo-quiet");
   const checkStatus = createPaymentStatusController({
     sessionID: params.get("session_id"),
     loadStatus: async (sessionID) => {
@@ -590,6 +614,14 @@ if (params.get("status") === "fertig") {
         track("trial_started", { source: state.source }, { event: "StartTrial", values: { currency: "EUR", value: 0 }, eventID: `st_${params.get("session_id")}` });
       }
       const active = ["paid", "trialing", "no_payment_due"].includes(outcome);
+      if (outcome === "checking" || active) return; // Laden bleibt; aktiv = Weiterleitung über activate
+      if (["unverified", "legacy"].includes(outcome) && quietTries < 6) {
+        quietTries += 1;
+        setTimeout(checkStatus, 1500);
+        return;
+      }
+      // Nur echte Ausnahmen bleiben sichtbar: Zahlung offen/abgelehnt, Kauf mit anderem Konto, Prüfung dauerhaft unmöglich.
+      reveal();
       // Bezahlte Probewoche (27. Nov 2026): heute wurde der Probepreis berechnet, nicht „nichts“.
       const [title, text] = outcome === "trialing" && trialFee
         ? t(["Deine Probewoche ist aktiv", `Deine Probewoche hat begonnen. Heute wurden ${euro(trialFee, "eur")} berechnet. Eine Vertragsbestätigung kommt per E-Mail.`],
@@ -607,7 +639,7 @@ if (params.get("status") === "fertig") {
       $("payment-status-retry").hidden = active;
       $("payment-status-retry").disabled = outcome === "checking";
     },
-    activate: () => { offerYearlySwitch(); }
+    activate: () => { goToResult(); }
   });
   $("payment-status-retry").addEventListener("click", checkStatus);
   checkStatus();

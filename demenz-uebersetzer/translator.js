@@ -2216,6 +2216,8 @@
       return;
     }
     emptyHint.textContent = '';
+    // Für die Rückkehr nach dem Kauf (abo/kasse.js): die zuletzt gefragte Situation, nur in diesem Tab.
+    try { sessionStorage.setItem('demenzcoach.letzteSituation.v1', text.slice(0, 200)); } catch {}
     // Clear only the submitted text; later goal changes must keep a new draft.
     if (keepInputAtTop) { input.value = ''; grow(); }
     typedCount += 1;
