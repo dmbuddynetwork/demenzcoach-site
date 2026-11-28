@@ -342,3 +342,7 @@ html.home-b body.einfach[data-translator-input-position="top"] #translator-form 
 html.home-b body.einfach[data-translator-input-position="top"] #translator-form .translator-privacy { margin: 8px 0 0 !important; text-align: center; }
 html.home-b body.einfach .home-situations { margin-top: 28px; }
 html.home-b body.einfach .e-home h1 { text-wrap: balance; }
+/* Daniel, 28. Nov: am Computer ist der Knopf über die ganze Breite zu breit. Ab 720 px schmal und rechts im Feld. */
+@media (min-width: 720px) {
+  html.home-b body.einfach #translator-form .translator-input-row .button { width: auto !important; min-width: 260px; margin-left: auto; padding: 0 32px; }
+}

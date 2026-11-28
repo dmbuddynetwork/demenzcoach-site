@@ -123,7 +123,7 @@
        Verkaufsseite (de/verkauf.js). Je Gerät fest (localStorage), ?home=a oder ?home=b legt den Arm fest. Suchmaschinen und
        automatisierte Browser bekommen immer a. Quelle und Kampagne werden hier gemerkt, weil die Seite die utm-Parameter später entfernt. -->
   <script>(function(){/* Daniel, 28. Nov 2026: neue Verkaufs-Startseite für alle (kein A/B-Test mehr). ?home=a zeigt die alte Seite. */var d=document.documentElement,u=new URLSearchParams(location.search),a=u.get("home")==="a"?"a":"b";try{localStorage.removeItem("demenzcoach.homeArm.v1")}catch(e){}d.dataset.homeArm=a;d.dataset.homeSrc=(u.get("src")||u.get("utm_source")||"").slice(0,40);d.dataset.homeCampaign=(u.get("utm_campaign")||u.get("k")||"").slice(0,80);if(a==="b")d.classList.add("home-b")})();</script>
-  <link rel="stylesheet" href="/de/verkauf.css?v=20261128e">
+  <link rel="stylesheet" href="/de/verkauf.css?v=20261128f">
 </head>
 <body class="einfach homepage-v2" data-page-type="translator-home" data-page-language="de" data-page-slug="home-de" data-translator-input-position="top">
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
@@ -390,7 +390,7 @@
   <script src="/demenz-uebersetzer/translator-saved.js"></script>
   <script src="/demenz-uebersetzer/translator.js"></script>
   <script type="module" src="/content-feed.js"></script>
-  <script type="module" src="/de/verkauf.js?v=20261128e"></script>
+  <script type="module" src="/de/verkauf.js?v=20261128f"></script>
   <script>(function(){var b=window.DemenzTranslatorSignup&&window.DemenzTranslatorSignup.box();if(b){document.getElementById('home-signup').append(b);}else{document.getElementById('liste').hidden=true;}})();</script>
 </body>
 </html>
