@@ -279,6 +279,33 @@ function mount() {
     buyButton('yearly', 'band'), el('p', { class: 'hs-note' })
   ])]);
 
+  // ---- Mehr Kaufstellen (wie /de/, Daniel, 28. Nov: „Bau mehr Kaufmöglichkeiten ein“). Nie im ersten Bildschirm.
+  const miniCta = where => el('div', { class: 'hs-mini-cta' }, [buyButton('yearly', where), el('p', { class: 'hs-note' })]);
+  for (const [block, where] of [[steps, 'schritte'], [examples, 'beispiele'], [voices, 'stimmen']]) block.querySelector('.hs-wrap').append(miniCta(where));
+
+  // Kauf-Block unter jeder Antwort: Jahresplan wie im Preisblock, mit Garantie. Nicht für Kunden mit Abo, nicht bei Sicherheitshinweisen.
+  const answerBuy = () => el('aside', { class: 'hs-answer-buy', 'aria-label': 'Unlock Dementia Coach' }, [
+    el('p', { class: 'hs-answer-buy-kicker', text: 'For every hard moment' }),
+    el('h3', { text: 'Get answers like this whenever you need them' }),
+    el('p', { class: 'hs-answer-buy-price', 'data-answer-price': '' }),
+    el('p', { class: 'hs-plan-day', 'data-per-day': 'yearly' }),
+    buyButton('yearly', 'antwort'),
+    el('p', { class: 'hs-note' }),
+    el('p', { class: 'hs-answer-buy-seal' }, [el('span', { class: 'hs-ico', html: ICON.shield }), el('span', { text: '30-day money-back guarantee' })])
+  ]);
+  const placeAnswerBuy = () => {
+    if (window.DemenzKiFreigabe?.isPaid?.()) { document.querySelectorAll('.hs-answer-buy').forEach(node => node.remove()); return; }
+    let added = false;
+    for (const answer of document.querySelectorAll('#translator-result .translator-goal-answer .translator-ai-answer')) {
+      const box = answer.closest('.translator-goal-answer > *');
+      if (!box || box.classList.contains('hs-answer-buy') || box.parentElement.querySelector(':scope > .hs-answer-buy') || box.querySelector('.safety-note')) continue;
+      box.after(answerBuy()); added = true; track('home_sales_answer_buy_view');
+    }
+    if (added) refresh();
+  };
+  const resultRoot = document.getElementById('translator-result');
+  if (resultRoot) new MutationObserver(() => placeAnswerBuy()).observe(resultRoot, { childList: true, subtree: true });
+
   // ---- 7. Preis ---------------------------------------------------------------------------------------------------
   const features = ['Sentences for every hard moment', 'Ask until it fits', 'Practice conversations calmly', 'Save and print your sentences', 'On the web and in the iPhone app'];
   const planCard = plan => el('article', { class: `hs-plan${plan === 'yearly' ? ' is-best' : ''}`, 'data-plan-card': plan }, [
@@ -297,10 +324,19 @@ function mount() {
     el('span', { text: 'If it doesn’t help you, you get your money back. No reason needed. ' }),
     el('a', { href: '/terms-en.html#abo-web', onclick: () => track('home_sales_garantie'), text: 'Terms' })
   ])]);
+  // Hinweis auf die iPhone-App (wie /de/, Daniel, 28. Nov). Nur weiter unten, nie im ersten Bildschirm. Nicht auf Android.
+  const appHint = place => /Android/i.test(navigator.userAgent) ? el('span', { hidden: true }) : el('a', {
+    class: 'hs-app', href: `https://apps.apple.com/app/apple-store/id6790763941?pt=120702089&ct=web_en_home_${place}&mt=8`,
+    'data-store-link': `home-${place}`, onclick: () => track('home_sales_app', { place })
+  }, [
+    el('img', { src: '/assets/lovable-logo.jpg', width: 56, height: 56, alt: '', loading: 'lazy', decoding: 'async' }),
+    el('span', { class: 'hs-app-text' }, [el('strong', { text: 'Also as an iPhone app' }), el('span', { text: 'Same account. Everything unlocked.' })]),
+    el('span', { class: 'hs-app-btn', text: 'Get it on the App Store' })
+  ]);
   const priceVoice = el('figure', { class: 'hs-voice-mini', hidden: true });
   const legal = el('p', { class: 'hs-legal' });
   const prices = section('', 'Choose your plan', null, [
-    el('div', { class: 'hs-plans' }, [planCard('yearly'), planCard('monthly')]), guarantee, priceVoice, legal
+    el('div', { class: 'hs-plans' }, [planCard('yearly'), planCard('monthly')]), guarantee, priceVoice, legal, appHint('preise')
   ], 'preise');
 
   // ---- 8. Vorteile ------------------------------------------------------------------------------------------------
@@ -328,7 +364,7 @@ function mount() {
     el('img', { src: '/assets/zeichnungen/v-umarmung.webp', width: 480, height: 489, alt: 'A daughter hugs her laughing mother', loading: 'lazy', decoding: 'async' }),
     el('h2', { text: 'Start today. At your own pace.' }),
     el('p', { class: 'hs-sub', text: 'Try Dementia Coach for 7 days. If it’s not for you, cancel online.' }),
-    buyButton('yearly', 'schluss'), el('p', { class: 'hs-note' })
+    buyButton('yearly', 'schluss'), el('p', { class: 'hs-note' }), appHint('schluss')
   ])]);
 
   // ---- Einhängen: nach den Beispielsituationen, vor den Tipps --------------------------------------------------------
@@ -384,6 +420,7 @@ function mount() {
     for (const note of document.querySelectorAll('.hs-note')) note.textContent = shortTerms('yearly');
     for (const node of document.querySelectorAll('[data-per-day]')) node.textContent = perDayText(node.dataset.perDay);
     for (const button of document.querySelectorAll('[data-hs-buy]:not(.hs-link)')) button.textContent = startText();
+    for (const node of document.querySelectorAll('[data-answer-price]')) node.replaceChildren(el('strong', { text: `${euro(Math.round(firstYear() / 12))} a month` }), el('span', { text: deal() ? ` · ${euro(firstYear())} for the first year` : ` · ${euro(offer.yearly)} a year` }));
     const yearly = prices.querySelector('[data-plan-card="yearly"]'), monthly = prices.querySelector('[data-plan-card="monthly"]');
     yearly.querySelector('[data-price]').replaceChildren(el('strong', { text: euro(Math.round(firstYear() / 12)) }), el('span', { text: ' a month' }));
     yearly.querySelector('[data-then]').textContent = deal() ? `${euro(firstYear())} for the first year, then ${euro(offer.yearly)} a year` : `${euro(offer.yearly)} a year`;
